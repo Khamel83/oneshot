@@ -430,6 +430,8 @@ Based on your answers, here's what I'll build:
 
 **I'll validate your environment before building anything.**
 
+### Archon Methodology: Validate Before Create
+
 Run this validation script on `oci-dev-public`:
 
 ```bash
@@ -582,6 +584,18 @@ PRD approved. Execute autonomous build.
 ```
 
 **Then I'll build the entire project while you go do other things.**
+
+### Archon Workflow Integration
+
+**Standard commands you'll see during build:**
+- `docker compose up --build -d` (if containerized)
+- `make dev` (if Makefile exists)
+- `git add . && git commit -m 'description' && git push` (after each milestone)
+
+**Core principles applied:**
+- Document the WHY, not just the HOW
+- Single responsibility for each module
+- Dependency awareness and circular prevention
 
 ---
 
@@ -838,6 +852,7 @@ tail -100 [project].log
 ---
 
 **Version History**
+- v1.1 (2024-11-21): Added Archon methodology integration - Validate Before Create, Dependency Awareness, WHY documentation
 - v1.0 (2024-11-21): Initial ONE_SHOT framework based on RelayQ, OOS, FrugalOS patterns
 
 ---
