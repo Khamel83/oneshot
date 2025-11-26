@@ -48,6 +48,7 @@ Web:          FastAPI, Flask, Express, etc.
 DB:           PostgreSQL, SQLite, Redis
 Web server:   Nginx Proxy Manager (web UI for SSL/reverse proxy)
               OR Caddy (if you prefer config files)
+DNS:          Cloudflare (free tier, SSL cert management)
 OS:           Ubuntu Server 24.04 LTS (or equivalent)
 Network:      Tailscale (free tier, WireGuard based)
 VC:           Git + GitHub (or self-hosted Gitea)
@@ -63,6 +64,11 @@ Automation:   Ansible (infrastructure-as-code, optional)
 - **Nginx Proxy Manager over Traefik/Caddy**: Web UI for SSL management
   - Easier for non-experts (Let's Encrypt auto-renewal via UI)
   - Still FOSS, just more accessible
+- **Cloudflare DNS**: Free tier for DNS + SSL certificate management
+  - Automatic SSL cert renewal via DNS challenge
+  - Protects origin IP (proxied mode)
+  - Works with Nginx Proxy Manager for secure public hosting
+  - Free tier: Unlimited DNS records, basic DDoS protection
 - **MergerFS + SnapRAID over ZFS/RAID**: 
   - Works with mixed drive sizes
   - Lower RAM overhead (ZFS needs ~1GB per TB for dedup)
@@ -71,6 +77,11 @@ Automation:   Ansible (infrastructure-as-code, optional)
   - No port forwarding needed
   - Encrypted by default
   - Free tier: 100 devices, 3 users
+  - Use for private services (admin panels, internal tools)
+- **Cloudflare Tunnel (optional)**: For selective public exposure
+  - Expose specific services without opening ports
+  - Example: Jellyfin for kids at ex's house
+  - Everything else stays Tailscale-only
 - **.env for ALL configuration**: Single source of truth
   - Document where each variable is used (e.g., `# Used in docker-compose.yml:42`)
   - Never hardcode secrets in code
