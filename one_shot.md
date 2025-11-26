@@ -87,30 +87,31 @@ These rules apply to every project ONE_SHOT builds:
 - AI is optional. No AI if you don't explicitly ask for it.
 - When used:
   - **Default provider**: OpenRouter (unified API for multiple models)
-  - **Default model**: Gemini 2.5 Flash Liteerimental (`google/gemini-2.5-flash-lite`)
-    - Free tier available
-    - Fast, cheap, good enough for most tasks
-    - Use for: summaries, categorization, simple analysis, content generation
+  - **Default model**: Gemini 2.5 Flash Lite (`google/gemini-2.5-flash-lite`)
+    - **Very cheap** (~$0.10-0.30/M tokens)
+    - Ultra-low latency, fast token generation
+    - Good enough for most tasks
+    - Use for: summaries, categorization, simple analysis, content generation, simple code
   - **Anthropic models** (via OpenRouter or direct API):
     - **Only when coding quality is critical**
-    - Haiku: Quick code reviews, simple refactors
-    - Sonnet: Complex code generation, architecture decisions
-    - Opus: Mission-critical code that must be perfect
+    - Haiku: Quick code reviews, simple refactors (~$0.80/M tokens)
+    - Sonnet: Complex code generation, architecture decisions (~$3/M tokens)
+    - Opus: Mission-critical code that must be perfect (~$15/M tokens)
   - **Agent SDK**: Only when tasks are multi-step, iterative, or need tool orchestration.
 
 ### 1.4.1 Cost Philosophy
 
 **Optimize for value**:
-- Gemini 2.5 Flash Lite (free tier): $0/month for most use cases
-- OpenRouter paid models: ~$0.10-2/month for typical usage
+- Gemini 2.5 Flash Lite (default): ~$0.10-0.30/M tokens → $0.50-2/month typical usage
+- OpenRouter other models: ~$0.10-2/month for typical usage
 - Anthropic (when needed): ~$1-5/month for critical coding
-- **Total AI cost target**: $0-5/month for most projects
+- **Total AI cost target**: $1-5/month for most projects (cheap enough to not worry)
 
 **When to upgrade models**:
-- Content/summaries/tags → Google Flash (free)
-- Simple code tasks → Google Flash or Haiku ($)
-- Complex code → Sonnet ($$)
-- Mission-critical code → Opus ($$$)
+- Content/summaries/tags/simple code → Gemini 2.5 Flash Lite (default, cheap)
+- Code quality matters → Anthropic Haiku ($)
+- Complex/critical code → Anthropic Sonnet ($$)
+- Mission-critical code → Anthropic Opus ($$$)
 
 ---
 
@@ -839,27 +840,27 @@ Short, unified guidance.
 - **Provider**: OpenRouter (https://openrouter.ai)
   - Unified API for 100+ models
   - Pay-as-you-go, no subscriptions
-  - Free tier models available
+  - Very affordable models available
 - **Default Model**: `google/gemini-2.5-flash-lite`
-  - **Free** (with rate limits)
-  - Fast (~1-2s response)
+  - **Very cheap** (~$0.10-0.30 per million tokens)
+  - Ultra-low latency, fast token generation
   - Good enough for 80% of tasks
 
 **Model Selection Guide**:
 
 | Task Type | Model | Cost | When to Use |
 |-----------|-------|------|-------------|
-| Summaries, tags, categorization | Gemini 2.5 Flash Lite | Free | Default for all content tasks |
-| Simple code (refactors, reviews) | Gemini 2.5 Flash Lite | Free | Default for simple coding |
-| Complex code generation | Anthropic Haiku | ~$0.80/M tokens | When Flash struggles |
+| Summaries, tags, categorization | Gemini 2.5 Flash Lite | ~$0.10-0.30/M | Default for all content tasks |
+| Simple code (refactors, reviews) | Gemini 2.5 Flash Lite | ~$0.10-0.30/M | Default for simple coding |
+| Complex code generation | Anthropic Haiku | ~$0.80/M tokens | When Flash Lite struggles |
 | Architecture, critical code | Anthropic Sonnet | ~$3/M tokens | When quality is critical |
 | Mission-critical code | Anthropic Opus | ~$15/M tokens | Rarely, only when perfect |
 
 **Cost Reality Check**:
-- Google Flash (free tier): 10 requests/min, 1500/day → $0/month
-- Typical project using Flash: $0-1/month
-- Typical project with some Anthropic: $1-5/month
-- Heavy Anthropic usage: $5-20/month
+- Gemini 2.5 Flash Lite: ~$0.50-2/month for typical usage
+- Typical project using Flash Lite: $1-3/month
+- Typical project with some Anthropic: $2-7/month
+- Heavy Anthropic usage: $10-20/month
 
 ## 9.2 Usage Pattern (Python with OpenRouter)
 
@@ -923,21 +924,20 @@ OPENROUTER_API_KEY=sk-or-v1-xxxxx  # Get from https://openrouter.ai/keys
 # Optional: Set default model
 AI_MODEL_DEFAULT=google/gemini-2.5-flash-lite
 MAX_TOKENS_DEFAULT=512
-```
 
 ## 9.4 When to Use Which Model
 
-**Use Gemini 2.5 Flash Lite (free) for**:
+**Use Gemini 2.5 Flash Lite (cheap) for**:
 - Content summarization
 - Tagging and categorization
 - Simple text transformations
 - Data extraction from text
 - Basic Q&A
-- Simple code reviews
+- Simple code reviews and refactors
 - **Default for everything unless you hit quality issues**
 
 **Upgrade to Anthropic Haiku when**:
-- Flash gives inconsistent results
+- Flash Lite gives inconsistent results
 - Need better code understanding
 - More complex reasoning required
 - Still want to keep costs low (~$0.80/M tokens)
@@ -947,13 +947,12 @@ MAX_TOKENS_DEFAULT=512
 - Architecture decisions
 - Critical business logic
 - Code quality must be high
-- Cost: ~$3/M tokens (still cheap)
+- Cost: ~$3/M tokens (still reasonable)
 
 **Use Anthropic Opus only when**:
 - Mission-critical code that cannot fail
 - Complex multi-step reasoning
 - Highest quality required
-- Cost: ~$15/M tokens (expensive, use sparingly)
 
 ## 9.5 Cost Management
 
