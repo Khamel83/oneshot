@@ -74,7 +74,35 @@ These rules apply to every project ONE_SHOT builds:
 - **Health First**
   - Every long-running service exposes a `/health` endpoint.
 
-## 1.3 Web & UX Philosophy (When Web Exists)
+## 1.3 Simplicity First (Core Principle)
+
+**Before building anything, ask: Does this already exist?**
+
+- **Prefer existing solutions** over building from scratch
+- If a library/tool does 80% of what you need:
+  - Fork it (give credit, follow license)
+  - Wrap it with a thin layer for your use case
+  - Document what you're doing and why
+- **Building from scratch is the last resort**, not the first
+
+**Examples**:
+- Need a CLI? Use `click` or `typer`, don't write argument parsing
+- Need a web server? Use FastAPI or Flask, don't write HTTP handling
+- Need a database? Use SQLite or PostgreSQL, don't write storage
+- Need auth? Use existing auth libraries, don't roll your own crypto
+
+**When to build from scratch**:
+- The existing solution is more complex than building it yourself
+- You need something so specific that wrapping would be harder
+- Learning is the goal (but document this as a learning project)
+
+**Documentation requirement**:
+- If using/forking existing code, document it clearly in README
+- Credit original authors
+- Explain what you added/changed and why
+- Follow licenses (prefer MIT/Apache/BSD)
+
+## 1.4 Web & UX Philosophy (When Web Exists)
 
 - Modern, clean, and responsive.
 - Real typography (Google Fonts), no browser defaults.
@@ -82,7 +110,7 @@ These rules apply to every project ONE_SHOT builds:
 - Micro-interactions (hover, focus, transitions) without bloat.
 - SEO basics: good titles, meta descriptions, semantic HTML.
 
-## 1.4 AI & Agents Philosophy (Optional)
+## 1.5 AI & Agents Philosophy (Optional)
 
 - AI is optional. No AI if you don't explicitly ask for it.
 - When used:
@@ -90,28 +118,28 @@ These rules apply to every project ONE_SHOT builds:
   - **Default model**: Gemini 2.5 Flash Lite (`google/gemini-2.5-flash-lite`)
     - **Very cheap** (~$0.10-0.30/M tokens)
     - Ultra-low latency, fast token generation
-    - Good enough for most tasks
-    - Use for: summaries, categorization, simple analysis, content generation, simple code
+    - **Use for 99% of AI tasks** - it's good enough
+    - Summaries, categorization, analysis, content generation, simple code, reviews
   - **Anthropic models** (via OpenRouter or direct API):
-    - **Only when coding quality is critical**
-    - Haiku: Quick code reviews, simple refactors (~$0.80/M tokens)
-    - Sonnet: Complex code generation, architecture decisions (~$3/M tokens)
-    - Opus: Mission-critical code that must be perfect (~$15/M tokens)
+    - **Only when Flash Lite genuinely fails**
+    - Haiku: When Flash Lite gives bad results (~$0.80/M tokens)
+    - Sonnet: Complex code generation, critical decisions (~$3/M tokens)
+    - Opus: Mission-critical code, rarely needed (~$15/M tokens)
   - **Agent SDK**: Only when tasks are multi-step, iterative, or need tool orchestration.
 
-### 1.4.1 Cost Philosophy
+### 1.5.1 Cost Philosophy
 
-**Optimize for value**:
-- Gemini 2.5 Flash Lite (default): ~$0.10-0.30/M tokens → $0.50-2/month typical usage
-- OpenRouter other models: ~$0.10-2/month for typical usage
-- Anthropic (when needed): ~$1-5/month for critical coding
-- **Total AI cost target**: $1-5/month for most projects (cheap enough to not worry)
+**Reality check**:
+- Gemini 2.5 Flash Lite handles **99% of AI tasks** just fine
+- Typical usage: $0.50-2/month
+- Only upgrade if Flash Lite genuinely fails, not "just in case"
+- **Total AI cost target**: $1-3/month for most projects
 
-**When to upgrade models**:
-- Content/summaries/tags/simple code → Gemini 2.5 Flash Lite (default, cheap)
-- Code quality matters → Anthropic Haiku ($)
-- Complex/critical code → Anthropic Sonnet ($$)
-- Mission-critical code → Anthropic Opus ($$$)
+**Decision tree**:
+1. Try Flash Lite first (always)
+2. If it fails, try again with better prompting
+3. If it still fails, consider Haiku
+4. Only use Sonnet/Opus if absolutely necessary
 
 ---
 
