@@ -120,11 +120,10 @@ These rules apply to every project ONE_SHOT builds:
     - Ultra-low latency, fast token generation
     - **Use for 99% of AI tasks** - it's good enough
     - Summaries, categorization, analysis, content generation, simple code, reviews
-  - **Anthropic models** (via OpenRouter or direct API):
-    - **Only when Flash Lite genuinely fails**
-    - Haiku: When Flash Lite gives bad results (~$0.80/M tokens)
-    - Sonnet: Complex code generation, critical decisions (~$3/M tokens)
-    - Opus: Mission-critical code, rarely needed (~$15/M tokens)
+  - **Upgrade models** (only when Flash Lite genuinely fails):
+    - `anthropic/claude-3-5-haiku`: When Flash Lite gives bad results (~$0.80/M tokens)
+    - `anthropic/claude-3-5-sonnet`: Complex code generation, critical decisions (~$3/M tokens)
+    - `anthropic/claude-3-opus`: Mission-critical code, rarely needed (~$15/M tokens)
   - **Agent SDK**: Only when tasks are multi-step, iterative, or need tool orchestration.
 
 ### 1.5.1 Cost Philosophy
@@ -138,7 +137,7 @@ These rules apply to every project ONE_SHOT builds:
 **Decision tree**:
 1. Try Flash Lite first (always)
 2. If it fails, try again with better prompting
-3. If it still fails, consider Haiku
+3. If it still fails, consider `anthropic/claude-3-5-haiku`
 4. Only use Sonnet/Opus if absolutely necessary
 
 ---
@@ -543,9 +542,9 @@ Only if you actually want AI.
 - Moderate ($5–20/month, Sonnet where it matters)
 - Flexible ($20+/month, no strict constraints)
 
-**Anthropic API key**:
+**OpenRouter API key**:
 - Yes, will provide in `.env`
-- No, not yet
+- No, not yet (get one at https://openrouter.ai/keys)
 - N/A (no AI)
 
 **Your answers** (optional):
@@ -878,17 +877,17 @@ Short, unified guidance.
 
 | Task Type | Model | Cost | When to Use |
 |-----------|-------|------|-------------|
-| Summaries, tags, categorization | Gemini 2.5 Flash Lite | ~$0.10-0.30/M | Default for all content tasks |
-| Simple code (refactors, reviews) | Gemini 2.5 Flash Lite | ~$0.10-0.30/M | Default for simple coding |
-| Complex code generation | Anthropic Haiku | ~$0.80/M tokens | When Flash Lite struggles |
-| Architecture, critical code | Anthropic Sonnet | ~$3/M tokens | When quality is critical |
-| Mission-critical code | Anthropic Opus | ~$15/M tokens | Rarely, only when perfect |
+| Summaries, tags, categorization | `google/gemini-2.5-flash-lite` | ~$0.10-0.30/M | Default for all tasks |
+| Simple code (refactors, reviews) | `google/gemini-2.5-flash-lite` | ~$0.10-0.30/M | Default for coding |
+| Complex code generation | `anthropic/claude-3-5-haiku` | ~$0.80/M | When Flash Lite fails |
+| Architecture, critical code | `anthropic/claude-3-5-sonnet` | ~$3/M | When quality critical |
+| Mission-critical code | `anthropic/claude-3-opus` | ~$15/M | Rarely needed |
 
 **Cost Reality Check**:
 - Gemini 2.5 Flash Lite: ~$0.50-2/month for typical usage
-- Typical project using Flash Lite: $1-3/month
-- Typical project with some Anthropic: $2-7/month
-- Heavy Anthropic usage: $10-20/month
+- Typical project: $1-3/month
+- With occasional upgrades: $2-5/month
+- Heavy usage: $5-10/month
 
 ## 9.2 Usage Pattern (Python with OpenRouter)
 
@@ -938,7 +937,7 @@ def summarize_text(text: str) -> str:
 
 
 def generate_code(description: str) -> str:
-    """Generate code using Anthropic Sonnet (when quality matters)."""
+    """Generate code using claude-3-5-sonnet (when quality matters)."""
     prompt = f"Write Python code for: {description}"
     return ai_call(prompt, model="anthropic/claude-3-5-sonnet", max_tokens=2048)
 ```
@@ -955,32 +954,31 @@ MAX_TOKENS_DEFAULT=512
 
 ## 9.4 When to Use Which Model
 
-**Use Gemini 2.5 Flash Lite (cheap) for**:
+**Use Gemini 2.5 Flash Lite for 99% of tasks**:
 - Content summarization
 - Tagging and categorization
 - Simple text transformations
 - Data extraction from text
 - Basic Q&A
-- Simple code reviews and refactors
-- **Default for everything unless you hit quality issues**
+- Code reviews and refactors
+- Simple code generation
+- **Default for everything**
 
-**Upgrade to Anthropic Haiku when**:
+**Only upgrade when Flash Lite genuinely fails**:
+
+**`anthropic/claude-3-5-haiku`** (~$0.80/M tokens):
 - Flash Lite gives inconsistent results
 - Need better code understanding
 - More complex reasoning required
-- Still want to keep costs low (~$0.80/M tokens)
 
-**Upgrade to Anthropic Sonnet when**:
+**`anthropic/claude-3-5-sonnet`** (~$3/M tokens):
 - Generating complex code
 - Architecture decisions
 - Critical business logic
-- Code quality must be high
-- Cost: ~$3/M tokens (still reasonable)
 
-**Use Anthropic Opus only when**:
+**`anthropic/claude-3-opus`** (~$15/M tokens):
 - Mission-critical code that cannot fail
-- Complex multi-step reasoning
-- Highest quality required
+- Rarely needed
 
 ## 9.5 Cost Management
 
@@ -1011,20 +1009,21 @@ def cached_ai_call(prompt: str, model: str = "google/gemini-2.5-flash-lite"):
     return ai_call(prompt, model)
 ```
 
-## 9.6 OpenRouter vs Direct Anthropic API
+## 9.6 Why OpenRouter?
 
-**Use OpenRouter when**:
-- You want flexibility (easy to switch models)
-- You want to use free models (Google Flash)
-- You want unified billing
-- You're experimenting with different models
+**Benefits**:
+- **Unified API**: One API key for 100+ models
+- **Easy switching**: Change models with one line of code
+- **Unified billing**: One bill for all AI usage
+- **No lock-in**: Switch providers anytime
+- **Fallbacks**: Automatic failover if a model is down
 
-**Use Direct Anthropic API when**:
-- You're only using Anthropic models
-- You want prompt caching (Anthropic-specific feature)
-- You need the absolute latest Anthropic features
+**When you might use direct APIs**:
+- Provider-specific features (e.g., Claude prompt caching)
+- Absolute latest model versions
+- Enterprise contracts with specific providers
 
-**Recommendation**: Start with OpenRouter, switch to direct Anthropic only if you need caching or latest features.
+**Recommendation**: Use OpenRouter unless you have a specific reason not to.
 
 ---
 
