@@ -86,9 +86,31 @@ These rules apply to every project ONE_SHOT builds:
 
 - AI is optional. No AI if you don't explicitly ask for it.
 - When used:
-  - Small, cheap models (Haiku) by default.
-  - Higher-end models (Sonnet/Opus) only when justified.
-  - Agent SDK only when tasks are multi-step, iterative, or need tool orchestration.
+  - **Default provider**: OpenRouter (unified API for multiple models)
+  - **Default model**: Gemini 2.5 Flash Liteerimental (`google/gemini-2.5-flash-lite`)
+    - Free tier available
+    - Fast, cheap, good enough for most tasks
+    - Use for: summaries, categorization, simple analysis, content generation
+  - **Anthropic models** (via OpenRouter or direct API):
+    - **Only when coding quality is critical**
+    - Haiku: Quick code reviews, simple refactors
+    - Sonnet: Complex code generation, architecture decisions
+    - Opus: Mission-critical code that must be perfect
+  - **Agent SDK**: Only when tasks are multi-step, iterative, or need tool orchestration.
+
+### 1.4.1 Cost Philosophy
+
+**Optimize for value**:
+- Gemini 2.5 Flash Lite (free tier): $0/month for most use cases
+- OpenRouter paid models: ~$0.10-2/month for typical usage
+- Anthropic (when needed): ~$1-5/month for critical coding
+- **Total AI cost target**: $0-5/month for most projects
+
+**When to upgrade models**:
+- Content/summaries/tags → Google Flash (free)
+- Simple code tasks → Google Flash or Haiku ($)
+- Complex code → Sonnet ($$)
+- Mission-critical code → Opus ($$$)
 
 ---
 
@@ -811,38 +833,171 @@ services:
 
 Short, unified guidance.
 
-## 9.1 Model Choices
+## 9.1 Provider & Model Choices
 
-- **Haiku** – cheap, fast. Default for:
-  - Summaries, categorization, tags, simple transformations.
-- **Sonnet** – balanced, for:
-  - Non-trivial reasoning, code, semantic search.
-- **Opus** – only when:
-  - Highest quality is critical and frequency is low.
+**Default Stack**:
+- **Provider**: OpenRouter (https://openrouter.ai)
+  - Unified API for 100+ models
+  - Pay-as-you-go, no subscriptions
+  - Free tier models available
+- **Default Model**: `google/gemini-2.5-flash-lite`
+  - **Free** (with rate limits)
+  - Fast (~1-2s response)
+  - Good enough for 80% of tasks
 
-## 9.2 Usage Pattern (Python)
+**Model Selection Guide**:
+
+| Task Type | Model | Cost | When to Use |
+|-----------|-------|------|-------------|
+| Summaries, tags, categorization | Gemini 2.5 Flash Lite | Free | Default for all content tasks |
+| Simple code (refactors, reviews) | Gemini 2.5 Flash Lite | Free | Default for simple coding |
+| Complex code generation | Anthropic Haiku | ~$0.80/M tokens | When Flash struggles |
+| Architecture, critical code | Anthropic Sonnet | ~$3/M tokens | When quality is critical |
+| Mission-critical code | Anthropic Opus | ~$15/M tokens | Rarely, only when perfect |
+
+**Cost Reality Check**:
+- Google Flash (free tier): 10 requests/min, 1500/day → $0/month
+- Typical project using Flash: $0-1/month
+- Typical project with some Anthropic: $1-5/month
+- Heavy Anthropic usage: $5-20/month
+
+## 9.2 Usage Pattern (Python with OpenRouter)
 
 ```python
-import anthropic
 import os
+import requests
 
-client = anthropic.Anthropic(
-    api_key=os.environ["ANTHROPIC_API_KEY"]
-)
-
-def ai_call(prompt: str, model: str = "claude-3-5-haiku-20241022", max_tokens: int = 512) -> str | None:
+# OpenRouter API (works with any model)
+def ai_call(
+    prompt: str,
+    model: str = "google/gemini-2.5-flash-lite",
+    max_tokens: int = 512
+) -> str | None:
+    """
+    Call AI via OpenRouter.
+    
+    Models:
+    - google/gemini-2.5-flash-lite (default, free)
+    - anthropic/claude-3-5-haiku (when Flash isn't enough)
+    - anthropic/claude-3-5-sonnet (critical code)
+    """
     try:
-        msg = client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}]
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": max_tokens
+            },
+            timeout=30
         )
-        return msg.content[0].text
-    except anthropic.APIError:
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"]
+    except requests.RequestException:
         return None
+
+
+# Example usage
+def summarize_text(text: str) -> str:
+    """Summarize using free Google Flash."""
+    prompt = f"Summarize this in 2-3 sentences:\n\n{text}"
+    return ai_call(prompt, model="google/gemini-2.5-flash-lite")
+
+
+def generate_code(description: str) -> str:
+    """Generate code using Anthropic Sonnet (when quality matters)."""
+    prompt = f"Write Python code for: {description}"
+    return ai_call(prompt, model="anthropic/claude-3-5-sonnet", max_tokens=2048)
 ```
 
-Add retries / backoff if needed, but don't duplicate this pattern elsewhere.
+## 9.3 Environment Variables
+
+```bash
+# .env file
+OPENROUTER_API_KEY=sk-or-v1-xxxxx  # Get from https://openrouter.ai/keys
+
+# Optional: Set default model
+AI_MODEL_DEFAULT=google/gemini-2.5-flash-lite
+MAX_TOKENS_DEFAULT=512
+```
+
+## 9.4 When to Use Which Model
+
+**Use Gemini 2.5 Flash Lite (free) for**:
+- Content summarization
+- Tagging and categorization
+- Simple text transformations
+- Data extraction from text
+- Basic Q&A
+- Simple code reviews
+- **Default for everything unless you hit quality issues**
+
+**Upgrade to Anthropic Haiku when**:
+- Flash gives inconsistent results
+- Need better code understanding
+- More complex reasoning required
+- Still want to keep costs low (~$0.80/M tokens)
+
+**Upgrade to Anthropic Sonnet when**:
+- Generating complex code
+- Architecture decisions
+- Critical business logic
+- Code quality must be high
+- Cost: ~$3/M tokens (still cheap)
+
+**Use Anthropic Opus only when**:
+- Mission-critical code that cannot fail
+- Complex multi-step reasoning
+- Highest quality required
+- Cost: ~$15/M tokens (expensive, use sparingly)
+
+## 9.5 Cost Management
+
+```python
+# Track usage
+import logging
+
+logger = logging.getLogger(__name__)
+
+def ai_call_with_tracking(prompt: str, model: str, max_tokens: int = 512):
+    """AI call with cost tracking."""
+    result = ai_call(prompt, model, max_tokens)
+    
+    # Estimate cost (rough)
+    input_tokens = len(prompt.split()) * 1.3  # rough estimate
+    output_tokens = len(result.split()) * 1.3 if result else 0
+    
+    logger.info(f"AI call: model={model}, in={input_tokens:.0f}, out={output_tokens:.0f}")
+    return result
+
+
+# Use caching for repeated queries
+from functools import lru_cache
+
+@lru_cache(maxsize=100)
+def cached_ai_call(prompt: str, model: str = "google/gemini-2.5-flash-lite"):
+    """Cache results for identical prompts."""
+    return ai_call(prompt, model)
+```
+
+## 9.6 OpenRouter vs Direct Anthropic API
+
+**Use OpenRouter when**:
+- You want flexibility (easy to switch models)
+- You want to use free models (Google Flash)
+- You want unified billing
+- You're experimenting with different models
+
+**Use Direct Anthropic API when**:
+- You're only using Anthropic models
+- You want prompt caching (Anthropic-specific feature)
+- You need the absolute latest Anthropic features
+
+**Recommendation**: Start with OpenRouter, switch to direct Anthropic only if you need caching or latest features.
 
 ---
 
