@@ -69,6 +69,11 @@ Automation:   Ansible (infrastructure-as-code, optional)
   - Protects origin IP (proxied mode)
   - Works with Nginx Proxy Manager for secure public hosting
   - Free tier: Unlimited DNS records, basic DDoS protection
+- **Cloudflare Tunnel**: For selective public exposure (free, always useful)
+  - Expose specific services without opening ports
+  - Zero-trust access, encrypted by default
+  - Example: Jellyfin for family, specific apps for friends
+  - Use with Tailscale: Tunnel for public, Tailscale for private
 - **MergerFS + SnapRAID over ZFS/RAID**: 
   - Works with mixed drive sizes
   - Lower RAM overhead (ZFS needs ~1GB per TB for dedup)
@@ -78,10 +83,6 @@ Automation:   Ansible (infrastructure-as-code, optional)
   - Encrypted by default
   - Free tier: 100 devices, 3 users
   - Use for private services (admin panels, internal tools)
-- **Cloudflare Tunnel (optional)**: For selective public exposure
-  - Expose specific services without opening ports
-  - Example: Jellyfin for kids at ex's house
-  - Everything else stays Tailscale-only
 - **.env for ALL configuration**: Single source of truth
   - Document where each variable is used (e.g., `# Used in docker-compose.yml:42`)
   - Never hardcode secrets in code
