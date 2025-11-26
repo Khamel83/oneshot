@@ -46,11 +46,35 @@ ONE_SHOT is built on a small set of non-negotiable principles.
 Application:   Python / Node / Go / Rust
 Web:          FastAPI, Flask, Express, etc.
 DB:           PostgreSQL, SQLite, Redis
-Web server:   Caddy or Nginx
-OS:           Ubuntu 22.04 LTS (or equivalent)
+Web server:   Nginx Proxy Manager (web UI for SSL/reverse proxy)
+              OR Caddy (if you prefer config files)
+OS:           Ubuntu Server 24.04 LTS (or equivalent)
 Network:      Tailscale (free tier, WireGuard based)
 VC:           Git + GitHub (or self-hosted Gitea)
+Containers:   Docker + Docker Compose (modular includes pattern)
+Storage:      MergerFS (pooling) + SnapRAID (parity, optional)
+Automation:   Ansible (infrastructure-as-code, optional)
 ```
+
+**Philosophy borrowed from homelab community**:
+- **Modular Docker Compose**: Each service in its own directory with dedicated compose file
+  - Master `docker-compose.yml` uses `include` directive
+  - Easy to add/remove services without touching monolithic files
+- **Nginx Proxy Manager over Traefik/Caddy**: Web UI for SSL management
+  - Easier for non-experts (Let's Encrypt auto-renewal via UI)
+  - Still FOSS, just more accessible
+- **MergerFS + SnapRAID over ZFS/RAID**: 
+  - Works with mixed drive sizes
+  - Lower RAM overhead (ZFS needs ~1GB per TB for dedup)
+  - Perfect for write-once, read-many workloads (media, backups)
+- **Tailscale over VPNs**: Zero-config mesh networking
+  - No port forwarding needed
+  - Encrypted by default
+  - Free tier: 100 devices, 3 users
+- **.env for ALL configuration**: Single source of truth
+  - Document where each variable is used (e.g., `# Used in docker-compose.yml:42`)
+  - Never hardcode secrets in code
+  - Easy to backup/restore (just one file)
 
 ### 1.1.2 Conscious Tradeoffs
 
@@ -557,19 +581,31 @@ API Key: [STATUS]
 
 ---
 
-## 4.3 Agents vs Simple API (Q24)
+## 4.3 Agent Architecture (Q24)
 
-**Decision rule** (ONE_SHOT uses this):
+**What is an Agent?**
+An agent is an AI that can:
+- Use tools (files, databases, APIs, web search)
+- Make decisions based on tool results
+- Iterate until task is complete
+
+**Decision rule**:
 - **If**:
-  - AI is requested and
-  - Project has multi-step workflows with tools (files, DB, GitHub, Slack, web search) and
+  - AI is requested AND
+  - Project has multi-step workflows with tools (files, DB, GitHub, Slack, web search) AND
   - You want it to operate semi-autonomously
   
-  → Use **Claude Agent SDK** (or equivalent agent loop).
+  → Use **Agent SDK with MCP** (Model Context Protocol)
 
 - **Else**:
   
-  → Use **simple Claude API calls**.
+  → Use **simple API calls**
+
+**MCP (Model Context Protocol)**:
+- **Open standard** for connecting AI to tools
+- Works with **any model** (Gemini, Claude, GPT, etc.)
+- Pre-built servers: Filesystem, GitHub, Slack, PostgreSQL, Brave Search, Google Drive
+- Get servers: https://github.com/modelcontextprotocol/servers
 
 **You can override**:
 - Agent SDK (orchestrator + subagents, MCP tooling)
@@ -581,15 +617,16 @@ API Key: [STATUS]
 ```
 If Agent SDK:
 - Orchestrator + subagents:
-  - ...
-  - ...
+  - Research agent (web search, docs)
+  - Analysis agent (data processing)
+  - Writing agent (content generation)
   - ...
 MCP servers needed:
-- Filesystem
-- GitHub
-- Slack
-- PostgreSQL
-- Web search (Brave)
+- Filesystem (read/write files)
+- GitHub (code, issues, PRs)
+- Slack (notifications)
+- PostgreSQL (database queries)
+- Brave Search (web search)
 - Other: ...
 ```
 
