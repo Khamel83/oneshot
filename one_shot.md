@@ -1,7 +1,8 @@
 # ONE_SHOT: AI-Powered Autonomous Project Builder
 
-**Version**: 1.4  
+**Version**: 1.5  
 **Philosophy**: Ask everything upfront, then execute autonomously  
+**Validated By**: 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)  
 **Deployment**: OCI Always Free Tier OR Homelab (i5, 16GB RAM, Ubuntu)  
 **Cost**: $0/month infra (AI optional, low-cost)  
 
@@ -109,6 +110,10 @@ These rules apply to every project ONE_SHOT builds:
   - Isolate layer → Check dependencies → Analyze logs → Verify health endpoints.
 - **Health First**
   - Every long-running service exposes a `/health` endpoint.
+- **Future-You Documentation**
+  - Write docs and code for yourself in 6 months when you've forgotten everything.
+  - Document upgrade triggers, not just current state.
+  - Explain context and decisions, not just commands.
 
 ## 1.3 Simplicity First (Core Principle)
 
@@ -137,6 +142,68 @@ These rules apply to every project ONE_SHOT builds:
 - Credit original authors
 - Explain what you added/changed and why
 - Follow licenses (prefer MIT/Apache/BSD)
+
+### 1.3.1 The Upgrade Path Principle
+
+**Start with the simplest thing that works, upgrade only when you hit limits.**
+
+**Storage progression**:
+1. **Files (YAML/JSON)** → works for < 1K items
+   - Single directory, simple parsing
+   - Easy to inspect, version control friendly
+   - Example: Config files, small datasets
+2. **SQLite** → works for < 100K items
+   - Single-file portability (easy backup/restore)
+   - No server overhead
+   - Real-world: 135K records with sub-second queries
+3. **PostgreSQL** → only when you need:
+   - Multi-user concurrent access
+   - Complex queries with joins
+   - > 100K items with heavy writes
+
+**Deployment progression**:
+1. **Local script** → works for personal use
+   - `python3 main.py` or `./run.sh`
+   - Good enough for development and testing
+2. **systemd service** → works for 24/7 single-machine
+   - Auto-restart on failure
+   - Logs via journalctl
+   - Real-world: Runs reliably for months
+3. **Docker Compose** → works for multi-service
+   - Easy rollback (just change image tag)
+   - Consistent environments
+   - Real-world: 29 services on single machine
+4. **Kubernetes** → only if you need:
+   - Multi-machine orchestration
+   - Auto-scaling across nodes
+   - You probably don't need this
+
+**Document your current tier and upgrade triggers**:
+```yaml
+# In README.md
+Current Tier: SQLite (15K records)
+Upgrade Trigger: > 100K records OR multi-user access needed
+Next Tier: PostgreSQL with connection pooling
+```
+
+### 1.3.2 The "Works on My Machine" is Actually Good
+
+**ONE_SHOT projects run on**:
+- Ubuntu 24.04 LTS (homelab standard)
+- Mac (development)
+- OCI Always Free Tier (cloud)
+
+**This is a feature, not a bug**:
+- You know these environments intimately
+- You can reproduce issues reliably
+- You can test before deploying
+- No wasted effort supporting unused platforms
+
+**ONE_SHOT embraces this**:
+- Default to "works on Ubuntu 24.04 LTS"
+- Provide Mac-specific instructions when needed
+- Don't try to support Windows (unless you use it)
+- Document your actual environment, not theoretical ones
 
 ## 1.4 Web & UX Philosophy (When Web Exists)
 
@@ -203,6 +270,58 @@ Why does this exist? What is painful or impossible without it?
 ```
 [YOUR ANSWER HERE]
 ```
+
+---
+
+## Q2.5 The Reality Check ⚠️
+
+**Before building anything, validate you have a real problem.**
+
+### Do you actually have this problem right now?
+- [ ] Yes, I hit this issue weekly
+- [ ] Yes, I hit this issue monthly  
+- [ ] No, but I might someday (⚠️ **WARNING**: Don't build it)
+- [ ] No, this is a learning project (⚠️ Mark as such in README)
+
+### What's your current painful workaround?
+```
+[Describe what you do manually now]
+```
+
+**If you don't have a workaround, you might not have a real problem.**
+
+### What's the simplest thing that would help?
+```
+[Describe the 20% solution that gives 80% of the value]
+```
+
+**Build this first. Everything else is v2+.**
+
+### How will you know it's working?
+```
+[Observable outcome, not "it exists"]
+```
+
+**Example**: "I process my weekly notes in 5 minutes instead of 30"
+
+### The "Would I Use This Tomorrow?" Test
+
+**Imagine the project is done. Tomorrow morning, you need to**:
+```
+[Describe a specific task you'd do with this tool]
+```
+
+**If you can't describe a specific task, stop and reconsider the project.**
+
+**Good examples**:
+- "Import my bank transactions and categorize them"
+- "Find all mentions of 'custody' in my divorce communications"
+- "Process this week's podcast transcripts"
+
+**Bad examples**:
+- "Explore the data"
+- "Manage things better"
+- "Be more organized"
 
 ---
 
@@ -723,6 +842,8 @@ Once Core Questions are answered, ONE_SHOT generates a **Project Requirements Do
    - From Q16–Q17 and Archon defaults.
 8. **Success Criteria**
    - From Q12.
+9. **Documentation Requirements**
+   - README structure, status indicators, WHY documentation.
 
 **You say**:
 
@@ -743,19 +864,165 @@ ONE_SHOT's build loop, assuming PRD is approved.
 - Create GitHub repo (if desired) with the name from Q13.
 - Clone into VM/homelab under `~/projects/[project]` or similar.
 - Initialize project layout (based on Q6 and Q16).
-- Add `.editorconfig`, `.gitignore`, basic `README.md`.
+- Add `.editorconfig`, `.gitignore`.
 - Configure pre-commit hooks (optional) for formatting/linting.
 
-## 7.2 Phase 1: Core Implementation
+**Create initial documentation**:
 
-- Implement data models (Q7).
-- Implement storage layer (Q9).
-- Implement main interface:
-  - **CLI**: commands + argument parsing.
-  - **Web**: FastAPI or equivalent + routes.
-  - **Library**: public functions/classes.
-- Implement critical paths first:
-  - The minimum for v1 (Q12b).
+### README.md (Required)
+```markdown
+# [Project Name] - [One-line description]
+
+**Status**: 🔄 In Development  
+**Current Tier**: [Storage/Deployment tier]  
+**Upgrade Trigger**: [When to upgrade]
+
+## 🎯 What This Does
+[Problem → Solution in 2-3 sentences]
+
+## 🚀 Quick Start
+[≤5 commands to get running]
+
+## 📁 File Structure
+[What's where and why]
+
+## 🆘 Troubleshooting
+[Will be populated as issues arise]
+
+## 📊 Architecture Decisions
+
+### Why [Technology Choice]?
+- [Reason 1]
+- [Reason 2]
+- **Upgrade trigger**: [When to change]
+```
+
+### Status Indicators (Use Consistently)
+- ✅ Complete
+- 🔄 In Progress
+- ⏳ Pending
+- ❌ Failed
+- ⚠️ Warning
+
+## 7.2 Phase 1: Core Implementation (Data-First Order)
+
+**Implementation order is critical. Follow this sequence**:
+
+### Step 1: Define Data Models
+
+Create `models.py` (or equivalent) with complete data structures:
+
+```python
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional
+
+@dataclass
+class Transaction:
+    """Financial transaction.
+    
+    This is the core data type for the entire project.
+    Everything else is built around transforming/querying these.
+    """
+    id: str
+    timestamp: datetime
+    description: str
+    amount: float
+    category: Optional[str] = None
+    account: str = "checking"
+```
+
+### Step 2: Define Storage Schema
+
+For SQLite/PostgreSQL, create `schema.sql`:
+
+```sql
+-- Complete schema with comments explaining each field
+CREATE TABLE transactions (
+    id TEXT PRIMARY KEY,
+    timestamp TEXT NOT NULL,  -- ISO 8601 format
+    description TEXT NOT NULL,
+    amount REAL NOT NULL,  -- Negative for expenses, positive for income
+    category TEXT,  -- NULL until categorized
+    account TEXT DEFAULT 'checking',
+    
+    -- Metadata
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for common queries
+CREATE INDEX idx_timestamp ON transactions(timestamp);
+CREATE INDEX idx_category ON transactions(category);
+
+-- Views for common access patterns
+CREATE VIEW monthly_summary AS
+SELECT 
+    strftime('%Y-%m', timestamp) as month,
+    category,
+    SUM(amount) as total,
+    COUNT(*) as count
+FROM transactions
+GROUP BY month, category;
+```
+
+### Step 3: Implement Storage Layer
+
+```python
+# storage.py
+class TransactionStore:
+    """Storage layer for transactions.
+    
+    All database access goes through this class.
+    Makes it easy to swap storage backends later.
+    """
+    
+    def __init__(self, db_path: str = "transactions.db"):
+        self.db = sqlite3.connect(db_path)
+        self._init_schema()
+    
+    def add(self, transaction: Transaction) -> None:
+        """Add a transaction."""
+        # Implementation
+    
+    def get(self, id: str) -> Optional[Transaction]:
+        """Get a transaction by ID."""
+        # Implementation
+```
+
+### Step 4: Build Processing
+
+```python
+# processor.py
+class TransactionProcessor:
+    """Business logic for transactions."""
+    
+    def __init__(self, store: TransactionStore):
+        self.store = store
+    
+    def import_csv(self, path: str) -> int:
+        """Import transactions from CSV."""
+        # Implementation
+```
+
+### Step 5: Build Interface (Last)
+
+- **CLI**: commands + argument parsing
+- **Web**: FastAPI or equivalent + routes
+- **Library**: public functions/classes
+
+**Why this order?**
+1. Data models = contract for the entire project
+2. Storage schema = how data persists
+3. Storage layer = abstraction over database
+4. Processing = business logic
+5. Interface = how users interact
+
+**Benefits**:
+- Can test storage without UI
+- Can swap storage backends (SQLite → Postgres)
+- Can add multiple interfaces (CLI + web + API)
+- Clear separation of concerns
 
 ## 7.3 Phase 2: Tests & Validation
 
@@ -846,25 +1113,216 @@ sudo systemctl reload caddy
 
 The app is then accessible via Tailscale HTTPS.
 
+## 7.6 Phase 5: Automation Scripts (Required)
+
+**Every ONE_SHOT project MUST include these scripts in `scripts/` directory.**
+
+### setup.sh - Complete Environment Setup
+
+```bash
+#!/usr/bin/env bash
+# scripts/setup.sh - Complete environment setup
+
+set -euo pipefail
+
+echo "=== Project Setup ==="
+
+# 1. Check prerequisites
+command -v python3 >/dev/null || { echo "❌ Python not found"; exit 1; }
+command -v git >/dev/null || { echo "❌ Git not found"; exit 1; }
+
+# 2. Create virtual environment
+if [ ! -d "venv" ]; then
+    python3 -m venv venv
+fi
+
+# 3. Install dependencies
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 4. Initialize database
+if [ ! -f "project.db" ]; then
+    python3 -c "from project import init_db; init_db()"
+fi
+
+# 5. Create .env if missing
+if [ ! -f ".env" ]; then
+    cp .env.example .env
+    echo "⚠️  Edit .env with your configuration"
+fi
+
+echo "✅ Setup complete!"
+```
+
+### start.sh - Start the Project
+
+```bash
+#!/usr/bin/env bash
+# scripts/start.sh - Start the project
+
+set -euo pipefail
+
+# Activate environment
+source venv/bin/activate
+
+# Check health of dependencies
+./scripts/healthcheck.sh || exit 1
+
+# Start the service
+if [ -f "project.pid" ]; then
+    echo "⚠️  Project already running (PID: $(cat project.pid))"
+    exit 1
+fi
+
+# Run in background
+nohup python3 -m project.main > logs/project.log 2>&1 &
+echo $! > project.pid
+
+echo "✅ Project started (PID: $!)"
+```
+
+### stop.sh - Stop the Project
+
+```bash
+#!/usr/bin/env bash
+# scripts/stop.sh - Stop the project
+
+set -euo pipefail
+
+if [ ! -f "project.pid" ]; then
+    echo "⚠️  Project not running"
+    exit 0
+fi
+
+PID=$(cat project.pid)
+if kill -0 "$PID" 2>/dev/null; then
+    kill "$PID"
+    rm project.pid
+    echo "✅ Project stopped"
+else
+    echo "⚠️  Process not found, cleaning up"
+    rm project.pid
+fi
+```
+
+### status.sh - Check Project Status
+
+```bash
+#!/usr/bin/env bash
+# scripts/status.sh - Check project status
+
+set -euo pipefail
+
+echo "=== PROJECT STATUS ==="
+echo "Date: $(date)"
+echo ""
+
+# Process status
+if [ -f "project.pid" ] && kill -0 "$(cat project.pid)" 2>/dev/null; then
+    echo "✅ Process: RUNNING (PID: $(cat project.pid))"
+else
+    echo "❌ Process: STOPPED"
+fi
+
+# Data status (if using database)
+if [ -f "project.db" ]; then
+    echo "📊 Records: $(sqlite3 project.db 'SELECT COUNT(*) FROM main_table')"
+fi
+
+# Health check (if web service)
+if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+    echo "🌐 API: HEALTHY"
+else
+    echo "❌ API: DOWN"
+fi
+```
+
+### process.sh - Run Processing (Cron-Safe)
+
+```bash
+#!/usr/bin/env bash
+# scripts/process.sh - Run processing (cron-safe)
+
+set -euo pipefail
+
+# Lock file to prevent concurrent runs
+LOCKFILE="/tmp/project.lock"
+if [ -f "$LOCKFILE" ]; then
+    echo "Already running, exiting"
+    exit 0
+fi
+
+trap "rm -f $LOCKFILE" EXIT
+touch "$LOCKFILE"
+
+# Activate environment
+cd "$(dirname "$0")/.."
+source venv/bin/activate
+
+# Run processing
+python3 -m project.process
+
+# Exit code determines cron success/failure
+exit $?
+```
+
+**Add to crontab for automated processing**:
+```bash
+# Run every 10 minutes
+*/10 * * * * /path/to/project/scripts/process.sh >> /var/log/project.log 2>&1
+```
+
 ---
 
 # 8. ARCHON OPS PATTERNS (CONDENSED)
 
 ONE_SHOT assumes these patterns by default.
 
-## 8.1 Health Endpoints
+## 8.1 Health Endpoints (Required for Web Services)
 
-For any HTTP service, add:
+For any HTTP service, implement comprehensive health checks:
 
 ```python
 from fastapi import FastAPI
 from datetime import datetime
+import sqlite3
 
 app = FastAPI()
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
+    """Basic health check with dependency validation."""
+    health_status = {
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": "1.0.0"
+    }
+    
+    # Check database
+    try:
+        db = sqlite3.connect("project.db")
+        db.execute("SELECT 1").fetchone()
+        health_status["database"] = "connected"
+    except Exception as e:
+        health_status["database"] = f"error: {str(e)}"
+        health_status["status"] = "degraded"
+    
+    # Check external dependencies (if any)
+    # ... add checks for APIs, file systems, etc.
+    
+    return health_status
+
+@app.get("/metrics")
+async def metrics():
+    """Operational metrics for monitoring."""
+    db = sqlite3.connect("project.db")
+    return {
+        "total_records": db.execute("SELECT COUNT(*) FROM main_table").fetchone()[0],
+        "last_activity": db.execute("SELECT MAX(timestamp) FROM events").fetchone()[0],
+        "errors_last_hour": db.execute(
+            "SELECT COUNT(*) FROM errors WHERE timestamp > datetime('now', '-1 hour')"
+        ).fetchone()[0]
+    }
 ```
 
 Make health checks part of Docker/systemd health mechanisms.
@@ -1029,25 +1487,91 @@ MAX_TOKENS_DEFAULT=512
 - Mission-critical code that cannot fail
 - Rarely needed
 
-## 9.5 Cost Management
+## 9.5 Cost Management (Required for AI Projects)
+
+**Every AI-enabled ONE_SHOT project MUST track costs.**
 
 ```python
-# Track usage
+# ai_usage.py
+import sqlite3
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
+
+class AIUsageTracker:
+    """Track AI usage and costs."""
+    
+    def __init__(self, db_path="ai_usage.db"):
+        self.db = sqlite3.connect(db_path)
+        self.db.execute("""
+            CREATE TABLE IF NOT EXISTS usage (
+                timestamp TEXT,
+                model TEXT,
+                input_tokens INTEGER,
+                output_tokens INTEGER,
+                estimated_cost REAL
+            )
+        """)
+        self.db.commit()
+    
+    def log(self, model: str, input_tokens: int, output_tokens: int):
+        """Log AI usage and return estimated cost."""
+        cost = self.estimate_cost(model, input_tokens, output_tokens)
+        self.db.execute(
+            "INSERT INTO usage VALUES (?, ?, ?, ?, ?)",
+            (datetime.now().isoformat(), model, input_tokens, output_tokens, cost)
+        )
+        self.db.commit()
+        logger.info(f"AI call: model={model}, in={input_tokens}, out={output_tokens}, cost=${cost:.4f}")
+        return cost
+    
+    def estimate_cost(self, model: str, input_tokens: int, output_tokens: int) -> float:
+        """Estimate cost based on model pricing."""
+        # Pricing per million tokens (approximate)
+        pricing = {
+            "google/gemini-2.5-flash-lite": {"input": 0.10, "output": 0.30},
+            "anthropic/claude-3-5-haiku": {"input": 0.80, "output": 0.80},
+            "anthropic/claude-3-5-sonnet": {"input": 3.00, "output": 3.00},
+            "anthropic/claude-3-opus": {"input": 15.00, "output": 15.00},
+        }
+        
+        rates = pricing.get(model, {"input": 1.0, "output": 1.0})
+        cost = (input_tokens * rates["input"] + output_tokens * rates["output"]) / 1_000_000
+        return cost
+    
+    def monthly_cost(self) -> float:
+        """Get current month's total cost."""
+        result = self.db.execute("""
+            SELECT SUM(estimated_cost)
+            FROM usage
+            WHERE timestamp >= date('now', 'start of month')
+        """).fetchone()
+        return result[0] or 0.0
+    
+    def model_breakdown(self) -> dict:
+        """Get cost breakdown by model for current month."""
+        results = self.db.execute("""
+            SELECT model, SUM(estimated_cost) as cost
+            FROM usage
+            WHERE timestamp >= date('now', 'start of month')
+            GROUP BY model
+        """).fetchall()
+        return {model: cost for model, cost in results}
+
+# Usage
+tracker = AIUsageTracker()
 
 def ai_call_with_tracking(prompt: str, model: str, max_tokens: int = 512):
     """AI call with cost tracking."""
     result = ai_call(prompt, model, max_tokens)
     
-    # Estimate cost (rough)
-    input_tokens = len(prompt.split()) * 1.3  # rough estimate
+    # Estimate tokens (rough)
+    input_tokens = len(prompt.split()) * 1.3
     output_tokens = len(result.split()) * 1.3 if result else 0
     
-    logger.info(f"AI call: model={model}, in={input_tokens:.0f}, out={output_tokens:.0f}")
+    tracker.log(model, int(input_tokens), int(output_tokens))
     return result
-
 
 # Use caching for repeated queries
 from functools import lru_cache
@@ -1056,6 +1580,20 @@ from functools import lru_cache
 def cached_ai_call(prompt: str, model: str = "google/gemini-2.5-flash-lite"):
     """Cache results for identical prompts."""
     return ai_call(prompt, model)
+```
+
+**Add to README.md**:
+```markdown
+## 💰 AI Cost Tracking
+
+Current month: $X.XX
+Model breakdown:
+- Gemini Flash Lite: $X.XX (XX% of total)
+- Claude Haiku: $X.XX (XX% of total)
+- Claude Sonnet: $X.XX (XX% of total)
+
+Budget: $5/month
+Status: ✅ Under budget / ⚠️ Approaching limit / ❌ Over budget
 ```
 
 ## 9.6 Why OpenRouter?
@@ -1161,11 +1699,219 @@ For every ONE_SHOT project:
 
 ---
 
-# 12. META: LIVING IDEA REPOSITORY
+# 12. ANTI-PATTERNS (Learn from Past Mistakes)
+
+**These are patterns to AVOID, learned from real projects.**
+
+## 12.1 Complexity Creep
+
+**Anti-Pattern**: Adding abstraction layers "for flexibility"
+
+**Example**:
+```python
+# Bad: Over-engineered (real example: 1,363 lines)
+class AbstractDataProviderFactory:
+    def create_provider(self, provider_type: str) -> AbstractDataProvider:
+        if provider_type == "json":
+            return JSONDataProvider()
+        elif provider_type == "yaml":
+            return YAMLDataProvider()
+        # ... 50 more lines of factory logic
+
+# Good: Simple and direct (reduced to 104 lines)
+def get_data(source: str) -> dict:
+    if source.endswith('.json'):
+        return json.load(open(source))
+    elif source.endswith('.yaml'):
+        return yaml.safe_load(open(source))
+    else:
+        raise ValueError(f"Unknown format: {source}")
+```
+
+**Rule**: Only add abstraction when you have 3+ implementations, not "in case we need it later"
+
+**Real-world lesson**: OOS project reduced from 1,363 lines to 104 lines (92% reduction) with same functionality.
+
+## 12.2 Building Before Validating
+
+**Anti-Pattern**: Start coding immediately
+
+**Better Pattern**:
+```bash
+# Phase 0: Validate (ALWAYS)
+1. Check environment (Python version, dependencies)
+2. Check connectivity (database, APIs, file access)
+3. Check data (does input exist? is it valid?)
+
+# Phase 1: Build (ONLY AFTER VALIDATION)
+4. Implement core logic
+5. Add tests
+6. Deploy
+```
+
+**Template validation script**:
+```bash
+#!/usr/bin/env bash
+# scripts/validate.sh
+
+set -euo pipefail
+
+echo "=== Environment Validation ==="
+
+# Check Python
+python3 --version || { echo "❌ Python not found"; exit 1; }
+
+# Check dependencies
+command -v git >/dev/null || { echo "❌ Git not found"; exit 1; }
+
+# Check data sources
+[ -f "data/input.csv" ] || { echo "❌ Input data not found"; exit 1; }
+
+# Check connectivity
+curl -sf https://api.example.com/health || { echo "❌ API unreachable"; exit 1; }
+
+echo "✅ All checks passed"
+```
+
+## 12.3 Assuming Data is Clean
+
+**Anti-Pattern**: Process data without validation
+
+**Better Pattern**:
+```python
+def import_data(path: str) -> int:
+    # Validate before processing
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Data file not found: {path}")
+    
+    # Check file size (avoid loading huge files into memory)
+    size_mb = os.path.getsize(path) / 1024 / 1024
+    if size_mb > 100:
+        raise ValueError(f"File too large: {size_mb:.1f}MB (max 100MB)")
+    
+    # Validate format
+    with open(path) as f:
+        first_line = f.readline()
+        if not first_line.startswith("id,timestamp,"):
+            raise ValueError("Invalid CSV format (missing expected headers)")
+    
+    # Now process
+    count = 0
+    with open(path) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            # Validate each row
+            if not row.get('id'):
+                logger.warning(f"Skipping row with missing ID: {row}")
+                continue
+            
+            # Process valid row
+            process_row(row)
+            count += 1
+    
+    return count
+```
+
+**Real-world lesson**: Divorce project processes 135K records with validation at every step.
+
+## 12.4 No Rollback Plan
+
+**Anti-Pattern**: Deploy without ability to undo
+
+**Better Pattern**:
+```bash
+# Before deployment
+1. Backup database: ./scripts/backup.sh
+2. Tag current version: git tag v1.2.3
+3. Deploy new version
+4. Test health endpoint
+5. If failed: ./scripts/rollback.sh
+
+# scripts/rollback.sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "⚠️  Rolling back to previous version"
+
+# Stop current version
+./scripts/stop.sh
+
+# Restore backup
+cp backups/project.db.backup project.db
+
+# Checkout previous version
+git checkout v1.2.2
+
+# Restart
+./scripts/start.sh
+
+echo "✅ Rollback complete"
+```
+
+## 12.5 Ignoring Error Cases
+
+**Anti-Pattern**: Only handle happy path
+
+**Better Pattern**:
+```python
+def process_item(item: dict) -> bool:
+    """Process an item.
+    
+    Returns True if successful, False otherwise.
+    Logs errors but doesn't crash.
+    """
+    try:
+        # Validate input
+        if not item.get('id'):
+            logger.error(f"Item missing ID: {item}")
+            return False
+        
+        # Process
+        result = do_processing(item)
+        
+        # Validate output
+        if not result:
+            logger.warning(f"Processing returned empty result for {item['id']}")
+            return False
+        
+        return True
+        
+    except KeyError as e:
+        logger.error(f"Missing required field: {e}", exc_info=True)
+        return False
+    except ValueError as e:
+        logger.error(f"Invalid value: {e}", exc_info=True)
+        return False
+    except Exception as e:
+        logger.error(f"Unexpected error processing {item.get('id')}: {e}", exc_info=True)
+        return False
+```
+
+**Real-world lesson**: Homelab runs 29 services reliably because every service has error handling and health checks.
+
+## 12.6 Over-Engineering Storage
+
+**Anti-Pattern**: Use PostgreSQL for everything
+
+**Better Pattern**: Follow the upgrade path
+1. Files (< 1K items) → Simple, version control friendly
+2. SQLite (< 100K items) → Single file, no server
+3. PostgreSQL (> 100K items OR multi-user) → Only when needed
+
+**Real-world validation**:
+- Divorce: 135K records in SQLite, sub-second queries, no issues
+- TrojanHorse: Files for raw notes, SQLite for processed
+- Atlas: SQLite for tracking, works great
+
+**Rule**: Don't use Postgres until SQLite fails you.
+
+---
+
+# 13. META: LIVING IDEA REPOSITORY
 
 ONE_SHOT is also your idea sink for future improvements.
 
-## 12.1 Rules for Updating This File
+## 13.1 Rules for Updating This File
 
 - **You don't hand-edit structure**.
 
@@ -1178,12 +1924,25 @@ Instead, you tell the agent:
   - Integrates new idea into the right section.
   - Keeps Core Questions compact.
   - Avoids duplication (one source of truth per concept).
-  - Updates version history (Section 13).
+  - Updates version history (Section 14).
 
 ---
 
-# 13. VERSION HISTORY
+# 14. VERSION HISTORY
 
+- **v1.5** (2024-11-26)
+  - **Major Enhancement**: Integrated patterns from 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
+  - **Added**: Reality Check questions (Q2.5) to validate actual need before building
+  - **Added**: Upgrade Path Principle (1.3.1) - Files → SQLite → PostgreSQL progression
+  - **Added**: "Works on My Machine is Actually Good" (1.3.2) - embrace known environments
+  - **Added**: Future-You Documentation principle to Archon Principles
+  - **Enhanced**: Data-First Implementation Order (7.2) - Models → Schema → Storage → Processing → Interface
+  - **Added**: Phase 5 - Required Automation Scripts (setup.sh, start.sh, stop.sh, status.sh, process.sh)
+  - **Enhanced**: Health Endpoints (8.1) with comprehensive dependency checking and metrics
+  - **Enhanced**: AI Cost Management (9.5) with required tracking, SQLite logging, and README template
+  - **Added**: Section 12 - Anti-Patterns (complexity creep, validation, data cleaning, rollback, error handling, storage)
+  - **Enhanced**: Documentation requirements in Phase 0 with README template and status indicators
+  - **Validated by**: Atlas, Atlas-voice, Divorce, Frugalos/Hermes, Homelab, Tablo, TrojanHorse, VDD/OOS projects
 - **v1.4** (2024-11-26)
   - Single-file layout but hierarchically structured.
   - Clear Core Questions vs Advanced vs Optional AI/Web.
