@@ -38,6 +38,47 @@ After deep analysis of your 8 major projects, here's the **connecting thread**: 
 - **OOS**: Comprehensive doc hierarchy with `QUICK_START.md`, `DEPLOYMENT.md`, `CLAUDE_CODE_INTEGRATION.md`
 - **Atlas**: API documentation, status scripts, multiple integration guides
 
+### Secrets Management Pattern (SOPS Integration)
+
+**What's Missing from Current Projects**:
+While your projects use `.env` files consistently, you don't yet have a unified secrets management system. The SOPS + Age pattern would significantly improve:
+
+- **Team collaboration**: Share encrypted secrets safely
+- **Environment switching**: One encrypted file, multiple environments
+- **Git safety**: Can commit encrypted secrets without risk
+- **Audit trail**: Git history of changes to encrypted secrets
+- **Backup/restore**: Clone vault, decrypt anywhere
+
+**Recommended Integration**:
+```markdown
+## 🔐 Secrets Management
+
+This project uses SOPS + Age for encrypted secrets management.
+
+### Quick Setup
+```bash
+# Method 1: Ask Claude (recommended)
+"I use secrets-vault for environment variables. Clone the vault, decrypt secrets.env.encrypted, and set up the project to use those environment variables."
+
+# Method 2: Manual
+git clone git@github.com:Khamel83/secrets-vault.git ~/github/secrets-vault
+echo "AGE-SECRET-KEY-..." > ~/.age/key.txt
+sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+```
+
+### Required Secrets
+- `DATABASE_URL`: PostgreSQL connection string
+- `JWT_SECRET`: JWT signing secret
+- `OPENAI_API_KEY`: AI processing (if applicable)
+```
+
+**Benefits Over Traditional .env**:
+- Store only ONE Age key in 1Password instead of multiple secrets
+- Git-friendly (encrypted files can be committed)
+- Team collaboration without sharing individual secrets
+- Automatic decryption in CI/CD and deployment
+- Unified secrets vault across all projects
+
 ### The Pattern
 
 ```markdown
@@ -1372,27 +1413,38 @@ def process_item(item: dict) -> bool:
    - Three-tier strategy (local → cheap → premium)
    - Required cost tracking for AI projects
 
-3. **Add automation requirements** (Section 7.6)
+3. **Add SOPS secrets management** (Section 8)
+   - Comprehensive SOPS + Age integration
+   - Replace traditional .env with encrypted workflow
+   - Automated setup and decryption
+
+4. **Add automation requirements** (Section 7.6)
    - Setup, start, stop, process scripts
    - Cron-friendly patterns
+   - SOPS integration in setup.sh
 
-4. **Require observability** (Section 8.4)
+5. **Require observability** (Section 8.4)
    - Status scripts/commands
    - Health endpoints
    - Metrics endpoints
 
-5. **Add anti-patterns section** (Section 14)
+6. **Add anti-patterns section** (Section 14)
    - Document what NOT to do
    - Learn from past mistakes
 
-6. **Strengthen data-first approach** (Section 7.2.1)
+7. **Strengthen data-first approach** (Section 7.2.1)
    - Models → Schema → Storage → Processing → Interface
    - Clear implementation order
 
-7. **Add "Future-You" documentation requirements** (Section 1.2.5)
+8. **Add "Future-You" documentation requirements** (Section 1.2.5)
    - WHY comments in code
    - Architecture decisions in README
    - Upgrade triggers documented
+
+9. **Integrate SOPS into Core Questions** (Section 3.4)
+   - Add secrets management choice (A/B/C)
+   - SOPS setup instructions
+   - Age key management in 1Password
 
 ### Philosophy Refinements
 

@@ -84,10 +84,12 @@ Automation:   Ansible (infrastructure-as-code, optional)
   - Encrypted by default
   - Free tier: 100 devices, 3 users
   - Use for private services (admin panels, internal tools)
-- **.env for ALL configuration**: Single source of truth
-  - Document where each variable is used (e.g., `# Used in docker-compose.yml:42`)
-  - Never hardcode secrets in code
-  - Easy to backup/restore (just one file)
+- **SOPS + Age for secrets management**: Single source of truth with encryption
+  - Use SOPS (Secrets OPerationS) with Age encryption for all sensitive environment variables
+  - Clone secrets-vault repository and decrypt `secrets.env.encrypted` to `.env`
+  - Store only ONE Age key in 1Password, get ALL environment variables automatically
+  - Never hardcode secrets in code or commit unencrypted secrets to git
+  - Easy to backup/restore and share encrypted secrets securely
 
 ### 1.1.2 Conscious Tradeoffs
 
@@ -620,20 +622,37 @@ If you don't care, ONE_SHOT picks sane defaults based on Q6.
 
 ## 3.4 Secrets & Env (Q19)
 
-- No secrets needed
-- Yes (list):
+**Choose your secrets management approach**:
+
+- **A.** No secrets needed
+- **B.** Traditional `.env` file (unencrypted, for development only)
+- **C.** SOPS + Age encryption (recommended for production/shared teams)
+
+If using SOPS (C), list the secrets you'll manage:
 
 ```
-SECRET_NAME_1 = what it is
-SECRET_NAME_2 = what it is
+SECRET_NAME_1 = what it is (e.g., API key for external service)
+SECRET_NAME_2 = what it is (e.g., database password)
+SECRET_NAME_3 = what it is (e.g., JWT signing secret)
 ```
-
-Provide values later in `.env`, not here.
 
 **Your answer** (optional):
 ```
-[LIST SECRETS OR "none"]
+[LETTER] + [LIST SECRETS IF USING SOPS]
 ```
+
+**Why SOPS + Age?**
+- Store only ONE Age encryption key in 1Password
+- Manage ALL environment variables securely in one encrypted file
+- Easy team collaboration (share encrypted vault, not individual secrets)
+- Git-friendly (encrypted files can be committed safely)
+- Supports automatic decryption in CI/CD and deployment scripts
+
+**SOPS Setup (Method C)**:
+1. Clone secrets vault: `git clone git@github.com:Khamel83/secrets-vault.git ~/github/secrets-vault`
+2. Get your Age key from 1Password and save it: `echo "AGE-SECRET-KEY-..." > ~/.age/key.txt`
+3. Decrypt secrets to your project: `sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env`
+4. Done! Your project has all environment variables securely
 
 ---
 
@@ -1131,27 +1150,73 @@ echo "=== Project Setup ==="
 command -v python3 >/dev/null || { echo "❌ Python not found"; exit 1; }
 command -v git >/dev/null || { echo "❌ Git not found"; exit 1; }
 
-# 2. Create virtual environment
+# 2. Check for SOPS secrets management
+if command -v sops >/dev/null 2>&1 && [ -d ~/github/secrets-vault ]; then
+    echo "[*] SOPS found, decrypting secrets..."
+    if [ -f ~/github/secrets-vault/secrets.env.encrypted ]; then
+        sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+        echo "✅ Secrets decrypted from vault"
+    else
+        echo "⚠️  secrets-vault found but no secrets.env.encrypted"
+    fi
+fi
+
+# 3. Create virtual environment
 if [ ! -d "venv" ]; then
     python3 -m venv venv
 fi
 
-# 3. Install dependencies
+# 4. Install dependencies
 source venv/bin/activate
 pip install -r requirements.txt
 
-# 4. Initialize database
+# 5. Install SOPS if not present (for secrets management)
+if ! command -v sops >/dev/null 2>&1; then
+    echo "[*] Installing SOPS for secrets management..."
+    # Install SOPS (Linux)
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        curl -LO https://github.com/getsops/sops/releases/download/v3.8.1/sops-v3.8.1.linux.amd64
+        sudo mv sops-v3.8.1.linux.amd64 /usr/local/bin/sops
+        sudo chmod +x /usr/local/bin/sops
+    # Install SOPS (macOS)
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install sops
+    fi
+fi
+
+# 6. Install Age if not present (SOPS encryption backend)
+if ! command -v age >/dev/null 2>&1; then
+    echo "[*] Installing Age for encryption..."
+    # Install Age (Linux)
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        curl -LO https://github.com/FiloSottile/age/releases/download/v1.1.1/age-v1.1.1-linux-amd64.tar.gz
+        tar -xzf age-v1.1.1-linux-amd64.tar.gz
+        sudo mv age/age /usr/local/bin/
+        sudo mv age/age-keygen /usr/local/bin/
+        rm -rf age age-v1.1.1-linux-amd64.tar.gz
+    # Install Age (macOS)
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install age
+    fi
+fi
+
+# 7. Initialize database
 if [ ! -f "project.db" ]; then
     python3 -c "from project import init_db; init_db()"
 fi
 
-# 5. Create .env if missing
+# 8. Create .env if missing (fallback)
 if [ ! -f ".env" ]; then
     cp .env.example .env
     echo "⚠️  Edit .env with your configuration"
+    echo "💡 Consider using SOPS for encrypted secrets management"
+    echo "   See: https://github.com/getsops/sops"
 fi
 
 echo "✅ Setup complete!"
+if [ -f ".env" ]; then
+    echo "📄 .env file configured"
+fi
 ```
 
 ### start.sh - Start the Project
@@ -1274,7 +1339,205 @@ exit $?
 
 ---
 
-# 8. ARCHON OPS PATTERNS (CONDENSED)
+# 8. SECRETS MANAGEMENT WITH SOPS
+
+ONE_SHOT integrates SOPS (Secrets OPerationS) with Age encryption for secure secrets management.
+
+## 8.1 The SOPS Workflow (Method 1: Recommended)
+
+**Tell Claude Code in any project**:
+```
+I use secrets-vault for environment variables. Clone the vault, decrypt secrets.env.encrypted, and set up the project to use those environment variables.
+```
+
+**Claude will automatically**:
+- Clone the secrets vault
+- Decrypt your environment variables
+- Set up your project to use them
+- Handle all the technical configuration
+
+## 8.2 Manual SOPS Setup (Method 2)
+
+```bash
+# 1. Clone secrets vault
+git clone git@github.com:Khamel83/secrets-vault.git ~/github/secrets-vault
+
+# 2. Get your Age key from 1Password and save it
+echo "AGE-SECRET-KEY-16PQX7DRJVAX79JSRL27TYERR5ATLNWYP8LV9GP88SM4VFAEA5UHQYVNMFY" > ~/.age/key.txt
+
+# 3. Decrypt secrets to your project
+sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+
+# 4. Done! Your project has all environment variables
+cat .env  # See your keys
+```
+
+## 8.3 What You Get with SOPS
+
+**Instead of managing this mess**:
+```bash
+DB_HOST=something
+DB_PASSWORD=another-thing
+API_KEY=sk-1234567890abcdef
+JWT_SECRET=your-secret-here
+REDIS_URL=redis://localhost:6379
+EMAIL_PASSWORD=app-password-xyz
+```
+
+**You just**:
+- Save ONE Age key in 1Password
+- Tell Claude or run 2 commands
+- Get ALL your variables automatically
+
+## 8.4 SOPS Configuration Files
+
+Create `.sops.yaml` in your project root:
+```yaml
+# .sops.yaml - SOPS configuration
+creation_rules:
+  - path_regex: secrets\.env\.encrypted$
+    age: age1yourpublickeyhere
+```
+
+Create `.env.example` for documentation:
+```bash
+# .env.example - Template for required variables
+# Copy this and fill in actual values (encrypted with SOPS)
+
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=myapp
+
+# External APIs
+OPENAI_API_KEY=your_openai_key_here
+STRIPE_API_KEY=your_stripe_key_here
+
+# Application
+JWT_SECRET=your_jwt_secret_here
+REDIS_URL=redis://localhost:6379
+```
+
+## 8.5 SOPS Integration in Projects
+
+### For New Projects
+When answering Q19 (Secrets & Env), choose option C:
+```
+C
+DATABASE_URL = PostgreSQL connection string
+JWT_SECRET = JWT signing secret
+STRIPE_API_KEY = Stripe payment processing
+```
+
+The setup.sh script will automatically:
+- Install SOPS and Age if missing
+- Decrypt secrets from vault if available
+- Create .env file with all required variables
+
+### For Existing Projects
+Add SOPS support by updating setup.sh and adding required secrets to the vault.
+
+## 8.6 Managing Secrets in the Vault
+
+**Ask Claude to process your environment variables**:
+```
+Here are my environment variables. Please:
+1. Add them to secrets-vault/secrets.env.encrypted
+2. Check for duplicates and consolidate
+3. Document what each variable is for
+4. Push the updated vault to GitHub
+5. Tell me what changed
+
+[Your environment variables here]
+```
+
+**SOPS Commands for Direct Vault Management**:
+```bash
+# Edit encrypted secrets (opens in your editor)
+sops ~/github/secrets-vault/secrets.env.encrypted
+
+# Add new secrets
+sops --set '["NEW_SECRET"] "new_value"' ~/github/secrets-vault/secrets.env.encrypted
+
+# Extract specific secret (without decrypting entire file)
+sops --decrypt --extract '["API_KEY"]' ~/github/secrets-vault/secrets.env.encrypted
+
+# Update vault and push changes
+cd ~/github/secrets-vault
+git add secrets.env.encrypted
+git commit -m "Add new project secrets"
+git push
+```
+
+## 8.7 SOPS in CI/CD and Deployment
+
+### GitHub Actions Example
+```yaml
+- name: Setup Age for SOPS decryption
+  run: |
+    curl -LO https://github.com/FiloSottile/age/releases/download/v1.1.1/age-v1.1.1-linux-amd64.tar.gz
+    tar -xzf age-v1.1.1-linux-amd64.tar.gz
+    sudo mv age/age /usr/local/bin/
+    sudo mv age/age-keygen /usr/local/bin/
+    rm -rf age age-v1.1.1-linux-amd64.tar.gz
+
+- name: Decrypt secrets
+  run: |
+    echo "${{ secrets.AGE_SECRET_KEY }}" | age -d -i - -o .env secrets.env.encrypted
+  env:
+    AGE_SECRET_KEY: ${{ secrets.AGE_SECRET_KEY }}
+```
+
+### systemd Service Integration
+```ini
+[Unit]
+Description=myapp service
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/myapp
+# Decrypt secrets before starting
+ExecStartPre=/bin/bash -c 'sops --decrypt /home/ubuntu/github/secrets-vault/secrets.env.encrypted > .env'
+ExecStart=/usr/bin/python3 -m myapp
+Restart=always
+EnvironmentFile=/home/ubuntu/myapp/.env
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## 8.8 SOPS Benefits Over Traditional .env Files
+
+| Feature | Traditional .env | SOPS + Age |
+|---------|------------------|------------|
+| **Security** | Plain text, can be committed accidentally | End-to-end encrypted |
+| **Team Collaboration** | Share secrets individually (risky) | Share encrypted vault safely |
+| **Git Storage** | Must exclude .env from git | Can commit encrypted files |
+| **Audit Trail** | No history of changes | Git history of encrypted changes |
+| **Key Management** | Multiple keys to manage/store | One Age key in 1Password |
+| **Backup/Restore** | Manual .env backup | Clone vault, decrypt |
+| **Environment Switching** | Multiple .env files | Same encrypted file, different keys |
+
+## 8.9 SOPS Migration Guide
+
+**From Traditional .env to SOPS**:
+1. Install SOPS and Age (handled by setup.sh)
+2. Generate Age key pair: `age-keygen -o key.txt`
+3. Encrypt current .env: `sops --encrypt --age age1... --encrypted-regex '^(.*)$' .env > secrets.env.encrypted`
+4. Store private key in 1Password
+5. Add encrypted file to secrets vault
+6. Delete plain .env file
+7. Update setup.sh to decrypt on setup
+
+**From Multiple .env Files**:
+- Consolidate all variables into one encrypted file
+- Use comments to indicate environment-specific values
+- Leverage ONE_SHOT's single .env philosophy with SOPS encryption
+
+---
+
+# 9. ARCHON OPS PATTERNS (CONDENSED)
 
 ONE_SHOT assumes these patterns by default.
 
@@ -1452,12 +1715,16 @@ def generate_code(description: str) -> str:
 ## 9.3 Environment Variables
 
 ```bash
-# .env file
+# .env file (encrypted with SOPS)
 OPENROUTER_API_KEY=sk-or-v1-xxxxx  # Get from https://openrouter.ai/keys
 
 # Optional: Set default model
 AI_MODEL_DEFAULT=google/gemini-2.5-flash-lite
 MAX_TOKENS_DEFAULT=512
+
+# SOPS Configuration (if using encrypted secrets)
+# These are managed in secrets-vault/secrets.env.encrypted
+# Decrypt with: sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
 
 ## 9.4 When to Use Which Model
 
