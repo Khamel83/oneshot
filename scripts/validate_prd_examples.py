@@ -39,10 +39,20 @@ def validate_prd_examples():
     sys.path.append('/home/khamel83/github/oneshot')
 
     try:
+        # Try to import claude_skills if available
         from claude_skills import load_oneshot_context, read_skill_md
         context = load_oneshot_context()
-    except:
-        print("❌ Error: Could not load ONE_SHOT context")
+    except ImportError:
+        # Fallback: load ONE_SHOT context directly
+        try:
+            with open('one_shot.md', 'r', encoding='utf-8') as f:
+                context = {'oneshot_content': f.read()}
+            print("✅ Loaded ONE_SHOT context directly from one_shot.md")
+        except FileNotFoundError:
+            print("❌ Error: Could not find one_shot.md")
+            return False
+    except Exception as e:
+        print(f"❌ Error: Could not load ONE_SHOT context: {e}")
         return False
 
     validation_patterns = load_validation_patterns()
@@ -52,13 +62,16 @@ def validate_prd_examples():
     # Find all example files
     agent_files = glob.glob('.claude/agents/*.md')
 
+    # Also check for examples directly in ONE_SHOT
+    main_oneshot_file = 'one_shot.md'
+
     total_files = 0
     validated_files = 0
     failed_files = 0
 
-    for agent_file in agent_files:
-        total_files += 1
-        file_path = Path(agent_file)
+    # Process main ONE_SHOT file first
+    file_path = Path(main_oneshot_file)
+    total_files += 1
 
         if not file_path.exists():
             print(f"❌ Missing file: {agent_file}")
