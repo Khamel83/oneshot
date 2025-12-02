@@ -155,6 +155,71 @@ These rules apply to every project ONE_SHOT builds:
   - Document upgrade triggers, not just current state.
   - Explain context and decisions, not just commands.
 
+### 1.2.1 Future-You Documentation Standards
+
+**Every non-obvious decision needs documentation**:
+
+#### In Code:
+```python
+# Good: Explains WHY
+# Using SQLite instead of Postgres because:
+# 1. Single-file portability (easy backup)
+# 2. No server overhead
+# 3. Handles our 100K records fine
+# Will upgrade to Postgres if we hit 500K records or need multi-user
+db = sqlite3.connect("project.db")
+
+# Bad: Just states WHAT
+db = sqlite3.connect("project.db")
+```
+
+#### In README:
+**Required sections for all projects**:
+
+1. **Architecture Decisions** - Why this stack?
+2. **Upgrade Triggers** - When to change technology?
+3. **Known Limitations** - What doesn't this do?
+4. **Troubleshooting** - Issues you've actually hit and solutions
+
+**Template**:
+```markdown
+## Architecture Decisions
+
+### Why SQLite?
+- Single-file portability
+- No server overhead
+- Sufficient for < 500K records
+- **Upgrade trigger**: > 500K records OR multi-user needed
+
+### Why FastAPI?
+- Modern async support
+- Auto-generated API docs
+- Type hints for validation
+- **Alternative**: Flask if you need simpler/more mature
+
+### Why Tailscale?
+- Zero-config VPN
+- No port forwarding
+- Free tier sufficient
+- **Alternative**: WireGuard if you want more control
+
+## Known Limitations
+
+- Single-user only (no auth system)
+- No real-time updates (polling only)
+- No mobile app (web UI only)
+
+## Troubleshooting
+
+### "Database is locked"
+**Cause**: Multiple processes accessing SQLite
+**Fix**: Close other connections, or upgrade to Postgres
+
+### "Service won't start"
+**Cause**: Port 8000 already in use
+**Fix**: `lsof -i :8000` to find process, kill it or change port
+```
+
 ## 1.3 Simplicity First (Core Principle)
 
 **Before building anything, ask: Does this already exist?**
@@ -283,6 +348,36 @@ Next Tier: PostgreSQL with connection pooling
 3. If it still fails, consider `anthropic/claude-3-5-haiku`
 4. Only use Sonnet/Opus if absolutely necessary
 
+### 1.5.2 Claude Code Subagents (optional, but recommended in IDE)
+
+When running ONE_SHOT inside Claude Code, use **subagents as specialized "workers"**, not as a generic graph.
+
+Subagents are Markdown files with YAML frontmatter, stored in:
+
+- Project-level: `.claude/agents/` (lives in the repo, highest priority)
+- User-level: `~/.claude/agents/` (global defaults, lower priority)
+
+Each subagent has its **own context and tool permissions**, and can be invoked automatically or explicitly:
+
+- Automatic: Claude delegates when your request matches the subagent's `description`
+- Explicit: `/agents` menu, or "Use the `<name>` subagent to …"
+
+Key constraints:
+
+- Subagents **cannot spawn other subagents**
+- Built-ins like **Explore**, **Plan**, and the general-purpose agent already exist for research and code exploration
+- Tools and models per subagent are controlled in YAML (`tools`, `model`, `permissionMode`, `skills`)
+
+**ONE_SHOT policy:**
+
+- Use subagents only when a task clearly benefits from its own context or tool policy:
+  - Long-lived PRD maintenance
+  - Deep code review / test running
+  - Ops / health / script hardening
+- Prefer **project-level** agents in `.claude/agents/` so behavior travels with the repo
+- Keep the graph small: **3–5 subagents per project max**, otherwise you pay complexity and token overhead for little gain
+- Built-in agents handle generic research; don't recreate Explore/Plan/general-purpose
+
 ## 1.6 Project Invariants (MUSTs)
 
 For every ONE_SHOT project, the agent MUST ensure:
@@ -372,14 +467,14 @@ Why does this exist? What is painful or impossible without it?
 **Before building anything, validate you have a real problem.**
 
 ### Do you actually have this problem right now?
-- [ ] Yes, I hit this issue weekly
-- [ ] Yes, I hit this issue monthly
+- [ ] Yes, I hit this issue **weekly** (strong build signal)
+- [ ] Yes, I hit this issue **monthly** (moderate build signal)
 - [ ] No, but I might someday (⚠️ **WARNING**: Don't build it)
-- [ ] No, this is a learning project (⚠️ Mark as such in README)
+- [ ] No, this is a learning project (⚠️ **Mark as such in README**)
 
 ### What's your current painful workaround?
 ```
-[Describe what you do manually now]
+[Describe exactly what you do manually now, including frequency and pain points]
 ```
 
 **If you don't have a workaround, you might not have a real problem.**
@@ -393,10 +488,11 @@ Why does this exist? What is painful or impossible without it?
 
 ### How will you know it's working?
 ```
-[Observable outcome, not "it exists"]
+[Observable outcome with measurable results, not "it exists"]
 ```
 
 **Example**: "I process my weekly notes in 5 minutes instead of 30"
+**Bad example**: "I can explore my notes better"
 
 ### The "Would I Use This Tomorrow?" Test
 
@@ -407,15 +503,25 @@ Why does this exist? What is painful or impossible without it?
 
 **If you can't describe a specific task, stop and reconsider the project.**
 
-**Good examples**:
-- "Import my bank transactions and categorize them"
-- "Find all mentions of 'custody' in my divorce communications"
-- "Process this week's podcast transcripts"
+**Good examples** (specific, actionable):
+- "Import my bank transactions and categorize them automatically"
+- "Find all mentions of 'custody' in my divorce communications and export them"
+- "Process this week's podcast transcripts and tag key topics"
 
-**Bad examples**:
+**Bad examples** (vague, non-actionable):
 - "Explore the data"
 - "Manage things better"
 - "Be more organized"
+
+### Project Validation Checklist
+
+Before proceeding, ensure:
+- [ ] Real problem with current painful workaround
+- [ ] Specific, measurable success criteria
+- [ ] Concrete "tomorrow morning" use case
+- [ ] Learning projects explicitly marked as such
+
+**If any item fails, pause and reconsider.**
 
 ---
 
@@ -878,6 +984,45 @@ MCP servers needed:
 [ARCHITECTURE IF AGENT SDK]
 ```
 
+#### 4.3.1 Claude Code subagent pattern for ONE_SHOT
+
+If you are using Claude Code as the execution environment for ONE_SHOT, treat it as:
+
+- **Main agent** = orchestrator that understands `ONE_SHOT.md` and the PRD
+- **Subagents** = specialists for the main phases in Section 7
+
+Recommended canonical subagents (project-level, in `.claude/agents/`):
+
+1. **`oneshot-spec`**
+   - Job: Turn Core Questions (Section 2) into a single PRD file and keep it current.
+   - Triggers: Any time Core Questions change or you say "update the PRD".
+   - Tools: Read/Write + light repo navigation.
+
+2. **`oneshot-architect`**
+   - Job: Enforce ONE_SHOT architecture rules (upgrade path, storage tier, deployment choice), design data models and schema, decide directory structure.
+   - Triggers: After PRD is stable, before implementation changes.
+   - Tools: Read/Write, Glob/Grep, Bash for code search.
+
+3. **`oneshot-impl`**
+   - Job: Implement the core code in the order Section 7.2 prescribes:
+     1. Data models
+     2. Schema
+     3. Storage layer
+     4. Processing
+     5. Interface
+   - Triggers: After architect finishes or PRD changes that affect behavior.
+   - Tools: Full coding toolset (read/write files, Bash, tests).
+
+4. **`oneshot-ops`**
+   - Job: Implement and maintain:
+     - `/health` and `/metrics` endpoints
+     - `scripts/*.sh` (setup, start/stop/status, process)
+     - systemd or Docker configs
+   - Triggers: After first working prototype and whenever deployment/ops changes.
+   - Tools: Read/Write, Bash, Git, any MCP tools tied to infra.
+
+These are **subagents for development**, not runtime agents in the app. They enforce the ONE_SHOT flow from inside the IDE.
+
 ---
 
 # 5. ENVIRONMENT VALIDATION
@@ -930,6 +1075,50 @@ You can either paste output into your agent or just confirm:
 ```
 - [ ] All checks passed.
 ```
+
+## 5.2 Validation-Before-Build Pattern
+
+**ALWAYS validate before writing code**. This prevents wasted effort on invalid assumptions.
+
+### Phase 0: Environment Validation (Always)
+```bash
+#!/usr/bin/env bash
+# scripts/validate.sh
+
+set -euo pipefail
+
+echo "=== Environment Validation ==="
+
+# 1. Check prerequisites
+command -v python3 >/dev/null || { echo "❌ Python not found"; exit 1; }
+command -v git >/dev/null || { echo "❌ Git not found"; exit 1; }
+
+# 2. Check data sources
+[ -f "data/input.csv" ] || { echo "❌ Input data not found"; exit 1; }
+
+# 3. Check connectivity (if applicable)
+curl -sf https://api.example.com/health || { echo "❌ API unreachable"; exit 1; }
+
+# 4. Check data format validation
+python3 -c "
+import csv
+with open('data/input.csv') as f:
+    reader = csv.DictReader(f)
+    headers = next(reader, None)
+    if not headers or 'id' not in headers:
+        print('❌ Invalid CSV format')
+        exit(1)
+"
+
+echo "✅ All checks passed"
+```
+
+### Phase 1: Build (Only After Validation)
+1. Implement core logic
+2. Add tests
+3. Deploy
+
+**If validation fails, STOP and fix before building.**
 
 ---
 
@@ -1476,6 +1665,91 @@ exit $?
 */10 * * * * /path/to/project/scripts/process.sh >> /var/log/project.log 2>&1
 ```
 
+## 7.7 (Optional) Claude Code subagent config for ONE_SHOT
+
+For repos that use ONE_SHOT inside Claude Code:
+
+### 1. Create project-level agents
+
+```bash
+mkdir -p .claude/agents
+```
+
+Example: `oneshot-spec` subagent:
+
+```markdown
+# .claude/agents/oneshot-spec.md
+---
+name: oneshot-spec
+description: >
+  Maintain a single up-to-date PRD for this repo using ONE_SHOT.md.
+  Use PROACTIVELY whenever Core Questions (Section 2) change or the user
+  says anything about scope, features, or non-goals.
+model: inherit        # follow the main thread's model
+permissionMode: default
+# tools:              # omit to inherit all tools from main thread
+# skills:             # optional: list skills if you have named skills configured
+---
+You are the PRD maintainer for this repository.
+
+Responsibilities:
+- Read ONE_SHOT.md and the answers to Core Questions.
+- Create or update a single PRD file (e.g. PRD.md or docs/prd.md).
+- Preserve structure but keep it concise and high-signal.
+- When something in the Core Questions changes, reconcile and rewrite the PRD.
+- Never write code here; only requirements, constraints, and success criteria.
+```
+
+Example: `oneshot-architect`:
+
+```markdown
+# .claude/agents/oneshot-architect.md
+---
+name: oneshot-architect
+description: >
+  Apply ONE_SHOT architecture rules to this repo. Use when designing or
+  changing data models, storage tier, directory layout, and deployment.
+  MUST BE USED before large refactors or storage changes.
+model: inherit
+permissionMode: default
+---
+You are the architecture lead for ONE_SHOT projects.
+
+Follow these rules:
+- Enforce the upgrade path (Files → SQLite → PostgreSQL) and document current tier + upgrade triggers.
+- Choose the simplest viable storage and deployment tier that matches Q6–Q9.
+- Design data models and schema first, then storage layer, then processing, then interfaces.
+- Keep directory structure aligned with the chosen pattern (flat vs domain-driven) and document it in README.
+- Explain WHY for non-obvious choices inside the PRD and README.
+```
+
+Similarly define `oneshot-impl` and `oneshot-ops` with focused, high-signal prompts.
+
+### 2. Use `/agents` to inspect and adjust
+
+In Claude Code:
+
+- Run `/agents` to:
+  - See all available subagents (built-in, user, project)
+  - Confirm your four ONE_SHOT subagents are loaded
+  - Adjust tool access without hand-editing YAML
+
+### 3. Drive the workflow from the main thread
+
+From the main conversation:
+
+```text
+Use the oneshot-spec subagent to generate PRD.md based on ONE_SHOT.md and my answers.
+
+Then have the oneshot-architect subagent turn that PRD into concrete data models,
+schemas, and a directory layout.
+
+After that, have the oneshot-impl subagent implement v1 scope, and finally use
+oneshot-ops to add health endpoints and scripts.
+```
+
+Claude will auto-delegate based on the `description` fields and your instructions, and you can explicitly call subagents when you want strict phase boundaries.
+
 ---
 
 <!-- ONESHOT_CORE_END -->
@@ -1751,7 +2025,75 @@ docker compose logs [service]
 3. **Check logs from the app itself**.
 4. **Only then change code**.
 
-## 9.3 Docker Compose Pattern (If Used)
+## 9.3 Required Observability (All Projects)
+
+Every ONE_SHOT project MUST include observability for both development and production.
+
+### 9.3.1 Status Command/Script
+
+**For CLI projects**:
+```bash
+# Add a 'status' subcommand
+project status
+
+# Output:
+# ✅ Database: Connected (1,234 records)
+# ✅ Last run: 2 minutes ago
+# ⚠️ Warnings: 3 items need attention
+```
+
+**For web/service projects**:
+```bash
+# Create project_status.sh
+./project_status.sh
+
+# Output:
+# ✅ Service: RUNNING (PID: 12345, Uptime: 2d 3h)
+# ✅ API: HEALTHY (http://localhost:8000/health)
+# 📊 Requests: 1,234 (last hour)
+# ⚠️ Errors: 5 (last hour)
+```
+
+### 9.3.2 Standardized Status Indicators
+
+Use consistently across all projects:
+- ✅ Complete/Healthy/Running
+- 🔄 In Progress/Starting
+- ⏳ Pending/Waiting
+- ❌ Failed/Stopped/Error
+- ⚠️ Warning/Degraded/Attention Needed
+
+### 9.3.3 Logging Standards
+
+```python
+import logging
+from datetime import datetime
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(f'logs/project_{datetime.now():%Y%m%d}.log'),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+# Log important events
+logger.info("Processing started")
+logger.warning("Unusual condition detected")
+logger.error("Operation failed", exc_info=True)
+```
+
+**Log rotation** (add to systemd service or cron):
+```bash
+# Keep last 30 days of logs
+find logs/ -name "*.log" -mtime +30 -delete
+```
+
+## 9.4 Docker Compose Pattern (If Used)
 
 ```yaml
 services:
@@ -1774,7 +2116,7 @@ services:
 
 Short, unified guidance.
 
-## 10.1 Provider & Model Choices
+## 10.1 The Three-Tier AI Strategy
 
 **Default Stack**:
 - **Provider**: OpenRouter (https://openrouter.ai)
@@ -2321,6 +2663,37 @@ def process_item(item: dict) -> bool:
   1. Explicitly documenting why SQLite/files are insufficient, AND
   2. Getting explicit human approval in the chat (e.g., "Approved: move to Postgres").
 
+## 13.7 Subagent Discipline (Claude Code)
+
+**Anti-Pattern**: Creating too many or poorly-scoped subagents
+
+Use subagents when:
+- The task benefits from its own long-lived context (PRD, architecture, ops)
+- You want different tool or permission policies than the main agent
+- You have clear phase boundaries that benefit from specialized focus
+
+Don't use subagents when:
+- A single agent with Plan/Explore can do the job just fine
+- You're tempted to create "micro-agents" for every tiny step
+- The overhead outweighs the benefit
+
+**Discipline Guidelines**:
+- Keep each subagent's `description` brutally specific so auto-delegation is predictable
+- Embed phrases like "Use PROACTIVELY when …" or "MUST BE USED before …" in `description` to encourage correct automatic delegation
+- Limit the number of active custom subagents in a repo (~3–5) to avoid cost and cognitive overhead
+- Prefer project-level agents (`.claude/agents/`) so behavior travels with the repo
+- Use built-in agents (Explore, Plan, general-purpose) for generic research tasks
+
+**Good Examples**:
+- `oneshot-spec`: "Maintain PRD. Use PROACTIVELY when Core Questions change or scope discussions occur."
+- `oneshot-architect`: "Apply ONE_SHOT architecture rules. MUST BE USED before storage changes or refactors."
+- `oneshot-ops`: "Implement health endpoints and scripts. Use when deployment or ops changes needed."
+
+**Bad Examples**:
+- `file-reader`: "Read files" (use built-in Explore or Read tool instead)
+- `bug-fixer`: "Fix bugs" (too generic, overlaps with main agent)
+- `test-runner`: "Run tests" (use Bash tool directly or built-in testing capabilities)
+
 ---
 
 # 14. META: LIVING IDEA REPOSITORY
@@ -2353,6 +2726,17 @@ Instead, you tell the agent:
   - **Added**: Project Invariants (1.6) – checklist of MUST-haves (README, scripts, endpoints, storage discipline).
   - **Added**: Rigid PRD Schema (6.1) so agents produce consistent, structured PRDs.
   - **Clarified**: Storage anti-pattern section with an explicit "no Postgres unless needed" enforcement rule.
+  - **Added**: First-class support for Claude Code subagents:
+    - New decision rule and discipline under 1.5.2
+    - Canonical ONE_SHOT subagent set (spec / architect / impl / ops) in 4.3.1
+    - `.claude/agents` examples and workflow in Section 7.7
+    - Subagent discipline guidelines in Section 13.7
+  - **Clarified**: These subagents live in the IDE (Claude Code), not inside the runtime app.
+  - **Enhanced**: Reality Check (Q2.5) with specific validation criteria and frequency indicators
+  - **Added**: Required observability patterns (Section 9.3) with status scripts and standardized indicators
+  - **Enhanced**: AI strategy with three-tier approach (local → cheap → premium) and cost controls
+  - **Added**: Validation-before-build pattern (Section 5.2) to prevent wasted effort on invalid assumptions
+  - **Enhanced**: Future-You documentation standards (Section 1.2.1) with WHY documentation requirements
 
 - **v1.5** (2024-11-26)
   - **Major Enhancement**: Integrated patterns from 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
@@ -2388,3 +2772,113 @@ Instead, you tell the agent:
 **ONE_SHOT: One file. One workflow. Infinite possibilities.**
 
 **100% Free & Open-Source** • **Deploy Anywhere** • **No Vendor Lock-in**
+
+---
+
+# 16. CLAUDE SKILLS INTEGRATION
+
+ONE_SHOT serves as the **single reference document** for Claude Skills that build autonomous projects.
+
+## 16.1 For Skill Developers
+
+When creating Claude Skills that use ONE_SHOT:
+
+### Reference ONE_SHOT Directly
+```yaml
+# In your skill's SKILL.md
+one_shot_reference:
+  version: "1.6"
+  file_path: "ONE_SHOT.md"  # Relative to your skill
+  sections:
+    - "core_questions"      # Section 2: Q0-Q13
+    - "autonomous_execution"  # Section 7: Build pipeline
+    - "ai_integration"      # Section 10: AI strategy
+    - "ops_patterns"        # Section 9: Health, monitoring
+```
+
+### Include ONE_SHOT Context
+```python
+# In your skill implementation
+def load_oneshot_context():
+    """Load ONE_SHOT principles and patterns."""
+    return {
+        "principles": {
+            "simplicity_first": True,
+            "validate_before_create": True,
+            "future_you_documentation": True,
+            "cost_conscious_ai": True
+        },
+        "execution_pipeline": [
+            "core_questions",
+            "prd_generation",
+            "data_first_implementation",
+            "automation_scripts",
+            "deployment_patterns"
+        ]
+    }
+```
+
+### ONE_SHOT Compliance Checklist
+- [ ] Skill references ONE_SHOT.md v1.6+
+- [ ] Follows question-driven approach (Q0-Q13)
+- [ ] Implements data-first implementation (Section 7.2)
+- [ ] Includes required automation scripts (Section 7.6)
+- [ ] Supports cost-conscious AI strategy (Section 10.1)
+- [ ] Enforces validation-before-build (Section 5.2)
+
+## 16.2 For Claude Code Users
+
+### Using ONE_SHOT with Skills
+When a skill references ONE_SHOT:
+
+```bash
+# Tell Claude to use the skill with ONE_SHOT context
+"Use the [skill-name] skill to build my project. Follow ONE_SHOT.md v1.6 for the complete process."
+```
+
+### Available ONE_SHOT-Powered Skills
+Skills that explicitly implement ONE_SHOT patterns:
+
+- **project-initializer**: Bootstraps new projects following ONE_SHOT questions → PRD → execution
+- **code-generator**: Generates code using data-first approach and validation patterns
+- **ops-automator**: Creates health endpoints, status scripts, and deployment automation
+- **ai-integrator**: Implements three-tier AI strategy with cost tracking
+
+## 16.3 Skill Development Standards
+
+### Required Skill Structure
+```markdown
+# [Skill Name] - ONE_SHOT Implementation
+
+## ONE_SHOT Version
+- **Version**: 1.6
+- **Reference**: ONE_SHOT.md (this file)
+
+## Implementation
+This skill follows ONE_SHOT patterns:
+- ✅ Core Questions workflow
+- ✅ PRD generation
+- ✅ Data-first implementation
+- ✅ Automation scripts
+- ✅ Cost-conscious AI
+- ✅ Health endpoints
+- ✅ Validation before build
+
+## Usage
+```bash
+claude --skill [skill-name] "Build my [project type] using ONE_SHOT v1.6"
+```
+```
+
+### Quality Standards
+All skills referencing ONE_SHOT must:
+1. **Maintain Simplicity**: Don't over-engineer solutions
+2. **Validate First**: Check environment before building
+3. **Document Decisions**: Explain WHY for non-obvious choices
+4. **Include Automation**: Setup/start/stop/status scripts
+5. **Track AI Costs**: Use three-tier strategy
+6. **Support Observability**: Health endpoints, logging, status commands
+
+---
+
+**ONE_SHOT: Single reference. Multiple implementations. Infinite possibilities.**
