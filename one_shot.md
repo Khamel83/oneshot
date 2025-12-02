@@ -1,7 +1,7 @@
 # ONE_SHOT_CONTRACT (do not remove)
 ```yaml
 oneshot:
-  version: 1.6
+  version: 1.7
   phases:
     - intake_core_questions
     - generate_prd
@@ -2787,7 +2787,7 @@ When creating Claude Skills that use ONE_SHOT:
 ```yaml
 # In your skill's SKILL.md
 one_shot_reference:
-  version: "1.6"
+  version: "1.7"
   file_path: "ONE_SHOT.md"  # Relative to your skill
   sections:
     - "core_questions"      # Section 2: Q0-Q13
