@@ -1,12 +1,50 @@
+# ONE_SHOT_CONTRACT (do not remove)
+```yaml
+oneshot:
+  version: 1.6
+  phases:
+    - intake_core_questions
+    - generate_prd
+    - wait_for_prd_approval
+    - autonomous_build
+  required_files:
+    - ONE_SHOT.md
+    - README.md
+    - scripts/setup.sh
+    - scripts/start.sh
+    - scripts/stop.sh
+    - scripts/status.sh
+  required_web_endpoints:
+    - /health
+    - /metrics
+  storage_upgrade_path:
+    - files
+    - sqlite
+    - postgres
+  ai:
+    default_provider: openrouter
+    default_model: google/gemini-2.5-flash-lite
+    monthly_cost_target_usd: 5
+
+oneshot_env:
+  projects_root: "~/github"
+  secrets_vault_repo: "git@github.com:Khamel83/secrets-vault.git"
+  secrets_vault_path: "~/github/secrets-vault"
+  default_os: "ubuntu-24.04"
+  default_user: "ubuntu"
+```
+
 # ONE_SHOT: AI-Powered Autonomous Project Builder
 
-**Version**: 1.5  
-**Philosophy**: Ask everything upfront, then execute autonomously  
-**Validated By**: 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)  
-**Deployment**: OCI Always Free Tier OR Homelab (i5, 16GB RAM, Ubuntu)  
-**Cost**: $0/month infra (AI optional, low-cost)  
+**Version**: 1.6
+**Philosophy**: Ask everything upfront, then execute autonomously
+**Validated By**: 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
+**Deployment**: OCI Always Free Tier OR Homelab (i5, 16GB RAM, Ubuntu)
+**Cost**: $0/month infra (AI optional, low-cost)
 
 ---
+
+<!-- ONESHOT_CORE_START -->
 
 # 0. HOW TO USE THIS FILE
 
@@ -21,9 +59,9 @@ This file is meant to be loaded into an IDE agent (Claude Code, Cursor, etc.) an
    > "Use `ONE_SHOT.md` as the spec. Ask me all *Core Questions* (Section 2) first. Don't write any code until I say `PRD approved. Execute autonomous build.`"
 
 4. Answer all Core Questions once.
-5. Agent generates a PRD (Section 5).
-6. You reply: `PRD approved. Execute autonomous build.`  
-7. Agent runs Section 6 (Autonomous Execution) and Section 7 (Architecture & Ops).
+5. Agent generates a PRD (Section 6).
+6. You reply: `PRD approved. Execute autonomous build.`
+7. Agent runs Section 7 (Autonomous Execution).
 
 This is the contract: *questions once → PRD → autonomous build*.
 
@@ -75,7 +113,7 @@ Automation:   Ansible (infrastructure-as-code, optional)
   - Zero-trust access, encrypted by default
   - Example: Jellyfin for family, specific apps for friends
   - Use with Tailscale: Tunnel for public, Tailscale for private
-- **MergerFS + SnapRAID over ZFS/RAID**: 
+- **MergerFS + SnapRAID over ZFS/RAID**:
   - Works with mixed drive sizes
   - Lower RAM overhead (ZFS needs ~1GB per TB for dedup)
   - Perfect for write-once, read-many workloads (media, backups)
@@ -245,11 +283,65 @@ Next Tier: PostgreSQL with connection pooling
 3. If it still fails, consider `anthropic/claude-3-5-haiku`
 4. Only use Sonnet/Opus if absolutely necessary
 
+## 1.6 Project Invariants (MUSTs)
+
+For every ONE_SHOT project, the agent MUST ensure:
+
+- **Documentation**
+  - [ ] A `README.md` with:
+    - [ ] A clear one-line description
+    - [ ] `Current Tier: ...` (storage/deployment)
+    - [ ] `Upgrade Trigger: ...` (when to move up a tier)
+    - [ ] A "Quick Start" with ≤5 commands
+  - [ ] A PRD file in the repo (name can be `PRD.md` or similar) that follows the PRD schema (Section 6.1).
+
+- **Scripts**
+  - [ ] `scripts/setup.sh`
+  - [ ] `scripts/start.sh`
+  - [ ] `scripts/stop.sh`
+  - [ ] `scripts/status.sh`
+  - [ ] `scripts/process.sh` if there is any recurring/batch work.
+
+- **Services**
+  - If Project Type ∈ {Web Application, AI-Powered Web Application, Background Service}:
+    - [ ] A `/health` endpoint
+    - [ ] A `/metrics` endpoint OR a documented reason why not.
+    - [ ] A clear deployment path (systemd and/or Docker) documented in README.
+
+- **Storage Discipline**
+  - [ ] If Data Scale (Q8) ∈ {A, B} and Storage Choice (Q9) ≠ PostgreSQL:
+    - Agent MUST NOT introduce PostgreSQL without explicit human approval.
+  - [ ] Storage tier and upgrade trigger MUST be explicitly documented in README.
+
+- **Complexity Control**
+  - [ ] No abstract factories / deep inheritance trees unless there are ≥3 real implementations.
+  - [ ] For small CLIs, keep modules small and direct; no premature layering "for flexibility."
+
 ---
 
 # 2. CORE QUESTIONS (REQUIRED FOR ANY PROJECT)
 
-These are the Core 10. Every project must answer them.
+These are the Core 10+. Every project must answer them.
+
+## Q0. Mode (Scope)
+
+Choose ONE. This controls how much of ONE_SHOT the agent applies.
+
+- **Tiny** – Single CLI/script, no services, no web, no AI.
+- **Normal** – CLI or simple web/API on one box. Archon patterns, health checks, basic ops.
+- **Heavy** – Multi-service and/or AI agents, MCP, full ops.
+
+**Your choice**:
+```
+[Tiny / Normal / Heavy]
+```
+
+**Agent rules**:
+- If **Tiny**: skip Sections 4, 7.4–7.5, 9, and any AI/agent-specific features.
+- If **Normal**: use core Archon ops, optional AI via simple API, no agents/MCP unless explicitly requested.
+- If **Heavy**: enable AI, Agent SDK/MCP (if requested), AI cost tracking, and full ops patterns.
+
+---
 
 ## Q1. What Are You Building?
 
@@ -281,7 +373,7 @@ Why does this exist? What is painful or impossible without it?
 
 ### Do you actually have this problem right now?
 - [ ] Yes, I hit this issue weekly
-- [ ] Yes, I hit this issue monthly  
+- [ ] Yes, I hit this issue monthly
 - [ ] No, but I might someday (⚠️ **WARNING**: Don't build it)
 - [ ] No, this is a learning project (⚠️ Mark as such in README)
 
@@ -744,11 +836,11 @@ An agent is an AI that can:
   - AI is requested AND
   - Project has multi-step workflows with tools (files, DB, GitHub, Slack, web search) AND
   - You want it to operate semi-autonomously
-  
+
   → Use **Agent SDK with MCP** (Model Context Protocol)
 
 - **Else**:
-  
+
   → Use **simple API calls**
 
 **MCP (Model Context Protocol)**:
@@ -843,26 +935,73 @@ You can either paste output into your agent or just confirm:
 
 # 6. PRD GENERATION (WHAT THE AGENT DOES)
 
-Once Core Questions are answered, ONE_SHOT generates a **Project Requirements Document** with:
+Once Core Questions are answered, ONE_SHOT generates a **Project Requirements Document**.
+
+## 6.1 PRD Schema (Required Shape)
+
+Every ONE_SHOT PRD MUST follow this structure, in this order:
 
 1. **Overview**
-   - Q1–Q3 summarized.
-2. **Features & Non-Goals**
-   - From Q4–Q5.
-3. **Architecture**
-   - Stack, storage, deployment from Q6–Q9, Q18.
-4. **Data Models**
-   - From Q7, expanded.
-5. **Interfaces**
-   - CLI/API/Library from Q11.
-6. **AI/Web Design**
-   - If Section 4 is used.
-7. **Testing & Ops**
-   - From Q16–Q17 and Archon defaults.
-8. **Success Criteria**
-   - From Q12.
-9. **Documentation Requirements**
-   - README structure, status indicators, WHY documentation.
+   - 3–8 sentences.
+   - Summarize: what we're building, for whom, and why now (map Q1–Q3 + Q2.5).
+
+2. **Problem & Reality Check**
+   - Short description of the core problem (Q2).
+   - Current workaround and pain (Q2.5).
+   - Explicit statement of the simplest 80/20 solution.
+
+3. **Philosophy & Constraints**
+   - 3–6 bullets of project philosophy (Q3).
+   - Non-goals / out-of-scope items (Q5).
+   - Mode (Q0: Tiny / Normal / Heavy).
+
+4. **Features**
+   - Numbered list of 3–7 concrete capabilities (Q4).
+   - Mark each feature as:
+     - `v1` (must-have for first release), or
+     - `later` (nice-to-have).
+
+5. **Data Model**
+   - YAML examples (from Q7).
+   - Formal schema (fields, types, required/optional, constraints).
+   - Indicate which fields are stable vs likely to evolve.
+
+6. **Storage & Upgrade Path**
+   - Current storage choice (Q9).
+   - Data scale (Q8).
+   - Storage tier label: `files` / `sqlite` / `postgres`.
+   - Explicit **Upgrade Trigger**: conditions for moving to the next tier.
+
+7. **Interfaces**
+   - CLI: commands and flags, with examples (if CLI).
+   - Web/API: routes and request/response shapes (if web).
+   - Library: public functions/classes and signatures (if library).
+
+8. **Architecture & Deployment**
+   - Project type (Q6).
+   - Stack choice (language, frameworks, DB).
+   - Where it runs (local, homelab, OCI).
+   - Deployment path (local, systemd, Docker, Tailscale, etc.).
+
+9. **Testing Strategy**
+   - Chosen testing level (3.2).
+   - What gets tested in v1 vs later.
+   - How to run tests (`pytest`, etc).
+
+10. **AI & Agents** (if applicable)
+    - Whether AI is used and for what.
+    - Default provider/model.
+    - Whether Agent SDK/MCP is used or just simple API calls.
+    - Monthly cost target.
+
+11. **v1 Scope vs Future Work**
+    - Bullet list of v1 (minimum usable) features.
+    - Bullet list of explicitly deferred work.
+    - Clear statement: "v1 is done when …" (maps Q12a/Q12b).
+
+Agents MUST generate PRDs that conform to this schema, not free-form documents.
+
+## 6.2 PRD Approval
 
 **You say**:
 
@@ -881,7 +1020,7 @@ ONE_SHOT's build loop, assuming PRD is approved.
 ## 7.1 Phase 0: Repo & Skeleton
 
 - Create GitHub repo (if desired) with the name from Q13.
-- Clone into VM/homelab under `~/projects/[project]` or similar.
+- Clone into VM/homelab under `~/github/[project]` or similar.
 - Initialize project layout (based on Q6 and Q16).
 - Add `.editorconfig`, `.gitignore`.
 - Configure pre-commit hooks (optional) for formatting/linting.
@@ -892,8 +1031,8 @@ ONE_SHOT's build loop, assuming PRD is approved.
 ```markdown
 # [Project Name] - [One-line description]
 
-**Status**: 🔄 In Development  
-**Current Tier**: [Storage/Deployment tier]  
+**Status**: 🔄 In Development
+**Current Tier**: [Storage/Deployment tier]
 **Upgrade Trigger**: [When to upgrade]
 
 ## 🎯 What This Does
@@ -939,7 +1078,7 @@ from typing import Optional
 @dataclass
 class Transaction:
     """Financial transaction.
-    
+
     This is the core data type for the entire project.
     Everything else is built around transforming/querying these.
     """
@@ -964,7 +1103,7 @@ CREATE TABLE transactions (
     amount REAL NOT NULL,  -- Negative for expenses, positive for income
     category TEXT,  -- NULL until categorized
     account TEXT DEFAULT 'checking',
-    
+
     -- Metadata
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -976,7 +1115,7 @@ CREATE INDEX idx_category ON transactions(category);
 
 -- Views for common access patterns
 CREATE VIEW monthly_summary AS
-SELECT 
+SELECT
     strftime('%Y-%m', timestamp) as month,
     category,
     SUM(amount) as total,
@@ -991,19 +1130,19 @@ GROUP BY month, category;
 # storage.py
 class TransactionStore:
     """Storage layer for transactions.
-    
+
     All database access goes through this class.
     Makes it easy to swap storage backends later.
     """
-    
+
     def __init__(self, db_path: str = "transactions.db"):
         self.db = sqlite3.connect(db_path)
         self._init_schema()
-    
+
     def add(self, transaction: Transaction) -> None:
         """Add a transaction."""
         # Implementation
-    
+
     def get(self, id: str) -> Optional[Transaction]:
         """Get a transaction by ID."""
         # Implementation
@@ -1015,10 +1154,10 @@ class TransactionStore:
 # processor.py
 class TransactionProcessor:
     """Business logic for transactions."""
-    
+
     def __init__(self, store: TransactionStore):
         self.store = store
-    
+
     def import_csv(self, path: str) -> int:
         """Import transactions from CSV."""
         # Implementation
@@ -1092,10 +1231,10 @@ After=network.target
 
 [Service]
 User=ubuntu
-WorkingDirectory=/home/ubuntu/projects/[project]
+WorkingDirectory=/home/ubuntu/github/[project]
 ExecStart=/usr/bin/python3 -m [module].main
 Restart=always
-EnvironmentFile=/home/ubuntu/projects/[project]/.env
+EnvironmentFile=/home/ubuntu/github/[project]/.env
 
 [Install]
 WantedBy=multi-user.target
@@ -1339,6 +1478,10 @@ exit $?
 
 ---
 
+<!-- ONESHOT_CORE_END -->
+
+<!-- ONESHOT_APPENDIX_START -->
+
 # 8. SECRETS MANAGEMENT WITH SOPS
 
 ONE_SHOT integrates SOPS (Secrets OPerationS) with Age encryption for secure secrets management.
@@ -1541,7 +1684,7 @@ WantedBy=multi-user.target
 
 ONE_SHOT assumes these patterns by default.
 
-## 8.1 Health Endpoints (Required for Web Services)
+## 9.1 Health Endpoints (Required for Web Services)
 
 For any HTTP service, implement comprehensive health checks:
 
@@ -1560,7 +1703,7 @@ async def health():
         "timestamp": datetime.utcnow().isoformat(),
         "version": "1.0.0"
     }
-    
+
     # Check database
     try:
         db = sqlite3.connect("project.db")
@@ -1569,10 +1712,10 @@ async def health():
     except Exception as e:
         health_status["database"] = f"error: {str(e)}"
         health_status["status"] = "degraded"
-    
+
     # Check external dependencies (if any)
     # ... add checks for APIs, file systems, etc.
-    
+
     return health_status
 
 @app.get("/metrics")
@@ -1590,7 +1733,7 @@ async def metrics():
 
 Make health checks part of Docker/systemd health mechanisms.
 
-## 8.2 Systematic Debugging
+## 9.2 Systematic Debugging
 
 When something breaks, the sequence is:
 
@@ -1608,7 +1751,7 @@ docker compose logs [service]
 3. **Check logs from the app itself**.
 4. **Only then change code**.
 
-## 8.3 Docker Compose Pattern (If Used)
+## 9.3 Docker Compose Pattern (If Used)
 
 ```yaml
 services:
@@ -1627,11 +1770,11 @@ services:
 
 ---
 
-# 9. AI INTEGRATION (SINGLE SOURCE OF TRUTH)
+# 10. AI INTEGRATION (SINGLE SOURCE OF TRUTH)
 
 Short, unified guidance.
 
-## 9.1 Provider & Model Choices
+## 10.1 Provider & Model Choices
 
 **Default Stack**:
 - **Provider**: OpenRouter (https://openrouter.ai)
@@ -1659,7 +1802,7 @@ Short, unified guidance.
 - With occasional upgrades: $2-5/month
 - Heavy usage: $5-10/month
 
-## 9.2 Usage Pattern (Python with OpenRouter)
+## 10.2 Usage Pattern (Python with OpenRouter)
 
 ```python
 import os
@@ -1673,7 +1816,7 @@ def ai_call(
 ) -> str | None:
     """
     Call AI via OpenRouter.
-    
+
     Models:
     - google/gemini-2.5-flash-lite (default, free)
     - anthropic/claude-3-5-haiku (when Flash isn't enough)
@@ -1712,7 +1855,7 @@ def generate_code(description: str) -> str:
     return ai_call(prompt, model="anthropic/claude-3-5-sonnet", max_tokens=2048)
 ```
 
-## 9.3 Environment Variables
+## 10.3 Environment Variables
 
 ```bash
 # .env file (encrypted with SOPS)
@@ -1725,8 +1868,9 @@ MAX_TOKENS_DEFAULT=512
 # SOPS Configuration (if using encrypted secrets)
 # These are managed in secrets-vault/secrets.env.encrypted
 # Decrypt with: sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+```
 
-## 9.4 When to Use Which Model
+## 10.4 When to Use Which Model
 
 **Use Gemini 2.5 Flash Lite for 99% of tasks**:
 - Content summarization
@@ -1754,7 +1898,7 @@ MAX_TOKENS_DEFAULT=512
 - Mission-critical code that cannot fail
 - Rarely needed
 
-## 9.5 Cost Management (Required for AI Projects)
+## 10.5 Cost Management (Required for AI Projects)
 
 **Every AI-enabled ONE_SHOT project MUST track costs.**
 
@@ -1768,7 +1912,7 @@ logger = logging.getLogger(__name__)
 
 class AIUsageTracker:
     """Track AI usage and costs."""
-    
+
     def __init__(self, db_path="ai_usage.db"):
         self.db = sqlite3.connect(db_path)
         self.db.execute("""
@@ -1781,7 +1925,7 @@ class AIUsageTracker:
             )
         """)
         self.db.commit()
-    
+
     def log(self, model: str, input_tokens: int, output_tokens: int):
         """Log AI usage and return estimated cost."""
         cost = self.estimate_cost(model, input_tokens, output_tokens)
@@ -1792,7 +1936,7 @@ class AIUsageTracker:
         self.db.commit()
         logger.info(f"AI call: model={model}, in={input_tokens}, out={output_tokens}, cost=${cost:.4f}")
         return cost
-    
+
     def estimate_cost(self, model: str, input_tokens: int, output_tokens: int) -> float:
         """Estimate cost based on model pricing."""
         # Pricing per million tokens (approximate)
@@ -1802,11 +1946,11 @@ class AIUsageTracker:
             "anthropic/claude-3-5-sonnet": {"input": 3.00, "output": 3.00},
             "anthropic/claude-3-opus": {"input": 15.00, "output": 15.00},
         }
-        
+
         rates = pricing.get(model, {"input": 1.0, "output": 1.0})
         cost = (input_tokens * rates["input"] + output_tokens * rates["output"]) / 1_000_000
         return cost
-    
+
     def monthly_cost(self) -> float:
         """Get current month's total cost."""
         result = self.db.execute("""
@@ -1815,7 +1959,7 @@ class AIUsageTracker:
             WHERE timestamp >= date('now', 'start of month')
         """).fetchone()
         return result[0] or 0.0
-    
+
     def model_breakdown(self) -> dict:
         """Get cost breakdown by model for current month."""
         results = self.db.execute("""
@@ -1832,11 +1976,11 @@ tracker = AIUsageTracker()
 def ai_call_with_tracking(prompt: str, model: str, max_tokens: int = 512):
     """AI call with cost tracking."""
     result = ai_call(prompt, model, max_tokens)
-    
+
     # Estimate tokens (rough)
     input_tokens = len(prompt.split()) * 1.3
     output_tokens = len(result.split()) * 1.3 if result else 0
-    
+
     tracker.log(model, int(input_tokens), int(output_tokens))
     return result
 
@@ -1863,7 +2007,7 @@ Budget: $5/month
 Status: ✅ Under budget / ⚠️ Approaching limit / ❌ Over budget
 ```
 
-## 9.6 Why OpenRouter?
+## 10.6 Why OpenRouter?
 
 **Benefits**:
 - **Unified API**: One API key for 100+ models
@@ -1881,11 +2025,11 @@ Status: ✅ Under budget / ⚠️ Approaching limit / ❌ Over budget
 
 ---
 
-# 10. CANONICAL EXAMPLES (CONDENSED)
+# 11. CANONICAL EXAMPLES (CONDENSED)
 
 These are patterns, not something to memorize.
 
-## 10.1 Minimal: Local-Only CLI Finance Tracker
+## 11.1 Minimal: Local-Only CLI Finance Tracker
 
 - **Type**: A (CLI Tool)
 - **Storage**: SQLite
@@ -1903,7 +2047,7 @@ Shows the simplest path: Core Questions → PRD → single binary CLI.
 
 ---
 
-## 10.2 Medium: Non-AI Web App Dashboard
+## 11.2 Medium: Non-AI Web App Dashboard
 
 Example: Headcount dashboard pulling from a Postgres DB.
 
@@ -1916,7 +2060,7 @@ Shows web design, DB, health endpoints, Tailscale, but no AI.
 
 ---
 
-## 10.3 Complex: AI Code Review with Subagents
+## 11.3 Complex: AI Code Review with Subagents
 
 - **Type**: F (AI-Powered Web Application)
 - **AI**: Yes, Agent SDK.
@@ -1942,11 +2086,11 @@ Shows where Agent SDK actually makes sense.
 
 ---
 
-# 11. GOAL VS BASELINE
+# 12. GOAL VS BASELINE
 
 To keep expectations aligned:
 
-## 11.1 Baseline Contract
+## 12.1 Baseline Contract
 
 For every ONE_SHOT project:
 - A PRD is generated and kept in the repo.
@@ -1955,7 +2099,7 @@ For every ONE_SHOT project:
 - Long-running services have `/health`.
 - README explains how to run and deploy.
 
-## 11.2 Goal State (Stretch)
+## 12.2 Goal State (Stretch)
 
 - Fully autonomous build from PRD to deployed system.
 - Clean commits per milestone, descriptive messages.
@@ -1966,11 +2110,11 @@ For every ONE_SHOT project:
 
 ---
 
-# 12. ANTI-PATTERNS (Learn from Past Mistakes)
+# 13. ANTI-PATTERNS (Learn from Past Mistakes)
 
 **These are patterns to AVOID, learned from real projects.**
 
-## 12.1 Complexity Creep
+## 13.1 Complexity Creep
 
 **Anti-Pattern**: Adding abstraction layers "for flexibility"
 
@@ -1999,7 +2143,7 @@ def get_data(source: str) -> dict:
 
 **Real-world lesson**: OOS project reduced from 1,363 lines to 104 lines (92% reduction) with same functionality.
 
-## 12.2 Building Before Validating
+## 13.2 Building Before Validating
 
 **Anti-Pattern**: Start coding immediately
 
@@ -2040,7 +2184,7 @@ curl -sf https://api.example.com/health || { echo "❌ API unreachable"; exit 1;
 echo "✅ All checks passed"
 ```
 
-## 12.3 Assuming Data is Clean
+## 13.3 Assuming Data is Clean
 
 **Anti-Pattern**: Process data without validation
 
@@ -2050,18 +2194,18 @@ def import_data(path: str) -> int:
     # Validate before processing
     if not os.path.exists(path):
         raise FileNotFoundError(f"Data file not found: {path}")
-    
+
     # Check file size (avoid loading huge files into memory)
     size_mb = os.path.getsize(path) / 1024 / 1024
     if size_mb > 100:
         raise ValueError(f"File too large: {size_mb:.1f}MB (max 100MB)")
-    
+
     # Validate format
     with open(path) as f:
         first_line = f.readline()
         if not first_line.startswith("id,timestamp,"):
             raise ValueError("Invalid CSV format (missing expected headers)")
-    
+
     # Now process
     count = 0
     with open(path) as f:
@@ -2071,17 +2215,17 @@ def import_data(path: str) -> int:
             if not row.get('id'):
                 logger.warning(f"Skipping row with missing ID: {row}")
                 continue
-            
+
             # Process valid row
             process_row(row)
             count += 1
-    
+
     return count
 ```
 
 **Real-world lesson**: Divorce project processes 135K records with validation at every step.
 
-## 12.4 No Rollback Plan
+## 13.4 No Rollback Plan
 
 **Anti-Pattern**: Deploy without ability to undo
 
@@ -2115,7 +2259,7 @@ git checkout v1.2.2
 echo "✅ Rollback complete"
 ```
 
-## 12.5 Ignoring Error Cases
+## 13.5 Ignoring Error Cases
 
 **Anti-Pattern**: Only handle happy path
 
@@ -2123,7 +2267,7 @@ echo "✅ Rollback complete"
 ```python
 def process_item(item: dict) -> bool:
     """Process an item.
-    
+
     Returns True if successful, False otherwise.
     Logs errors but doesn't crash.
     """
@@ -2132,17 +2276,17 @@ def process_item(item: dict) -> bool:
         if not item.get('id'):
             logger.error(f"Item missing ID: {item}")
             return False
-        
+
         # Process
         result = do_processing(item)
-        
+
         # Validate output
         if not result:
             logger.warning(f"Processing returned empty result for {item['id']}")
             return False
-        
+
         return True
-        
+
     except KeyError as e:
         logger.error(f"Missing required field: {e}", exc_info=True)
         return False
@@ -2156,7 +2300,7 @@ def process_item(item: dict) -> bool:
 
 **Real-world lesson**: Homelab runs 29 services reliably because every service has error handling and health checks.
 
-## 12.6 Over-Engineering Storage
+## 13.6 Over-Engineering Storage
 
 **Anti-Pattern**: Use PostgreSQL for everything
 
@@ -2172,13 +2316,18 @@ def process_item(item: dict) -> bool:
 
 **Rule**: Don't use Postgres until SQLite fails you.
 
+**Enforcement Rule (for agents)**:
+- If Q8 (Data Scale) is A or B and Q9 (Storage Choice) is not PostgreSQL, the agent MUST NOT choose PostgreSQL without:
+  1. Explicitly documenting why SQLite/files are insufficient, AND
+  2. Getting explicit human approval in the chat (e.g., "Approved: move to Postgres").
+
 ---
 
-# 13. META: LIVING IDEA REPOSITORY
+# 14. META: LIVING IDEA REPOSITORY
 
 ONE_SHOT is also your idea sink for future improvements.
 
-## 13.1 Rules for Updating This File
+## 14.1 Rules for Updating This File
 
 - **You don't hand-edit structure**.
 
@@ -2191,11 +2340,19 @@ Instead, you tell the agent:
   - Integrates new idea into the right section.
   - Keeps Core Questions compact.
   - Avoids duplication (one source of truth per concept).
-  - Updates version history (Section 14).
+  - Updates version history (Section 15).
 
 ---
 
-# 14. VERSION HISTORY
+# 15. VERSION HISTORY
+
+- **v1.6** (2024-12-02)
+  - **Added**: Machine-readable `ONE_SHOT_CONTRACT` + `oneshot_env` header for tools/agents.
+  - **Added**: `ONESHOT_CORE` vs `ONESHOT_APPENDIX` markers to separate contract from reference material.
+  - **Added**: Q0 Mode (Tiny / Normal / Heavy) to control scope and avoid overbuilding.
+  - **Added**: Project Invariants (1.6) – checklist of MUST-haves (README, scripts, endpoints, storage discipline).
+  - **Added**: Rigid PRD Schema (6.1) so agents produce consistent, structured PRDs.
+  - **Clarified**: Storage anti-pattern section with an explicit "no Postgres unless needed" enforcement rule.
 
 - **v1.5** (2024-11-26)
   - **Major Enhancement**: Integrated patterns from 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
@@ -2205,9 +2362,9 @@ Instead, you tell the agent:
   - **Added**: Future-You Documentation principle to Archon Principles
   - **Enhanced**: Data-First Implementation Order (7.2) - Models → Schema → Storage → Processing → Interface
   - **Added**: Phase 5 - Required Automation Scripts (setup.sh, start.sh, stop.sh, status.sh, process.sh)
-  - **Enhanced**: Health Endpoints (8.1) with comprehensive dependency checking and metrics
-  - **Enhanced**: AI Cost Management (9.5) with required tracking, SQLite logging, and README template
-  - **Added**: Section 12 - Anti-Patterns (complexity creep, validation, data cleaning, rollback, error handling, storage)
+  - **Enhanced**: Health Endpoints (9.1) with comprehensive dependency checking and metrics
+  - **Enhanced**: AI Cost Management (10.5) with required tracking, SQLite logging, and README template
+  - **Added**: Section 13 - Anti-Patterns (complexity creep, validation, data cleaning, rollback, error handling, storage)
   - **Enhanced**: Documentation requirements in Phase 0 with README template and status indicators
   - **Validated by**: Atlas, Atlas-voice, Divorce, Frugalos/Hermes, Homelab, Tablo, TrojanHorse, VDD/OOS projects
 - **v1.4** (2024-11-26)
@@ -2225,6 +2382,8 @@ Instead, you tell the agent:
   - Initial ONE_SHOT framework: front-loaded questionnaire, PRD → autonomous build loop.
 
 ---
+
+<!-- ONESHOT_APPENDIX_END -->
 
 **ONE_SHOT: One file. One workflow. Infinite possibilities.**
 
