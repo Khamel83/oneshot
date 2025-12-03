@@ -2,29 +2,82 @@
 ```yaml
 oneshot:
   version: 1.7
+
   phases:
     - intake_core_questions
     - generate_prd
     - wait_for_prd_approval
     - autonomous_build
-  required_files:
-    - ONE_SHOT.md
-    - README.md
-    - scripts/setup.sh
-    - scripts/start.sh
-    - scripts/stop.sh
-    - scripts/status.sh
-  required_web_endpoints:
-    - /health
-    - /metrics
-  storage_upgrade_path:
-    - files
-    - sqlite
-    - postgres
-  ai:
-    default_provider: openrouter
-    default_model: google/gemini-2.5-flash-lite
-    monthly_cost_target_usd: 5
+
+  modes:
+    tiny:
+      description: "Single script/CLI, no services, no web, no AI."
+      skip_sections:
+        - web_design
+        - ai
+        - agents
+        - heavy_deployment
+    normal:
+      description: "CLI or simple web/API on one box. Archon patterns, health checks, basic ops."
+      skip_sections: []
+    heavy:
+      description: "Multi-service and/or AI/agents/MCP with full ops."
+      skip_sections: []
+
+  core_questions:
+    - { id: Q0,  key: mode,          type: enum,       required: true }
+    - { id: Q1,  key: what_build,    type: text,       required: true }
+    - { id: Q2,  key: problem,       type: text,       required: true }
+    - { id: Q2.5,key: reality_check, type: structured, required: true }
+    - { id: Q3,  key: philosophy,    type: text,       required: true }
+    - { id: Q4,  key: features,      type: structured, required: true }
+    - { id: Q5,  key: non_goals,     type: text,       required: true }
+    - { id: Q6,  key: project_type,  type: enum,       required: true }
+    - { id: Q7,  key: data_shape,    type: structured, required: true }
+    - { id: Q8,  key: data_scale,    type: enum,       required: true }
+    - { id: Q9,  key: storage,       type: enum,       required: true }
+    - { id: Q10, key: deps,          type: text,       required: false }
+    - { id: Q11, key: interface,     type: text,       required: true }
+    - { id: Q12, key: done_v1,       type: structured, required: true }
+    - { id: Q13, key: naming,        type: structured, required: true }
+
+  variants:
+    required_files:
+      - ONE_SHOT.md
+      - README.md
+      - scripts/setup.sh
+      - scripts/start.sh
+      - scripts/stop.sh
+      - scripts/status.sh
+    required_web_endpoints:
+      - /health
+      - /metrics
+    storage_upgrade_path:
+      - files
+      - sqlite
+      - postgres
+    ai_defaults:
+      default_provider: openrouter
+      default_model: google/gemini-2.5-flash-lite
+      monthly_cost_target_usd: 5
+
+  enforcement:
+    presence_rule: >
+      If ONE_SHOT.md exists in a repo, agents MUST treat it as the governing
+      spec for questions, PRD, implementation order, ops, and AI usage.
+    prd_rule: >
+      Any non-trivial change (new feature, storage change, deployment change)
+      MUST go through PRD update before code changes.
+    storage_rule: >
+      Agents MUST NOT introduce PostgreSQL unless data_scale is Large (Q8 = C)
+      or requirements clearly demand it AND user explicitly approves.
+    mode_rule: >
+      Agents MUST respect the selected mode's skip_sections when planning
+      and implementing work.
+    reality_check_rule: >
+      If Q2.5 is answered "No, but I might someday" and the project is not
+      explicitly marked as a learning project, agents MUST stop after PRD and
+      only proceed if the user types the override phrase 'Override Reality Check'.
 
 oneshot_env:
   projects_root: "~/github"
@@ -36,7 +89,7 @@ oneshot_env:
 
 # ONE_SHOT: AI-Powered Autonomous Project Builder
 
-**Version**: 1.6
+**Version**: 1.7
 **Philosophy**: Ask everything upfront, then execute autonomously
 **Validated By**: 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
 **Deployment**: OCI Always Free Tier OR Homelab (i5, 16GB RAM, Ubuntu)
@@ -378,6 +431,12 @@ Key constraints:
 - Keep the graph small: **3–5 subagents per project max**, otherwise you pay complexity and token overhead for little gain
 - Built-in agents handle generic research; don't recreate Explore/Plan/general-purpose
 
+**Normative subagent responsibilities (when present):**
+- `oneshot-spec` MUST own and maintain the PRD file and be used whenever scope/requirements change.
+- `oneshot-architect` MUST be used before storage tier changes, schema changes, or major refactors.
+- `oneshot-impl` MUST follow the data-first order (models → schema → storage → processing → interface).
+- `oneshot-ops` MUST own health endpoints and scripts (`setup/start/stop/status/process`) and deployment configs.
+
 ## 1.6 Project Invariants (MUSTs)
 
 For every ONE_SHOT project, the agent MUST ensure:
@@ -431,10 +490,18 @@ Choose ONE. This controls how much of ONE_SHOT the agent applies.
 [Tiny / Normal / Heavy]
 ```
 
-**Agent rules**:
-- If **Tiny**: skip Sections 4, 7.4–7.5, 9, and any AI/agent-specific features.
-- If **Normal**: use core Archon ops, optional AI via simple API, no agents/MCP unless explicitly requested.
-- If **Heavy**: enable AI, Agent SDK/MCP (if requested), AI cost tracking, and full ops patterns.
+**Agent rules for Q0 (Mode)**:
+- MUST ask Q0 first for any new ONE_SHOT project.
+- MUST map the answer to `oneshot.modes[mode]` from the YAML header.
+- MUST respect that mode's `skip_sections` when:
+  - Generating the PRD
+  - Proposing implementation steps
+  - Adding web/AI/agent/deployment features
+
+Concretely:
+- **Tiny** → skip Section 4 (Web & AI) and Sections 7.4–7.5 (AI & Deployment).
+- **Normal** → apply Archon ops + health checks; AI optional; no Agent SDK/MCP unless explicitly requested.
+- **Heavy** → enable AI, Agent SDK/MCP (if requested), AI cost tracking, and full ops patterns.
 
 ---
 
@@ -522,6 +589,16 @@ Before proceeding, ensure:
 - [ ] Learning projects explicitly marked as such
 
 **If any item fails, pause and reconsider.**
+
+**Agent rules for Q2.5 (Reality Check)**:
+- If the user selects "No, but I might someday" AND does **not** mark it as a learning project:
+  - Agent MUST stop after PRD generation.
+  - Agent MUST NOT proceed to the build pipeline unless the user types:
+    - `Override Reality Check`
+- If the user explicitly marks it as a learning project:
+  - Agent MAY proceed, but MUST:
+    - Mark it as a learning project in the PRD Overview, and
+    - Mark it as a learning project in the README.
 
 ---
 
@@ -1125,6 +1202,18 @@ echo "✅ All checks passed"
 # 6. PRD GENERATION (WHAT THE AGENT DOES)
 
 Once Core Questions are answered, ONE_SHOT generates a **Project Requirements Document**.
+
+## 6.0 Agent Rules for PRD-First Changes
+
+When `ONE_SHOT.md` is present in a repo:
+
+- Any non-trivial change (new feature, changed behavior, storage change, deployment change) MUST:
+  1. Re-check relevant Core Questions (especially Q0, Q2, Q2.5, Q4–Q6, Q8–Q9, Q12).
+  2. Use the `oneshot-spec` subagent (or equivalent) to update the PRD.
+  3. Only then modify code/tests/scripts.
+
+Small refactors, bugfixes, and copy changes may skip PRD updates, but anything that would surprise
+"future you" MUST be reflected in the PRD first.
 
 ## 6.1 PRD Schema (Required Shape)
 
@@ -1780,7 +1869,7 @@ I use secrets-vault for environment variables. Clone the vault, decrypt secrets.
 git clone git@github.com:Khamel83/secrets-vault.git ~/github/secrets-vault
 
 # 2. Get your Age key from 1Password and save it
-echo "AGE-SECRET-KEY-16PQX7DRJVAX79JSRL27TYERR5ATLNWYP8LV9GP88SM4VFAEA5UHQYVNMFY" > ~/.age/key.txt
+echo "AGE-SECRET-KEY-REPLACE-WITH-YOUR-OWN-KEY" > ~/.age/key.txt
 
 # 3. Decrypt secrets to your project
 sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
@@ -2718,6 +2807,13 @@ Instead, you tell the agent:
 ---
 
 # 15. VERSION HISTORY
+
+- **v1.7** (2024-12-02)
+  - Added machine-readable `ONE_SHOT_CONTRACT` header with modes, core_questions, invariants, and enforcement rules.
+  - Promoted Q0 Mode and Q2.5 Reality Check to hard gates with explicit agent rules and an override phrase.
+  - Clarified PRD-first evolution in Section 6.0: non-trivial changes MUST update PRD before code changes.
+  - Strengthened Claude Code subagent responsibilities (spec / architect / impl / ops) as normative behavior.
+  - Replaced sample Age key with an obvious placeholder to avoid leaking secret-looking material.
 
 - **v1.6** (2024-12-02)
   - **Added**: Machine-readable `ONE_SHOT_CONTRACT` + `oneshot_env` header for tools/agents.
