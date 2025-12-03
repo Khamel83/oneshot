@@ -1199,6 +1199,134 @@ echo "✅ All checks passed"
 
 ---
 
+## 5.5 Using ONE_SHOT with Existing Projects
+
+ONE_SHOT isn't just for greenfield projects. You can apply its patterns incrementally to improve existing codebases.
+
+### 5.5.1 Progressive Adoption Approach
+
+**Start Small, Add Value Quickly:**
+
+1. **Observability First** (Always):
+   ```bash
+   # Add health/metrics endpoints to existing services
+   # Add status scripts for development/deployment
+   ```
+
+2. **Documentation Upgrade**:
+   ```bash
+   # Enhance README with current tier/upgrade triggers
+   # Add troubleshooting section with real issues you've faced
+   ```
+
+3. **Secrets Management**:
+   ```bash
+   # Add SOPS + Age for any sensitive configs
+   # Move .env files to encrypted vault
+   ```
+
+4. **Scripts & Automation**:
+   ```bash
+   # Add setup.sh if missing
+   # Enhance start/stop scripts with real-world issues
+   ```
+
+### 5.5.2 ONE_SHOT Patterns for Existing Projects
+
+**Q0 Mode Selection (Adjusted for Reality):**
+- **Tiny**: Single service/utility - apply health checks and basic scripts
+- **Normal**: Multi-component app - add observability and structured PRD for future work
+- **Heavy**: Complex system - use full ONE_SHOT for major refactors/new features
+
+**Q2.5 Reality Check (Modified):**
+Instead of "Do you have this problem now?", ask:
+- "What's the most painful maintenance issue we face weekly?"
+- "Which feature causes the most support tickets?"
+- "What part of the codebase are we afraid to change?"
+
+**Targeted ONE_SHOT Elements:**
+
+| Problem | ONE_SHOT Pattern to Apply |
+|---------|---------------------------|
+| Deployment chaos | Add Section 9 health endpoints + scripts |
+| Debugging nightmares | Add Section 9.3 observability patterns |
+| Onboarding struggles | Enhance README + add Section 8 scripts |
+| Configuration drift | Add Section 8.5 SOPS secrets management |
+| Unplanned outages | Add Section 9.2 structured debugging |
+| Technical debt accumulation | Use Section 6.0 PRD-first for all changes |
+
+### 5.5.3 Agent Rules for Existing Projects
+
+**When ONE_SHOT.md is added to an existing repo:**
+
+- **Don't recreate** - analyze existing architecture first
+- **Respect current constraints** - databases, frameworks, deployment patterns
+- **Focus on pain points** - apply ONE_SHOT patterns where they provide immediate value
+- **Progressive enhancement** - start with observability, then documentation, then automation
+
+**Phase 1: Stabilization (First Week)**
+- Add `/health` and `/metrics` endpoints
+- Create/update `scripts/status.sh`
+- Document current state in README
+- Add real troubleshooting issues you've faced
+
+**Phase 2: Documentation (Week 2-3)**
+- Create/update PRD reflecting current system
+- Document architectural decisions
+- Add upgrade triggers for known bottlenecks
+- Create onboarding guide
+
+**Phase 3: Automation (Week 4+)**
+- Add SOPS secrets management
+- Enhance deployment scripts with real-world issues
+- Add validation scripts for common failures
+- Implement Section 6.0 PRD-first changes for all modifications
+
+### 5.5.4 Retrofit Examples
+
+**Example 1: Legacy Web Service**
+```markdown
+# Current: Manual deployment, no health checks, config files in repo
+# ONE_SHOT retrofit:
+- Add /health endpoint checking database connectivity
+- Add SOPS for database credentials
+- Create scripts/deploy.sh with rollback capability
+- Document current limitations in README
+```
+
+**Example 2: Multi-Component System**
+```markdown
+# Current: Complex architecture, no observability
+# ONE_SHOT retrofit:
+- Add Section 9.3 status command showing component health
+- Create PRD for each major component
+- Add secrets vault for cross-component communication
+- Use Section 6.0 for any new features or refactors
+```
+
+**Example 3: Data Processing Pipeline**
+```markdown
+# Current: Manual monitoring, unclear failure modes
+# ONE_SHOT retrofit:
+- Add metrics endpoints for pipeline stages
+- Document known failure modes and recovery procedures
+- Add scripts/process.sh with data validation
+- Create PRD for pipeline improvements
+```
+
+### 5.5.5 Integration Strategy
+
+**Start with Value, Add Structure Later:**
+
+1. **Immediate Wins** (Day 1): Health endpoints, status scripts
+2. **Documentation** (Week 1): README, troubleshooting, current state
+3. **Automation** (Week 2+): Secrets management, validation scripts
+4. **Governance** (Month 1+): PRD-first changes, structured development
+
+**Key Principle**: **Don't let perfect be the enemy of better.** Apply ONE_SHOT patterns incrementally where they solve real problems you're actually facing.
+
+---
+
 # 6. PRD GENERATION (WHAT THE AGENT DOES)
 
 Once Core Questions are answered, ONE_SHOT generates a **Project Requirements Document**.
@@ -2813,6 +2941,7 @@ Instead, you tell the agent:
   - Promoted Q0 Mode and Q2.5 Reality Check to hard gates with explicit agent rules and an override phrase.
   - Clarified PRD-first evolution in Section 6.0: non-trivial changes MUST update PRD before code changes.
   - Strengthened Claude Code subagent responsibilities (spec / architect / impl / ops) as normative behavior.
+  - Added Section 5.5: Using ONE_SHOT with Existing Projects - progressive adoption approach for brownfield projects.
   - Replaced sample Age key with an obvious placeholder to avoid leaking secret-looking material.
 
 - **v1.6** (2024-12-02)
