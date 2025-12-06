@@ -205,6 +205,11 @@ oneshot:
         prompt: "Schema migration: [description]. Backup recommended. Approve?"
     agent_behavior: |
       On trigger: STOP → Present prompt → Wait for approval → Log decision → Proceed only after approval
+    override:
+      pattern: "OVERRIDE: [stop_id]"
+      example: "OVERRIDE: storage_upgrade"
+      logging: "All overrides logged to .oneshot/decisions.log with timestamp and reason"
+      format: "[timestamp] OVERRIDE: [stop_id] - User approved despite warning"
 
   # Agent compatibility notes
   agent_compatibility:
@@ -225,6 +230,19 @@ oneshot:
       opus: "Initial setup, complex architecture, multi-phase builds"
       sonnet: "Bug fixes, single features, documentation"
       haiku: "Quick edits, simple scripts"
+
+  # Validation tracking
+  validation:
+    last_tested: "2024-12-06"
+    test_projects:
+      - name: "atlas-v2"
+        type: "Heavy (AI-powered web app)"
+        result: "Pass"
+      - name: "divorce-finance"
+        type: "Normal (CLI + SQLite)"
+        result: "Pass - 135K records"
+    primary_agent: "claude-code / opus-4"
+    spec_author: "Omar / Khamel83"
 
 oneshot_env:
   projects_root: "~/github"
@@ -652,6 +670,101 @@ For every ONE_SHOT project, the agent MUST ensure:
 | **Yolo** | 5 must-answer | 3-5 min | Full project |
 | **Normal** | All Core Questions | 10-15 min | Full project |
 | **Heavy** | All + AI/Agent Qs | 15-20 min | Full project + AI |
+
+### 2.0.5 Micro Mode: Complete Flow
+
+**Trigger**: User says "micro mode" OR describes a script <100 lines
+
+**The Micro Flow** (1-2 minutes total):
+
+```yaml
+micro_mode_flow:
+  step_1_detect:
+    trigger_phrases:
+      - "micro mode"
+      - "quick script"
+      - "simple script that..."
+      - "one-liner" / "one file"
+    auto_detect: "Description implies <100 lines, no services"
+
+  step_2_ask:
+    questions:
+      - "What should this script do? (Q1)"
+      - "CLI with args, or just run it? (Q11 simplified)"
+    skip_entirely:
+      - Q0 (mode) - already micro
+      - Q2 (problem) - implied by Q1
+      - Q2.5 (reality check) - micro = low investment
+      - Q3-Q5 (philosophy, features, non-goals) - overkill
+      - Q6 (project type) - default to CLI Tool
+      - Q7-Q10 (data, storage, deps) - inline decisions
+      - Q12 (done) - "it runs without errors"
+      - Q13 (naming) - derive from description
+
+  step_3_defaults:
+    Q6: "A (CLI Tool)"
+    Q12: "Script runs without errors"
+    naming: "Derived from description (e.g., 'rename_jpeg.py')"
+    structure: "Single file, no directories"
+    testing: "Manual run = test"
+    documentation: "Inline comments only"
+
+  step_4_output:
+    deliverables:
+      - "Single script file with shebang"
+      - "Inline comments for non-obvious logic"
+      - "Usage example in file header"
+    skip_deliverables:
+      - README.md
+      - PRD.md
+      - LLM-OVERVIEW.md
+      - scripts/ directory
+      - .oneshot/ directory
+    optional:
+      - ".oneshot/micro_log.txt for history tracking"
+```
+
+**Example Micro Interaction**:
+
+```
+User: "Micro mode. Script that renames all .jpeg files to .jpg in current dir."
+
+Agent: "Got it. Two quick questions:
+1. Should it be recursive (subdirectories)?
+2. Dry-run option to preview changes?
+
+Or just the basics?"
+
+User: "Just basics, current dir only."
+
+Agent: [Produces rename_jpeg.py - done in 30 seconds]
+```
+
+**Micro Output Template**:
+
+```python
+#!/usr/bin/env python3
+"""
+rename_jpeg.py - Renames .jpeg files to .jpg in current directory
+
+Usage:
+    python rename_jpeg.py
+
+Created via ONE_SHOT micro mode.
+"""
+
+import os
+from pathlib import Path
+
+def main():
+    for f in Path('.').glob('*.jpeg'):
+        new_name = f.with_suffix('.jpg')
+        f.rename(new_name)
+        print(f"Renamed: {f} -> {new_name}")
+
+if __name__ == "__main__":
+    main()
+```
 
 ---
 
@@ -1086,6 +1199,110 @@ echo "=== Validation complete ==="
 
 **ALWAYS validate before writing code**. This prevents wasted effort on invalid assumptions.
 
+## 5.3 ONE_SHOT Doctor (Project Health Check)
+
+Run this to validate a project against the ONE_SHOT spec:
+
+```bash
+#!/usr/bin/env bash
+# scripts/oneshot_doctor.sh
+# Validates a project against ONE_SHOT spec
+
+set -euo pipefail
+
+echo "=== ONE_SHOT Doctor ==="
+echo "Checking project health..."
+echo ""
+
+ERRORS=0
+WARNINGS=0
+
+# Required files
+echo "[Checking required files]"
+for f in ONE_SHOT.md LLM-OVERVIEW.md README.md PRD.md; do
+  if [ -f "$f" ]; then
+    echo "  ✓ $f"
+  else
+    echo "  ✗ MISSING: $f"
+    ((ERRORS++))
+  fi
+done
+
+# Required scripts (for non-micro projects)
+echo ""
+echo "[Checking scripts]"
+if [ -d "scripts" ]; then
+  for s in setup.sh start.sh stop.sh status.sh; do
+    if [ -f "scripts/$s" ]; then
+      echo "  ✓ scripts/$s"
+    else
+      echo "  ✗ MISSING: scripts/$s"
+      ((ERRORS++))
+    fi
+  done
+else
+  echo "  ⚠ No scripts/ directory (OK for micro mode)"
+  ((WARNINGS++))
+fi
+
+# Checkpoint directory
+echo ""
+echo "[Checking session continuity]"
+if [ -d ".oneshot" ]; then
+  echo "  ✓ .oneshot/ directory exists"
+  [ -f ".oneshot/checkpoint.yaml" ] && echo "  ✓ checkpoint.yaml" || echo "  ⚠ No checkpoint.yaml"
+  [ -f ".oneshot/decisions.log" ] && echo "  ✓ decisions.log" || echo "  ⚠ No decisions.log"
+else
+  echo "  ⚠ No .oneshot/ directory (no resume capability)"
+  ((WARNINGS++))
+fi
+
+# PRD freshness
+echo ""
+echo "[Checking PRD freshness]"
+if [ -f "PRD.md" ]; then
+  # Cross-platform date handling
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    PRD_MOD=$(stat -f %m PRD.md)
+  else
+    PRD_MOD=$(stat -c %Y PRD.md)
+  fi
+  PRD_AGE=$(( ($(date +%s) - PRD_MOD) / 86400 ))
+  if [ $PRD_AGE -gt 30 ]; then
+    echo "  ⚠ PRD.md is $PRD_AGE days old - review for accuracy"
+    ((WARNINGS++))
+  else
+    echo "  ✓ PRD.md is $PRD_AGE days old"
+  fi
+fi
+
+# Health endpoint check (if service)
+echo ""
+echo "[Checking service health]"
+if grep -q "health" scripts/status.sh 2>/dev/null; then
+  echo "  ✓ Health check in status.sh"
+else
+  echo "  ⚠ No health check found"
+  ((WARNINGS++))
+fi
+
+echo ""
+echo "=== Results ==="
+echo "Errors:   $ERRORS"
+echo "Warnings: $WARNINGS"
+echo ""
+
+if [ $ERRORS -gt 0 ]; then
+  echo "❌ Project does not meet ONE_SHOT spec"
+  exit 1
+else
+  echo "✅ Project passes ONE_SHOT spec"
+  exit 0
+fi
+```
+
+**Usage**: `./scripts/oneshot_doctor.sh` or `bash scripts/oneshot_doctor.sh`
+
 ## 5.5 Using ONE_SHOT with Existing Projects
 
 ONE_SHOT isn't just for greenfield projects. You can apply its patterns incrementally.
@@ -1156,7 +1373,13 @@ ONE_SHOT's build loop, assuming PRD is approved.
 - Clone into `~/github/[project]`
 - Initialize project layout
 - Add `.editorconfig`, `.gitignore`
-- **Create LLM-OVERVIEW.md** (NEW in v1.8)
+- **Create LLM-OVERVIEW.md**
+- **Initialize checkpoint tracking**:
+  ```bash
+  mkdir -p .oneshot
+  touch .oneshot/checkpoint.yaml
+  echo "# ONE_SHOT decisions log - $(date -Iseconds)" > .oneshot/decisions.log
+  ```
 
 ### Required Initial Files
 
@@ -1247,7 +1470,8 @@ Sessions get interrupted. Context windows fill up. Machines crash. This section 
 ```yaml
 # .oneshot/checkpoint.yaml
 checkpoint:
-  version: 1.0
+  oneshot_version: "1.9"      # Spec version this was created under
+  checkpoint_schema: "1.0"    # Checkpoint format version
   project: project-name
   last_updated: 2024-12-06T14:32:00Z
 
