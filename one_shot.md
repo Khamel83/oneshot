@@ -1,21 +1,27 @@
 # ONE_SHOT_CONTRACT (do not remove)
 ```yaml
 oneshot:
-  version: 2.1
+  version: 3.0
+
+  # ============================================================================
+  # ONE_SHOT: THE $0 AI BUILD SYSTEM
+  # ============================================================================
+  # Single file. Works standalone. Builds anything. Costs nothing.
+  #
+  # Compatible with: Claude Code, Cursor, Aider, Gemini CLI, any LLM agent
+  # Also compatible with: AGENTS.md standard (this file can BE your AGENTS.md)
+  # ============================================================================
 
   # ============================================================================
   # PRIME DIRECTIVE: FRONT-LOAD EVERYTHING
   # ============================================================================
-  # The user answers questions ONCE. Then the agent works autonomously.
-  # The user should be able to walk away after PRD approval.
-  # 5 minutes of questions → 5 hours of uninterrupted autonomous work.
-  # ============================================================================
-
   prime_directive:
     philosophy: |
       ONE_SHOT exists to MINIMIZE user interruptions during development.
       All information gathering happens UPFRONT, before any code is written.
       Once the PRD is approved, the agent works autonomously until done.
+
+      THE FORMULA: 5 min questions → PRD approval → hours of autonomous work → done
 
     rules:
       - "Ask ALL questions before writing ANY code"
@@ -24,60 +30,121 @@ oneshot:
       - "Validate answers immediately - don't discover problems 2 hours into coding"
       - "The user's time is precious - your compute time is cheap"
 
-    information_flow:
-      intake_phase:
-        duration: "5-15 minutes of user time"
-        goal: "Gather EVERYTHING needed to build autonomously"
-        output: "Complete PRD with no ambiguity"
+    flow:
+      intake: "5-15 min of user time → Complete PRD with no ambiguity"
+      autonomous: "Minutes to hours of agent work → User can walk away"
+      interruption: "Only for hard_stops (security, data deletion, etc.)"
 
-      autonomous_phase:
-        duration: "Minutes to hours of agent work"
-        goal: "Build the entire project without interruption"
-        user_involvement: "ZERO - user can walk away"
-        interruption_allowed: "Only for hard_stops (see below)"
+  # ============================================================================
+  # COST: $0 INFRASTRUCTURE + MINIMAL TOKENS
+  # ============================================================================
+  cost_optimization:
+    infrastructure: "$0 - OCI Free Tier or homelab"
+    ai_model:
+      default: "google/gemini-2.5-flash-lite"  # ~$0.02/million tokens
+      complex: "claude-sonnet-4"               # For architecture decisions
+      heavy: "claude-opus-4"                   # For initial setup only
+    monthly_target: "$0-5 for most projects"
+
+    token_strategy:
+      one_shot_md: "~18K tokens (always loaded)"
+      skills_md: "~3K per skill (loaded on-demand)"
+      llm_overview: "~2-5K per project"
+      total_typical: "~25K tokens per session"
 
     anti_patterns:
-      - "Asking one question at a time over multiple messages"
-      - "Discovering missing requirements mid-implementation"
-      - "Interrupting to ask 'should I also do X?'"
-      - "Waiting for approval on obvious next steps"
-      - "Asking the same question twice in different forms"
+      - "Loading entire codebase into context"
+      - "Re-explaining project every session"
+      - "Using expensive models for routine tasks"
 
-  # File architecture guidance
+  # ============================================================================
+  # STANDALONE vs SUPPLEMENTED
+  # ============================================================================
+  # ONE_SHOT works completely standalone. No other files required.
+  # But it can be SUPPLEMENTED by external resources for power users.
+  # ============================================================================
+  standalone:
+    works_alone: true
+    minimum_files: ["ONE_SHOT.md"]  # This file is all you need
+    generates: ["PRD.md", "LLM-OVERVIEW.md", "README.md", ".oneshot/"]
+
+  supplements:
+    skills_md:
+      url: "https://raw.githubusercontent.com/Khamel83/secrets-vault/master/SKILLS.md"
+      local: "~/github/secrets-vault/SKILLS.md"
+      when: "For skill-based orchestration (19 reusable skills)"
+      required: false
+    secrets_vault:
+      repo: "github.com/Khamel83/secrets-vault"
+      when: "For SOPS+Age encrypted secrets"
+      required: false
+
+  # ============================================================================
+  # AGENTS.MD COMPATIBILITY
+  # ============================================================================
+  # ONE_SHOT is compatible with the AGENTS.md standard (2025).
+  # You can rename this file to AGENTS.md or symlink it.
+  # ============================================================================
+  agents_md_compatible: true
+  agents_md_note: |
+    ONE_SHOT follows the AGENTS.md philosophy:
+    - Single file for AI context
+    - Project-specific instructions
+    - Build/test/deploy guidance
+
+    ONE_SHOT goes BEYOND AGENTS.md:
+    - PRD-first development
+    - Triage layer for intent classification
+    - Checkpoint/resume for long sessions
+    - Skills composition for complex builds
+    - Cost tracking and optimization
+
+  # ============================================================================
+  # THE BUILD LOOP (Aider-inspired)
+  # ============================================================================
+  # Implement → Test → Fix → Commit → Repeat
+  # ============================================================================
+  build_loop:
+    pattern: |
+      for each task in PRD:
+        1. implement(task)
+        2. test(task)           # Auto-run tests
+        3. if test_fails:
+             fix(errors)        # Feed errors back to LLM
+             goto 2
+        4. commit(task)         # Conventional commits
+        5. update_checkpoint()
+
+    auto_test:
+      enabled: true
+      command: "auto-detect from project type"
+      on_failure: "Feed error to LLM, attempt fix, max 3 retries"
+
+    auto_lint:
+      enabled: true
+      command: "auto-detect from project type"
+      on_failure: "Auto-fix if possible, otherwise warn"
+
+  # ============================================================================
+  # FILE ARCHITECTURE
+  # ============================================================================
   architecture:
     current_size: "~18K tokens"
-    growth_ceiling: "30-40K tokens before restructure needed"
-    restructure_note: |
-      Skills extracted to secrets-vault/SKILLS.md in v2.1.
-      If more extraction needed, add to secrets-vault as companion files.
+    growth_ceiling: "30-40K tokens"
     priority_order: |
-      1. YAML header (always parsed first)
-      2. Part I Sections 0-7 (core flow - agent keeps hot)
-      3. Part I Sections 8-16 (supporting patterns)
-      4. Part II-III (reference on demand)
-      5. Part IV (appendix - skim only)
-    growth_rules:
-      - "Add new core patterns to Part I only if used in >50% of projects"
-      - "Add new reference material to Part II-III"
-      - "Skills and templates go in Part IV (appendix)"
-      - "If Part IV exceeds 40% of file, consider SKILLS.md companion"
+      1. YAML header (always parsed)
+      2. Part I Sections 0-7 (core flow)
+      3. Part I Sections 8-16 (supporting)
+      4. Part II-III (reference)
+      5. Part IV (skills index only - full skills external)
 
-  # Single-file reference - everything consolidated here
-  consolidation:
-    purpose: "Single-file reference for AI/LLM to understand entire ONE_SHOT system"
-    includes:
-      - core_specification
-      - all_skills_inline
-      - secrets_management
-      - llm_overview_standard
-      - session_continuity
-      - failure_recovery
-
-  # LLM-OVERVIEW standard
+  # ============================================================================
+  # LLM-OVERVIEW STANDARD
+  # ============================================================================
   llm_overview:
     purpose: "Every ONE_SHOT project gets an LLM-OVERVIEW.md file"
     content: "Complete project context for a blank-slate LLM"
-    update_frequency: "During development milestones, not every commit"
+    update_frequency: "At milestones, not every commit"
     location: "PROJECT_ROOT/LLM-OVERVIEW.md"
 
   phases:
@@ -299,14 +366,15 @@ companion_repo:
     - This repo is the "resource dump" - ONE_SHOT is the "spec"
 ```
 
-# ONE_SHOT: AI-Powered Autonomous Project Builder
+# ONE_SHOT: The $0 AI Build System
 
-**Version**: 2.1
-**Philosophy**: Front-load ALL questions → Execute AUTONOMOUSLY → User walks away
-**Prime Directive**: User's time is precious. Agent compute is cheap.
-**Validated By**: 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
-**Deployment**: OCI Always Free Tier OR Homelab (i5, 16GB RAM, Ubuntu)
-**Cost**: $0/month infra (AI optional, low-cost)
+**Version**: 3.0
+**Tagline**: Single file. Works standalone. Builds anything. Costs nothing.
+**Philosophy**: 5 min questions → PRD approval → hours of autonomous work → done
+**Compatible With**: Claude Code, Cursor, Aider, Gemini CLI, AGENTS.md standard
+**Default Model**: `google/gemini-2.5-flash-lite` (~$0.02/million tokens)
+**Infrastructure**: $0 (OCI Free Tier or homelab)
+**Validated By**: 8+ real-world projects
 
 ---
 
@@ -2456,6 +2524,28 @@ companion_files:
 
 # 15. VERSION HISTORY
 
+- **v3.0** (2025-12-06)
+  - **MAJOR**: ONE_SHOT is now "The $0 AI Build System"
+  - **NEW**: AGENTS.md compatibility
+    - ONE_SHOT follows the 2025 AGENTS.md standard
+    - Can be renamed to AGENTS.md or symlinked
+    - Works with Codex, Gemini CLI, Aider, any agent
+  - **NEW**: Cost optimization section
+    - Default model: `google/gemini-2.5-flash-lite` (~$0.02/million tokens)
+    - Token strategy: ~25K tokens typical session
+    - Monthly target: $0-5 for most projects
+  - **NEW**: Build loop (Aider-inspired)
+    - Implement → Test → Fix → Commit → Repeat
+    - Auto-test with error feedback to LLM
+    - Auto-lint with auto-fix
+  - **NEW**: Standalone vs Supplemented pattern
+    - ONE_SHOT works completely alone (just this file)
+    - Supplements (SKILLS.md, secrets-vault) are optional power-ups
+  - **UPDATED**: SKILLS.md v2.1 with BUILD_WITH_SKILLS algorithm
+    - 19 modular skills that compose like LEGO
+    - 6 build recipes (CLI, API, Website, Full-Stack, Bug Fix, Refactor)
+  - **RATIONALE**: Make AI-assisted development accessible to everyone for $0
+
 - **v2.1** (2024-12-06)
   - **NEW**: TRIAGE LAYER (Section 0.0) - First Contact Protocol
     - Intent Classification: build_new, fix_existing, continue_work, modify, understand, quick_task
@@ -2996,45 +3086,59 @@ Prompt: "Find the [skill-name] skill and follow its workflow"
 
 ---
 
-# END OF ONE_SHOT v2.1
+# END OF ONE_SHOT v3.0
 
 ---
 
-**ONE_SHOT v2.1: Triage first. Front-load everything. Execute autonomously.**
+## ONE_SHOT v3.0: The $0 AI Build System
 
-**Architecture**:
-- **Part I (Sections 0-16)**: Core specification - agent keeps hot
-- **Part II-III (Sections 17-18)**: Reference material - load on demand
-- **Part IV (Section 19)**: Appendix - skills via external reference
+**Single file. Works standalone. Builds anything. Costs nothing.**
 
-**The Contract**:
+### The Formula
 ```
-Micro:  2 questions → single file (2 min)
-Yolo:   5 questions → full project (5 min)
-Normal: 14 questions → full project (15 min)
-Heavy:  14+ questions → full project + AI (20 min)
+5 min questions → PRD approval → hours of autonomous work → done
 ```
 
-**Companion Repository: secrets-vault**
+### The Contract
+```
+Micro:  2 questions → single file      ($0.00)
+Yolo:   5 questions → full project     ($0.01)
+Normal: 14 questions → full project    ($0.05)
+Heavy:  14+ questions → full project   ($0.10)
+```
+
+### Cost Breakdown
 ```yaml
-secrets_vault:
-  repo: "github.com/Khamel83/secrets-vault"
-  local: "~/github/secrets-vault"
-  contains:
-    - SKILLS.md           # All ONE_SHOT skills (9 skills)
-    - secrets.env.encrypted  # SOPS-encrypted secrets
-    - homelab.env         # Homelab-specific config
-  purpose: "Shared resources for all ONE_SHOT projects"
-  relationship: "ONE_SHOT is the spec, secrets-vault is the resource dump"
+default_model: "google/gemini-2.5-flash-lite"  # $0.02/million tokens
+infrastructure: "$0 - OCI Free Tier or homelab"
+monthly_budget: "$0-5 for most projects"
+token_usage: "~25K per session typical"
 ```
 
-**File Health**:
-- Current: ~18K tokens ✅ (reduced from ~25K after skills extraction)
-- Ceiling: 30-40K tokens
-- Status: Healthy, room to grow
+### Standalone vs Supplemented
+```
+STANDALONE (this file only):
+  ONE_SHOT.md → works with any LLM agent → builds projects
 
-**100% Free & Open-Source** | **Deploy Anywhere** | **No Vendor Lock-in**
+SUPPLEMENTED (optional power-ups):
+  + SKILLS.md (19 composable skills)     → skill-based orchestration
+  + secrets-vault (SOPS+Age)             → encrypted secrets
+```
+
+### Compatibility
+```
+✅ Claude Code    ✅ Cursor    ✅ Aider
+✅ Gemini CLI     ✅ Codex     ✅ Any LLM agent
+✅ AGENTS.md standard (2025)
+```
+
+### File Health
+- Current: ~18K tokens
+- Ceiling: 30-40K tokens
+- Status: Healthy
 
 ---
 
-*ONE_SHOT v2.1 - Triage. Front-load. Execute. Single file. Built to last.*
+**100% Free & Open-Source** | **$0 Infrastructure** | **No Vendor Lock-in**
+
+*ONE_SHOT v3.0 - The $0 AI Build System. Single file. Built to last.*
