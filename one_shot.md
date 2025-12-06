@@ -1,10 +1,49 @@
 # ONE_SHOT_CONTRACT (do not remove)
 ```yaml
 oneshot:
-  version: 1.8
+  version: 1.9
 
-  # NEW IN v1.8: This single file IS the complete reference
-  # No external files needed - everything is consolidated here
+  # ============================================================================
+  # PRIME DIRECTIVE: FRONT-LOAD EVERYTHING
+  # ============================================================================
+  # The user answers questions ONCE. Then the agent works autonomously.
+  # The user should be able to walk away after PRD approval.
+  # 5 minutes of questions → 5 hours of uninterrupted autonomous work.
+  # ============================================================================
+
+  prime_directive:
+    philosophy: |
+      ONE_SHOT exists to MINIMIZE user interruptions during development.
+      All information gathering happens UPFRONT, before any code is written.
+      Once the PRD is approved, the agent works autonomously until done.
+
+    rules:
+      - "Ask ALL questions before writing ANY code"
+      - "NEVER interrupt the user mid-build for information you could have asked upfront"
+      - "If you discover you need new information, BATCH questions together"
+      - "Validate answers immediately - don't discover problems 2 hours into coding"
+      - "The user's time is precious - your compute time is cheap"
+
+    information_flow:
+      intake_phase:
+        duration: "5-15 minutes of user time"
+        goal: "Gather EVERYTHING needed to build autonomously"
+        output: "Complete PRD with no ambiguity"
+
+      autonomous_phase:
+        duration: "Minutes to hours of agent work"
+        goal: "Build the entire project without interruption"
+        user_involvement: "ZERO - user can walk away"
+        interruption_allowed: "Only for hard_stops (see below)"
+
+    anti_patterns:
+      - "Asking one question at a time over multiple messages"
+      - "Discovering missing requirements mid-implementation"
+      - "Interrupting to ask 'should I also do X?'"
+      - "Waiting for approval on obvious next steps"
+      - "Asking the same question twice in different forms"
+
+  # Single-file reference - everything consolidated here
   consolidation:
     purpose: "Single-file reference for AI/LLM to understand entire ONE_SHOT system"
     includes:
@@ -12,13 +51,10 @@ oneshot:
       - all_skills_inline
       - secrets_management
       - llm_overview_standard
-    replaces:
-      - "Separate SKILL.md files (now inline)"
-      - "CENTRAL_SECRETS.md (now Section 17)"
-      - "SOPS_STANDALONE.md (now Section 17)"
-      - "SHARING_ONESHOT.md (now Section 18)"
+      - session_continuity  # NEW IN v1.9
+      - failure_recovery    # NEW IN v1.9
 
-  # NEW IN v1.8: LLM-OVERVIEW standard
+  # LLM-OVERVIEW standard
   llm_overview:
     purpose: "Every ONE_SHOT project gets an LLM-OVERVIEW.md file"
     content: "Complete project context for a blank-slate LLM"
@@ -26,12 +62,27 @@ oneshot:
     location: "PROJECT_ROOT/LLM-OVERVIEW.md"
 
   phases:
-    - intake_core_questions
-    - generate_prd
-    - wait_for_prd_approval
-    - autonomous_build
+    - intake_core_questions   # User present - gather everything
+    - generate_prd            # User present - review and approve
+    - wait_for_prd_approval   # User says "go"
+    - autonomous_build        # User can leave - agent works alone
 
   modes:
+    micro:
+      description: "Single file, <100 lines, no project structure needed."
+      trigger: "User says 'micro mode' or describes a tiny script"
+      required_questions: [Q1, Q6, Q11]
+      optional_questions: [Q12]
+      skip_sections:
+        - web_design
+        - ai
+        - agents
+        - deployment
+        - testing
+        - health_endpoints
+        - scripts_directory
+        - llm_overview
+      output: "Single script file with inline comments"
     tiny:
       description: "Single script/CLI, no services, no web, no AI."
       skip_sections:
@@ -45,6 +96,21 @@ oneshot:
     heavy:
       description: "Multi-service and/or AI/agents/MCP with full ops."
       skip_sections: []
+
+  # Tiered questions for speed vs thoroughness
+  question_tiers:
+    must_answer:
+      description: "Always required, no defaults possible"
+      questions: [Q0, Q1, Q2, Q6, Q12]
+      count: 5
+    answer_if_non_default:
+      description: "Has smart defaults - only ask if user's needs differ"
+      questions: [Q2.5, Q3, Q4, Q5, Q7, Q8, Q9, Q10, Q11, Q13]
+      behavior: "Agent proposes defaults, user confirms or overrides"
+    yolo_mode:
+      trigger: "User says 'yolo mode' or 'fast mode'"
+      behavior: "Only ask must_answer questions, use defaults for rest"
+      confirmation: "Show proposed defaults, proceed on 'yes'"
 
   core_questions:
     - { id: Q0,  key: mode,          type: enum,       required: true }
@@ -104,6 +170,61 @@ oneshot:
     llm_overview_rule: >
       Every ONE_SHOT project MUST have an LLM-OVERVIEW.md file that provides
       complete context for a blank-slate LLM to understand the project.
+    front_load_rule: >
+      Agents MUST gather ALL required information during intake phase.
+      NEVER interrupt autonomous build phase for information that could
+      have been gathered upfront. User's time is precious; compute is cheap.
+
+  # Hard stops - agent MUST pause and get explicit approval
+  hard_stops:
+    description: "Agent MUST pause and get explicit user approval before proceeding"
+    triggers:
+      - id: storage_upgrade
+        condition: "Upgrading storage tier (files→SQLite, SQLite→Postgres)"
+        prompt: "Storage upgrade requires approval. Current: [X], Proposed: [Y]. Approve?"
+      - id: new_major_dependency
+        condition: "Adding dependency > 5MB or with native extensions"
+        prompt: "Adding [dependency]. This requires [native deps/compilation]. Approve?"
+      - id: auth_change
+        condition: "Changing authentication method"
+        prompt: "Changing auth from [X] to [Y]. This affects [scope]. Approve?"
+      - id: production_deploy
+        condition: "Any change to production deployment configuration"
+        prompt: "Modifying production config. Change: [description]. Approve?"
+      - id: reality_check_failed
+        condition: "Q2.5 answered 'No, but I might someday' without learning flag"
+        prompt: "Reality Check failed. Type 'Override Reality Check' to proceed."
+      - id: external_api_integration
+        condition: "Adding new external API integration"
+        prompt: "Adding [API] integration. Cost: [estimate]. Rate limits: [limits]. Approve?"
+      - id: data_deletion
+        condition: "Any operation that deletes user data or database tables"
+        prompt: "This will delete [description]. Type 'CONFIRM DELETE' to proceed."
+      - id: schema_migration
+        condition: "Database schema changes on existing data"
+        prompt: "Schema migration: [description]. Backup recommended. Approve?"
+    agent_behavior: |
+      On trigger: STOP → Present prompt → Wait for approval → Log decision → Proceed only after approval
+
+  # Agent compatibility notes
+  agent_compatibility:
+    tested_with:
+      - agent: "claude-code"
+        model: "claude-opus-4"
+        status: "Primary - follows sections literally"
+      - agent: "claude-code"
+        model: "claude-sonnet-4"
+        status: "Good for routine tasks, may need section reminders"
+      - agent: "cursor"
+        model: "claude-3.5-sonnet"
+        status: "May need reminders to check ONE_SHOT.md"
+    tips:
+      claude_code: "Reference specific sections: 'Follow Section 7.2'"
+      cursor: "Start sessions with: 'Read ONE_SHOT.md first'"
+    model_selection:
+      opus: "Initial setup, complex architecture, multi-phase builds"
+      sonnet: "Bug fixes, single features, documentation"
+      haiku: "Quick edits, simple scripts"
 
 oneshot_env:
   projects_root: "~/github"
@@ -115,8 +236,9 @@ oneshot_env:
 
 # ONE_SHOT: AI-Powered Autonomous Project Builder
 
-**Version**: 1.8
-**Philosophy**: Ask everything upfront, then execute autonomously
+**Version**: 1.9
+**Philosophy**: Front-load ALL questions → Execute AUTONOMOUSLY → User walks away
+**Prime Directive**: User's time is precious. Agent compute is cheap.
 **Validated By**: 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
 **Deployment**: OCI Always Free Tier OR Homelab (i5, 16GB RAM, Ubuntu)
 **Cost**: $0/month infra (AI optional, low-cost)
@@ -127,20 +249,23 @@ oneshot_env:
 
 This single file contains EVERYTHING an AI needs to understand and use ONE_SHOT:
 
+**PRIME DIRECTIVE**: User's time is precious. Agent compute is cheap.
+Ask ALL questions upfront → PRD → Autonomous build → User walks away.
+
 **PART I: CORE SPECIFICATION (Sections 0-16)**
 - Section 0: How to Use This File
 - Section 1: Core Ethos
-- Section 2: Core Questions (Q0-Q13)
+- Section 2: Core Questions (Q0-Q13) + **PRIME DIRECTIVE (2.0)** + **Tiered Questions**
 - Section 3: Defaults & Advanced Options
 - Section 4: Optional Web Design & AI
 - Section 5: Environment Validation
 - Section 6: PRD Generation
-- Section 7: Autonomous Execution Pipeline
+- Section 7: Autonomous Execution Pipeline + **Resume Protocol (7.6)** + **Handoff Protocol (7.7)**
 - Section 8-10: Deployment, Ops, AI Integration
-- Section 11-13: Examples, Goals, Anti-Patterns
+- Section 11-13: Examples, Goals, Anti-Patterns + **Failure Recovery (13.5)**
 - Section 14-16: Meta, Version History, Skills Integration
 
-**PART II: LLM-OVERVIEW STANDARD (Section 17)** - NEW IN v1.8
+**PART II: LLM-OVERVIEW STANDARD (Section 17)**
 - What it is and why it exists
 - Template for every project
 - Update guidelines
@@ -180,19 +305,99 @@ This file is meant to be loaded into an IDE agent (Claude Code, Cursor, etc.) an
 
 This is the contract: *questions once → PRD → autonomous build*.
 
-## 0.2 What's New in v1.8: Consolidated Single File
+## 0.2 PROJECT RECONNAISSANCE (Auto-Run on Session Start)
 
-**v1.8 consolidates EVERYTHING into this single file:**
+**Before asking ANY questions, the agent MUST run a quick reconnaissance to understand where the project is.**
 
-- **Skills are inline** (Section 19) - No need to check `.claude/skills/` separately
-- **Secrets management included** (Section 18) - SOPS, Age, vault setup all here
-- **LLM-OVERVIEW standard** (Section 17) - Every project gets a file that explains itself to any LLM
+### 0.2.1 Reconnaissance Checklist (30 seconds)
 
-**Why single file?**
-- AI can read ONE file and understand the entire system
-- No chasing references across multiple files
-- Complete context in one place
-- Easier to share and maintain
+```yaml
+reconnaissance:
+  files_to_check:
+    - ONE_SHOT.md: "Is this a ONE_SHOT project?"
+    - .oneshot/checkpoint.yaml: "Is there a resume point?"
+    - LLM-OVERVIEW.md: "What's the project context?"
+    - PRD.md: "Is there an approved PRD?"
+    - README.md: "What does this project do?"
+    - .git: "Is this a git repo?"
+
+  state_detection:
+    new_project:
+      indicators: ["No ONE_SHOT.md", "Empty or minimal repo"]
+      action: "Start fresh - ask Core Questions"
+
+    existing_oneshot_fresh:
+      indicators: ["ONE_SHOT.md exists", "No checkpoint", "No PRD"]
+      action: "Resume intake - check which questions answered"
+
+    existing_oneshot_prd:
+      indicators: ["ONE_SHOT.md exists", "PRD.md exists", "No checkpoint"]
+      action: "Ask: 'PRD exists. Resume build or modify PRD?'"
+
+    existing_oneshot_in_progress:
+      indicators: ["checkpoint.yaml exists"]
+      action: "Resume from checkpoint - show state summary"
+
+    brownfield_no_oneshot:
+      indicators: ["Code exists", "No ONE_SHOT.md"]
+      action: "Ask: 'Existing project. Apply ONE_SHOT patterns incrementally?'"
+```
+
+### 0.2.2 Quick State Detection Script
+
+Agent should mentally run this on session start:
+
+```bash
+# What kind of project is this?
+if [ -f "ONE_SHOT.md" ]; then
+    if [ -f ".oneshot/checkpoint.yaml" ]; then
+        echo "STATE: Resume from checkpoint"
+    elif [ -f "PRD.md" ]; then
+        echo "STATE: PRD exists, ready to build or modify"
+    else
+        echo "STATE: ONE_SHOT project, needs intake"
+    fi
+elif [ -d ".git" ] && [ -n "$(ls -A src/ 2>/dev/null)" ]; then
+    echo "STATE: Brownfield - existing code, no ONE_SHOT"
+else
+    echo "STATE: Greenfield - new project"
+fi
+```
+
+### 0.2.3 State-Dependent First Message
+
+Based on reconnaissance, agent's FIRST message should be:
+
+| State | First Message |
+|-------|---------------|
+| **Greenfield** | "New project. Let me ask the Core Questions..." |
+| **ONE_SHOT Fresh** | "ONE_SHOT project detected. Let me continue intake..." |
+| **ONE_SHOT + PRD** | "Found PRD.md. Ready to build, or need changes first?" |
+| **Resume** | "[Checkpoint summary]. Ready to continue from [task]?" |
+| **Brownfield** | "Existing codebase. Apply ONE_SHOT patterns, or specific task?" |
+
+**This reconnaissance takes <30 seconds and prevents wasted questions.**
+
+---
+
+## 0.3 What's New in v1.9
+
+**v1.9 is about MINIMIZING user time:**
+
+- **PRIME DIRECTIVE** (Section 2.0) - User's time is precious, agent compute is cheap
+- **Project Reconnaissance** (Section 0.2) - Auto-detect project state on session start
+- **Tiered Questions** - Must-answer vs defaults, Yolo mode for speed
+- **Session Continuity** (Sections 7.6-7.7) - Resume from checkpoint, handoff between agents
+- **Failure Recovery** (Section 13.5) - Patterns for common problems
+- **Hard Stops** (YAML header) - Explicit approval triggers
+- **Micro Mode** - Single file, <100 lines, minimal questions
+
+**The Goal**: 5-15 minutes of user time → Hours of autonomous agent work
+
+Everything from v1.8 remains:
+- Skills inline (Section 19)
+- Secrets management (Section 18)
+- LLM-OVERVIEW standard (Section 17)
 
 ---
 
@@ -377,7 +582,78 @@ For every ONE_SHOT project, the agent MUST ensure:
 
 # 2. CORE QUESTIONS (REQUIRED FOR ANY PROJECT)
 
-These are the Core 10+. Every project must answer them.
+## 2.0 THE PRIME DIRECTIVE: FRONT-LOAD EVERYTHING
+
+**This is the most important principle in ONE_SHOT.**
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  USER TIME IS PRECIOUS. AGENT COMPUTE TIME IS CHEAP.                │
+│                                                                     │
+│  Ask ALL questions ONCE, UPFRONT.                                   │
+│  Get ALL information BEFORE writing ANY code.                       │
+│  Then execute AUTONOMOUSLY for hours without interruption.          │
+│                                                                     │
+│  The user should be able to walk away after saying:                 │
+│  "PRD approved. Execute autonomous build."                          │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 2.0.1 Information Gathering Rules
+
+**Agent MUST**:
+1. Ask ALL Core Questions in ONE message (or as few as possible)
+2. Validate answers IMMEDIATELY - catch problems before coding starts
+3. If answers are ambiguous, clarify NOW, not 2 hours into the build
+4. If new information is needed mid-build, BATCH questions together
+5. NEVER interrupt for something that could have been asked upfront
+
+**Agent MUST NOT**:
+- Ask one question, wait for answer, ask next question (drip-feed)
+- Interrupt mid-build to ask "should I also do X?"
+- Ask for approval on obvious next steps
+- Ask the same question in different forms
+- Discover missing requirements after starting implementation
+
+### 2.0.2 Question Tiers (Speed vs Thoroughness)
+
+| Tier | Questions | When to Ask |
+|------|-----------|-------------|
+| **Must Answer** | Q0, Q1, Q2, Q6, Q12 | Always - no defaults possible |
+| **If Non-Default** | Q2.5, Q3-Q5, Q7-Q11, Q13 | Only if user's needs differ from smart defaults |
+
+### 2.0.3 Yolo Mode (For Experienced Users)
+
+**Trigger**: User says "yolo mode" or "fast mode"
+
+**Flow**:
+1. Ask only must-answer questions (Q0, Q1, Q2, Q6, Q12)
+2. Propose smart defaults for everything else
+3. Show summary: "Using these defaults: [list]. Proceed? (yes/override)"
+4. On "yes" → Generate PRD immediately
+
+**Smart Defaults by Project Type**:
+
+| Q6 Type | Stack | Structure | Storage |
+|---------|-------|-----------|---------|
+| A. CLI Tool | Python, Click | Flat | SQLite |
+| B. Library | Python, pytest | Modular | N/A |
+| C. Web App | FastAPI, Jinja2 | Domain-driven | SQLite |
+| D. Data Pipeline | Python, pandas | Flat | SQLite |
+| E. Background Service | Python, APScheduler | Flat | SQLite |
+| F. AI Web App | FastAPI, OpenRouter | Domain-driven | SQLite |
+| G. Static Page | HTML/CSS/JS | Flat | N/A |
+
+### 2.0.4 Quick Mode Reference
+
+| Mode | Questions | User Time | Output |
+|------|-----------|-----------|--------|
+| **Micro** | Q1, Q6, Q11 only | 1-2 min | Single file |
+| **Yolo** | 5 must-answer | 3-5 min | Full project |
+| **Normal** | All Core Questions | 10-15 min | Full project |
+| **Heavy** | All + AI/Agent Qs | 15-20 min | Full project + AI |
+
+---
 
 ## Q0. Mode (Scope)
 
@@ -960,6 +1236,173 @@ scripts/
 
 ---
 
+## 7.6 SESSION CONTINUITY: RESUME PROTOCOL
+
+Sessions get interrupted. Context windows fill up. Machines crash. This section ensures work survives.
+
+### 7.6.1 Checkpoint System
+
+**Every ONE_SHOT project maintains a checkpoint file**:
+
+```yaml
+# .oneshot/checkpoint.yaml
+checkpoint:
+  version: 1.0
+  project: project-name
+  last_updated: 2024-12-06T14:32:00Z
+
+  session:
+    current_phase: "Phase 1: Core Implementation"
+    current_task: "Implement storage layer"
+    completion_percentage: 45
+
+  progress:
+    completed:
+      - "Phase 0: Repo & Skeleton"
+      - "Define data models"
+      - "Define storage schema"
+    in_progress:
+      - task: "Implement storage layer"
+        status: "CRUD operations 3/5 done"
+        files_modified:
+          - src/storage.py
+          - tests/test_storage.py
+    pending:
+      - "Build processing logic"
+      - "Create CLI interface"
+      - "Write tests"
+
+  decisions_made:
+    - decision: "Use SQLite over files"
+      reason: "Need querying, expect 10K+ records"
+      date: 2024-12-06
+
+  blockers: []
+
+  files_changed_this_session:
+    - src/models.py
+    - src/storage.py
+```
+
+### 7.6.2 When to Update Checkpoint
+
+**Agent MUST update checkpoint**:
+- After completing any task
+- Before context window reaches 70% capacity
+- When switching to a new phase
+- When hitting a blocker
+- At end of any session
+
+### 7.6.3 Resume Command
+
+**User says**: `Resume from checkpoint`
+
+**Agent MUST**:
+1. Read `.oneshot/checkpoint.yaml`
+2. Read `LLM-OVERVIEW.md` for full context
+3. Read the PRD for requirements
+4. Summarize current state to user
+5. Confirm next action before proceeding
+
+**Resume summary format**:
+```markdown
+## Session Resume
+
+**Project**: [name]
+**Last checkpoint**: [timestamp]
+
+**Completed**:
+- [x] Task 1
+- [x] Task 2
+
+**In Progress**:
+- [ ] Task 3 (50% - [status details])
+
+**Next Action**: [exact next step]
+
+Ready to continue?
+```
+
+### 7.6.4 Checkpoint Directory Structure
+
+```
+.oneshot/
+├── checkpoint.yaml      # Current state
+├── checkpoints/         # Historical checkpoints (optional)
+│   └── YYYY-MM-DD.yaml
+└── decisions.log        # Running log of decisions made
+```
+
+---
+
+## 7.7 SESSION HANDOFF PROTOCOL
+
+When switching agents (Claude Code → Cursor), models, or machines, use this standardized handoff.
+
+### 7.7.1 Quick Handoff Template
+
+When ending a session or switching contexts, generate this:
+
+```markdown
+## HANDOFF STATE
+**Project**: [project-name]
+**Timestamp**: [ISO timestamp]
+**Agent**: [Claude Code / Cursor / etc.]
+
+### Last Completed
+- [Phase X, Task Y - specific description]
+
+### Currently Blocked On (if any)
+- [Issue description]
+- [What was tried]
+- [Why it failed]
+
+### Next Action (BE SPECIFIC)
+1. Open file: `[exact path]`
+2. Find function: `[function name]`
+3. Do: [exact change needed]
+
+### Files Changed This Session
+- `src/storage.py` - Added CRUD operations
+- `tests/test_storage.py` - Added 5 test cases
+
+### Decisions Made This Session
+- Chose X over Y because Z
+
+### Context the Next Agent Needs
+- [Important detail 1]
+- [Important detail 2]
+```
+
+### 7.7.2 Handoff Triggers
+
+**Generate handoff when**:
+- User says "handoff", "switch agent", "take a break"
+- Context window exceeds 80%
+- Agent detects it's looping or stuck
+- Before any session end
+
+### 7.7.3 Receiving a Handoff
+
+**When starting with a handoff, agent MUST**:
+1. Read the handoff document
+2. Read `LLM-OVERVIEW.md`
+3. Read the PRD
+4. Verify "Next Action" is still valid
+5. Confirm understanding before proceeding
+
+### 7.7.4 Handoff vs LLM-OVERVIEW vs Checkpoint
+
+| Document | Purpose | Update Frequency |
+|----------|---------|------------------|
+| LLM-OVERVIEW.md | Full project context | Milestones |
+| Handoff | Session state transfer | Every session |
+| Checkpoint | Machine-readable state | Continuous |
+
+**Use together**: LLM-OVERVIEW for "what is this project", Handoff for "what was I just doing", Checkpoint for precise state recovery.
+
+---
+
 # 8-10. DEPLOYMENT, OPS, AI INTEGRATION
 
 ## 8. Health Endpoints
@@ -1152,6 +1595,143 @@ def get_data(source: str) -> dict:
 
 ---
 
+## 13.5 FAILURE MODES & RECOVERY
+
+When things go wrong, follow these recovery patterns.
+
+### 13.5.1 Build Failure Recovery
+
+```yaml
+recovery_build_failure:
+  trigger: "Tests fail, build errors, runtime crashes"
+  steps:
+    1_isolate:
+      action: "Identify failing component"
+      commands:
+        - "pytest tests/ -x --tb=short"  # Stop at first failure
+        - "git diff HEAD~1"              # What changed?
+    2_rollback:
+      action: "Revert to last known good state"
+      commands:
+        - "git stash"                    # Save current changes
+        - "git checkout HEAD~1"          # Go back one commit
+        - "pytest tests/"                # Verify it works
+    3_bisect:
+      action: "Find the breaking change"
+      commands:
+        - "git bisect start"
+        - "git bisect bad HEAD"
+        - "git bisect good [last-good-commit]"
+    4_fix:
+      action: "Apply minimal fix"
+      rule: "Fix the bug, don't refactor"
+    5_verify:
+      action: "Confirm fix works"
+      commands:
+        - "pytest tests/"
+        - "git stash pop"  # Restore changes if any
+```
+
+### 13.5.2 Agent Confusion Recovery
+
+```yaml
+recovery_agent_confusion:
+  trigger: "Agent loops, gives inconsistent answers, seems lost"
+  symptoms:
+    - "Repeating same action without progress"
+    - "Contradicting previous statements"
+    - "Asking questions already answered"
+    - "Generating code that ignores existing patterns"
+  steps:
+    1_restate:
+      prompt: |
+        STOP. Let's reset.
+        Current phase: [Phase X]
+        Current task: [Task Y]
+        Reference: ONE_SHOT.md Section [N]
+    2_narrow:
+      prompt: |
+        Focus only on: src/storage.py
+        Specific change needed: [exact change]
+        Do not touch any other files.
+    3_verify:
+      prompt: |
+        Before proceeding, tell me:
+        1. What file are you editing?
+        2. What specific change are you making?
+        3. Why?
+    4_checkpoint:
+      prompt: "Update .oneshot/checkpoint.yaml with current state"
+```
+
+### 13.5.3 Context Window Exhaustion
+
+```yaml
+recovery_context_exhaustion:
+  trigger: "Agent responses get shorter, misses context, forgets decisions"
+  prevention:
+    - "Use checkpoint.yaml for state"
+    - "Keep LLM-OVERVIEW.md updated"
+    - "Don't paste entire files - use line ranges"
+  recovery:
+    1_handoff:
+      prompt: "Generate a HANDOFF STATE document for session transfer"
+    2_new_session:
+      prompt: |
+        New session. Read these files in order:
+        1. ONE_SHOT.md (skim, you know this)
+        2. LLM-OVERVIEW.md (full read)
+        3. .oneshot/checkpoint.yaml
+        4. [handoff document]
+        Then confirm your understanding.
+```
+
+### 13.5.4 Dependency Hell
+
+```yaml
+recovery_dependency_hell:
+  trigger: "Package conflicts, version mismatches, missing deps"
+  steps:
+    1_isolate:
+      action: "Create clean environment"
+      commands:
+        - "python -m venv .venv-clean"
+        - "source .venv-clean/bin/activate"
+    2_minimal:
+      action: "Install only what PRD specifies"
+      commands:
+        - "pip install [core-deps-only]"
+    3_add_incrementally:
+      action: "Add deps one at a time, test after each"
+    4_pin:
+      action: "Pin working versions"
+      commands:
+        - "pip freeze > requirements.lock"
+```
+
+### 13.5.5 Recovery Decision Tree
+
+```
+Problem detected
+    │
+    ├─ Build/test failure?
+    │   └─ → Section 13.5.1
+    │
+    ├─ Agent acting weird?
+    │   └─ → Section 13.5.2
+    │
+    ├─ Responses degrading?
+    │   └─ → Section 13.5.3
+    │
+    ├─ Dependency issues?
+    │   └─ → Section 13.5.4
+    │
+    └─ Unknown?
+        └─ → Generate handoff, start fresh session
+```
+
+---
+
 # 14. META: LIVING IDEA REPOSITORY
 
 ONE_SHOT is also your idea sink for future improvements.
@@ -1165,6 +1745,30 @@ ONE_SHOT is also your idea sink for future improvements.
 ---
 
 # 15. VERSION HISTORY
+
+- **v1.9** (2024-12-06)
+  - **MAJOR**: PRIME DIRECTIVE - Front-load everything
+    - New philosophy: User's time is precious, agent compute is cheap
+    - All information gathering happens UPFRONT before any code
+    - User can walk away after "PRD approved. Execute autonomous build."
+  - **NEW**: Session Continuity (Section 7.6-7.7)
+    - Resume Protocol with checkpoint.yaml
+    - Handoff Protocol for switching agents/models
+    - Recovery patterns for common failures
+  - **NEW**: Tiered Questions (Section 2.0)
+    - Must-answer vs defaults-available questions
+    - Yolo mode for experienced users (5 questions → full project)
+    - Micro mode for single-file scripts
+  - **NEW**: Hard Stops in YAML header
+    - Explicit triggers where agent MUST pause for approval
+    - Storage upgrades, auth changes, production deploys
+  - **NEW**: Agent Compatibility notes
+    - Tested configurations (Claude Code, Cursor)
+    - Model selection guidance (Opus vs Sonnet vs Haiku)
+  - **NEW**: Failure Recovery (Section 13.5)
+    - Build failure, agent confusion, context exhaustion, dependency hell
+    - Decision tree for problem diagnosis
+  - **RATIONALE**: Real-world sessions get interrupted. This version ensures work survives and users spend minimal time babysitting agents.
 
 - **v1.8** (2024-12-06)
   - **MAJOR**: Consolidated everything into single file
@@ -2036,17 +2640,25 @@ cp -r skill-repo/skills/* .claude/skills/
 
 ---
 
-# END OF ONE_SHOT v1.8
+# END OF ONE_SHOT v1.9
 
 ---
 
-**ONE_SHOT v1.8: One file. Complete context. Infinite possibilities.**
+**ONE_SHOT v1.9: Front-load everything. Execute autonomously. User walks away.**
 
 **What's in this file**:
+- PRIME DIRECTIVE: User time is precious (YAML header + Section 2.0)
 - Complete specification (Sections 0-16)
+- Session continuity: Resume & Handoff (Sections 7.6-7.7)
+- Failure recovery patterns (Section 13.5)
 - LLM-OVERVIEW standard (Section 17)
 - Secrets management (Section 18)
 - All 8 skills inline (Section 19)
+
+**The Contract**:
+```
+5-15 minutes of questions → PRD approval → Hours of autonomous work
+```
 
 **100% Free & Open-Source** | **Deploy Anywhere** | **No Vendor Lock-in**
 
