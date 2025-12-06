@@ -92,6 +92,11 @@ oneshot:
   infrastructure:
     priority: ["homelab ($0)", "OCI free tier ($0)", "GitHub Actions ($0)", "Supabase ($0)"]
     decision: "Homelab unless needs 24/7 public access"
+    oci_dev:
+      ip: "100.126.13.70"  # Tailscale
+      limits: "4 OCPU, 24GB RAM, 200GB disk (Always Free ARM)"
+      use_for: "Lightweight APIs, webhooks, bots, 24/7 services"
+      skill: "push-to-cloud"  # Full deployment automation
 
   cost:
     default_model: "google/gemini-2.5-flash-lite"  # ~$0.02/million tokens
@@ -1365,6 +1370,7 @@ skills_reference:
 | **skill-creator** | Create new skills | "create skill" |
 | **marketplace-browser** | Find skills | "find skill", "browse" |
 | **designer** | Web designs | "design", "website", "UI" |
+| **push-to-cloud** | Deploy to OCI-Dev | "deploy", "push to cloud", "host this" |
 
 ## How to Use
 
