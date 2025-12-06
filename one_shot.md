@@ -45,11 +45,11 @@ oneshot:
 
   # File architecture guidance
   architecture:
-    current_size: "~25K tokens"
+    current_size: "~18K tokens"
     growth_ceiling: "30-40K tokens before restructure needed"
-    restructure_plan: |
-      When ceiling is reached, split Part IV (Skills Reference) into SKILLS.md
-      companion file. Keep core flow (Sections 0-16) in one_shot.md.
+    restructure_note: |
+      Skills extracted to secrets-vault/SKILLS.md in v2.1.
+      If more extraction needed, add to secrets-vault as companion files.
     priority_order: |
       1. YAML header (always parsed first)
       2. Part I Sections 0-7 (core flow - agent keeps hot)
@@ -274,6 +274,29 @@ oneshot_env:
   secrets_vault_path: "~/github/secrets-vault"
   default_os: "ubuntu-24.04"
   default_user: "ubuntu"
+
+# Companion repository - shared resources for all ONE_SHOT projects
+companion_repo:
+  name: "secrets-vault"
+  repo: "github.com/Khamel83/secrets-vault"
+  local_path: "~/github/secrets-vault"
+  purpose: "Shared resources, secrets, and detailed reference material"
+  contents:
+    skills_md:
+      file: "SKILLS.md"
+      url: "https://raw.githubusercontent.com/Khamel83/secrets-vault/master/SKILLS.md"
+      description: "All 9 ONE_SHOT skills with full documentation"
+    secrets:
+      file: "secrets.env.encrypted"
+      description: "SOPS-encrypted secrets for all projects"
+    homelab:
+      file: "homelab.env"
+      description: "Homelab-specific environment config"
+  agent_behavior: |
+    - Clone/access secrets-vault at project start
+    - Fetch SKILLS.md when a skill is triggered
+    - Decrypt secrets to .env as needed
+    - This repo is the "resource dump" - ONE_SHOT is the "spec"
 ```
 
 # ONE_SHOT: AI-Powered Autonomous Project Builder
@@ -2442,9 +2465,15 @@ companion_files:
     - Graceful Degradation when ONE_SHOT is overkill
     - "I'm Lost" Recovery - what to do when confused
     - Environment Mismatch Detection
-  - **UPDATED**: Architecture current_size updated to ~25K tokens
-  - **ADDED**: Restructure plan for when ceiling is reached (split Skills to SKILLS.md)
-  - **RATIONALE**: Agents need to understand WHAT the user needs before deciding HOW to help. Triage prevents running full 13-question intake for a simple bug fix.
+  - **EXTRACTED**: Skills moved to secrets-vault/SKILLS.md
+    - Reduced one_shot.md from ~25K to ~18K tokens
+    - Added designer skill (9 skills total)
+    - secrets-vault is now the "companion repo" for shared resources
+  - **NEW**: Companion repository pattern
+    - secrets-vault holds: SKILLS.md, secrets.env.encrypted, homelab.env
+    - ONE_SHOT = spec, secrets-vault = resource dump
+    - Agents fetch skills on-demand via URL or local path
+  - **RATIONALE**: Agents need to understand WHAT the user needs before deciding HOW to help. Skills extraction keeps core spec lean while full detail remains accessible.
 
 - **v2.0** (2024-12-06)
   - **ARCHITECTURE**: File structure optimized for long-term growth
@@ -2916,482 +2945,67 @@ key.txt
 
 <!-- SECTION:19:SKILLS_REFERENCE -->
 
-> **📋 APPENDIX NOTICE**: This section is REFERENCE MATERIAL.
->
-> **Agent behavior**: Skim on initial load. Reference specific skills only when:
-> - User explicitly mentions a skill by name
-> - Task matches a skill's "When to Use" trigger
-> - User asks "is there a skill for X?"
->
-> **Do NOT** memorize all skill details. **DO** know they exist for lookup.
+# 19. SKILLS (EXTERNAL REFERENCE)
 
----
+**Full skills documentation has been moved to a dedicated file for better maintainability.**
 
-# 19. CLAUDE CODE SKILLS (INLINE REFERENCE)
+## Quick Reference
 
-All 8 ONE_SHOT skills are documented here for reference. These skills are also available in `.claude/skills/` as separate files, but this inline reference means any AI reading this file has complete context.
-
----
-
-## 19.1 PROJECT-INITIALIZER
-
-**Name**: `project-initializer`
-**Purpose**: Bootstraps new projects with ONE_SHOT standards
-
-### When to Use
-- User says "initialize new project" or "start new project"
-- User asks to "set up project with ONE_SHOT standards"
-- Starting any new development effort
-
-### What It Does
-
-1. **Gathers project information**: Name, type, stack, purpose, scope
-2. **Creates directory structure** based on project type
-3. **Initializes git** with proper `.gitignore`
-4. **Creates CLAUDE.md** with project-specific guidance
-5. **Creates README.md** with Quick Start
-6. **Creates LLM-OVERVIEW.md** (NEW in v1.8)
-7. **Sets up secrets management** (SOPS integration)
-8. **Configures quality tools** (linting, formatting, testing)
-9. **Creates documentation structure** (`docs/architecture/`, ADR template)
-10. **Makes initial commit**
-
-### Directory Structures by Project Type
-
-**Web Application**:
-```
-project-name/
-├── .claude/
-│   ├── CLAUDE.md
-│   └── skills/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── utils/
-├── tests/
-├── docs/
-├── LLM-OVERVIEW.md
-├── README.md
-└── package.json
+```yaml
+skills_reference:
+  url: "https://raw.githubusercontent.com/Khamel83/secrets-vault/master/SKILLS.md"
+  local: "~/github/secrets-vault/SKILLS.md"
+  fetch_when: "Skill is needed - don't load on every session"
 ```
 
-**CLI Tool**:
-```
-project-name/
-├── .claude/
-│   └── CLAUDE.md
-├── cmd/
-├── internal/
-├── tests/
-├── docs/
-├── scripts/
-├── LLM-OVERVIEW.md
-├── README.md
-└── Makefile
-```
-
-**API/Backend Service**:
-```
-project-name/
-├── .claude/
-│   └── CLAUDE.md
-├── cmd/
-├── internal/
-├── api/
-├── tests/
-├── docs/
-│   └── api/
-├── LLM-OVERVIEW.md
-├── README.md
-└── docker-compose.yml
-```
-
----
-
-## 19.2 FEATURE-PLANNER
-
-**Name**: `feature-planner`
-**Purpose**: Breaks down feature requests into implementable plans
-
-### When to Use
-- User requests "plan this feature"
-- User describes a new feature or enhancement
-- Complex feature needs decomposition
-- User says "break this down" or "create a plan"
-
-### Planning Methodology
-
-1. **Understand the feature**: What problem does it solve? Who uses it?
-2. **Break down into components**: Frontend, backend, database, infrastructure, testing, documentation
-3. **Create task list**: Ordered by dependencies
-4. **Identify dependencies**: What must be done first?
-5. **Estimate complexity**: Simple / Medium / Complex
-6. **Risk assessment**: What could go wrong?
-7. **Testing strategy**: How to verify it works?
-
-### Output Format
-
-```markdown
-# Feature Plan: [Feature Name]
-
-## Overview
-[What this feature does and why]
-
-## Components
-1. [Component 1]
-2. [Component 2]
-
-## Tasks (ordered)
-- [ ] Task 1 (prerequisite for 2, 3)
-- [ ] Task 2 (depends on 1)
-- [ ] Task 3 (depends on 1)
-
-## Dependencies
-- External: [APIs, libraries]
-- Internal: [Other features, services]
-
-## Risks
-- Risk 1: [Description] → Mitigation: [How to handle]
-
-## Testing Strategy
-- Unit tests for [X]
-- Integration tests for [Y]
-- Manual testing for [Z]
-
-## Success Criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
-```
-
----
-
-## 19.3 GIT-WORKFLOW
-
-**Name**: `git-workflow`
-**Purpose**: Automates git operations with conventional commits
-
-### When to Use
-- User asks to commit changes
-- User wants to create a PR
-- User mentions conventional commits
-- Git workflow automation needed
-
-### Conventional Commits Format
-
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
-```
-
-**Types**:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation only
-- `style`: Formatting, no code change
-- `refactor`: Code change without feature/fix
-- `test`: Adding tests
-- `chore`: Maintenance tasks
-- `perf`: Performance improvement
-- `ci`: CI/CD changes
-
-### Commit Workflow
-
-1. **Review changes**: `git status`, `git diff`
-2. **Stage files**: `git add <files>` (be selective)
-3. **Create commit**: Use conventional format
-4. **Push changes**: `git push`
-
-### Branch Naming
-
-```
-feature/[ticket-id]-short-description
-fix/[ticket-id]-short-description
-docs/update-readme
-chore/update-dependencies
-```
-
-### PR Template
-
-```markdown
-## Summary
-[2-3 bullet points]
-
-## Changes
-- Change 1
-- Change 2
-
-## Testing
-- [ ] Unit tests pass
-- [ ] Integration tests pass
-- [ ] Manual testing done
-
-## Screenshots (if UI changes)
-[Before/After]
-```
-
----
-
-## 19.4 CODE-REVIEWER
-
-**Name**: `code-reviewer`
-**Purpose**: Comprehensive code review including quality and security
-
-### When to Use
-- User asks to review code
-- User mentions code review or PR review
-- User asks about security issues
-- Before merging significant changes
-
-### Review Checklist
-
-**Code Quality**:
-- [ ] DRY - No repeated code blocks
-- [ ] KISS - Simplest solution that works
-- [ ] YAGNI - No speculative features
-
-**Security (OWASP Top 10)**:
-- [ ] A01: Broken Access Control
-- [ ] A02: Cryptographic Failures
-- [ ] A03: Injection (SQL, Command, XSS)
-- [ ] A04: Insecure Design
-- [ ] A05: Security Misconfiguration
-- [ ] A06: Vulnerable Components
-- [ ] A07: Authentication Failures
-- [ ] A08: Software/Data Integrity Failures
-- [ ] A09: Security Logging Failures
-- [ ] A10: SSRF
-
-**Best Practices**:
-- [ ] Error handling is appropriate
-- [ ] Logging is useful but not excessive
-- [ ] Tests cover critical paths
-- [ ] Documentation is updated
-
-### Output Format
-
-```markdown
-## Code Review: [File/PR Name]
-
-### Critical Issues
-- **[Location]**: [Issue description]
-  - **Why it matters**: [Impact]
-  - **Fix**: [How to resolve]
-
-### Important Suggestions
-- **[Location]**: [Suggestion]
-  - **Benefit**: [Why this helps]
-
-### Minor Improvements
-- [Improvement 1]
-- [Improvement 2]
-
-### What's Good
-- [Positive observation 1]
-- [Positive observation 2]
-```
-
----
-
-## 19.5 DOCUMENTATION-GENERATOR
-
-**Name**: `documentation-generator`
-**Purpose**: Generates READMEs, API docs, ADRs, and project guides
-
-### When to Use
-- User asks to generate documentation
-- User mentions README, API docs, or ADR
-- New project needs documentation structure
-- Documentation updates needed after changes
-
-### Documentation Types
-
-1. **README.md**: User-facing, getting started
-2. **LLM-OVERVIEW.md**: AI context file (NEW in v1.8)
-3. **ADR (Architecture Decision Record)**: Why we chose X
-4. **API Documentation**: Endpoints, request/response
-5. **Developer Guide**: How to contribute
-6. **CLAUDE.md**: AI assistant guidance
-
-### ADR Template (Nygard Format)
-
-```markdown
-# ADR-[NUMBER]: [Title]
-
-**Date**: YYYY-MM-DD
-**Status**: [Proposed | Accepted | Deprecated | Superseded]
-
-## Context
-[What is the issue we're facing?]
-
-## Decision
-[What is the change we're proposing?]
-
-## Rationale
-[Why is this the best approach?]
-
-## Consequences
-
-### Positive
-- [Benefit 1]
-
-### Negative
-- [Trade-off 1]
-
-## Alternatives Considered
-- Alternative 1: [Description] - Rejected because [reason]
-```
-
----
-
-## 19.6 SECRETS-VAULT-MANAGER
-
-**Name**: `secrets-vault-manager`
-**Purpose**: Automates secrets management with SOPS + Age
-
-### When to Use
-- User mentions secrets, environment variables, or API keys
-- User asks to set up secrets-vault
-- New project initialization needing secrets
-- User mentions decrypting secrets
-
-### Setup Workflow
-
-1. **Verify Age key exists**: `~/.age/key.txt`
-2. **Clone vault**: `git clone git@github.com:Khamel83/secrets-vault.git`
-3. **Set up project**: Decrypt secrets to `.env`
-4. **Add to .gitignore**: Ensure `.env` is ignored
-5. **Verify setup**: Source `.env` and check variables
-6. **Document usage**: Add secrets section to README
-
-### Common Operations
-
-**Initial setup**:
+## Available Skills
+
+| Skill | Purpose | Trigger Keywords |
+|-------|---------|------------------|
+| **project-initializer** | Bootstrap new projects | "new project", "initialize", "start fresh" |
+| **feature-planner** | Break down features into tasks | "plan feature", "break down", "create plan" |
+| **git-workflow** | Conventional commits & PRs | "commit", "PR", "conventional commits" |
+| **code-reviewer** | Code quality & security review | "review code", "security check", "PR review" |
+| **documentation-generator** | READMEs, ADRs, API docs | "generate docs", "README", "ADR" |
+| **secrets-vault-manager** | SOPS + Age secrets management | "secrets", "API keys", "environment variables" |
+| **skill-creator** | Create new Claude Code skills | "create skill", "new skill", "automate workflow" |
+| **marketplace-browser** | Find & install community skills | "find skill", "browse marketplace", "is there a skill for" |
+| **designer** | Create beautiful web designs | "design", "website", "UI", "landing page" |
+
+## How to Use
+
+**Agent behavior**:
+1. When a skill is triggered (by keyword or user request), fetch the full SKILLS.md
+2. Read the specific skill section needed
+3. Follow that skill's workflow
+
+**Fetch command**:
 ```bash
-sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
-source .env
+# If on same machine as secrets-vault
+cat ~/github/secrets-vault/SKILLS.md
+
+# Or fetch from GitHub
+curl -s https://raw.githubusercontent.com/Khamel83/secrets-vault/master/SKILLS.md
 ```
 
-**Refresh secrets**:
-```bash
-sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+**WebFetch for agents**:
 ```
-
-**Add new secret**:
-```bash
-cd ~/github/secrets-vault
-sops secrets.env.encrypted
-# Add new line: NEW_SECRET=value
-# Save and exit
-git add . && git commit -m "Add NEW_SECRET" && git push
+URL: https://raw.githubusercontent.com/Khamel83/secrets-vault/master/SKILLS.md
+Prompt: "Find the [skill-name] skill and follow its workflow"
 ```
 
 ---
 
-## 19.7 SKILL-CREATOR
-
-**Name**: `skill-creator`
-**Purpose**: Creates well-structured Claude Code skills
-
-### When to Use
-- User explicitly asks to create a skill
-- User describes a repetitive workflow to automate
-- User wants to package domain knowledge for reuse
-
-### Skill Creation Workflow
-
-1. **Gather requirements**: What should the skill do? When should it be used?
-2. **Create directory structure**: `.claude/skills/skill-name/`
-3. **Write SKILL.md**: YAML frontmatter + instructions
-4. **Create supporting files**: Templates, examples, scripts
-5. **Test the skill**: Verify it works as expected
-6. **Document**: Keywords, examples, edge cases
-
-### SKILL.md Structure
-
-```markdown
----
-name: skill-name
-description: Brief description of what this skill does
-version: "1.0.0"
-allowed-tools: [Bash, Read, Write, Grep, Glob]
----
-
-# Skill Name
-
-You are an expert at [domain].
-
-## When to Use This Skill
-- Trigger condition 1
-- Trigger condition 2
-
-## Workflow
-1. Step 1
-2. Step 2
-3. Step 3
-
-## Output Format
-[Expected output format]
-
-## Keywords
-keyword1, keyword2, keyword3
-```
+# END OF ONE_SHOT v2.1
 
 ---
 
-## 19.8 MARKETPLACE-BROWSER
-
-**Name**: `marketplace-browser`
-**Purpose**: Discovers and installs skills from community sources
-
-### When to Use
-- User asks to find or search for skills
-- User wants to browse the marketplace
-- User describes a task and asks "is there a skill for that?"
-
-### Skill Discovery Sources
-
-1. **skillsmp.com**: Official Skills Marketplace
-2. **Anthropic official**: Built-in Claude Code skills
-3. **Community repositories**:
-   - obra/claude-code-skills
-   - levnikolaevich/claude-code-skills
-   - mhattingpete/claude-skills
-   - OneRedOak/claude-code-prompt-repo
-   - WSHobson/claude-skill-builder
-
-### Installation Methods
-
-**From marketplace**:
-```bash
-# Browse available skills
-open https://skillsmp.com
-
-# Download skill to local
-curl -o .claude/skills/skill-name/SKILL.md https://skillsmp.com/skills/skill-name
-```
-
-**From GitHub**:
-```bash
-# Clone skill repository
-git clone https://github.com/author/skill-repo
-cp -r skill-repo/skills/* .claude/skills/
-```
-
----
-
-# END OF ONE_SHOT v2.0
-
----
-
-**ONE_SHOT v2.0: Front-load everything. Execute autonomously. Scale sustainably.**
+**ONE_SHOT v2.1: Triage first. Front-load everything. Execute autonomously.**
 
 **Architecture**:
 - **Part I (Sections 0-16)**: Core specification - agent keeps hot
 - **Part II-III (Sections 17-18)**: Reference material - load on demand
-- **Part IV (Section 19)**: Appendix - skim only, lookup when needed
+- **Part IV (Section 19)**: Appendix - skills via external reference
 
 **The Contract**:
 ```
@@ -3401,8 +3015,21 @@ Normal: 14 questions → full project (15 min)
 Heavy:  14+ questions → full project + AI (20 min)
 ```
 
+**Companion Repository: secrets-vault**
+```yaml
+secrets_vault:
+  repo: "github.com/Khamel83/secrets-vault"
+  local: "~/github/secrets-vault"
+  contains:
+    - SKILLS.md           # All ONE_SHOT skills (9 skills)
+    - secrets.env.encrypted  # SOPS-encrypted secrets
+    - homelab.env         # Homelab-specific config
+  purpose: "Shared resources for all ONE_SHOT projects"
+  relationship: "ONE_SHOT is the spec, secrets-vault is the resource dump"
+```
+
 **File Health**:
-- Current: ~13K tokens ✅
+- Current: ~18K tokens ✅ (reduced from ~25K after skills extraction)
 - Ceiling: 30-40K tokens
 - Status: Healthy, room to grow
 
@@ -3410,4 +3037,4 @@ Heavy:  14+ questions → full project + AI (20 min)
 
 ---
 
-*ONE_SHOT v2.0 - Single file. Priority ordered. Built to last.*
+*ONE_SHOT v2.1 - Triage. Front-load. Execute. Single file. Built to last.*
