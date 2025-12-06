@@ -1,4 +1,46 @@
-# ONE_SHOT: The $0 AI Build System
+# ONE_SHOT
+
+**The $0 AI Build System.** Single file. Works standalone. Builds anything. Costs nothing.
+
+```
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/README.md > AGENTS.md
+```
+
+Then tell your AI: **"utilize agents.md"**
+
+---
+
+## What This Is
+
+A single file you drop into any project. Your AI agent reads it and knows how to:
+
+- Ask the right questions upfront (5 min of your time)
+- Generate a PRD you approve
+- Build autonomously for hours while you walk away
+- Use SOPS+Age for secrets (encrypted, $0, no SaaS)
+- Resume from checkpoints across sessions
+
+**Cost**: $0 infrastructure (homelab/OCI free tier) + ~$0.02/million tokens (Gemini Flash)
+
+## What This Isn't
+
+- Not a framework to install
+- Not a SaaS to sign up for
+- Not a CLI tool to configure
+- Just a markdown file your AI reads
+
+## The System
+
+```
+~/.claude/CLAUDE.md          ← Your global rules (symlink to secrets-vault)
+project/AGENTS.md            ← This file (curl from oneshot)
+~/github/secrets-vault/      ← Your encrypted secrets + SKILLS.md
+~/.age/key.txt               ← Your Age key (backup to 1Password)
+```
+
+One Age key in 1Password. All secrets encrypted forever. All projects work the same way.
+
+---
 <!-- ONE_SHOT_CONTRACT v3.1 -->
 
 **Version**: 3.1 | **Philosophy**: 5 min questions → PRD → autonomous build → done
@@ -6,7 +48,7 @@
 
 ---
 
-## HOW TO READ THIS FILE (CRITICAL FOR AGENTS)
+## HOW TO READ THIS FILE (FOR AGENTS)
 
 This file is ~3000 lines. **DO NOT read it all at once.**
 
