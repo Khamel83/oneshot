@@ -38,8 +38,49 @@ oneshot:
   # ============================================================================
   # COST: $0 INFRASTRUCTURE + MINIMAL TOKENS
   # ============================================================================
+  # ============================================================================
+  # INFRASTRUCTURE HIERARCHY
+  # ============================================================================
+  # Priority order for where to run things. Homelab first, cloud only when needed.
+  # ============================================================================
+  infrastructure:
+    priority_order:
+      1_homelab:
+        when: "Default - anything that can run locally"
+        examples: ["dev servers", "databases", "self-hosted apps", "CI runners"]
+        cost: "$0 (electricity only)"
+      2_oci_free_tier:
+        when: "Needs 24/7 uptime, homelab can't provide"
+        examples: ["public APIs", "webhooks", "always-on services"]
+        cost: "$0 (forever free tier)"
+        specs: "ARM 4 OCPU, 24GB RAM, 200GB storage"
+      3_github_actions:
+        when: "CI/CD, scheduled tasks, cloud-only operations"
+        examples: ["tests", "builds", "deployments", "cron jobs"]
+        cost: "$0 (2000 min/month free)"
+      4_supabase:
+        when: "Need managed Postgres with auth/realtime"
+        examples: ["user data", "app state", "auth"]
+        cost: "$0 (free tier with keep-alive)"
+        note: "Requires keep-alive ping every 7 days to prevent pause"
+
+    supabase_keepalive:
+      method: "GitHub Action scheduled workflow"
+      schedule: "0 0 */5 * *"  # Every 5 days at midnight
+      action: "Simple SELECT 1 query via Supabase REST API"
+      workflow_file: ".github/workflows/supabase-keepalive.yml"
+
+    decision_tree: |
+      Q: Does it need 24/7 public access?
+        No  → Homelab
+        Yes → Q: Is it stateless/simple?
+                Yes → OCI Free Tier
+                No  → Q: Is it just scheduled tasks?
+                        Yes → GitHub Actions
+                        No  → Supabase + OCI combo
+
   cost_optimization:
-    infrastructure: "$0 - OCI Free Tier or homelab"
+    infrastructure: "$0 - Homelab → OCI → GitHub Actions → Supabase"
     ai_model:
       default: "google/gemini-2.5-flash-lite"  # ~$0.02/million tokens
       complex: "claude-sonnet-4"               # For architecture decisions
