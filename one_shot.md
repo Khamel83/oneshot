@@ -1,7 +1,7 @@
 # ONE_SHOT_CONTRACT (do not remove)
 ```yaml
 oneshot:
-  version: 2.0
+  version: 2.1
 
   # ============================================================================
   # PRIME DIRECTIVE: FRONT-LOAD EVERYTHING
@@ -45,8 +45,11 @@ oneshot:
 
   # File architecture guidance
   architecture:
-    current_size: "~13K tokens"
+    current_size: "~25K tokens"
     growth_ceiling: "30-40K tokens before restructure needed"
+    restructure_plan: |
+      When ceiling is reached, split Part IV (Skills Reference) into SKILLS.md
+      companion file. Keep core flow (Sections 0-16) in one_shot.md.
     priority_order: |
       1. YAML header (always parsed first)
       2. Part I Sections 0-7 (core flow - agent keeps hot)
@@ -263,7 +266,7 @@ oneshot:
         result: "Pass - 135K records"
     primary_agent: "claude-code / claude-opus-4"
     spec_author: "Omar / Khamel83"
-    oneshot_version: "2.0"
+    oneshot_version: "2.1"
 
 oneshot_env:
   projects_root: "~/github"
@@ -275,7 +278,7 @@ oneshot_env:
 
 # ONE_SHOT: AI-Powered Autonomous Project Builder
 
-**Version**: 2.0
+**Version**: 2.1
 **Philosophy**: Front-load ALL questions → Execute AUTONOMOUSLY → User walks away
 **Prime Directive**: User's time is precious. Agent compute is cheap.
 **Validated By**: 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
@@ -292,7 +295,7 @@ This single file contains EVERYTHING an AI needs to understand and use ONE_SHOT:
 Ask ALL questions upfront → PRD → Autonomous build → User walks away.
 
 **PART I: CORE SPECIFICATION (Sections 0-16)**
-- Section 0: How to Use This File
+- Section 0: How to Use This File + **TRIAGE LAYER (0.0)** + Reconnaissance (0.2)
 - Section 1: Core Ethos
 - Section 2: Core Questions (Q0-Q13) + **PRIME DIRECTIVE (2.0)** + **Tiered Questions**
 - Section 3: Defaults & Advanced Options
@@ -330,6 +333,313 @@ Ask ALL questions upfront → PRD → Autonomous build → User walks away.
 # 0. HOW TO USE THIS FILE
 
 This file is meant to be loaded into an IDE agent (Claude Code, Cursor, etc.) and used as the **single spec** for building projects.
+
+<!-- SECTION:0.0:TRIAGE_LAYER -->
+
+## 0.0 TRIAGE LAYER (First Contact Protocol)
+
+**CRITICAL: This runs BEFORE anything else. Before reconnaissance. Before questions.**
+
+When an agent encounters a project with ONE_SHOT.md, or receives any user request, the FIRST action is TRIAGE - understanding what the user actually needs.
+
+### 0.0.1 Intent Classification
+
+**Before doing ANYTHING, classify the user's intent:**
+
+```yaml
+intent_classification:
+  build_new:
+    signals: ["new project", "build me", "create", "start fresh", "greenfield"]
+    action: "Full ONE_SHOT flow → Reconnaissance → Core Questions → PRD → Build"
+
+  fix_existing:
+    signals: ["broken", "not working", "bug", "error", "fix", "debug"]
+    action: "Diagnostic Mode → Gather symptoms → Isolate → Fix → Verify"
+
+  continue_work:
+    signals: ["continue", "resume", "pick up where", "last session"]
+    action: "Context Recovery → Load checkpoint → Summarize state → Resume"
+
+  modify_existing:
+    signals: ["add feature", "change", "update", "modify", "extend"]
+    action: "Scope Assessment → Impact analysis → Mini-PRD → Implement"
+
+  understand:
+    signals: ["explain", "how does", "what is", "show me", "walk through"]
+    action: "Research Mode → Read code → Explain → No code changes"
+
+  quick_task:
+    signals: ["just", "quickly", "simple", "one-liner", "script"]
+    action: "Micro Mode check → If truly micro, skip to Section 2.1"
+```
+
+### 0.0.2 Triage Decision Tree
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    TRIAGE: First 30 Seconds                             │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  1. READ THE USER'S MESSAGE CAREFULLY                                   │
+│     └─→ What are they actually asking for?                              │
+│                                                                         │
+│  2. CLASSIFY INTENT (see 0.0.1)                                         │
+│     ├─→ Build new?     → Go to Section 0.2 (Reconnaissance)             │
+│     ├─→ Fix existing?  → Go to 0.0.3 (Diagnostic Mode)                  │
+│     ├─→ Continue?      → Go to 0.0.4 (Context Recovery)                 │
+│     ├─→ Modify?        → Go to 0.0.5 (Scope Assessment)                 │
+│     ├─→ Understand?    → Research mode (no ONE_SHOT flow needed)        │
+│     └─→ Quick task?    → Go to Section 2.1 (Micro Mode)                 │
+│                                                                         │
+│  3. CONFIRM CLASSIFICATION IF AMBIGUOUS                                 │
+│     "It sounds like you want to [X]. Is that right, or..."              │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 0.0.3 Diagnostic Mode (For "It's Broken" Scenarios)
+
+When user says something is broken/not working:
+
+```yaml
+diagnostic_protocol:
+  step_1_symptoms:
+    ask: "What behavior are you seeing vs what you expected?"
+    gather:
+      - "What error message (if any)?"
+      - "When did it last work?"
+      - "What changed since then?"
+
+  step_2_reproduce:
+    action: "Try to reproduce the issue yourself"
+    commands:
+      - "Run the failing command/action"
+      - "Check logs: docker logs, journalctl, app logs"
+      - "Check health endpoints if applicable"
+
+  step_3_isolate:
+    layers:
+      - "Network: Can you reach the service?"
+      - "Process: Is it running?"
+      - "Config: Any recent changes?"
+      - "Dependencies: All services up?"
+      - "Data: Database accessible?"
+
+  step_4_fix:
+    approach: "Smallest change that fixes the issue"
+    avoid: "Do NOT refactor while debugging"
+
+  step_5_verify:
+    action: "Confirm fix, document what broke and why"
+
+  anti_pattern: |
+    DO NOT run the full ONE_SHOT flow for a bug fix.
+    User said "it's broken" - they want it fixed, not rebuilt.
+```
+
+### 0.0.4 Context Recovery Protocol (For Partial Handoffs)
+
+When resuming work from a previous session or different agent:
+
+```yaml
+context_recovery:
+  step_1_check_artifacts:
+    files:
+      - ".oneshot/checkpoint.yaml"  # Checkpoint from previous session
+      - "PRD.md"                    # Approved requirements
+      - "LLM-OVERVIEW.md"           # Project context doc
+      - ".oneshot/decisions.log"    # Past decisions
+      - "git log --oneline -20"     # Recent commits
+
+  step_2_summarize_state:
+    output: |
+      "Here's what I found:
+      - Project: [name]
+      - Last checkpoint: [phase/task]
+      - Recent work: [last 3 commits]
+      - Outstanding: [pending tasks]
+
+      Ready to continue from [specific task], or need to catch up first?"
+
+  step_3_gap_detection:
+    check:
+      - "Any TODO comments in code?"
+      - "Any failing tests?"
+      - "Any incomplete features in PRD?"
+
+  step_4_handoff_complete:
+    confirm: "Does this summary match your understanding?"
+    proceed: "Continue from checkpoint"
+
+  incomplete_handoff:
+    if: "No checkpoint, no PRD, but code exists"
+    action: |
+      "I found code but no ONE_SHOT artifacts. Options:
+      1. Generate LLM-OVERVIEW.md from existing code (understand first)
+      2. Retrofit ONE_SHOT patterns (add structure)
+      3. Just help with specific task (no full ONE_SHOT)"
+```
+
+### 0.0.5 Scope Assessment (For Modifications)
+
+When user wants to modify an existing project:
+
+```yaml
+scope_assessment:
+  step_1_understand_request:
+    ask: "What feature/change do you want?"
+
+  step_2_impact_analysis:
+    check:
+      - "Which files will change?"
+      - "Any database changes needed?"
+      - "Any new dependencies?"
+      - "Does this affect other features?"
+
+  step_3_size_classification:
+    micro:
+      criteria: "<10 lines, single file, no new deps"
+      action: "Just do it, no PRD update"
+    small:
+      criteria: "<100 lines, 1-3 files, no arch changes"
+      action: "Document in LLM-OVERVIEW.md, implement"
+    medium:
+      criteria: "New feature, multiple files, possible deps"
+      action: "Mini-PRD → Approval → Implement"
+    large:
+      criteria: "Architecture change, new service, major refactor"
+      action: "Full PRD update → Approval → Phased implementation"
+
+  step_4_propose:
+    output: |
+      "This looks like a [size] change. My plan:
+      1. [step]
+      2. [step]
+
+      Should I proceed, or want to discuss first?"
+```
+
+### 0.0.6 Graceful Degradation (When ONE_SHOT is Overkill)
+
+Not every task needs the full ONE_SHOT flow:
+
+```yaml
+graceful_degradation:
+  one_shot_overkill_signals:
+    - "Just add a comment"
+    - "Rename this variable"
+    - "Quick script to..."
+    - "Help me understand..."
+    - "What does this do?"
+
+  degradation_levels:
+    full_oneshot:
+      when: "New project, major feature, architectural change"
+      flow: "Core Questions → PRD → Autonomous Build"
+
+    mini_oneshot:
+      when: "Medium feature, some complexity"
+      flow: "Quick scope check → Mini-PRD → Implement"
+
+    direct_action:
+      when: "Micro task, clear request, minimal risk"
+      flow: "Understand → Do → Verify → Done"
+
+    research_only:
+      when: "User wants to understand, not change"
+      flow: "Read → Explain → No code changes"
+
+  agent_judgment: |
+    Use judgment. A 5-line fix doesn't need 13 Core Questions.
+    But a "quick" feature that touches auth definitely does.
+    When in doubt, ask: "This seems [small/medium/large]. Full ONE_SHOT flow?"
+```
+
+### 0.0.7 "I'm Lost" Recovery
+
+If at any point the agent is confused about what to do:
+
+```yaml
+lost_recovery:
+  symptoms:
+    - "User request doesn't match any intent category"
+    - "Project state is inconsistent"
+    - "Previous context is missing or contradictory"
+    - "Agent doesn't know which section to follow"
+
+  recovery_protocol:
+    step_1: "STOP. Don't guess or hallucinate."
+    step_2: |
+      Ask the user directly:
+      "I want to make sure I help you correctly. Can you tell me:
+      1. What's the end goal you're trying to achieve?
+      2. Is this a new project, existing project, or continuation?
+      3. What's the most important thing to get right?"
+    step_3: "Based on answers, re-run triage from 0.0.1"
+
+  anti_pattern: |
+    DO NOT pretend to understand when confused.
+    DO NOT make up context that wasn't provided.
+    DO NOT proceed with assumptions on ambiguous requests.
+
+  user_time_cost: "30 seconds to clarify saves 30 minutes of wrong work"
+```
+
+### 0.0.8 Environment Mismatch Detection
+
+Check for environment/expectation mismatches early:
+
+```yaml
+environment_check:
+  quick_sanity:
+    - "Does the language/framework match what user described?"
+    - "Are expected files present? (package.json, requirements.txt, etc.)"
+    - "Is this actually a ONE_SHOT project or did user paste spec into non-ONE_SHOT repo?"
+
+  mismatch_handling:
+    spec_without_project:
+      situation: "ONE_SHOT.md exists but no code"
+      action: "This is greenfield - proceed with Core Questions"
+
+    project_without_spec:
+      situation: "Code exists but no ONE_SHOT.md"
+      action: "Ask: Apply ONE_SHOT patterns, or just help with specific task?"
+
+    spec_mismatch:
+      situation: "ONE_SHOT.md describes Python but code is JavaScript"
+      action: "Flag mismatch: 'Spec says Python but I see JS. Which is correct?'"
+
+    version_mismatch:
+      situation: "Checkpoint says v1.8, current spec is v2.1"
+      action: "Note version difference, continue with current spec patterns"
+```
+
+### 0.0.9 Triage Output Template
+
+After triage, agent should have a clear answer:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ TRIAGE COMPLETE                                                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│ Intent: [build_new | fix_existing | continue_work | modify | understand]│
+│ Scope:  [micro | small | medium | large | research_only]                │
+│ Flow:   [Full ONE_SHOT | Mini-PRD | Direct Action | Research]           │
+│ Next:   [Specific next step to take]                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Example outputs:**
+
+```
+Intent: build_new     | Scope: large  | Flow: Full ONE_SHOT | Next: Section 0.2 Reconnaissance
+Intent: fix_existing  | Scope: small  | Flow: Direct Action | Next: Diagnostic Mode step 1
+Intent: continue_work | Scope: medium | Flow: Resume        | Next: Load checkpoint, summarize state
+Intent: modify        | Scope: micro  | Flow: Direct Action | Next: Just make the change
+Intent: understand    | Scope: n/a    | Flow: Research      | Next: Read and explain, no changes
+```
+
+---
 
 ## 0.1 Operational Flow (Human + AI)
 
@@ -421,24 +731,29 @@ Based on reconnaissance, agent's FIRST message should be:
 
 ---
 
-## 0.3 What's New in v1.9
+## 0.3 What's New in v2.1
 
-**v1.9 is about MINIMIZING user time:**
+**v2.1 adds the TRIAGE LAYER - first contact protocol for agents:**
 
-- **PRIME DIRECTIVE** (Section 2.0) - User's time is precious, agent compute is cheap
-- **Project Reconnaissance** (Section 0.2) - Auto-detect project state on session start
-- **Tiered Questions** - Must-answer vs defaults, Yolo mode for speed
-- **Session Continuity** (Sections 7.6-7.7) - Resume from checkpoint, handoff between agents
-- **Failure Recovery** (Section 13.5) - Patterns for common problems
-- **Hard Stops** (YAML header) - Explicit approval triggers
-- **Micro Mode** - Single file, <100 lines, minimal questions
+- **TRIAGE LAYER** (Section 0.0) - First 30 seconds of every session
+  - Intent Classification (build/fix/continue/modify/understand/quick)
+  - Diagnostic Mode for "it's broken" scenarios
+  - Context Recovery Protocol for partial handoffs
+  - Scope Assessment for modifications
+  - Graceful Degradation when ONE_SHOT is overkill
+  - "I'm Lost" Recovery for confused agents
+  - Environment Mismatch Detection
 
-**The Goal**: 5-15 minutes of user time → Hours of autonomous agent work
+**The Philosophy**: Understand WHAT the user needs before deciding HOW to help.
 
-Everything from v1.8 remains:
+Everything from v2.0 remains:
+- PRIME DIRECTIVE (Section 2.0)
+- Project Reconnaissance (Section 0.2)
+- Session Continuity (Sections 7.6-7.7)
+- Micro Mode (Section 2.1)
+- Hard Stops + Override pattern
 - Skills inline (Section 19)
 - Secrets management (Section 18)
-- LLM-OVERVIEW standard (Section 17)
 
 ---
 
@@ -2117,6 +2432,19 @@ companion_files:
 ---
 
 # 15. VERSION HISTORY
+
+- **v2.1** (2024-12-06)
+  - **NEW**: TRIAGE LAYER (Section 0.0) - First Contact Protocol
+    - Intent Classification: build_new, fix_existing, continue_work, modify, understand, quick_task
+    - Diagnostic Mode for "it's broken" scenarios (don't run full ONE_SHOT for bugs)
+    - Context Recovery Protocol for partial handoffs
+    - Scope Assessment for modifications (micro/small/medium/large)
+    - Graceful Degradation when ONE_SHOT is overkill
+    - "I'm Lost" Recovery - what to do when confused
+    - Environment Mismatch Detection
+  - **UPDATED**: Architecture current_size updated to ~25K tokens
+  - **ADDED**: Restructure plan for when ceiling is reached (split Skills to SKILLS.md)
+  - **RATIONALE**: Agents need to understand WHAT the user needs before deciding HOW to help. Triage prevents running full 13-question intake for a simple bug fix.
 
 - **v2.0** (2024-12-06)
   - **ARCHITECTURE**: File structure optimized for long-term growth
