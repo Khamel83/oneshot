@@ -1,7 +1,7 @@
 # ONE_SHOT_CONTRACT (do not remove)
 ```yaml
 oneshot:
-  version: 1.9
+  version: 2.0
 
   # ============================================================================
   # PRIME DIRECTIVE: FRONT-LOAD EVERYTHING
@@ -43,6 +43,22 @@ oneshot:
       - "Waiting for approval on obvious next steps"
       - "Asking the same question twice in different forms"
 
+  # File architecture guidance
+  architecture:
+    current_size: "~13K tokens"
+    growth_ceiling: "30-40K tokens before restructure needed"
+    priority_order: |
+      1. YAML header (always parsed first)
+      2. Part I Sections 0-7 (core flow - agent keeps hot)
+      3. Part I Sections 8-16 (supporting patterns)
+      4. Part II-III (reference on demand)
+      5. Part IV (appendix - skim only)
+    growth_rules:
+      - "Add new core patterns to Part I only if used in >50% of projects"
+      - "Add new reference material to Part II-III"
+      - "Skills and templates go in Part IV (appendix)"
+      - "If Part IV exceeds 40% of file, consider SKILLS.md companion"
+
   # Single-file reference - everything consolidated here
   consolidation:
     purpose: "Single-file reference for AI/LLM to understand entire ONE_SHOT system"
@@ -51,8 +67,8 @@ oneshot:
       - all_skills_inline
       - secrets_management
       - llm_overview_standard
-      - session_continuity  # NEW IN v1.9
-      - failure_recovery    # NEW IN v1.9
+      - session_continuity
+      - failure_recovery
 
   # LLM-OVERVIEW standard
   llm_overview:
@@ -208,8 +224,12 @@ oneshot:
     override:
       pattern: "OVERRIDE: [stop_id]"
       example: "OVERRIDE: storage_upgrade"
-      logging: "All overrides logged to .oneshot/decisions.log with timestamp and reason"
-      format: "[timestamp] OVERRIDE: [stop_id] - User approved despite warning"
+      logging: "All overrides MUST be logged to .oneshot/decisions.log"
+      format: |
+        ## Override: [stop_id]
+        **Date**: [ISO timestamp]
+        **Reason**: [User's justification]
+        **Risk accepted**: [What could go wrong]
 
   # Agent compatibility notes
   agent_compatibility:
@@ -241,8 +261,9 @@ oneshot:
       - name: "divorce-finance"
         type: "Normal (CLI + SQLite)"
         result: "Pass - 135K records"
-    primary_agent: "claude-code / opus-4"
+    primary_agent: "claude-code / claude-opus-4"
     spec_author: "Omar / Khamel83"
+    oneshot_version: "2.0"
 
 oneshot_env:
   projects_root: "~/github"
@@ -254,7 +275,7 @@ oneshot_env:
 
 # ONE_SHOT: AI-Powered Autonomous Project Builder
 
-**Version**: 1.9
+**Version**: 2.0
 **Philosophy**: Front-load ALL questions → Execute AUTONOMOUSLY → User walks away
 **Prime Directive**: User's time is precious. Agent compute is cheap.
 **Validated By**: 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs)
@@ -303,6 +324,8 @@ Ask ALL questions upfront → PRD → Autonomous build → User walks away.
 <!-- ONESHOT_CORE_START -->
 
 # PART I: CORE SPECIFICATION
+
+<!-- SECTION:0:HOW_TO_USE -->
 
 # 0. HOW TO USE THIS FILE
 
@@ -418,6 +441,8 @@ Everything from v1.8 remains:
 - LLM-OVERVIEW standard (Section 17)
 
 ---
+
+<!-- SECTION:1:CORE_ETHOS -->
 
 # 1. CORE ETHOS
 
@@ -598,7 +623,11 @@ For every ONE_SHOT project, the agent MUST ensure:
 
 ---
 
+<!-- SECTION:2:CORE_QUESTIONS -->
+
 # 2. CORE QUESTIONS (REQUIRED FOR ANY PROJECT)
+
+<!-- SECTION:2.0:PRIME_DIRECTIVE -->
 
 ## 2.0 THE PRIME DIRECTIVE: FRONT-LOAD EVERYTHING
 
@@ -671,11 +700,17 @@ For every ONE_SHOT project, the agent MUST ensure:
 | **Normal** | All Core Questions | 10-15 min | Full project |
 | **Heavy** | All + AI/Agent Qs | 15-20 min | Full project + AI |
 
-### 2.0.5 Micro Mode: Complete Flow
+## 2.1 MICRO MODE: The Fast Path
 
 **Trigger**: User says "micro mode" OR describes a script <100 lines
 
-**The Micro Flow** (1-2 minutes total):
+**Micro mode is for**:
+- Single-file scripts
+- Quick utilities
+- One-off automation
+- Learning exercises
+
+### Micro Mode Flow (1-2 minutes total)
 
 ```yaml
 micro_mode_flow:
@@ -765,6 +800,15 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+### When to Upgrade from Micro
+
+If any of these become true, upgrade to Tiny or Normal mode:
+- Script exceeds 100 lines
+- Need persistent storage
+- Need to run as service
+- Need tests
+- Will be used by others
 
 ---
 
@@ -1156,6 +1200,8 @@ Only relevant for Web / AI Web / Landing projects.
 
 ---
 
+<!-- SECTION:5:ENVIRONMENT_VALIDATION -->
+
 # 5. ENVIRONMENT VALIDATION
 
 ONE_SHOT always validates environment before building.
@@ -1199,109 +1245,124 @@ echo "=== Validation complete ==="
 
 **ALWAYS validate before writing code**. This prevents wasted effort on invalid assumptions.
 
-## 5.3 ONE_SHOT Doctor (Project Health Check)
+## 5.3 Project Health Check (oneshot_doctor.sh)
 
-Run this to validate a project against the ONE_SHOT spec:
+**Validates a project against ONE_SHOT spec. Run periodically or before major changes.**
 
 ```bash
 #!/usr/bin/env bash
 # scripts/oneshot_doctor.sh
-# Validates a project against ONE_SHOT spec
+# Validates project against ONE_SHOT v2.0 spec
 
 set -euo pipefail
 
-echo "=== ONE_SHOT Doctor ==="
-echo "Checking project health..."
+echo "=== ONE_SHOT Doctor v2.0 ==="
+echo "Timestamp: $(date -Iseconds)"
 echo ""
 
 ERRORS=0
 WARNINGS=0
 
-# Required files
-echo "[Checking required files]"
-for f in ONE_SHOT.md LLM-OVERVIEW.md README.md PRD.md; do
-  if [ -f "$f" ]; then
-    echo "  ✓ $f"
-  else
-    echo "  ✗ MISSING: $f"
-    ((ERRORS++))
-  fi
+# Helper functions
+error() { echo "❌ ERROR: $1"; ((ERRORS++)) || true; }
+warn() { echo "⚠️  WARN: $1"; ((WARNINGS++)) || true; }
+ok() { echo "✅ OK: $1"; }
+
+# Required files (all modes except micro)
+echo "=== Required Files ==="
+for f in ONE_SHOT.md README.md; do
+  [ -f "$f" ] && ok "$f exists" || error "$f missing"
 done
 
-# Required scripts (for non-micro projects)
+# Mode-dependent files
+if [ -f "PRD.md" ]; then
+  ok "PRD.md exists"
+else
+  warn "PRD.md missing (required for non-micro projects)"
+fi
+
+if [ -f "LLM-OVERVIEW.md" ]; then
+  ok "LLM-OVERVIEW.md exists"
+  # Check freshness
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    AGE=$(( ($(date +%s) - $(stat -f %m LLM-OVERVIEW.md)) / 86400 ))
+  else
+    AGE=$(( ($(date +%s) - $(stat -c %Y LLM-OVERVIEW.md)) / 86400 ))
+  fi
+  [ $AGE -gt 30 ] && warn "LLM-OVERVIEW.md is $AGE days old - consider updating"
+else
+  warn "LLM-OVERVIEW.md missing (required for non-micro projects)"
+fi
+
+# Scripts directory
 echo ""
-echo "[Checking scripts]"
+echo "=== Scripts ==="
 if [ -d "scripts" ]; then
   for s in setup.sh start.sh stop.sh status.sh; do
-    if [ -f "scripts/$s" ]; then
-      echo "  ✓ scripts/$s"
-    else
-      echo "  ✗ MISSING: scripts/$s"
-      ((ERRORS++))
-    fi
+    [ -f "scripts/$s" ] && ok "scripts/$s exists" || warn "scripts/$s missing"
   done
 else
-  echo "  ⚠ No scripts/ directory (OK for micro mode)"
-  ((WARNINGS++))
+  warn "scripts/ directory missing (required for non-micro projects)"
 fi
 
 # Checkpoint directory
 echo ""
-echo "[Checking session continuity]"
+echo "=== Session Continuity ==="
 if [ -d ".oneshot" ]; then
-  echo "  ✓ .oneshot/ directory exists"
-  [ -f ".oneshot/checkpoint.yaml" ] && echo "  ✓ checkpoint.yaml" || echo "  ⚠ No checkpoint.yaml"
-  [ -f ".oneshot/decisions.log" ] && echo "  ✓ decisions.log" || echo "  ⚠ No decisions.log"
+  ok ".oneshot/ directory exists"
+  [ -f ".oneshot/checkpoint.yaml" ] && ok "checkpoint.yaml exists" || warn "checkpoint.yaml missing"
 else
-  echo "  ⚠ No .oneshot/ directory (no resume capability)"
-  ((WARNINGS++))
+  warn ".oneshot/ directory missing (no resume capability)"
 fi
 
-# PRD freshness
+# Git status
 echo ""
-echo "[Checking PRD freshness]"
-if [ -f "PRD.md" ]; then
-  # Cross-platform date handling
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    PRD_MOD=$(stat -f %m PRD.md)
-  else
-    PRD_MOD=$(stat -c %Y PRD.md)
+echo "=== Git Status ==="
+if [ -d ".git" ]; then
+  ok "Git repository initialized"
+  # Check for uncommitted changes
+  if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+    warn "Uncommitted changes present"
   fi
-  PRD_AGE=$(( ($(date +%s) - PRD_MOD) / 86400 ))
-  if [ $PRD_AGE -gt 30 ]; then
-    echo "  ⚠ PRD.md is $PRD_AGE days old - review for accuracy"
-    ((WARNINGS++))
-  else
-    echo "  ✓ PRD.md is $PRD_AGE days old"
-  fi
-fi
-
-# Health endpoint check (if service)
-echo ""
-echo "[Checking service health]"
-if grep -q "health" scripts/status.sh 2>/dev/null; then
-  echo "  ✓ Health check in status.sh"
 else
-  echo "  ⚠ No health check found"
-  ((WARNINGS++))
+  error "Not a git repository"
 fi
 
+# Secrets check
 echo ""
-echo "=== Results ==="
-echo "Errors:   $ERRORS"
+echo "=== Secrets Safety ==="
+if [ -f ".env" ]; then
+  if grep -q "^.env$" .gitignore 2>/dev/null; then
+    ok ".env exists and is gitignored"
+  else
+    error ".env exists but NOT in .gitignore!"
+  fi
+else
+  ok "No .env file (or using SOPS)"
+fi
+
+# Summary
+echo ""
+echo "=== Summary ==="
+echo "Errors: $ERRORS"
 echo "Warnings: $WARNINGS"
-echo ""
 
 if [ $ERRORS -gt 0 ]; then
-  echo "❌ Project does not meet ONE_SHOT spec"
+  echo ""
+  echo "❌ Project has $ERRORS errors that should be fixed."
   exit 1
+elif [ $WARNINGS -gt 0 ]; then
+  echo ""
+  echo "⚠️  Project has $WARNINGS warnings to review."
+  exit 0
 else
-  echo "✅ Project passes ONE_SHOT spec"
+  echo ""
+  echo "✅ Project passes all ONE_SHOT checks!"
   exit 0
 fi
 ```
 
-**Usage**: `./scripts/oneshot_doctor.sh` or `bash scripts/oneshot_doctor.sh`
+**Usage**: Run `./scripts/oneshot_doctor.sh` to validate project health.
 
 ## 5.5 Using ONE_SHOT with Existing Projects
 
@@ -1322,6 +1383,8 @@ ONE_SHOT isn't just for greenfield projects. You can apply its patterns incremen
 - **Progressive enhancement** - start with observability, then documentation, then automation
 
 ---
+
+<!-- SECTION:6:PRD_GENERATION -->
 
 # 6. PRD GENERATION
 
@@ -1363,6 +1426,8 @@ At that point the agent stops asking questions and moves to execution.
 
 ---
 
+<!-- SECTION:7:AUTONOMOUS_EXECUTION -->
+
 # 7. AUTONOMOUS EXECUTION PIPELINE
 
 ONE_SHOT's build loop, assuming PRD is approved.
@@ -1375,11 +1440,42 @@ ONE_SHOT's build loop, assuming PRD is approved.
 - Add `.editorconfig`, `.gitignore`
 - **Create LLM-OVERVIEW.md**
 - **Initialize checkpoint tracking**:
-  ```bash
-  mkdir -p .oneshot
-  touch .oneshot/checkpoint.yaml
-  echo "# ONE_SHOT decisions log - $(date -Iseconds)" > .oneshot/decisions.log
-  ```
+
+### Initialize Checkpoint Tracking
+
+```bash
+# Create checkpoint directory structure
+mkdir -p .oneshot/checkpoints
+touch .oneshot/checkpoint.yaml
+echo "# ONE_SHOT Decision Log - $(date -I)" > .oneshot/decisions.log
+```
+
+**Initial checkpoint.yaml**:
+```yaml
+checkpoint:
+  oneshot_version: "2.0"      # Spec version this project uses
+  checkpoint_schema: "1.0"    # Checkpoint format version
+  project: [PROJECT_NAME]
+  created: [ISO_TIMESTAMP]
+  last_updated: [ISO_TIMESTAMP]
+
+  session:
+    current_phase: "Phase 0: Repo & Skeleton"
+    current_task: "Initial setup"
+    completion_percentage: 0
+
+  progress:
+    completed: []
+    in_progress: []
+    pending:
+      - "Phase 1: Core Implementation"
+      - "Phase 2: Tests"
+      - "Phase 3: Scripts"
+      - "Phase 4: Deployment"
+
+  decisions_made: []
+  blockers: []
+```
 
 ### Required Initial Files
 
@@ -1458,6 +1554,8 @@ scripts/
 - Test health endpoints
 
 ---
+
+<!-- SECTION:7.6:RESUME_PROTOCOL -->
 
 ## 7.6 SESSION CONTINUITY: RESUME PROTOCOL
 
@@ -1558,6 +1656,8 @@ Ready to continue?
 ```
 
 ---
+
+<!-- SECTION:7.7:HANDOFF_PROTOCOL -->
 
 ## 7.7 SESSION HANDOFF PROTOCOL
 
@@ -1819,6 +1919,8 @@ def get_data(source: str) -> dict:
 
 ---
 
+<!-- SECTION:13.5:FAILURE_RECOVERY -->
+
 ## 13.5 FAILURE MODES & RECOVERY
 
 When things go wrong, follow these recovery patterns.
@@ -1966,9 +2068,76 @@ ONE_SHOT is also your idea sink for future improvements.
 - Tell the agent: "Add this concept: [idea]"
 - The agent integrates new ideas, keeps Core Questions compact, avoids duplication
 
+## 14.2 File Size & Growth Guidelines
+
+**Current state**: ~13K tokens (~50K characters, ~3,000 lines)
+**Growth ceiling**: 30-40K tokens before considering restructure
+
+### Why Single File Works
+
+1. **Agent loads once**: File is parsed at session start, not re-read constantly
+2. **Context window is large**: 100K+ tokens available; we use ~10-15%
+3. **Simplicity**: One file to clone, one file to update, one source of truth
+
+### When Single File Breaks Down
+
+Watch for these signals:
+- Agent "forgets" later sections without explicit references
+- Part IV (appendix) exceeds 40% of total file size
+- You find yourself saying "see Section X" constantly
+- New users are overwhelmed finding relevant sections
+
+### Growth Rules
+
+| Content Type | Where to Add | When to Add |
+|--------------|--------------|-------------|
+| Core patterns | Part I (Sections 0-7) | Used in >50% of projects |
+| Supporting patterns | Part I (Sections 8-16) | Used in >25% of projects |
+| Reference material | Part II-III | Needed but not core |
+| Skills & templates | Part IV (Appendix) | Lookup only |
+
+### If Restructure Needed (Future)
+
+If file exceeds 40K tokens, consider:
+
+```
+ONE_SHOT.md          # Core spec (Parts I-III, ~25K tokens)
+SKILLS_REFERENCE.md  # Part IV extracted (~15K tokens)
+```
+
+With ONE_SHOT.md containing:
+```yaml
+companion_files:
+  skills: SKILLS_REFERENCE.md
+  load: "On demand when skills needed"
+```
+
+**But not yet.** Current size is healthy. Revisit at 30K tokens.
+
 ---
 
 # 15. VERSION HISTORY
+
+- **v2.0** (2024-12-06)
+  - **ARCHITECTURE**: File structure optimized for long-term growth
+    - Added growth ceiling guidance (~30-40K tokens max)
+    - Added priority ordering for agent attention
+    - Marked Part IV as appendix (skim, don't memorize)
+    - Added section markers for navigation (`<!-- SECTION:X:NAME -->`)
+  - **NEW**: Micro mode explicit flow (Section 2.1)
+    - Complete fast-path for <100 line scripts
+    - 2 questions → single file output
+  - **NEW**: oneshot_doctor.sh v2.0 (Section 5.3)
+    - Project health validation script
+    - Checks required files, git status, secrets safety
+  - **NEW**: Checkpoint initialization in Phase 0
+    - .oneshot/ directory created at project start
+    - checkpoint.yaml includes oneshot_version field
+  - **NEW**: Hard stop override pattern
+    - Explicit `OVERRIDE: [stop_id]` syntax
+    - All overrides logged to decisions.log
+  - **ENHANCED**: Reference sections marked for on-demand loading
+  - **RATIONALE**: Prepare ONE_SHOT for continued growth while maintaining single-file simplicity. Agent attention is finite; prioritize core flow.
 
 - **v1.9** (2024-12-06)
   - **MAJOR**: PRIME DIRECTIVE - Front-load everything
@@ -2039,7 +2208,9 @@ ONE_SHOT serves as the **single reference document** for Claude Skills.
 
 ---
 
-# PART II: LLM-OVERVIEW STANDARD (NEW IN v1.8)
+# PART II: LLM-OVERVIEW STANDARD
+
+<!-- SECTION:17:LLM_OVERVIEW -->
 
 # 17. LLM-OVERVIEW: THE PROJECT CONTEXT FILE
 
@@ -2295,6 +2466,12 @@ A: [Answer]
 
 # PART III: SECRETS MANAGEMENT
 
+<!-- SECTION:18:SECRETS_MANAGEMENT -->
+
+> **📋 REFERENCE SECTION**: Load on demand.
+> Only relevant when project needs secrets management.
+> Skip if Q19 answer is "A. No secrets needed".
+
 # 18. SECRETS MANAGEMENT (SOPS + Age)
 
 ## 18.1 Central Secrets Vault (Recommended)
@@ -2407,9 +2584,22 @@ key.txt
 
 ---
 
-# PART IV: SKILLS REFERENCE
+# PART IV: SKILLS REFERENCE (APPENDIX)
 
-# 19. CLAUDE CODE SKILLS (INLINE)
+<!-- SECTION:19:SKILLS_REFERENCE -->
+
+> **📋 APPENDIX NOTICE**: This section is REFERENCE MATERIAL.
+>
+> **Agent behavior**: Skim on initial load. Reference specific skills only when:
+> - User explicitly mentions a skill by name
+> - Task matches a skill's "When to Use" trigger
+> - User asks "is there a skill for X?"
+>
+> **Do NOT** memorize all skill details. **DO** know they exist for lookup.
+
+---
+
+# 19. CLAUDE CODE SKILLS (INLINE REFERENCE)
 
 All 8 ONE_SHOT skills are documented here for reference. These skills are also available in `.claude/skills/` as separate files, but this inline reference means any AI reading this file has complete context.
 
@@ -2864,28 +3054,32 @@ cp -r skill-repo/skills/* .claude/skills/
 
 ---
 
-# END OF ONE_SHOT v1.9
+# END OF ONE_SHOT v2.0
 
 ---
 
-**ONE_SHOT v1.9: Front-load everything. Execute autonomously. User walks away.**
+**ONE_SHOT v2.0: Front-load everything. Execute autonomously. Scale sustainably.**
 
-**What's in this file**:
-- PRIME DIRECTIVE: User time is precious (YAML header + Section 2.0)
-- Complete specification (Sections 0-16)
-- Session continuity: Resume & Handoff (Sections 7.6-7.7)
-- Failure recovery patterns (Section 13.5)
-- LLM-OVERVIEW standard (Section 17)
-- Secrets management (Section 18)
-- All 8 skills inline (Section 19)
+**Architecture**:
+- **Part I (Sections 0-16)**: Core specification - agent keeps hot
+- **Part II-III (Sections 17-18)**: Reference material - load on demand
+- **Part IV (Section 19)**: Appendix - skim only, lookup when needed
 
 **The Contract**:
 ```
-5-15 minutes of questions → PRD approval → Hours of autonomous work
+Micro:  2 questions → single file (2 min)
+Yolo:   5 questions → full project (5 min)
+Normal: 14 questions → full project (15 min)
+Heavy:  14+ questions → full project + AI (20 min)
 ```
+
+**File Health**:
+- Current: ~13K tokens ✅
+- Ceiling: 30-40K tokens
+- Status: Healthy, room to grow
 
 **100% Free & Open-Source** | **Deploy Anywhere** | **No Vendor Lock-in**
 
 ---
 
-*This single file IS the complete ONE_SHOT reference. No external files needed.*
+*ONE_SHOT v2.0 - Single file. Priority ordered. Built to last.*
