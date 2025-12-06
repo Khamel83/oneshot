@@ -20,7 +20,7 @@ A single file you drop into any project. Your AI agent reads it and knows how to
 - Use SOPS+Age for secrets (encrypted, $0, no SaaS)
 - Resume from checkpoints across sessions
 
-**Cost**: $0 infrastructure (homelab/OCI free tier) + ~$0.02/million tokens (Gemini Flash)
+**Cost**: $0 infrastructure (homelab/OCI free tier) + ~$0.30/million tokens (Gemini 2.5 Flash Lite - best pound-for-pound general purpose LLM)
 
 ## What This Isn't
 
