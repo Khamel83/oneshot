@@ -8,6 +8,8 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/README.md > A
 
 Then tell your AI: **"utilize agents.md"**
 
+**Reset anytime**: Say `(ONE_SHOT)` to re-anchor to first principles.
+
 ---
 
 ## What This Is
