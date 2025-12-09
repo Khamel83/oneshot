@@ -110,7 +110,7 @@ oneshot:
       trigger: "'micro mode' OR <100 lines"
       questions: [Q1, Q11]
       output: "Single file, inline comments"
-      skip: [PRD, README, scripts/, .oneshot/]
+      skip: [PRD, README, scripts/, TODO.md]
     tiny:
       trigger: "Single CLI, no services"
       skip: [web_design, ai, agents]
@@ -141,10 +141,19 @@ oneshot:
       2. test(task)        # Auto-run tests
       3. if fails: fix → retry (max 3)
       4. commit(task)      # Conventional commits
-      5. update_checkpoint()
+      5. update TODO.md    # ALWAYS - move task to Done ✓
+
+  todo_md:
+    rule: "ALWAYS maintain TODO.md - this is how the user tracks progress"
+    update_triggers:
+      - "Starting a task → move to In Progress"
+      - "Completing a task → move to Done ✓ with date"
+      - "Discovering new work → add to Backlog"
+      - "End of session → ensure current state is reflected"
+    enforcement: "Agent MUST update TODO.md before ending any session"
 
   required_files:
-    all: [ONE_SHOT.md, README.md, LLM-OVERVIEW.md, PRD.md]
+    all: [TODO.md, README.md, LLM-OVERVIEW.md, PRD.md]
     scripts: [setup.sh, start.sh, stop.sh, status.sh]
     services: ["/health endpoint", "/metrics endpoint"]
 
@@ -236,7 +245,7 @@ Ask these UPFRONT in ONE message (or batched). Don't drip-feed.
 ```
 Phase 0: Repo & Skeleton
   ├─ Create repo, .gitignore, .editorconfig
-  ├─ Initialize .oneshot/checkpoint.yaml
+  ├─ Initialize TODO.md
   └─ Create LLM-OVERVIEW.md
 
 Phase 1: Core Implementation (DATA-FIRST ORDER)
@@ -256,7 +265,7 @@ Phase 4: Deployment
   └─ systemd/Docker, health endpoints, README
 ```
 
-**Checkpoint after each task.** Update `.oneshot/checkpoint.yaml`.
+**Checkpoint after each task.** Update `TODO.md`.
 
 ---
 
@@ -290,6 +299,7 @@ Phase 4: Deployment
 ## PROJECT INVARIANTS (Every Project MUST Have)
 
 - [ ] `README.md` with: one-line description, current tier, upgrade trigger, quick start (≤5 commands)
+- [ ] `TODO.md` - task tracking (kanban-style sections)
 - [ ] `LLM-OVERVIEW.md` - complete project context for any LLM
 - [ ] `PRD.md` - approved requirements document
 - [ ] `scripts/` - setup.sh, start.sh, stop.sh, status.sh
@@ -313,7 +323,7 @@ Only interrupt for hard_stops (storage upgrade, auth change, etc.)
 **User says**: `Resume from checkpoint`
 
 **Agent MUST**:
-1. Read `.oneshot/checkpoint.yaml`
+1. Read `TODO.md`
 2. Read `LLM-OVERVIEW.md`
 3. Read `PRD.md`
 4. Summarize state to user
@@ -322,10 +332,10 @@ Only interrupt for hard_stops (storage upgrade, auth change, etc.)
 ```markdown
 ## Session Resume
 **Project**: [name]
-**Last checkpoint**: [timestamp]
-**Completed**: [list]
-**In Progress**: [task + status]
-**Next Action**: [exact next step]
+**Last updated**: [date from TODO.md header]
+**Done**: [from Done ✓ section]
+**In Progress**: [from In Progress section]
+**Next Action**: [first In Progress item, or first Backlog if none in progress]
 Ready to continue?
 ```
 
@@ -513,31 +523,30 @@ lost_recovery:
 ```yaml
 reconnaissance:
   files_to_check:
-    - ONE_SHOT.md: "Is this a ONE_SHOT project?"
-    - .oneshot/checkpoint.yaml: "Is there a resume point?"
+    - TODO.md: "Is there task state to resume?"
     - LLM-OVERVIEW.md: "What's the project context?"
     - PRD.md: "Is there an approved PRD?"
     - README.md: "What does this project do?"
 
   state_detection:
     new_project:
-      indicators: ["No ONE_SHOT.md", "Empty or minimal repo"]
+      indicators: ["No TODO.md", "Empty or minimal repo"]
       action: "Start fresh - ask Core Questions"
 
     existing_oneshot_fresh:
-      indicators: ["ONE_SHOT.md exists", "No checkpoint", "No PRD"]
+      indicators: ["PRD.md exists", "No TODO.md or empty TODO.md"]
       action: "Resume intake - check which questions answered"
 
     existing_oneshot_prd:
-      indicators: ["ONE_SHOT.md exists", "PRD.md exists", "No checkpoint"]
+      indicators: ["PRD.md exists", "TODO.md empty or only Backlog"]
       action: "Ask: 'PRD exists. Resume build or modify PRD?'"
 
     existing_oneshot_in_progress:
-      indicators: ["checkpoint.yaml exists"]
-      action: "Resume from checkpoint - show state summary"
+      indicators: ["TODO.md has items in 'In Progress' section"]
+      action: "Resume from TODO.md - show state summary"
 
     brownfield_no_oneshot:
-      indicators: ["Code exists", "No ONE_SHOT.md"]
+      indicators: ["Code exists", "No TODO.md"]
       action: "Ask: 'Existing project. Apply ONE_SHOT patterns?'"
 ```
 
@@ -746,7 +755,7 @@ The 80% you would actually use.
 
 **Questions**: Only Q1 (what) and Q11 (interface)
 
-**Skip**: PRD, README, LLM-OVERVIEW, scripts/, .oneshot/
+**Skip**: PRD, README, LLM-OVERVIEW, scripts/, TODO.md
 
 **Output**: Single file with shebang, inline comments, usage in header
 
@@ -790,39 +799,49 @@ if __name__ == "__main__":
 - Clone to `~/github/[project]`
 - Initialize: `.editorconfig`, `.gitignore`
 - Create `LLM-OVERVIEW.md`
-- Initialize checkpoint:
+- Initialize TODO.md:
 
 ```bash
-mkdir -p .oneshot/checkpoints
-touch .oneshot/checkpoint.yaml
-echo "# ONE_SHOT Decision Log - $(date -I)" > .oneshot/decisions.log
+# Create TODO.md with standard template
+cat > TODO.md << 'EOF'
+# TODO - [PROJECT_NAME]
+
+> Project tasks organized by status. Updated: [DATE]
+
+### Backlog
+- [ ] Phase 1: Core Implementation
+- [ ] Phase 2: Tests
+- [ ] Phase 3: Scripts
+- [ ] Phase 4: Deployment
+
+### In Progress
+
+### Done ✓
+- [x] Phase 0: Repo & Skeleton
+EOF
 ```
 
-**Initial checkpoint.yaml**:
-```yaml
-checkpoint:
-  oneshot_version: "3.1"
-  project: [NAME]
-  created: [ISO_TIMESTAMP]
-  last_updated: [ISO_TIMESTAMP]
+**TODO.md Format** (based on [todomd/todo.md](https://github.com/todomd/todo.md)):
+```markdown
+# TODO - project-name
 
-  session:
-    current_phase: "Phase 0: Repo & Skeleton"
-    current_task: "Initial setup"
-    completion_percentage: 0
+> Project tasks. Updated: YYYY-MM-DD
 
-  progress:
-    completed: []
-    in_progress: []
-    pending:
-      - "Phase 1: Core Implementation"
-      - "Phase 2: Tests"
-      - "Phase 3: Scripts"
-      - "Phase 4: Deployment"
+### Backlog
+- [ ] Task description ~estimate #tag @assignee
 
-  decisions_made: []
-  blockers: []
+### In Progress
+- [ ] Current task ~2h #feature
+
+### Done ✓
+- [x] Completed task 2024-12-09
 ```
+
+**Metadata syntax** (optional, at end of line):
+- `~3d` or `~2h` - time estimate
+- `#tag` - category/type
+- `@name` - assignee
+- `YYYY-MM-DD` - due date or completion date
 
 **Required README.md**:
 ```markdown
@@ -910,50 +929,42 @@ async def metrics():
 <!-- REF:RESUME -->
 # SESSION CONTINUITY: RESUME PROTOCOL
 
-## Checkpoint System
+## Task Tracking with TODO.md
 
-**Every project maintains `.oneshot/checkpoint.yaml`**:
+**Every project maintains `TODO.md`** using the [todomd/todo.md](https://github.com/todomd/todo.md) format:
 
-```yaml
-checkpoint:
-  oneshot_version: "3.1"
-  checkpoint_schema: "1.0"
-  project: project-name
-  last_updated: 2024-12-06T14:32:00Z
+```markdown
+# TODO - project-name
 
-  session:
-    current_phase: "Phase 1: Core Implementation"
-    current_task: "Implement storage layer"
-    completion_percentage: 45
+> Project tasks. Updated: 2024-12-09
 
-  progress:
-    completed:
-      - "Phase 0: Repo & Skeleton"
-      - "Define data models"
-    in_progress:
-      - task: "Implement storage layer"
-        status: "CRUD operations 3/5 done"
-        files_modified:
-          - src/storage.py
-    pending:
-      - "Build processing logic"
-      - "Create CLI interface"
+### Backlog
+- [ ] Build processing logic ~2d #core
+- [ ] Create CLI interface ~1d #interface
 
-  decisions_made:
-    - decision: "Use SQLite over files"
-      reason: "Need querying, expect 10K+ records"
-      date: 2024-12-06
+### In Progress
+- [ ] Implement storage layer ~3d #core
+  - [x] CRUD operations 3/5 done
+  - [ ] Add query helpers
 
-  blockers: []
-  files_changed_this_session: []
+### Done ✓
+- [x] Phase 0: Repo & Skeleton 2024-12-06
+- [x] Define data models 2024-12-06
 ```
 
-## When to Update Checkpoint
+**Why TODO.md over YAML checkpoint**:
+- Human-readable without tooling
+- GitHub renders checkboxes natively
+- Simpler to edit manually
+- Kanban-style visual organization
+- Aligns with "simplest thing that works"
 
-- After completing any task
+## When to Update TODO.md
+
+- After completing any task (move to Done ✓)
+- When starting a task (move to In Progress)
 - Before context window reaches 70%
 - When switching phases
-- When hitting a blocker
 - At end of any session
 
 ## Resume Command
@@ -961,10 +972,10 @@ checkpoint:
 **User says**: `Resume from checkpoint`
 
 **Agent MUST**:
-1. Read `.oneshot/checkpoint.yaml`
+1. Read `TODO.md`
 2. Read `LLM-OVERVIEW.md`
-3. Read PRD
-4. Summarize state
+3. Read `PRD.md`
+4. Summarize state from TODO.md sections
 5. Confirm next action
 
 **Resume format**:
@@ -972,16 +983,16 @@ checkpoint:
 ## Session Resume
 
 **Project**: [name]
-**Last checkpoint**: [timestamp]
+**Last updated**: [date from TODO.md header]
 
-**Completed**:
+**Done** (from Done ✓ section):
 - [x] Task 1
 - [x] Task 2
 
-**In Progress**:
-- [ ] Task 3 (50% - [status])
+**In Progress** (from In Progress section):
+- [ ] Task 3 (status from sub-tasks)
 
-**Next Action**: [exact next step]
+**Next Action**: First item from In Progress, or first Backlog item if none in progress
 
 Ready to continue?
 ```
@@ -1033,6 +1044,11 @@ Generate handoff when:
 - Agent is looping or stuck
 - Before any session end
 
+**CRITICAL**: Before ANY handoff or session end, agent MUST:
+1. Update TODO.md to reflect current state
+2. Ensure "In Progress" section shows actual current work
+3. Move completed items to "Done ✓" with date
+
 ## Receiving a Handoff
 
 **Agent MUST**:
@@ -1047,8 +1063,8 @@ Generate handoff when:
 | Document | Purpose | Update Frequency |
 |----------|---------|------------------|
 | LLM-OVERVIEW.md | Full project context | Milestones |
+| TODO.md | Task state (kanban-style) | Continuous |
 | Handoff | Session state transfer | Every session |
-| checkpoint.yaml | Machine-readable state | Continuous |
 
 ---
 
@@ -1102,7 +1118,7 @@ recovery_agent_confusion:
       2. What change?
       3. Why?
     4_checkpoint:
-      "Update .oneshot/checkpoint.yaml"
+      "Update TODO.md"
 ```
 
 ## Context Window Exhaustion
@@ -1111,7 +1127,7 @@ recovery_agent_confusion:
 recovery_context_exhaustion:
   trigger: "Responses get shorter, misses context"
   prevention:
-    - "Use checkpoint.yaml for state"
+    - "Use TODO.md for state"
     - "Keep LLM-OVERVIEW.md updated"
     - "Don't paste entire files"
   recovery:
@@ -1119,7 +1135,7 @@ recovery_context_exhaustion:
     2_new_session: |
       New session. Read in order:
       1. LLM-OVERVIEW.md
-      2. .oneshot/checkpoint.yaml
+      2. TODO.md
       3. [handoff document]
       Confirm understanding.
 ```
