@@ -134,7 +134,7 @@ Full details in `oneshot-core` skill.
 
 ---
 
-## AVAILABLE SKILLS (22)
+## AVAILABLE SKILLS (23)
 
 **Core**: `oneshot-core`, `oneshot-resume`, `failure-recovery`
 
@@ -146,7 +146,73 @@ Full details in `oneshot-core` skill.
 
 **Docs & Secrets**: `documentation-generator`, `secrets-vault-manager`
 
+**Content**: `content-enricher`
+
 **Meta**: `skill-creator`, `marketplace-browser`
+
+---
+
+## CREATING NEW SKILLS
+
+Skills live in the **secrets-vault** repo and get symlinked to `~/.claude/skills/oneshot/`.
+
+### Skill File Format
+
+Create `secrets-vault/.claude/skills/{skill-name}/SKILL.md`:
+
+```markdown
+---
+name: my-skill
+description: "Brief description. Use when user says 'trigger phrase'."
+allowed-tools: Bash, Read, Write, Glob, Grep
+---
+
+# My Skill
+
+You are an expert at [domain].
+
+## When To Use
+- User says "..."
+- [Trigger conditions]
+
+## Inputs
+- [What the skill needs]
+
+## Outputs
+- [What the skill produces]
+
+## Workflow
+1. [Step 1]
+2. [Step 2]
+...
+
+## Keywords
+comma, separated, trigger, words
+```
+
+### Adding a New Skill
+
+```bash
+# 1. Create skill in secrets-vault
+cd ~/github/secrets-vault
+mkdir -p .claude/skills/my-skill
+vim .claude/skills/my-skill/SKILL.md
+
+# 2. Commit and push
+git add .claude/skills/my-skill
+git commit -m "feat: add my-skill for [purpose]"
+git push
+
+# 3. Update skill count in oneshot README
+# Edit AVAILABLE SKILLS section, add to appropriate category
+```
+
+### Skill Design Tips
+
+- **Trigger phrases**: Include in description for auto-invocation
+- **Keywords section**: Helps with discovery
+- **Workflow steps**: Be explicit - agent follows literally
+- **Allowed tools**: Limit to what's needed for safety
 
 ---
 
@@ -192,6 +258,6 @@ sops -e .env > .env.encrypted && rm .env
 
 ---
 
-**Version**: 4.0 | **Skills**: 22 | **Cost**: $0
+**Version**: 4.0 | **Skills**: 23 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI
