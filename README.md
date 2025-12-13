@@ -1,306 +1,186 @@
 # ONE_SHOT
 
-**The $0 AI Build System.** Single curl. Skills included. Builds anything.
+**The $0 AI Build System.** Single curl. 28 skills. Builds anything.
 
 ```bash
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 ```
 
-Then tell Claude Code: **"utilize agents.md"**
+---
+
+## What Happens
+
+One curl drops these files into your project:
+
+| File | Purpose |
+|------|---------|
+| `AGENTS.md` | Orchestration rules for AI agents |
+| `CLAUDE.md` | Project instructions (supplements existing) |
+| `TODO.md` | Task tracking ([todo.md](https://github.com/todomd/todo.md) format) |
+| `LLM-OVERVIEW.md` | Project context for any LLM |
+| `.claude/skills/` | 28 predetermined workflows |
+| `.sops.yaml` | Secrets encryption config |
+
+**Non-destructive**: Existing files are supplemented, never overwritten.
 
 ---
 
-## What This Is
+## How It Works
 
-A single curl that drops everything into your project:
-- **AGENTS.md** - orchestration rules
-- **22 skills** - predetermined workflows for Claude Code
-- **SOPS config** - encrypted secrets (bring your own Age key)
+```
+You                          AI Agent
+ │                              │
+ ├─ curl oneshot.sh ──────────► │ Files installed
+ │                              │
+ ├─ "Build me a CLI for..."     │
+ │                              ├─► Reads CLAUDE.md
+ │                              ├─► Reads AGENTS.md (orchestration)
+ │                              ├─► Routes to skills
+ │                              │
+ ◄─── Questions (5 min) ────────┤
+ │                              │
+ ├─ Answers ───────────────────►│
+ │                              ├─► Generates PRD
+ ◄─── "Approve PRD?" ───────────┤
+ │                              │
+ ├─ "Approved" ────────────────►│
+ │                              ├─► Autonomous build
+ │                              ├─► Updates TODO.md
+ │                              ├─► Commits after each feature
+ │                              │
+ ◄─── "Done!" ──────────────────┤
+```
 
-Your AI agent reads it and knows how to:
-- Ask the right questions upfront (5 min of your time)
-- Generate a PRD you approve
-- Build autonomously for hours while you walk away
-- Resume from checkpoints across sessions
-
-**Cost**: $0 infrastructure (homelab/OCI free tier) + ~$0.30/million tokens
-
-## What This Isn't
-
-- Not a framework to install
-- Not a SaaS to sign up for
-- Not a CLI tool to configure
-- Just files your AI reads
+**Your time**: ~5 minutes of questions, then walk away.
 
 ---
 
-## Prerequisites
+## Key Features
 
-**Age key** (one-time setup):
+### Thinking Modes
+Activate deeper analysis:
+- `think` - quick sanity check
+- `think hard` - trade-off analysis
+- `ultrathink` - architecture decisions
+- `super think` - system-wide design
+- `mega think` - strategic decisions
+
+### Plan Workflow
+Structured implementation with context preservation:
+```
+/create_plan     → Generate implementation plan
+/implement_plan  → Execute plan systematically
+/create_handoff  → Save context before clearing
+/resume_handoff  → Continue where you left off
+```
+
+### 28 Skills
+Pre-built workflows for common tasks:
+- **Build**: `oneshot-core`, `feature-planner`, `api-designer`
+- **Debug**: `debugger`, `test-runner`, `code-reviewer`
+- **Deploy**: `push-to-cloud`, `ci-cd-setup`, `docker-composer`
+- **Context**: `create-handoff`, `resume-handoff`, `thinking-modes`
+
+---
+
+## Quick Start
+
+### 1. Install (one-time)
 ```bash
-# Install age
+# Optional: Set up secrets encryption
 sudo apt install age  # or: brew install age
+mkdir -p ~/.age && age-keygen -o ~/.age/key.txt
+```
 
-# Generate key
-mkdir -p ~/.age
-age-keygen -o ~/.age/key.txt
+### 2. Add to Any Project
+```bash
+cd your-project
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
+```
 
-# Save public key to 1Password (backup)
+### 3. Open in Claude Code
+Claude automatically reads `CLAUDE.md` → `AGENTS.md` and knows what to do.
+
+### 4. Say What You Want
+```
+"Build me a task management CLI in Python"
+"Add user authentication to this app"
+"Debug why the tests are failing"
 ```
 
 ---
 
-## After Installation
+## Commands
 
-Your project now has:
+| Command | What It Does |
+|---------|--------------|
+| `(ONE_SHOT)` | Re-anchor to orchestration rules |
+| `ultrathink` | Deep analysis mode |
+| `/create_plan` | Start structured planning |
+| `/create_handoff` | Save context before `/clear` |
+
+---
+
+## File Hierarchy
+
 ```
 project/
-├── AGENTS.md              # Skeleton key orchestrator
-├── .claude/skills/        # 22 skills for Claude Code
-├── .sops.yaml             # Secrets encryption config
-├── .env.example           # Secrets template
-└── .gitignore             # Updated for secrets
-```
-
-**Reset anytime**: Say `(ONE_SHOT)` to re-anchor to first principles.
-
----
-
-<!-- ONE_SHOT_CONTRACT v4.1 -->
-
-## YAML CONFIG (Always Parsed by Agent)
-
-```yaml
-oneshot:
-  version: 4.1
-
-  prime_directive: |
-    USER TIME IS PRECIOUS. AGENT COMPUTE IS CHEAP.
-    Ask ALL questions UPFRONT. Get ALL info BEFORE coding.
-    User walks away after: "PRD approved. Execute autonomous build."
-
-  infrastructure:
-    priority: ["homelab ($0)", "OCI free tier ($0)", "GitHub Actions ($0)"]
-    oci_dev:
-      ip: "100.126.13.70"
-      limits: "4 OCPU, 24GB RAM, 200GB disk (Always Free ARM)"
-
-  modes:
-    micro: { trigger: "'micro mode' OR <100 lines", questions: [Q1, Q11] }
-    tiny: { trigger: "Single CLI, no services" }
-    normal: { trigger: "CLI or simple web/API" }
-    heavy: { trigger: "Multi-service, AI agents" }
-
-  hard_stops:
-    - "Storage upgrade (files->SQLite->Postgres)"
-    - "Auth method changes"
-    - "Production deployment"
-    action: "STOP -> Present -> Wait for approval"
-
-  build_loop: |
-    for each task in PRD:
-      implement -> test -> commit -> update TODO.md
-
-  required_files: [TODO.md, README.md, LLM-OVERVIEW.md, PRD.md]
+├── CLAUDE.md              ← Claude reads first (your project rules)
+│   └── "Read AGENTS.md"   ← Points to orchestrator
+├── AGENTS.md              ← Skill routing, build loop
+├── TODO.md                ← Track progress (always updated)
+├── LLM-OVERVIEW.md        ← Context for any LLM
+├── .claude/skills/        ← 28 skills
+└── .sops.yaml             ← Secrets config
 ```
 
 ---
 
-## TRIAGE (First 30 Seconds)
+## Core Principles
 
-| Intent | Signals | Skill |
-|--------|---------|-------|
-| **build_new** | "new project", "build me" | `oneshot-core` |
-| **fix_existing** | "broken", "bug", "error" | `debugger` |
-| **continue_work** | "resume", "checkpoint" | `oneshot-resume` |
-| **add_feature** | "add feature", "extend" | `feature-planner` |
-| **deploy** | "deploy", "push to cloud" | `push-to-cloud` |
-| **stuck** | "looping", "confused" | `failure-recovery` |
+1. **Non-Destructive**: Only adds to projects, never overwrites
+2. **User Time is Precious**: 5 min questions → autonomous build
+3. **$0 Infrastructure**: Homelab, OCI Free Tier, no lock-in
+4. **Skills Over Scripts**: Predetermined workflows, not reinvention
+5. **Context Preservation**: Handoffs > auto-compact
 
 ---
 
-## CORE QUESTIONS
+## Secrets Management
 
-| ID | Key | Required |
-|----|-----|----------|
-| **Q0** | Mode (micro/tiny/normal/heavy) | Yes |
-| **Q1** | What are you building? | Yes |
-| **Q2** | What problem does this solve? | Yes |
-| **Q4** | Features (3-7 items) | Yes |
-| **Q6** | Project type (CLI/Web/API) | Yes |
-| **Q12** | Done criteria / v1 scope | Yes |
-
-Full details in `oneshot-core` skill.
-
----
-
-## THINKING MODES
-
-Activate extended thinking by level. Deeper levels simulate expert perspectives for better analysis.
-
-| Level | Trigger | Use Case |
-|-------|---------|----------|
-| **Think** | "think", "consider" | Quick sanity checks |
-| **Think Hard** | "think hard", "really think" | Trade-off analysis |
-| **Ultrathink** | "ultrathink" | Architecture, debugging |
-| **Super Think** | "super think" | System-wide design |
-| **Mega Think** | "mega think", "super mega think" | Strategic decisions |
-
-> **Pro tip**: End requests with "ultrathink please do a good job" for deeper analysis.
-
-See `thinking-modes` skill for details.
-
----
-
-## PLAN WORKFLOW
-
-Structured workflow for complex implementations with context preservation:
-
-```
-/create_plan [idea]      -> thoughts/shared/plans/YYYY-MM-DD-description.md
-  └─ answer questions, get approval
-
-/implement_plan @[plan]  -> systematic execution with commits
-  └─ context getting low?
-
-/create_handoff          -> thoughts/shared/handoffs/YYYY-MM-DD-handoff.md
-  └─ /clear
-
-/resume_handoff @[file]  -> continue exactly where you left off
-```
-
-**Why handoffs > auto-compact**: Explicit control, versioned, shareable, no context loss.
-
----
-
-## AVAILABLE SKILLS (28)
-
-**Core**: `oneshot-core`, `oneshot-resume`, `failure-recovery`
-
-**Thinking**: `thinking-modes`
-
-**Planning**: `project-initializer`, `feature-planner`, `api-designer`, `designer`, `create-plan`, `implement-plan`
-
-**Context**: `create-handoff`, `resume-handoff`
-
-**Development**: `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `database-migrator`, `performance-optimizer`
-
-**Operations**: `git-workflow`, `ci-cd-setup`, `docker-composer`, `push-to-cloud`, `dependency-manager`
-
-**Docs & Secrets**: `documentation-generator`, `secrets-vault-manager`
-
-**Content**: `content-enricher`
-
-**Meta**: `skill-creator`, `marketplace-browser`
-
----
-
-## CREATING NEW SKILLS
-
-Skills live in the **secrets-vault** repo and get symlinked to `~/.claude/skills/oneshot/`.
-
-### Skill File Format
-
-Create `secrets-vault/.claude/skills/{skill-name}/SKILL.md`:
-
-```markdown
----
-name: my-skill
-description: "Brief description. Use when user says 'trigger phrase'."
-allowed-tools: Bash, Read, Write, Glob, Grep
----
-
-# My Skill
-
-You are an expert at [domain].
-
-## When To Use
-- User says "..."
-- [Trigger conditions]
-
-## Inputs
-- [What the skill needs]
-
-## Outputs
-- [What the skill produces]
-
-## Workflow
-1. [Step 1]
-2. [Step 2]
-...
-
-## Keywords
-comma, separated, trigger, words
-```
-
-### Adding a New Skill
+OneShot uses [SOPS](https://github.com/getsops/sops) + [Age](https://github.com/FiloSottile/age) for secrets:
 
 ```bash
-# 1. Create skill in secrets-vault
-cd ~/github/secrets-vault
-mkdir -p .claude/skills/my-skill
-vim .claude/skills/my-skill/SKILL.md
+# Central vault (optional)
+sops -d ~/github/secrets-vault/secrets.env.encrypted | grep API_KEY >> .env
 
-# 2. Commit and push
-git add .claude/skills/my-skill
-git commit -m "feat: add my-skill for [purpose]"
-git push
-
-# 3. Update skill count in oneshot README
-# Edit AVAILABLE SKILLS section, add to appropriate category
-```
-
-### Skill Design Tips
-
-- **Trigger phrases**: Include in description for auto-invocation
-- **Keywords section**: Helps with discovery
-- **Workflow steps**: Be explicit - agent follows literally
-- **Allowed tools**: Limit to what's needed for safety
-
----
-
-## QUICK REFERENCES
-
-### Storage Progression
-| Tier | When | Upgrade Trigger |
-|------|------|-----------------|
-| Files | Default | Need querying |
-| SQLite | Most projects | Multi-user |
-| PostgreSQL | Only when needed | Explicit approval |
-
-### Project Invariants
-- `README.md` - one-line description, quick start
-- `TODO.md` - task tracking (kanban)
-- `LLM-OVERVIEW.md` - project context
-- `PRD.md` - approved requirements
-- `scripts/` - setup, start, stop, status
-- `/health` endpoint (if service)
-
----
-
-## SECRETS
-
-```bash
-# Decrypt from secrets-vault
-sops -d ~/github/secrets-vault/secrets.env.encrypted > .env
-
-# Create project secrets
-cp .env.example .env
-# Fill in values
+# Encrypt project secrets
 sops -e .env > .env.encrypted && rm .env
+
+# Decrypt when needed
+sops -d .env.encrypted > .env
 ```
 
 ---
 
-## CORE ETHOS
+## FAQ
 
-- **$0 Infrastructure**: Homelab, OCI Free Tier, no lock-in
-- **Simplicity First**: Files → SQLite → Postgres only when needed
-- **Skills Over Scripts**: Predetermined workflows, not reinvention
-- **User Time is Precious**: 5 min questions → autonomous build → done
+**Q: Does this overwrite my existing files?**
+A: No. Existing `CLAUDE.md` gets a reference prepended. Existing `TODO.md`, `LLM-OVERVIEW.md` are left alone.
+
+**Q: What if I don't want secrets encryption?**
+A: It's optional. Skip the Age key setup - everything else still works.
+
+**Q: Can I add my own skills?**
+A: Yes. Create `.claude/skills/my-skill/SKILL.md` following the format in AGENTS.md.
+
+**Q: Does this work with other AI tools?**
+A: Yes. Compatible with Claude Code, Cursor, Aider, Gemini CLI, and any tool that reads markdown.
 
 ---
 
-**Version**: 4.1 | **Skills**: 28 | **Cost**: $0
+## Version
 
-Compatible: Claude Code, Cursor, Aider, Gemini CLI
+**v5.0** | 28 Skills | $0 Cost
+
+[GitHub](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
