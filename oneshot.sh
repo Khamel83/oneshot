@@ -1,5 +1,5 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v5.0
+# ONE_SHOT Bootstrap Script v5.1
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # NON-DESTRUCTIVE: This script only adds to your project, never overwrites existing files.
@@ -22,7 +22,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo ""
-echo -e "${BLUE}ONE_SHOT Bootstrap v5.0${NC}"
+echo -e "${BLUE}ONE_SHOT Bootstrap v5.1${NC}"
 echo "========================"
 echo ""
 
@@ -38,30 +38,52 @@ fi
 # =============================================================================
 curl -sL "$ONESHOT_BASE/AGENTS.md" > AGENTS.md 2>/dev/null || \
   curl -sL "$ONESHOT_BASE/README.md" > AGENTS.md
-echo -e "  ${GREEN}✓${NC} AGENTS.md (orchestrator)"
+echo -e "  ${GREEN}✓${NC} AGENTS.md (orchestrator with skill routing)"
 
 # =============================================================================
 # 2. CLAUDE.md - Supplement if exists, create if not
 # =============================================================================
-CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT -->
-# Read AGENTS.md first - it contains orchestration rules and skill routing.
-# Update TODO.md as you work. Update LLM-OVERVIEW.md for major changes.
+CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.1 -->
+# IMPORTANT: Read AGENTS.md - it contains skill routing rules.
+#
+# Skills are triggered automatically based on what you say:
+#   \"build me...\"     → oneshot-core
+#   \"plan...\"         → create-plan
+#   \"implement...\"    → implement-plan
+#   \"debug/fix...\"    → debugger
+#   \"deploy...\"       → push-to-cloud
+#   \"ultrathink...\"   → thinking-modes
+#
+# Always update TODO.md as you work.
 <!-- /ONE_SHOT -->"
 
 if [ -f CLAUDE.md ]; then
-  if ! grep -q "<!-- ONE_SHOT -->" CLAUDE.md; then
+  if ! grep -q "<!-- ONE_SHOT" CLAUDE.md; then
     # Prepend OneShot block to existing CLAUDE.md
     echo "$CLAUDE_ONESHOT_BLOCK" | cat - CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md (supplemented - added AGENTS.md reference)"
+    echo -e "  ${GREEN}✓${NC} CLAUDE.md (supplemented - added skill routing reference)"
   else
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md (already configured)"
+    # Update existing OneShot block
+    sed -i.bak '/<!-- ONE_SHOT/,/<!-- \/ONE_SHOT -->/d' CLAUDE.md 2>/dev/null || true
+    echo "$CLAUDE_ONESHOT_BLOCK" | cat - CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md
+    rm -f CLAUDE.md.bak 2>/dev/null || true
+    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v5.1)"
   fi
 else
-  # Create new CLAUDE.md
+  # Create new CLAUDE.md with skill routing emphasis
   cat > CLAUDE.md << 'EOF'
-<!-- ONE_SHOT -->
-# Read AGENTS.md first - it contains orchestration rules and skill routing.
-# Update TODO.md as you work. Update LLM-OVERVIEW.md for major changes.
+<!-- ONE_SHOT v5.1 -->
+# IMPORTANT: Read AGENTS.md - it contains skill routing rules.
+#
+# Skills are triggered automatically based on what you say:
+#   "build me..."     → oneshot-core
+#   "plan..."         → create-plan
+#   "implement..."    → implement-plan
+#   "debug/fix..."    → debugger
+#   "deploy..."       → push-to-cloud
+#   "ultrathink..."   → thinking-modes
+#
+# Always update TODO.md as you work.
 <!-- /ONE_SHOT -->
 
 # Project Instructions
@@ -86,8 +108,15 @@ else
 
 ## Conventions
 [Project-specific conventions and standards]
+
+## Skill Usage
+When working on this project, use these skills:
+- Planning: `create-plan` → `implement-plan`
+- Debugging: `debugger` → `test-runner`
+- Deploying: `push-to-cloud` → `ci-cd-setup`
+- Context: `create-handoff` before `/clear`
 EOF
-  echo -e "  ${GREEN}✓${NC} CLAUDE.md (created template)"
+  echo -e "  ${GREEN}✓${NC} CLAUDE.md (created with skill routing)"
 fi
 
 # =============================================================================
@@ -107,7 +136,7 @@ Project task tracking following [todo.md](https://github.com/todomd/todo.md) spe
 ### Done ✓
 
 ---
-*Updated by OneShot skills. Run `(ONE_SHOT)` to re-sync.*
+*Updated by OneShot skills. Say `(ONE_SHOT)` to re-anchor.*
 EOF
   echo -e "  ${GREEN}✓${NC} TODO.md (created)"
 else
@@ -121,8 +150,7 @@ if [ ! -f LLM-OVERVIEW.md ]; then
   cat > LLM-OVERVIEW.md << 'EOF'
 # LLM Overview
 
-> This file provides context for any LLM working on this project.
-> Keep it updated. No secrets or private information.
+> Context for any LLM working on this project. No secrets.
 
 ## What This Project Does
 [One paragraph description]
@@ -141,7 +169,9 @@ if [ ! -f LLM-OVERVIEW.md ]; then
 ## Key Files
 | File | Purpose |
 |------|---------|
-| `[file]` | [what it does] |
+| `CLAUDE.md` | Project instructions |
+| `AGENTS.md` | Skill routing |
+| `TODO.md` | Task tracking |
 
 ## How to Run
 ```bash
@@ -151,7 +181,6 @@ if [ ! -f LLM-OVERVIEW.md ]; then
 ## Current State
 - **Status**: [Planning / In Development / Production]
 - **Last Updated**: [date]
-- **Main Branch**: [main/master]
 
 ## Important Context
 [Anything an LLM should know before working on this project]
@@ -162,16 +191,21 @@ else
 fi
 
 # =============================================================================
-# 5. Skills - Additive only (never remove existing skills)
+# 5. Skills - Consolidated 20 skills (additive only)
 # =============================================================================
 SKILLS=(
-  oneshot-core oneshot-resume failure-recovery
-  project-initializer feature-planner git-workflow
-  code-reviewer documentation-generator secrets-vault-manager
-  skill-creator marketplace-browser designer debugger
-  test-runner api-designer database-migrator performance-optimizer
-  dependency-manager docker-composer ci-cd-setup refactorer push-to-cloud
-  content-enricher thinking-modes create-plan implement-plan create-handoff resume-handoff
+  # Core (3)
+  oneshot-core failure-recovery thinking-modes
+  # Planning (3)
+  create-plan implement-plan api-designer
+  # Context (2)
+  create-handoff resume-handoff
+  # Development (5)
+  debugger test-runner code-reviewer refactorer performance-optimizer
+  # Operations (4)
+  git-workflow push-to-cloud ci-cd-setup docker-composer
+  # Data & Docs (3)
+  database-migrator documentation-generator secrets-vault-manager
 )
 
 mkdir -p .claude/skills
@@ -182,13 +216,13 @@ for skill in "${SKILLS[@]}"; do
   if [ ! -f ".claude/skills/$skill/SKILL.md" ]; then
     mkdir -p ".claude/skills/$skill"
     if curl -sL "$SKILLS_BASE/$skill/SKILL.md" -o ".claude/skills/$skill/SKILL.md" 2>/dev/null; then
-      ((SKILLS_ADDED++))
+      ((SKILLS_ADDED++)) || true
     fi
   else
-    ((SKILLS_SKIPPED++))
+    ((SKILLS_SKIPPED++)) || true
   fi
 done
-echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing)"
+echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 20 total)"
 
 # =============================================================================
 # 6. .sops.yaml - Create if not exists (never overwrite)
@@ -256,19 +290,20 @@ echo ""
 echo -e "${GREEN}Done!${NC} Project is now ONE_SHOT enabled."
 echo ""
 echo "  Files:"
-echo "    AGENTS.md        - Orchestration rules (skill routing)"
-echo "    CLAUDE.md        - Project instructions (references AGENTS.md)"
-echo "    TODO.md          - Task tracking (todo.md format)"
-echo "    LLM-OVERVIEW.md  - Project context for any LLM"
-echo "    .claude/skills/  - ${#SKILLS[@]} skills"
+echo "    AGENTS.md        - Skill routing (20 skills)"
+echo "    CLAUDE.md        - Project instructions"
+echo "    TODO.md          - Task tracking"
+echo "    LLM-OVERVIEW.md  - Project context"
 echo ""
-echo "  Next steps:"
-echo "    1. Open in Claude Code"
-echo "    2. Claude reads CLAUDE.md → AGENTS.md automatically"
-echo "    3. Say what you want to build"
+echo "  Skill triggers (say these to activate):"
+echo "    \"build me...\"     → oneshot-core"
+echo "    \"plan...\"         → create-plan"
+echo "    \"ultrathink...\"   → thinking-modes"
+echo "    \"debug/fix...\"    → debugger"
+echo "    \"deploy...\"       → push-to-cloud"
 echo ""
 echo "  Commands:"
-echo "    (ONE_SHOT)       - Re-anchor to orchestration rules"
-echo "    ultrathink       - Deep analysis mode"
+echo "    (ONE_SHOT)       - Re-anchor to skill routing"
 echo "    /create_plan     - Start structured planning"
+echo "    /create_handoff  - Save context before /clear"
 echo ""

@@ -1,264 +1,240 @@
-# ONE_SHOT Orchestrator
+# ONE_SHOT Orchestrator v5.1
 
-> **FOR AI AGENTS**: This file contains orchestration rules. Parse the YAML config, route to skills based on user intent, and follow the build loop.
+> **IMPORTANT**: This file controls skill routing. Parse the SKILL ROUTER first.
 
-<!-- ONE_SHOT_CONTRACT v5.0 -->
+---
 
-## YAML CONFIG (Always Parse First)
+## SKILL ROUTER (Parse First)
+
+**When user says → Trigger this skill:**
 
 ```yaml
-oneshot:
-  version: 5.0
+skill_router:
+  # CORE - Always check these first
+  - pattern: "new project|build me|start fresh|create.*app|make.*tool"
+    skill: oneshot-core
+    chain: [create-plan, implement-plan]
 
-  prime_directive: |
-    USER TIME IS PRECIOUS. AGENT COMPUTE IS CHEAP.
-    Ask ALL questions UPFRONT. Get ALL info BEFORE coding.
-    User walks away after: "PRD approved. Execute autonomous build."
+  - pattern: "stuck|looping|confused|not working|start over|broken build"
+    skill: failure-recovery
 
-  file_hierarchy:
-    - CLAUDE.md        # Read first (project-specific)
-    - AGENTS.md        # This file (orchestration)
-    - TODO.md          # Track progress (always update)
-    - LLM-OVERVIEW.md  # Project context (update on major changes)
+  - pattern: "think|consider|analyze|ultrathink|super think|mega think"
+    skill: thinking-modes
 
-  infrastructure:
-    priority: ["homelab ($0)", "OCI free tier ($0)", "GitHub Actions ($0)"]
-    oci_dev:
-      ip: "100.126.13.70"
-      limits: "4 OCPU, 24GB RAM, 200GB disk (Always Free ARM)"
+  # PLANNING - Before building
+  - pattern: "plan|design|architect|how should|what's the approach"
+    skill: create-plan
+    next: implement-plan
 
-  modes:
-    micro: { trigger: "'micro mode' OR <100 lines", questions: [Q1, Q11] }
-    tiny: { trigger: "Single CLI, no services" }
-    normal: { trigger: "CLI or simple web/API" }
-    heavy: { trigger: "Multi-service, AI agents" }
+  - pattern: "implement|execute|build it|do it|run the plan"
+    skill: implement-plan
+    requires: approved_plan
 
-  hard_stops:
-    - "Storage upgrade (files->SQLite->Postgres)"
-    - "Auth method changes"
-    - "Production deployment"
-    action: "STOP -> Present options -> Wait for approval"
+  - pattern: "api|endpoints|routes|rest|graphql"
+    skill: api-designer
 
-  build_loop: |
-    for each task in PRD:
-      implement -> test -> commit -> update TODO.md
+  # CONTEXT - Session management
+  - pattern: "handoff|save context|preserve|before clear|context low"
+    skill: create-handoff
 
-  required_files: [TODO.md, CLAUDE.md, LLM-OVERVIEW.md, PRD.md]
+  - pattern: "resume|continue|pick up|where.*left|from handoff"
+    skill: resume-handoff
+
+  # DEVELOPMENT - During building
+  - pattern: "bug|error|fix|debug|not working|fails"
+    skill: debugger
+
+  - pattern: "test|verify|check|run tests|make sure"
+    skill: test-runner
+
+  - pattern: "review|code quality|check.*code|pr review"
+    skill: code-reviewer
+
+  - pattern: "refactor|clean up|improve|restructure"
+    skill: refactorer
+
+  - pattern: "slow|performance|optimize|speed|faster"
+    skill: performance-optimizer
+
+  # OPERATIONS - Deploy & maintain
+  - pattern: "commit|push|branch|merge|pr|pull request"
+    skill: git-workflow
+
+  - pattern: "deploy|ship|cloud|host|production|oci"
+    skill: push-to-cloud
+
+  - pattern: "ci|cd|github actions|pipeline|automation"
+    skill: ci-cd-setup
+
+  - pattern: "docker|container|compose|kubernetes"
+    skill: docker-composer
+
+  # DATA & DOCS
+  - pattern: "database|schema|migration|postgres|sqlite"
+    skill: database-migrator
+
+  - pattern: "docs|readme|documentation|explain"
+    skill: documentation-generator
+
+  - pattern: "secrets|env|credentials|api key|encrypt"
+    skill: secrets-vault-manager
 ```
 
 ---
 
-## TRIAGE (First 30 Seconds)
+## AVAILABLE SKILLS (20)
 
-Classify user intent and route to appropriate skill chain:
-
-| Intent | Signals | Primary Skill | Chain |
-|--------|---------|---------------|-------|
-| **build_new** | "new project", "build me" | `oneshot-core` | → create-plan → implement-plan |
-| **fix_existing** | "broken", "bug", "error" | `debugger` | → thinking-modes → test-runner |
-| **continue_work** | "resume", "checkpoint" | `oneshot-resume` | → resume-handoff |
-| **add_feature** | "add feature", "extend" | `feature-planner` | → create-plan → implement-plan |
-| **deploy** | "deploy", "push to cloud" | `push-to-cloud` | → ci-cd-setup |
-| **stuck** | "looping", "confused" | `failure-recovery` | → create-handoff |
-| **deep_analysis** | "think", "ultrathink" | `thinking-modes` | (standalone) |
-
----
-
-## SKILL CHAINS
-
-Skills compose together. Use appropriate chains for complex tasks:
-
-```yaml
-skill_chains:
-  # New project: questions → plan → build
-  new_project:
-    - oneshot-core        # Ask questions, generate PRD
-    - create-plan         # Structure implementation
-    - implement-plan      # Execute with commits
-
-  # Add feature to existing project
-  add_feature:
-    - feature-planner     # Break down feature
-    - create-plan         # Structure approach
-    - implement-plan      # Build it
-    - test-runner         # Verify
-
-  # Debug an issue
-  debug:
-    - thinking-modes      # Analyze deeply (ultrathink)
-    - debugger            # Systematic debugging
-    - test-runner         # Verify fix
-
-  # Deploy to production
-  deploy:
-    - code-reviewer       # Pre-deploy review
-    - push-to-cloud       # Deploy
-    - ci-cd-setup         # Set up automation
-
-  # Context management
-  session_end:
-    - create-handoff      # Preserve context
-    # After /clear:
-    - resume-handoff      # Continue seamlessly
-```
+| Category | Skills | Purpose |
+|----------|--------|---------|
+| **Core** | `oneshot-core`, `failure-recovery`, `thinking-modes` | Orchestration, recovery, cognition |
+| **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
+| **Context** | `create-handoff`, `resume-handoff` | Session persistence |
+| **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
+| **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer` | Deploy & maintain |
+| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager` | Support |
 
 ---
 
 ## THINKING MODES
 
-Activate extended thinking by level. Deeper = more expert perspectives simulated.
+| Level | Trigger | Use |
+|-------|---------|-----|
+| **Think** | "think" | Quick check |
+| **Think Hard** | "think hard" | Trade-offs |
+| **Ultrathink** | "ultrathink" | Architecture |
+| **Super Think** | "super think" | System design |
+| **Mega Think** | "mega think" | Strategic |
 
-| Level | Trigger | Use Case |
-|-------|---------|----------|
-| **Think** | "think", "consider" | Quick sanity checks |
-| **Think Hard** | "think hard", "really think" | Trade-off analysis |
-| **Ultrathink** | "ultrathink" | Architecture, debugging |
-| **Super Think** | "super think" | System-wide design |
-| **Mega Think** | "mega think", "super mega think" | Strategic decisions |
+> **Pro tip**: "ultrathink please do a good job"
 
-> **Pro tip**: "ultrathink please do a good job" activates deep analysis.
+---
+
+## SKILL CHAINS
+
+Common workflows that compose multiple skills:
+
+```yaml
+chains:
+  new_project:
+    1: oneshot-core      # Questions → PRD
+    2: create-plan       # Structure approach
+    3: implement-plan    # Build it
+
+  add_feature:
+    1: create-plan       # Plan the feature
+    2: implement-plan    # Build it
+    3: test-runner       # Verify
+
+  debug_issue:
+    1: thinking-modes    # Analyze (ultrathink)
+    2: debugger          # Systematic fix
+    3: test-runner       # Verify fix
+
+  deploy:
+    1: code-reviewer     # Pre-deploy check
+    2: push-to-cloud     # Deploy
+    3: ci-cd-setup       # Automate future
+
+  session_break:
+    1: create-handoff    # Save state
+    # /clear
+    2: resume-handoff    # Continue
+```
+
+---
+
+## YAML CONFIG
+
+```yaml
+oneshot:
+  version: 5.1
+  skills: 20
+
+  prime_directive: |
+    USER TIME IS PRECIOUS. AGENT COMPUTE IS CHEAP.
+    Ask ALL questions UPFRONT. Get ALL info BEFORE coding.
+
+  file_hierarchy:
+    1: CLAUDE.md        # Project-specific (read first)
+    2: AGENTS.md        # This file (skill routing)
+    3: TODO.md          # Progress tracking
+    4: LLM-OVERVIEW.md  # Project context
+
+  build_loop: |
+    for each task:
+      1. Mark "In Progress" in TODO.md
+      2. Use appropriate skill
+      3. Test
+      4. Commit
+      5. Mark "Done ✓" in TODO.md
+
+  hard_stops:
+    - "Storage upgrade (files→SQLite→Postgres)"
+    - "Auth method changes"
+    - "Production deployment"
+    action: "STOP → Ask user → Wait for approval"
+```
 
 ---
 
 ## PLAN WORKFLOW
 
-Structured workflow for complex implementations:
-
 ```
 /create_plan [idea]      → thoughts/shared/plans/YYYY-MM-DD-description.md
   └─ answer questions, get approval
 
-/implement_plan @[plan]  → systematic execution with commits
-  └─ context getting low?
+/implement_plan @[plan]  → systematic execution
+  └─ context low?
 
 /create_handoff          → thoughts/shared/handoffs/YYYY-MM-DD-handoff.md
   └─ /clear
 
-/resume_handoff @[file]  → continue exactly where you left off
+/resume_handoff @[file]  → continue exactly where left off
 ```
-
-**Why handoffs > auto-compact**: Explicit control, versioned, shareable, no context loss.
 
 ---
 
-## CORE QUESTIONS
-
-Ask these upfront before any implementation:
+## CORE QUESTIONS (Ask Upfront)
 
 | ID | Question | Required |
 |----|----------|----------|
-| **Q0** | Mode (micro/tiny/normal/heavy) | Yes |
-| **Q1** | What are you building? | Yes |
-| **Q2** | What problem does this solve? | Yes |
-| **Q4** | Features (3-7 items) | Yes |
-| **Q6** | Project type (CLI/Web/API) | Yes |
-| **Q12** | Done criteria / v1 scope | Yes |
-
-Full details in `oneshot-core` skill.
+| Q0 | Mode (micro/tiny/normal/heavy) | Yes |
+| Q1 | What are you building? | Yes |
+| Q2 | What problem does this solve? | Yes |
+| Q4 | Features (3-7 items) | Yes |
+| Q6 | Project type (CLI/Web/API) | Yes |
+| Q12 | Done criteria / v1 scope | Yes |
 
 ---
 
-## AVAILABLE SKILLS (28)
+## TRIAGE (First 30 Seconds)
 
-**Core**: `oneshot-core`, `oneshot-resume`, `failure-recovery`
-
-**Thinking**: `thinking-modes`
-
-**Planning**: `project-initializer`, `feature-planner`, `api-designer`, `designer`, `create-plan`, `implement-plan`
-
-**Context**: `create-handoff`, `resume-handoff`
-
-**Development**: `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `database-migrator`, `performance-optimizer`
-
-**Operations**: `git-workflow`, `ci-cd-setup`, `docker-composer`, `push-to-cloud`, `dependency-manager`
-
-**Docs & Secrets**: `documentation-generator`, `secrets-vault-manager`
-
-**Content**: `content-enricher`
-
-**Meta**: `skill-creator`, `marketplace-browser`
-
----
-
-## BUILD LOOP
-
-After PRD approval, execute this loop:
-
-```
-for each task in TODO.md:
-  1. Mark task "In Progress"
-  2. Implement (use appropriate skills)
-  3. Test (run tests, verify)
-  4. Commit (clear message referencing task)
-  5. Mark task "Done ✓"
-  6. Update LLM-OVERVIEW.md if major change
-```
+| Intent | Signals | Skill |
+|--------|---------|-------|
+| build_new | "new project", "build me" | oneshot-core |
+| fix_existing | "broken", "bug", "error" | debugger |
+| continue_work | "resume", "checkpoint" | resume-handoff |
+| add_feature | "add feature", "extend" | create-plan |
+| deploy | "deploy", "push" | push-to-cloud |
+| stuck | "looping", "confused" | failure-recovery |
 
 ---
 
 ## ALWAYS UPDATE
 
-| File | When to Update |
-|------|----------------|
+| File | When |
+|------|------|
 | **TODO.md** | Every task state change |
 | **LLM-OVERVIEW.md** | Major architectural changes |
-| **CLAUDE.md** | New project conventions |
-
----
-
-## STORAGE PROGRESSION
-
-| Tier | When | Upgrade Trigger |
-|------|------|-----------------|
-| Files | Default | Need querying |
-| SQLite | Most projects | Multi-user |
-| PostgreSQL | Only when needed | **HARD STOP** - get approval |
-
----
-
-## PROJECT INVARIANTS
-
-Every project should have:
-- `CLAUDE.md` - project instructions
-- `TODO.md` - task tracking (todo.md format)
-- `LLM-OVERVIEW.md` - context for any LLM
-- `PRD.md` - approved requirements (after planning)
-- `scripts/` - setup, start, stop, status
-- `/health` endpoint (if service)
-
----
-
-## SECRETS
-
-```bash
-# Pull from central vault
-sops -d ~/github/secrets-vault/secrets.env.encrypted | grep KEY_NAME >> .env
-
-# Encrypt project secrets
-sops -e .env > .env.encrypted && rm .env
-
-# Decrypt when needed
-sops -d .env.encrypted > .env
-```
 
 ---
 
 ## RESET
 
-Say `(ONE_SHOT)` anytime to re-anchor to these orchestration rules.
+Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-## CORE ETHOS
-
-- **$0 Infrastructure**: Homelab, OCI Free Tier, no lock-in
-- **Simplicity First**: Files → SQLite → Postgres only when needed
-- **Skills Over Scripts**: Predetermined workflows, not reinvention
-- **User Time is Precious**: 5 min questions → autonomous build → done
-- **Non-Destructive**: Always add, never overwrite existing work
-
----
-
-**Version**: 5.0 | **Skills**: 28 | **Cost**: $0
+**Version**: 5.1 | **Skills**: 20 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI
