@@ -1,0 +1,240 @@
+# ONE_SHOT Orchestrator v5.1
+
+> **IMPORTANT**: This file controls skill routing. Parse the SKILL ROUTER first.
+
+---
+
+## SKILL ROUTER (Parse First)
+
+**When user says → Trigger this skill:**
+
+```yaml
+skill_router:
+  # CORE - Always check these first
+  - pattern: "new project|build me|start fresh|create.*app|make.*tool"
+    skill: oneshot-core
+    chain: [create-plan, implement-plan]
+
+  - pattern: "stuck|looping|confused|not working|start over|broken build"
+    skill: failure-recovery
+
+  - pattern: "think|consider|analyze|ultrathink|super think|mega think"
+    skill: thinking-modes
+
+  # PLANNING - Before building
+  - pattern: "plan|design|architect|how should|what's the approach"
+    skill: create-plan
+    next: implement-plan
+
+  - pattern: "implement|execute|build it|do it|run the plan"
+    skill: implement-plan
+    requires: approved_plan
+
+  - pattern: "api|endpoints|routes|rest|graphql"
+    skill: api-designer
+
+  # CONTEXT - Session management
+  - pattern: "handoff|save context|preserve|before clear|context low"
+    skill: create-handoff
+
+  - pattern: "resume|continue|pick up|where.*left|from handoff"
+    skill: resume-handoff
+
+  # DEVELOPMENT - During building
+  - pattern: "bug|error|fix|debug|not working|fails"
+    skill: debugger
+
+  - pattern: "test|verify|check|run tests|make sure"
+    skill: test-runner
+
+  - pattern: "review|code quality|check.*code|pr review"
+    skill: code-reviewer
+
+  - pattern: "refactor|clean up|improve|restructure"
+    skill: refactorer
+
+  - pattern: "slow|performance|optimize|speed|faster"
+    skill: performance-optimizer
+
+  # OPERATIONS - Deploy & maintain
+  - pattern: "commit|push|branch|merge|pr|pull request"
+    skill: git-workflow
+
+  - pattern: "deploy|ship|cloud|host|production|oci"
+    skill: push-to-cloud
+
+  - pattern: "ci|cd|github actions|pipeline|automation"
+    skill: ci-cd-setup
+
+  - pattern: "docker|container|compose|kubernetes"
+    skill: docker-composer
+
+  # DATA & DOCS
+  - pattern: "database|schema|migration|postgres|sqlite"
+    skill: database-migrator
+
+  - pattern: "docs|readme|documentation|explain"
+    skill: documentation-generator
+
+  - pattern: "secrets|env|credentials|api key|encrypt"
+    skill: secrets-vault-manager
+```
+
+---
+
+## AVAILABLE SKILLS (20)
+
+| Category | Skills | Purpose |
+|----------|--------|---------|
+| **Core** | `oneshot-core`, `failure-recovery`, `thinking-modes` | Orchestration, recovery, cognition |
+| **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
+| **Context** | `create-handoff`, `resume-handoff` | Session persistence |
+| **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
+| **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer` | Deploy & maintain |
+| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager` | Support |
+
+---
+
+## THINKING MODES
+
+| Level | Trigger | Use |
+|-------|---------|-----|
+| **Think** | "think" | Quick check |
+| **Think Hard** | "think hard" | Trade-offs |
+| **Ultrathink** | "ultrathink" | Architecture |
+| **Super Think** | "super think" | System design |
+| **Mega Think** | "mega think" | Strategic |
+
+> **Pro tip**: "ultrathink please do a good job"
+
+---
+
+## SKILL CHAINS
+
+Common workflows that compose multiple skills:
+
+```yaml
+chains:
+  new_project:
+    1: oneshot-core      # Questions → PRD
+    2: create-plan       # Structure approach
+    3: implement-plan    # Build it
+
+  add_feature:
+    1: create-plan       # Plan the feature
+    2: implement-plan    # Build it
+    3: test-runner       # Verify
+
+  debug_issue:
+    1: thinking-modes    # Analyze (ultrathink)
+    2: debugger          # Systematic fix
+    3: test-runner       # Verify fix
+
+  deploy:
+    1: code-reviewer     # Pre-deploy check
+    2: push-to-cloud     # Deploy
+    3: ci-cd-setup       # Automate future
+
+  session_break:
+    1: create-handoff    # Save state
+    # /clear
+    2: resume-handoff    # Continue
+```
+
+---
+
+## YAML CONFIG
+
+```yaml
+oneshot:
+  version: 5.1
+  skills: 20
+
+  prime_directive: |
+    USER TIME IS PRECIOUS. AGENT COMPUTE IS CHEAP.
+    Ask ALL questions UPFRONT. Get ALL info BEFORE coding.
+
+  file_hierarchy:
+    1: CLAUDE.md        # Project-specific (read first)
+    2: AGENTS.md        # This file (skill routing)
+    3: TODO.md          # Progress tracking
+    4: LLM-OVERVIEW.md  # Project context
+
+  build_loop: |
+    for each task:
+      1. Mark "In Progress" in TODO.md
+      2. Use appropriate skill
+      3. Test
+      4. Commit
+      5. Mark "Done ✓" in TODO.md
+
+  hard_stops:
+    - "Storage upgrade (files→SQLite→Postgres)"
+    - "Auth method changes"
+    - "Production deployment"
+    action: "STOP → Ask user → Wait for approval"
+```
+
+---
+
+## PLAN WORKFLOW
+
+```
+/create_plan [idea]      → thoughts/shared/plans/YYYY-MM-DD-description.md
+  └─ answer questions, get approval
+
+/implement_plan @[plan]  → systematic execution
+  └─ context low?
+
+/create_handoff          → thoughts/shared/handoffs/YYYY-MM-DD-handoff.md
+  └─ /clear
+
+/resume_handoff @[file]  → continue exactly where left off
+```
+
+---
+
+## CORE QUESTIONS (Ask Upfront)
+
+| ID | Question | Required |
+|----|----------|----------|
+| Q0 | Mode (micro/tiny/normal/heavy) | Yes |
+| Q1 | What are you building? | Yes |
+| Q2 | What problem does this solve? | Yes |
+| Q4 | Features (3-7 items) | Yes |
+| Q6 | Project type (CLI/Web/API) | Yes |
+| Q12 | Done criteria / v1 scope | Yes |
+
+---
+
+## TRIAGE (First 30 Seconds)
+
+| Intent | Signals | Skill |
+|--------|---------|-------|
+| build_new | "new project", "build me" | oneshot-core |
+| fix_existing | "broken", "bug", "error" | debugger |
+| continue_work | "resume", "checkpoint" | resume-handoff |
+| add_feature | "add feature", "extend" | create-plan |
+| deploy | "deploy", "push" | push-to-cloud |
+| stuck | "looping", "confused" | failure-recovery |
+
+---
+
+## ALWAYS UPDATE
+
+| File | When |
+|------|------|
+| **TODO.md** | Every task state change |
+| **LLM-OVERVIEW.md** | Major architectural changes |
+
+---
+
+## RESET
+
+Say `(ONE_SHOT)` to re-anchor to these rules.
+
+---
+
+**Version**: 5.1 | **Skills**: 20 | **Cost**: $0
+
+Compatible: Claude Code, Cursor, Aider, Gemini CLI
