@@ -39,6 +39,7 @@ SKILLS=(
   skill-creator marketplace-browser designer debugger
   test-runner api-designer database-migrator performance-optimizer
   dependency-manager docker-composer ci-cd-setup refactorer push-to-cloud
+  content-enricher thinking-modes create-plan implement-plan create-handoff resume-handoff
 )
 
 mkdir -p .claude/skills
@@ -95,7 +96,7 @@ echo ""
 echo "Done! Project is now ONE_SHOT enabled."
 echo ""
 echo "  AGENTS.md          - orchestration rules"
-echo "  .claude/skills/    - 22 skills for Claude Code"
+echo "  .claude/skills/    - 28 skills for Claude Code"
 echo "  .sops.yaml         - secrets encryption config"
 echo ""
 echo "Next: Open in Claude Code and say 'utilize agents.md'"
