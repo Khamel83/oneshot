@@ -229,6 +229,98 @@ oneshot:
 
 ---
 
+## ARCHITECTURAL PATTERNS (Apply When Building)
+
+When building AI/LLM projects, apply these patterns:
+
+### Agentic Loop
+Don't just generate → verify. Use: **Observe → Think → Act → Verify**
+```
+1. Scout: Read relevant files, understand context
+2. Plan: Chain of Thought before acting
+3. Execute: Make changes
+4. Verify: Run tests, check output
+5. Iterate: If verify fails, return to step 2
+```
+
+### Claude Optimization
+When building for Claude specifically:
+```yaml
+claude_patterns:
+  xml_structure: |
+    Wrap distinct data in semantic tags:
+    <codebase><file name="x.py">...</file></codebase>
+    Claude attends to XML tags with higher precision.
+
+  prompt_caching: |
+    For high-frequency tools, use cache_control: {"type": "ephemeral"}
+    Structure: System → Context → Cache Breakpoint → User Query
+    90% cost reduction on cached prefix reads.
+
+  two_pass_generation: |
+    Pass 1: Reasoning in <thinking> tags
+    Pass 2: Implementation
+    Strip reasoning from final output.
+
+  context_ordering: |
+    Important info FIRST in context window.
+    Models lose fidelity toward end of long contexts.
+```
+
+### Model Context Protocol (MCP)
+For tool-based AI systems:
+```yaml
+mcp_benefits:
+  - Decouples "Brain" (LLM) from "Hands" (Tools)
+  - Standardized JSON-RPC interface
+  - Security via sandboxing (tools in containers)
+  - Extensibility (plug in new MCP servers)
+  - Cross-model compatibility (Claude, Gemini, GPT)
+
+mcp_core_tools:
+  - read_file_context(path, start_line, end_line)
+  - search_codebase(query)
+  - apply_patch(path, diff)  # with fuzzy matching
+  - run_command(command)     # restricted
+```
+
+### Graceful Degradation
+Design for best platform, degrade gracefully:
+```yaml
+capability_matrix:
+  claude:
+    prompt_caching: true
+    computer_use: true
+    xml_optimization: true
+  gemini:
+    prompt_caching: true  # different API
+    computer_use: false
+    xml_optimization: partial
+  gpt:
+    prompt_caching: implicit
+    computer_use: false
+    xml_optimization: partial
+
+strategy: |
+  Detect capabilities at runtime.
+  Claude gets full features.
+  Others get core functionality.
+  Never break for lack of advanced features.
+```
+
+### Token Economics
+For LLM-heavy projects:
+```yaml
+cost_optimization:
+  - Cache static context (codebase, system prompt)
+  - Use diffs instead of full file rewrites
+  - Semantic search before loading files (don't load everything)
+  - Haiku for simple tasks, Opus for architecture
+  - Track token usage per session
+```
+
+---
+
 ## RESET
 
 Say `(ONE_SHOT)` to re-anchor to these rules.
