@@ -66,13 +66,13 @@ project/
 
 ---
 
-<!-- ONE_SHOT_CONTRACT v4.0 -->
+<!-- ONE_SHOT_CONTRACT v4.1 -->
 
 ## YAML CONFIG (Always Parsed by Agent)
 
 ```yaml
 oneshot:
-  version: 4.0
+  version: 4.1
 
   prime_directive: |
     USER TIME IS PRECIOUS. AGENT COMPUTE IS CHEAP.
@@ -134,11 +134,54 @@ Full details in `oneshot-core` skill.
 
 ---
 
-## AVAILABLE SKILLS (23)
+## THINKING MODES
+
+Activate extended thinking by level. Deeper levels simulate expert perspectives for better analysis.
+
+| Level | Trigger | Use Case |
+|-------|---------|----------|
+| **Think** | "think", "consider" | Quick sanity checks |
+| **Think Hard** | "think hard", "really think" | Trade-off analysis |
+| **Ultrathink** | "ultrathink" | Architecture, debugging |
+| **Super Think** | "super think" | System-wide design |
+| **Mega Think** | "mega think", "super mega think" | Strategic decisions |
+
+> **Pro tip**: End requests with "ultrathink please do a good job" for deeper analysis.
+
+See `thinking-modes` skill for details.
+
+---
+
+## PLAN WORKFLOW
+
+Structured workflow for complex implementations with context preservation:
+
+```
+/create_plan [idea]      -> thoughts/shared/plans/YYYY-MM-DD-description.md
+  └─ answer questions, get approval
+
+/implement_plan @[plan]  -> systematic execution with commits
+  └─ context getting low?
+
+/create_handoff          -> thoughts/shared/handoffs/YYYY-MM-DD-handoff.md
+  └─ /clear
+
+/resume_handoff @[file]  -> continue exactly where you left off
+```
+
+**Why handoffs > auto-compact**: Explicit control, versioned, shareable, no context loss.
+
+---
+
+## AVAILABLE SKILLS (28)
 
 **Core**: `oneshot-core`, `oneshot-resume`, `failure-recovery`
 
-**Planning**: `project-initializer`, `feature-planner`, `api-designer`, `designer`
+**Thinking**: `thinking-modes`
+
+**Planning**: `project-initializer`, `feature-planner`, `api-designer`, `designer`, `create-plan`, `implement-plan`
+
+**Context**: `create-handoff`, `resume-handoff`
 
 **Development**: `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `database-migrator`, `performance-optimizer`
 
@@ -258,6 +301,6 @@ sops -e .env > .env.encrypted && rm .env
 
 ---
 
-**Version**: 4.0 | **Skills**: 23 | **Cost**: $0
+**Version**: 4.1 | **Skills**: 28 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI
