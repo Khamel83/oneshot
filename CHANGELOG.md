@@ -15,6 +15,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - CI pipeline with skill validation and tests
 - Skill INDEX.md catalog
 - Skill TEMPLATE.md for creating new skills
+- `--upgrade` flag to oneshot.sh for updating existing skills
+- `--help` flag to oneshot.sh
 
 ### Fixed
 - Stale `oneshot-resume` reference → `resume-handoff`

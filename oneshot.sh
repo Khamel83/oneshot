@@ -2,16 +2,48 @@
 # ONE_SHOT Bootstrap Script v5.2
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
+# Options:
+#   --upgrade    Update all skills to latest version (overwrites existing skills)
+#   --help       Show this help
+#
 # NON-DESTRUCTIVE: This script only adds to your project, never overwrites existing files.
 # - Existing CLAUDE.md? We prepend a reference to AGENTS.md
 # - Existing TODO.md, LLM-OVERVIEW.md? We skip them
-# - Existing skills? We add new ones, never remove yours
+# - Existing skills? We add new ones, never remove yours (unless --upgrade)
 #
 # Requires: ~/.age/key.txt (your Age private key) for secrets encryption
 # Get Age: sudo apt install age || brew install age
 # Generate key: age-keygen -o ~/.age/key.txt
 
 set -e
+
+# Parse arguments
+UPGRADE_MODE=false
+for arg in "$@"; do
+  case $arg in
+    --upgrade)
+      UPGRADE_MODE=true
+      shift
+      ;;
+    --help)
+      echo "ONE_SHOT Bootstrap Script v5.2"
+      echo ""
+      echo "Usage:"
+      echo "  curl -sL .../oneshot.sh | bash           # Install (non-destructive)"
+      echo "  curl -sL .../oneshot.sh | bash -s -- --upgrade  # Update all skills"
+      echo ""
+      echo "Options:"
+      echo "  --upgrade    Update all skills to latest version"
+      echo "  --help       Show this help"
+      echo ""
+      echo "What gets updated:"
+      echo "  Always:      AGENTS.md, CLAUDE.md ONE_SHOT block"
+      echo "  --upgrade:   All skills (overwrites existing)"
+      echo "  Never:       TODO.md, LLM-OVERVIEW.md, your custom skills"
+      exit 0
+      ;;
+  esac
+done
 
 ONESHOT_BASE="https://raw.githubusercontent.com/Khamel83/oneshot/master"
 SKILLS_BASE="$ONESHOT_BASE/.claude/skills"
@@ -22,8 +54,13 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo ""
-echo -e "${BLUE}ONE_SHOT Bootstrap v5.2${NC}"
-echo "========================"
+if [ "$UPGRADE_MODE" = true ]; then
+  echo -e "${BLUE}ONE_SHOT Upgrade v5.2${NC}"
+  echo "====================="
+else
+  echo -e "${BLUE}ONE_SHOT Bootstrap v5.2${NC}"
+  echo "========================"
+fi
 echo ""
 
 # Check for Age key (optional)
@@ -210,19 +247,31 @@ SKILLS=(
 
 mkdir -p .claude/skills
 SKILLS_ADDED=0
+SKILLS_UPDATED=0
 SKILLS_SKIPPED=0
 
 for skill in "${SKILLS[@]}"; do
   if [ ! -f ".claude/skills/$skill/SKILL.md" ]; then
+    # New skill - always download
     mkdir -p ".claude/skills/$skill"
     if curl -sL "$SKILLS_BASE/$skill/SKILL.md" -o ".claude/skills/$skill/SKILL.md" 2>/dev/null; then
       ((SKILLS_ADDED++)) || true
+    fi
+  elif [ "$UPGRADE_MODE" = true ]; then
+    # Existing skill + upgrade mode - overwrite
+    if curl -sL "$SKILLS_BASE/$skill/SKILL.md" -o ".claude/skills/$skill/SKILL.md" 2>/dev/null; then
+      ((SKILLS_UPDATED++)) || true
     fi
   else
     ((SKILLS_SKIPPED++)) || true
   fi
 done
-echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 21 total)"
+
+if [ "$UPGRADE_MODE" = true ]; then
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 21 total)"
+else
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 21 total)"
+fi
 
 # =============================================================================
 # 6. .sops.yaml - Create if not exists (never overwrite)

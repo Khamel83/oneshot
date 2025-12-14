@@ -116,6 +116,37 @@ Claude reads `CLAUDE.md` → `AGENTS.md` automatically.
 
 ---
 
+## Upgrading
+
+### Update to Latest Version
+
+Re-run the bootstrap to get latest AGENTS.md and any new skills:
+```bash
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
+```
+
+### Full Upgrade (Update All Skills)
+
+Use `--upgrade` to overwrite existing skills with latest versions:
+```bash
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash -s -- --upgrade
+```
+
+### What Gets Updated
+
+| File | Normal | --upgrade |
+|------|--------|-----------|
+| `AGENTS.md` | Always | Always |
+| `CLAUDE.md` ONE_SHOT block | Always | Always |
+| Missing skills | Added | Added |
+| Existing skills | Skipped | **Updated** |
+| `TODO.md`, `LLM-OVERVIEW.md` | Never | Never |
+| Your custom skills | Never | Never |
+
+**Note**: Custom skills (not in the 21 standard skills) are never touched.
+
+---
+
 ## File Hierarchy
 
 ```
