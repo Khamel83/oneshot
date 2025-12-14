@@ -1,4 +1,4 @@
-# ONE_SHOT Orchestrator v5.1
+# ONE_SHOT Orchestrator v5.2
 
 > **IMPORTANT**: This file controls skill routing. Parse the SKILL ROUTER first.
 
@@ -69,6 +69,9 @@ skill_router:
   - pattern: "docker|container|compose|kubernetes"
     skill: docker-composer
 
+  - pattern: "monitoring|observability|metrics|logging|alerts|health check"
+    skill: observability-setup
+
   # DATA & DOCS
   - pattern: "database|schema|migration|postgres|sqlite"
     skill: database-migrator
@@ -82,7 +85,7 @@ skill_router:
 
 ---
 
-## AVAILABLE SKILLS (20)
+## AVAILABLE SKILLS (21)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -90,7 +93,7 @@ skill_router:
 | **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
 | **Context** | `create-handoff`, `resume-handoff` | Session persistence |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
-| **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer` | Deploy & maintain |
+| **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
 | **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager` | Support |
 
 ---
@@ -147,8 +150,8 @@ chains:
 
 ```yaml
 oneshot:
-  version: 5.1
-  skills: 20
+  version: 5.2
+  skills: 21
 
   prime_directive: |
     USER TIME IS PRECIOUS. AGENT COMPUTE IS CHEAP.
@@ -235,6 +238,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 5.1 | **Skills**: 20 | **Cost**: $0
+**Version**: 5.2 | **Skills**: 21 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI

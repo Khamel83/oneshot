@@ -1,7 +1,7 @@
 ---
 name: push-to-cloud
 description: "Deploy projects to OCI-Dev cloud instance with full automation. Handles rsync, systemd service creation, and optional DNS/Traefik setup. Use when user says 'deploy', 'push to cloud', 'host this', or 'run externally'."
-allowed-tools: Read, Write, Bash, Glob
+allowed-tools: Read, Write, Edit, Bash, Glob
 ---
 
 # Push to Cloud

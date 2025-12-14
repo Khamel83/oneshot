@@ -1,7 +1,7 @@
 ---
 name: test-runner
 description: "Run tests, analyze results, and improve coverage. Supports pytest, jest, go test, and cargo test. Use when user says 'run tests', 'test', 'coverage', 'pytest', 'jest', or asks about test results."
-allowed-tools: Bash, Read, Write
+allowed-tools: Bash, Read, Write, Edit
 ---
 
 # Test Runner

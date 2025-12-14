@@ -1,7 +1,7 @@
 ---
 name: api-designer
 description: "Design RESTful or GraphQL APIs with proper conventions. Creates endpoint specifications, request/response schemas, and documentation. Use when user says 'design API', 'endpoints', 'REST', 'GraphQL', or 'API spec'."
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit
 ---
 
 # API Designer

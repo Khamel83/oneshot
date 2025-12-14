@@ -1,7 +1,7 @@
 ---
 name: refactorer
 description: "Apply systematic refactoring patterns to improve code quality. Performs safe, tested refactoring one step at a time. Use when user says 'refactor', 'clean up', 'extract', 'rename', or 'improve code'."
-allowed-tools: Read, Write, Glob, Grep
+allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
 # Refactorer

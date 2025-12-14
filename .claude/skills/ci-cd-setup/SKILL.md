@@ -1,7 +1,7 @@
 ---
 name: ci-cd-setup
 description: "Set up GitHub Actions or other CI/CD pipelines. Creates automated testing, building, and deployment workflows. Use when user says 'CI', 'CD', 'GitHub Actions', 'pipeline', 'automate testing', or 'deploy automation'."
-allowed-tools: Read, Write
+allowed-tools: Read, Write, Edit
 ---
 
 # CI/CD Setup

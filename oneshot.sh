@@ -1,5 +1,5 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v5.1
+# ONE_SHOT Bootstrap Script v5.2
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # NON-DESTRUCTIVE: This script only adds to your project, never overwrites existing files.
@@ -22,7 +22,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo ""
-echo -e "${BLUE}ONE_SHOT Bootstrap v5.1${NC}"
+echo -e "${BLUE}ONE_SHOT Bootstrap v5.2${NC}"
 echo "========================"
 echo ""
 
@@ -43,7 +43,7 @@ echo -e "  ${GREEN}✓${NC} AGENTS.md (orchestrator with skill routing)"
 # =============================================================================
 # 2. CLAUDE.md - Supplement if exists, create if not
 # =============================================================================
-CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.1 -->
+CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.2 -->
 # IMPORTANT: Read AGENTS.md - it contains skill routing rules.
 #
 # Skills are triggered automatically based on what you say:
@@ -67,12 +67,12 @@ if [ -f CLAUDE.md ]; then
     sed -i.bak '/<!-- ONE_SHOT/,/<!-- \/ONE_SHOT -->/d' CLAUDE.md 2>/dev/null || true
     echo "$CLAUDE_ONESHOT_BLOCK" | cat - CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md
     rm -f CLAUDE.md.bak 2>/dev/null || true
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v5.1)"
+    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v5.2)"
   fi
 else
   # Create new CLAUDE.md with skill routing emphasis
   cat > CLAUDE.md << 'EOF'
-<!-- ONE_SHOT v5.1 -->
+<!-- ONE_SHOT v5.2 -->
 # IMPORTANT: Read AGENTS.md - it contains skill routing rules.
 #
 # Skills are triggered automatically based on what you say:
@@ -191,7 +191,7 @@ else
 fi
 
 # =============================================================================
-# 5. Skills - Consolidated 20 skills (additive only)
+# 5. Skills - Consolidated 21 skills (additive only)
 # =============================================================================
 SKILLS=(
   # Core (3)
@@ -202,8 +202,8 @@ SKILLS=(
   create-handoff resume-handoff
   # Development (5)
   debugger test-runner code-reviewer refactorer performance-optimizer
-  # Operations (4)
-  git-workflow push-to-cloud ci-cd-setup docker-composer
+  # Operations (5)
+  git-workflow push-to-cloud ci-cd-setup docker-composer observability-setup
   # Data & Docs (3)
   database-migrator documentation-generator secrets-vault-manager
 )
@@ -222,7 +222,7 @@ for skill in "${SKILLS[@]}"; do
     ((SKILLS_SKIPPED++)) || true
   fi
 done
-echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 20 total)"
+echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 21 total)"
 
 # =============================================================================
 # 6. .sops.yaml - Create if not exists (never overwrite)
@@ -250,7 +250,7 @@ if [ ! -f .env.example ]; then
 # Decrypt: sops -d .env.encrypted > .env
 
 # Pull from central vault:
-# sops -d ~/github/secrets-vault/secrets.env.encrypted | grep KEY_NAME >> .env
+# sops -d ~/github/oneshot/secrets/secrets.env.encrypted | grep KEY_NAME >> .env
 
 # Project-specific secrets:
 EOF
@@ -290,7 +290,7 @@ echo ""
 echo -e "${GREEN}Done!${NC} Project is now ONE_SHOT enabled."
 echo ""
 echo "  Files:"
-echo "    AGENTS.md        - Skill routing (20 skills)"
+echo "    AGENTS.md        - Skill routing (21 skills)"
 echo "    CLAUDE.md        - Project instructions"
 echo "    TODO.md          - Task tracking"
 echo "    LLM-OVERVIEW.md  - Project context"

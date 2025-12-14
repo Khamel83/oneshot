@@ -1,7 +1,7 @@
 ---
 name: docker-composer
 description: "Create and manage Docker and Docker Compose configurations. Builds optimized Dockerfiles and multi-service compose setups. Use when user says 'docker', 'dockerize', 'container', 'compose', or 'containerize'."
-allowed-tools: Bash, Read, Write
+allowed-tools: Bash, Read, Write, Edit
 ---
 
 # Docker Composer

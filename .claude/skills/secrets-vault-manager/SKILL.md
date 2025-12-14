@@ -1,7 +1,7 @@
 ---
 name: secrets-vault-manager
 description: "Handle SOPS + Age secrets for ONE_SHOT projects. Manages encrypted secrets, decryption, and secret rotation. Use when user mentions 'secrets', 'API keys', 'environment variables', '.env', or 'SOPS'."
-allowed-tools: Bash, Read, Write
+allowed-tools: Bash, Read, Write, Edit
 ---
 
 # Secrets Vault Manager
@@ -31,8 +31,8 @@ mkdir -p ~/.age
 age-keygen -o ~/.age/key.txt
 # Save public key (age1...) to 1Password
 
-# Clone vault
-git clone git@github.com:Khamel83/secrets-vault.git ~/github/secrets-vault
+# Secrets are in the oneshot repo
+# If not cloned: git clone git@github.com:Khamel83/oneshot.git ~/github/oneshot
 ```
 
 ## Create .sops.yaml
@@ -47,14 +47,13 @@ creation_rules:
 
 ```bash
 # Decrypt to project
-sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+sops --decrypt ~/github/oneshot/secrets/secrets.env.encrypted > .env
 source .env
 
 # Update secrets
-cd ~/github/secrets-vault
-sops secrets.env.encrypted
+sops ~/github/oneshot/secrets/secrets.env.encrypted
 # Edit, save, auto-encrypted
-git add . && git commit -m "Update secrets" && git push
+cd ~/github/oneshot && git add . && git commit -m "Update secrets" && git push
 ```
 
 ## Common Operations
@@ -62,7 +61,7 @@ git add . && git commit -m "Update secrets" && git push
 ### Decrypt for Local Use
 
 ```bash
-sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+sops --decrypt ~/github/oneshot/secrets/secrets.env.encrypted > .env
 ```
 
 Verify `.env` is gitignored!
@@ -70,17 +69,16 @@ Verify `.env` is gitignored!
 ### Add New Secret
 
 ```bash
-cd ~/github/secrets-vault
-sops secrets.env.encrypted
+sops ~/github/oneshot/secrets/secrets.env.encrypted
 # Add: NEW_SECRET=value
 # Save and exit
-git add . && git commit -m "Add NEW_SECRET" && git push
+cd ~/github/oneshot && git add . && git commit -m "Add NEW_SECRET" && git push
 ```
 
 ### Refresh Secrets
 
 ```bash
-sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+sops --decrypt ~/github/oneshot/secrets/secrets.env.encrypted > .env
 ```
 
 ### Per-Project SOPS (Alternative)
@@ -130,7 +128,7 @@ This project uses SOPS + Age for secrets management.
 
 \`\`\`bash
 # Decrypt secrets (requires Age key)
-sops --decrypt ~/github/secrets-vault/secrets.env.encrypted > .env
+sops --decrypt ~/github/oneshot/secrets/secrets.env.encrypted > .env
 source .env
 \`\`\`
 ```

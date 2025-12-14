@@ -1,7 +1,7 @@
 ---
 name: documentation-generator
 description: "Generate and update project documentation including README, LLM-OVERVIEW, and ADRs. Ensures docs match current code state. Use when user says 'update docs', 'write README', 'generate documentation', or 'ADR'."
-allowed-tools: Read, Write, Glob
+allowed-tools: Read, Write, Edit, Glob
 ---
 
 # Documentation Generator

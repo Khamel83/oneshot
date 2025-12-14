@@ -1,7 +1,7 @@
 ---
 name: oneshot-core
 description: "The $0 AI Build System. Handles triage, questions, PRD generation, and autonomous build execution. Use when starting new projects, when user says 'utilize agents.md', 'new project', 'build me', 'create', or '(ONE_SHOT)'."
-allowed-tools: Read, Write, Bash, Glob, Grep
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
 # ONE_SHOT Core
@@ -29,7 +29,7 @@ Before doing ANYTHING, classify the user's intent:
 |--------|---------|--------|
 | **build_new** | "new project", "build me", "create" | Full ONE_SHOT flow |
 | **fix_existing** | "broken", "bug", "error" | Use `debugger` skill |
-| **continue_work** | "continue", "resume" | Use `oneshot-resume` skill |
+| **continue_work** | "continue", "resume" | Use `resume-handoff` skill |
 | **modify_existing** | "add feature", "change" | Scope check → mini-PRD |
 | **understand** | "explain", "how does" | Research only |
 | **quick_task** | "just", "quickly" | Micro mode |

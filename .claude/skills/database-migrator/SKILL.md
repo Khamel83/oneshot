@@ -1,7 +1,7 @@
 ---
 name: database-migrator
 description: "Handle schema changes and data migrations safely. Creates migration files with rollback plans. Use when user says 'migration', 'schema change', 'add column', 'database change', or 'alter table'."
-allowed-tools: Bash, Read, Write
+allowed-tools: Bash, Read, Write, Edit
 ---
 
 # Database Migrator

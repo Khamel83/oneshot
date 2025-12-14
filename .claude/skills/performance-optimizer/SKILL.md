@@ -1,7 +1,7 @@
 ---
 name: performance-optimizer
 description: "Profile and optimize slow code, queries, or systems. Uses evidence-based profiling before optimizing. Use when user says 'slow', 'performance', 'optimize', 'profile', or 'speed up'."
-allowed-tools: Bash, Read, Write, Glob
+allowed-tools: Bash, Read, Write, Edit, Glob
 ---
 
 # Performance Optimizer
