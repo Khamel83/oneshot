@@ -146,6 +146,10 @@ source .env
 - Sharing Age private key outside 1Password
 - Storing secrets in code or comments
 
+## Related Skills
+
+- `secrets-sync`: Two-way sync between vault and projects, namespacing, project labels
+
 ## Keywords
 
 secrets, API keys, environment variables, .env, SOPS, Age, encrypt, decrypt, vault

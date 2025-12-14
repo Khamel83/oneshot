@@ -228,7 +228,7 @@ else
 fi
 
 # =============================================================================
-# 5. Skills - Consolidated 21 skills (additive only)
+# 5. Skills - Consolidated 22 skills (additive only)
 # =============================================================================
 SKILLS=(
   # Core (3)
@@ -241,8 +241,8 @@ SKILLS=(
   debugger test-runner code-reviewer refactorer performance-optimizer
   # Operations (5)
   git-workflow push-to-cloud ci-cd-setup docker-composer observability-setup
-  # Data & Docs (3)
-  database-migrator documentation-generator secrets-vault-manager
+  # Data & Docs (4)
+  database-migrator documentation-generator secrets-vault-manager secrets-sync
 )
 
 mkdir -p .claude/skills
@@ -268,9 +268,9 @@ for skill in "${SKILLS[@]}"; do
 done
 
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 21 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 22 total)"
 else
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 21 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 22 total)"
 fi
 
 # =============================================================================
@@ -339,7 +339,7 @@ echo ""
 echo -e "${GREEN}Done!${NC} Project is now ONE_SHOT enabled."
 echo ""
 echo "  Files:"
-echo "    AGENTS.md        - Skill routing (21 skills)"
+echo "    AGENTS.md        - Skill routing (22 skills)"
 echo "    CLAUDE.md        - Project instructions"
 echo "    TODO.md          - Task tracking"
 echo "    LLM-OVERVIEW.md  - Project context"

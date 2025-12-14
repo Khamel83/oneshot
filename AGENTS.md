@@ -79,13 +79,16 @@ skill_router:
   - pattern: "docs|readme|documentation|explain"
     skill: documentation-generator
 
+  - pattern: "sync secrets|pull secrets|push secrets|secrets diff|compare secrets"
+    skill: secrets-sync
+
   - pattern: "secrets|env|credentials|api key|encrypt"
     skill: secrets-vault-manager
 ```
 
 ---
 
-## AVAILABLE SKILLS (21)
+## AVAILABLE SKILLS (22)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -94,7 +97,7 @@ skill_router:
 | **Context** | `create-handoff`, `resume-handoff` | Session persistence |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
 | **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
-| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager` | Support |
+| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync` | Support |
 
 ---
 
@@ -238,6 +241,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 5.2 | **Skills**: 21 | **Cost**: $0
+**Version**: 5.2 | **Skills**: 22 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI
