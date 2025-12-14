@@ -175,6 +175,48 @@ A: Yes. Claude Code, Cursor, Aider, Gemini CLI - anything that reads markdown.
 
 ---
 
+## Secrets Management
+
+Encrypted secrets are stored in `secrets/` using [SOPS](https://github.com/getsops/sops) + [Age](https://github.com/FiloSottile/age).
+
+### Setup (One Time)
+
+```bash
+# Install Age
+sudo apt install age  # or: brew install age
+
+# Generate key (save backup in 1Password)
+mkdir -p ~/.age
+age-keygen -o ~/.age/key.txt
+
+# Export for SOPS
+export SOPS_AGE_KEY_FILE=~/.age/key.txt
+```
+
+### Using Secrets
+
+```bash
+# Decrypt to use
+sops -d secrets/homelab.env.encrypted > .env
+
+# Encrypt after editing
+sops -e .env > secrets/homelab.env.encrypted
+
+# Edit in-place (decrypts, opens editor, re-encrypts)
+sops secrets/homelab.env.encrypted
+```
+
+### Available Secret Files
+
+| File | Contents |
+|------|----------|
+| `secrets/homelab.env.encrypted` | Homelab service credentials |
+| `secrets/secrets.env.encrypted` | General API keys |
+
+**Safe to commit**: Only encrypted files (`.encrypted`) are tracked. Plaintext `.env` files are gitignored.
+
+---
+
 ## Research & Similar Projects
 
 - [wshobson/agents](https://github.com/wshobson/agents) - 91 agents, 47 skills, plugin architecture
