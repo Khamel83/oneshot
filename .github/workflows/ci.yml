@@ -1,0 +1,102 @@
+# ONE_SHOT CI Pipeline
+# Simple, reliable validation - no spam
+#
+# Design principles:
+# - Runs on master only (not every branch/PR)
+# - No email notifications (check GitHub UI)
+# - Fast fail (no retries, fix issues properly)
+# - No flaky tests (no network calls, no timing deps)
+
+name: CI
+
+on:
+  push:
+    branches: [master]
+  # Manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  validate-skills:
+    name: Validate Skills
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Make scripts executable
+        run: chmod +x scripts/validate-skills.sh
+
+      - name: Validate skill format
+        run: ./scripts/validate-skills.sh .claude/skills
+
+  test-oneshot:
+    name: Test oneshot.sh
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install bats-core
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+      - name: Run tests
+        run: bats tests/test_oneshot.bats
+
+  # Quick sanity checks (no external tools needed)
+  lint-basic:
+    name: Basic Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check skill count matches
+        run: |
+          # Count SKILL.md files
+          skill_count=$(find .claude/skills -name "SKILL.md" | wc -l)
+          echo "Found $skill_count skills"
+
+          # Check AGENTS.md mentions same count
+          if ! grep -q "$skill_count skills" AGENTS.md; then
+            echo "Warning: AGENTS.md skill count may be outdated"
+          fi
+
+      - name: Check no stale references
+        run: |
+          # Check for known stale patterns
+          if grep -r "oneshot-resume" .claude/skills/ 2>/dev/null; then
+            echo "ERROR: Found stale 'oneshot-resume' reference (should be 'resume-handoff')"
+            exit 1
+          fi
+
+          if grep -r "secrets-vault/" .claude/skills/ 2>/dev/null | grep -v "oneshot/secrets"; then
+            echo "ERROR: Found stale 'secrets-vault/' reference"
+            exit 1
+          fi
+
+          echo "No stale references found"
+
+      - name: Verify required files exist
+        run: |
+          required_files=(
+            "AGENTS.md"
+            "CLAUDE.md"
+            "README.md"
+            "oneshot.sh"
+            "CHANGELOG.md"
+            ".claude/skills/INDEX.md"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Required file missing: $file"
+              exit 1
+            fi
+          done
+
+          echo "All required files present"

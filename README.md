@@ -1,6 +1,8 @@
 # ONE_SHOT
 
-**The $0 AI Build System.** Single curl. 20 skills. Builds anything.
+**The $0 AI Build System.** Single curl. 21 skills. Builds anything.
+
+[![CI](https://github.com/Khamel83/oneshot/actions/workflows/ci.yml/badge.svg)](https://github.com/Khamel83/oneshot/actions/workflows/ci.yml)
 
 ```bash
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
@@ -18,7 +20,7 @@ One curl drops these files into your project:
 | `CLAUDE.md` | Project instructions (supplements existing, never overwrites) |
 | `TODO.md` | Task tracking ([todo.md](https://github.com/todomd/todo.md) format) |
 | `LLM-OVERVIEW.md` | Project context for any LLM |
-| `.claude/skills/` | 20 non-overlapping skills |
+| `.claude/skills/` | 21 non-overlapping skills |
 
 **Non-destructive**: Existing files are supplemented, never overwritten.
 
@@ -41,7 +43,7 @@ AGENTS.md contains a **skill router** that matches what you say to the right ski
 
 ---
 
-## The 20 Skills
+## The 21 Skills
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -49,10 +51,10 @@ AGENTS.md contains a **skill router** that matches what you say to the right ski
 | **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
 | **Context** | `create-handoff`, `resume-handoff` | Session persistence |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
-| **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer` | Deploy & maintain |
+| **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
 | **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager` | Support |
 
-**Why 20?** Consolidated from 28 to eliminate overlap. Each skill does one thing well.
+**Why 21?** Consolidated from 28 to eliminate overlap. Each skill does one thing well.
 
 ---
 
@@ -123,7 +125,7 @@ project/
 ├── AGENTS.md              ← Skill routing rules
 ├── TODO.md                ← Always updated during work
 ├── LLM-OVERVIEW.md        ← Project context
-└── .claude/skills/        ← 20 skills
+└── .claude/skills/        ← 21 skills
 ```
 
 **Important info at the top**: AGENTS.md puts the skill router FIRST so it's in the early context window.
@@ -169,7 +171,7 @@ A: Yes. Claude Code, Cursor, Aider, Gemini CLI - anything that reads markdown.
 
 ## Version
 
-**v5.1** | 20 Skills | $0 Cost | Non-Destructive
+**v5.2** | 21 Skills | $0 Cost | Non-Destructive
 
 [GitHub](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
 

@@ -227,3 +227,7 @@ Problem detected
 - Verify after each change
 - Update TODO.md with current state
 - Ask user when genuinely stuck
+
+## Keywords
+
+stuck, looping, confused, lost, broken, failing, recovery, reset, start over, context exhaustion, dependency hell, build failure
