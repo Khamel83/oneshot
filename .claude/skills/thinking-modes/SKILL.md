@@ -140,6 +140,88 @@ Use thinking modes during:
 - **Debugging**: Ultrathink for elusive bugs
 - **Feature Planning**: Think Hard for scope decisions
 
+---
+
+## Extended Persona Library
+
+### Technical Personas
+
+| Persona | Focus | Questions They Ask |
+|---------|-------|-------------------|
+| **Senior Engineer** | Technical risks | "What could break? What's the blast radius?" |
+| **Security Engineer** | Vulnerabilities | "How could this be exploited? What's the attack surface?" |
+| **SRE/DevOps** | Operations | "How will this fail? How do we recover? What's the runbook?" |
+| **Performance Engineer** | Efficiency | "What's the latency? Memory usage? Does it scale?" |
+| **Data Engineer** | Data flow | "Where does data come from? Where does it go? Is it consistent?" |
+| **QA Engineer** | Edge cases | "What inputs break this? What's the happy path vs error path?" |
+
+### Product Personas
+
+| Persona | Focus | Questions They Ask |
+|---------|-------|-------------------|
+| **Product Manager** | User value | "Does this solve the problem? Is it worth building?" |
+| **UX Designer** | Experience | "Is this intuitive? What's the user's mental model?" |
+| **Customer** | Outcomes | "Does this help me? Is it too complicated?" |
+| **Support Engineer** | Troubleshooting | "How do I debug this? What will users complain about?" |
+
+### Strategic Personas
+
+| Persona | Focus | Questions They Ask |
+|---------|-------|-------------------|
+| **CTO** | Technical strategy | "Does this align with our technical direction?" |
+| **Skeptic** | Risks | "Why will this fail? What's being overlooked?" |
+| **Optimist** | Opportunities | "What's the best-case outcome? What doors does this open?" |
+| **Historian** | Precedent | "What similar approaches have worked or failed?" |
+| **Simplifier** | Complexity | "Is this the simplest solution? What can we remove?" |
+
+### Domain-Specific Personas
+
+#### For API Design
+- API consumer: "Is this easy to integrate? Are the errors helpful?"
+- Documentation writer: "Can I explain this clearly?"
+
+#### For Database Changes
+- DBA: "What's the migration impact? What about backups?"
+- Data analyst: "Can I query this efficiently? Is the schema intuitive?"
+
+#### For Frontend
+- Accessibility expert: "Can everyone use this? What about screen readers?"
+- Mobile developer: "Does this work on slow connections? Small screens?"
+
+#### For ML/AI
+- ML engineer: "What's the training/inference cost? Is the model interpretable?"
+- Data scientist: "Is the data representative? What are the biases?"
+
+---
+
+## Problem-Type Thinking Guides
+
+### Debugging
+1. Reproduce the issue
+2. Channel **QA Engineer**: "What's the minimal repro case?"
+3. Channel **Detective**: "What changed recently? What's different about failing cases?"
+4. Channel **Skeptic**: "Is this actually a bug or expected behavior?"
+
+### Architecture
+1. Understand requirements deeply
+2. Channel **Simplifier**: "What's the simplest architecture that works?"
+3. Channel **SRE**: "How does this fail? How do we monitor it?"
+4. Channel **Future Maintainer**: "Will this make sense in 2 years?"
+
+### Performance
+1. Measure first (don't guess)
+2. Channel **Performance Engineer**: "Where's the bottleneck? Is it CPU, memory, I/O?"
+3. Channel **Skeptic**: "Is this optimization worth the complexity?"
+4. Channel **Customer**: "Does this matter to users?"
+
+### Security
+1. Identify attack surface
+2. Channel **Attacker**: "How would I exploit this?"
+3. Channel **Security Engineer**: "What's the threat model? What's the blast radius?"
+4. Channel **Auditor**: "Can we prove this is secure? What's the evidence?"
+
+---
+
 ## Keywords
 
 think, think hard, ultrathink, ultra think, super think, mega think, super mega think, deep analysis, consider carefully, really think, do a good job, analyze deeply, extended thinking

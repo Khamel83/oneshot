@@ -157,6 +157,136 @@ rollback:
   tested: true
 ```
 
+---
+
+## NoSQL Migrations
+
+### MongoDB Schema Evolution
+
+Unlike SQL, MongoDB is schema-less but you still need to manage document structure changes.
+
+#### Adding a Field
+
+```javascript
+// No migration needed for new fields - just start writing them
+// Optional: backfill existing documents
+db.users.updateMany(
+  { preferences: { $exists: false } },
+  { $set: { preferences: {} } }
+);
+```
+
+#### Renaming a Field
+
+```javascript
+// 1. Add new field, copy data
+db.users.updateMany(
+  {},
+  [{ $set: { newName: "$oldName" } }]
+);
+
+// 2. Update code to use newName
+
+// 3. Remove old field
+db.users.updateMany(
+  {},
+  { $unset: { oldName: "" } }
+);
+```
+
+#### Changing Field Type
+
+```javascript
+// String to Number
+db.users.updateMany(
+  {},
+  [{ $set: { age: { $toInt: "$age" } } }]
+);
+
+// Nested object to flat
+db.users.updateMany(
+  {},
+  [{
+    $set: {
+      city: "$address.city",
+      country: "$address.country"
+    },
+    $unset: "address"
+  }]
+);
+```
+
+### MongoDB Migration Script Template
+
+```javascript
+// migrations/001_add_preferences.js
+module.exports = {
+  async up(db) {
+    await db.collection('users').updateMany(
+      { preferences: { $exists: false } },
+      { $set: { preferences: { theme: 'light', notifications: true } } }
+    );
+  },
+
+  async down(db) {
+    await db.collection('users').updateMany(
+      {},
+      { $unset: { preferences: "" } }
+    );
+  }
+};
+```
+
+### Redis Data Evolution
+
+Redis doesn't have migrations per se, but key naming and data structure changes need planning.
+
+#### Key Naming Convention
+
+```
+# Good: namespace:entity:id:attribute
+user:123:profile
+user:123:sessions
+cache:products:list
+
+# Bad: no structure
+user_profile_123
+```
+
+#### Changing Key Structure
+
+```python
+# Migrate from old to new key format
+import redis
+r = redis.Redis()
+
+# 1. Copy data to new keys
+for key in r.scan_iter("user_*"):
+    user_id = key.decode().split("_")[1]
+    new_key = f"user:{user_id}:profile"
+    r.copy(key, new_key)
+
+# 2. Update code to use new keys
+# 3. Delete old keys (after verification)
+for key in r.scan_iter("user_*"):
+    r.delete(key)
+```
+
+### When SQL vs NoSQL
+
+| Factor | Use SQL | Use NoSQL |
+|--------|---------|-----------|
+| Schema | Fixed, well-known | Flexible, evolving |
+| Relationships | Many, complex | Few, embedded |
+| Transactions | Critical | Nice to have |
+| Scale | Vertical first | Horizontal first |
+| Query patterns | Complex joins | Key-value, document |
+| Data size | <100GB | Any size |
+
+**Default to SQL (SQLite → PostgreSQL)** unless you have specific NoSQL needs.
+
+---
+
 ## Anti-Patterns
 
 - Migrations without rollback plan
@@ -164,7 +294,9 @@ rollback:
 - Long-running migrations during peak hours
 - Not testing migrations locally first
 - Combining multiple changes in one migration
+- MongoDB: Not validating document structure
+- Redis: Not using key namespaces
 
 ## Keywords
 
-migration, schema change, add column, database, alter table, alembic, prisma
+migration, schema change, add column, database, alter table, alembic, prisma, mongodb, redis, nosql
