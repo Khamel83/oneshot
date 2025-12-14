@@ -1,0 +1,9 @@
+# Never commit plaintext secrets
+*.env
+secrets/*.env
+!*.encrypted
+!.env.example
+
+# Local keys
+.age/
+*.key
