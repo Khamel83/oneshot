@@ -4,6 +4,33 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.3] - 2024-12-15
+
+### Added
+- **Native Sub-agents** (4 agents) for isolated context work:
+  - `security-auditor` - OWASP/secrets/auth security review (sonnet)
+  - `deep-research` - Long codebase exploration (haiku)
+  - `background-worker` - Parallel task execution (haiku)
+  - `multi-agent-coordinator` - Multi-agent orchestration (sonnet)
+- **delegate-to-agent** skill - Bridge skill to route tasks to native sub-agents
+- `.claude/agents/` directory with INDEX.md and TEMPLATE.md
+- Agent router in AGENTS.md with pattern matching
+- "Skills vs Agents" decision guide in AGENTS.md
+- Agent validation job in CI pipeline
+- Agent installation in oneshot.sh bootstrap
+
+### Changed
+- Skill count: 22 → 23 (added delegate-to-agent)
+- Version: 5.2 → 5.3
+- oneshot.sh now installs both skills and agents
+- CLAUDE.md template includes agent triggers
+- CI now validates both skills and agents
+
+### Documentation
+- Updated README.md with agents section
+- Updated skills INDEX.md with delegate-to-agent
+- Added agent chains to skill chains documentation
+
 ## [5.2] - 2024-12-14
 
 ### Added

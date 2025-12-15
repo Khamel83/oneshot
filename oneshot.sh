@@ -1,9 +1,9 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v5.2
+# ONE_SHOT Bootstrap Script v5.3
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # Options:
-#   --upgrade    Update all skills to latest version (overwrites existing skills)
+#   --upgrade    Update all skills/agents to latest version (overwrites existing)
 #   --help       Show this help
 #
 # NON-DESTRUCTIVE: This script only adds to your project, never overwrites existing files.
@@ -26,20 +26,26 @@ for arg in "$@"; do
       shift
       ;;
     --help)
-      echo "ONE_SHOT Bootstrap Script v5.2"
+      echo "ONE_SHOT Bootstrap Script v5.3"
       echo ""
       echo "Usage:"
       echo "  curl -sL .../oneshot.sh | bash           # Install (non-destructive)"
-      echo "  curl -sL .../oneshot.sh | bash -s -- --upgrade  # Update all skills"
+      echo "  curl -sL .../oneshot.sh | bash -s -- --upgrade  # Update all skills/agents"
       echo ""
       echo "Options:"
-      echo "  --upgrade    Update all skills to latest version"
+      echo "  --upgrade    Update all skills and agents to latest version"
       echo "  --help       Show this help"
       echo ""
-      echo "What gets updated:"
+      echo "What gets installed:"
       echo "  Always:      AGENTS.md, CLAUDE.md ONE_SHOT block"
-      echo "  --upgrade:   All skills (overwrites existing)"
-      echo "  Never:       TODO.md, LLM-OVERVIEW.md, your custom skills"
+      echo "  Skills:      23 skills in .claude/skills/"
+      echo "  Agents:      4 sub-agents in .claude/agents/"
+      echo ""
+      echo "What gets updated (--upgrade):"
+      echo "  All skills and agents (overwrites existing)"
+      echo ""
+      echo "Never touched:"
+      echo "  TODO.md, LLM-OVERVIEW.md, your custom skills/agents"
       exit 0
       ;;
   esac
@@ -47,6 +53,7 @@ done
 
 ONESHOT_BASE="https://raw.githubusercontent.com/Khamel83/oneshot/master"
 SKILLS_BASE="$ONESHOT_BASE/.claude/skills"
+AGENTS_BASE="$ONESHOT_BASE/.claude/agents"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -55,10 +62,10 @@ NC='\033[0m'
 
 echo ""
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "${BLUE}ONE_SHOT Upgrade v5.2${NC}"
+  echo -e "${BLUE}ONE_SHOT Upgrade v5.3${NC}"
   echo "====================="
 else
-  echo -e "${BLUE}ONE_SHOT Bootstrap v5.2${NC}"
+  echo -e "${BLUE}ONE_SHOT Bootstrap v5.3${NC}"
   echo "========================"
 fi
 echo ""
@@ -80,16 +87,22 @@ echo -e "  ${GREEN}✓${NC} AGENTS.md (orchestrator with skill routing)"
 # =============================================================================
 # 2. CLAUDE.md - Supplement if exists, create if not
 # =============================================================================
-CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.2 -->
-# IMPORTANT: Read AGENTS.md - it contains skill routing rules.
+CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.3 -->
+# IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
 #
-# Skills are triggered automatically based on what you say:
+# Skills (synchronous, shared context):
 #   \"build me...\"     → oneshot-core
 #   \"plan...\"         → create-plan
 #   \"implement...\"    → implement-plan
 #   \"debug/fix...\"    → debugger
 #   \"deploy...\"       → push-to-cloud
 #   \"ultrathink...\"   → thinking-modes
+#
+# Agents (isolated context, background):
+#   \"security audit...\" → security-auditor
+#   \"explore/find all...\" → deep-research
+#   \"background/parallel...\" → background-worker
+#   \"coordinate agents...\" → multi-agent-coordinator
 #
 # Always update TODO.md as you work.
 <!-- /ONE_SHOT -->"
@@ -104,21 +117,27 @@ if [ -f CLAUDE.md ]; then
     sed -i.bak '/<!-- ONE_SHOT/,/<!-- \/ONE_SHOT -->/d' CLAUDE.md 2>/dev/null || true
     echo "$CLAUDE_ONESHOT_BLOCK" | cat - CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md
     rm -f CLAUDE.md.bak 2>/dev/null || true
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v5.2)"
+    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v5.3)"
   fi
 else
-  # Create new CLAUDE.md with skill routing emphasis
+  # Create new CLAUDE.md with skill and agent routing emphasis
   cat > CLAUDE.md << 'EOF'
-<!-- ONE_SHOT v5.2 -->
-# IMPORTANT: Read AGENTS.md - it contains skill routing rules.
+<!-- ONE_SHOT v5.3 -->
+# IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
 #
-# Skills are triggered automatically based on what you say:
+# Skills (synchronous, shared context):
 #   "build me..."     → oneshot-core
 #   "plan..."         → create-plan
 #   "implement..."    → implement-plan
 #   "debug/fix..."    → debugger
 #   "deploy..."       → push-to-cloud
 #   "ultrathink..."   → thinking-modes
+#
+# Agents (isolated context, background):
+#   "security audit..." → security-auditor
+#   "explore/find all..." → deep-research
+#   "background/parallel..." → background-worker
+#   "coordinate agents..." → multi-agent-coordinator
 #
 # Always update TODO.md as you work.
 <!-- /ONE_SHOT -->
@@ -146,14 +165,16 @@ else
 ## Conventions
 [Project-specific conventions and standards]
 
-## Skill Usage
-When working on this project, use these skills:
+## Skill & Agent Usage
+When working on this project:
 - Planning: `create-plan` → `implement-plan`
 - Debugging: `debugger` → `test-runner`
 - Deploying: `push-to-cloud` → `ci-cd-setup`
 - Context: `create-handoff` before `/clear`
+- Security: `security-auditor` (isolated)
+- Research: `deep-research` (isolated)
 EOF
-  echo -e "  ${GREEN}✓${NC} CLAUDE.md (created with skill routing)"
+  echo -e "  ${GREEN}✓${NC} CLAUDE.md (created with skill/agent routing)"
 fi
 
 # =============================================================================
@@ -228,7 +249,7 @@ else
 fi
 
 # =============================================================================
-# 5. Skills - Consolidated 22 skills (additive only)
+# 5. Skills - Consolidated 23 skills (additive only)
 # =============================================================================
 SKILLS=(
   # Core (3)
@@ -243,6 +264,8 @@ SKILLS=(
   git-workflow push-to-cloud ci-cd-setup docker-composer observability-setup
   # Data & Docs (4)
   database-migrator documentation-generator secrets-vault-manager secrets-sync
+  # Agent Bridge (1)
+  delegate-to-agent
 )
 
 mkdir -p .claude/skills
@@ -268,13 +291,54 @@ for skill in "${SKILLS[@]}"; do
 done
 
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 22 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 23 total)"
 else
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 22 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 23 total)"
 fi
 
 # =============================================================================
-# 6. .sops.yaml - Create if not exists (never overwrite)
+# 6. Agents - Native sub-agents for isolated context work (4 agents)
+# =============================================================================
+AGENTS=(
+  security-auditor
+  deep-research
+  background-worker
+  multi-agent-coordinator
+)
+
+mkdir -p .claude/agents
+AGENTS_ADDED=0
+AGENTS_UPDATED=0
+AGENTS_SKIPPED=0
+
+for agent in "${AGENTS[@]}"; do
+  if [ ! -f ".claude/agents/$agent.md" ]; then
+    # New agent - always download
+    if curl -sL "$AGENTS_BASE/$agent.md" -o ".claude/agents/$agent.md" 2>/dev/null; then
+      ((AGENTS_ADDED++)) || true
+    fi
+  elif [ "$UPGRADE_MODE" = true ]; then
+    # Existing agent + upgrade mode - overwrite
+    if curl -sL "$AGENTS_BASE/$agent.md" -o ".claude/agents/$agent.md" 2>/dev/null; then
+      ((AGENTS_UPDATED++)) || true
+    fi
+  else
+    ((AGENTS_SKIPPED++)) || true
+  fi
+done
+
+# Download INDEX.md and TEMPLATE.md for agents
+curl -sL "$AGENTS_BASE/INDEX.md" -o ".claude/agents/INDEX.md" 2>/dev/null || true
+curl -sL "$AGENTS_BASE/TEMPLATE.md" -o ".claude/agents/TEMPLATE.md" 2>/dev/null || true
+
+if [ "$UPGRADE_MODE" = true ]; then
+  echo -e "  ${GREEN}✓${NC} .claude/agents/ (${AGENTS_ADDED} added, ${AGENTS_UPDATED} updated, 4 total)"
+else
+  echo -e "  ${GREEN}✓${NC} .claude/agents/ (${AGENTS_ADDED} added, ${AGENTS_SKIPPED} existing, 4 total)"
+fi
+
+# =============================================================================
+# 7. .sops.yaml - Create if not exists (never overwrite)
 # =============================================================================
 if [ ! -f .sops.yaml ]; then
   cat > .sops.yaml << 'EOF'
@@ -290,7 +354,7 @@ else
 fi
 
 # =============================================================================
-# 7. .env.example - Create if not exists (never overwrite)
+# 8. .env.example - Create if not exists (never overwrite)
 # =============================================================================
 if [ ! -f .env.example ]; then
   cat > .env.example << 'EOF'
@@ -309,7 +373,7 @@ else
 fi
 
 # =============================================================================
-# 8. .gitignore - Append if block not present (never remove existing rules)
+# 9. .gitignore - Append if block not present (never remove existing rules)
 # =============================================================================
 GITIGNORE_BLOCK="
 # ONE_SHOT
@@ -339,17 +403,23 @@ echo ""
 echo -e "${GREEN}Done!${NC} Project is now ONE_SHOT enabled."
 echo ""
 echo "  Files:"
-echo "    AGENTS.md        - Skill routing (22 skills)"
+echo "    AGENTS.md        - Skill & agent routing (23 skills, 4 agents)"
 echo "    CLAUDE.md        - Project instructions"
 echo "    TODO.md          - Task tracking"
 echo "    LLM-OVERVIEW.md  - Project context"
 echo ""
-echo "  Skill triggers (say these to activate):"
+echo "  Skills (synchronous, shared context):"
 echo "    \"build me...\"     → oneshot-core"
 echo "    \"plan...\"         → create-plan"
 echo "    \"ultrathink...\"   → thinking-modes"
 echo "    \"debug/fix...\"    → debugger"
 echo "    \"deploy...\"       → push-to-cloud"
+echo ""
+echo "  Agents (isolated context, background):"
+echo "    \"security audit\"  → security-auditor"
+echo "    \"explore/find\"    → deep-research"
+echo "    \"background\"      → background-worker"
+echo "    \"coordinate\"      → multi-agent-coordinator"
 echo ""
 echo "  Commands:"
 echo "    (ONE_SHOT)       - Re-anchor to skill routing"

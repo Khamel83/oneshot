@@ -1,6 +1,6 @@
 # ONE_SHOT
 
-**The $0 AI Build System.** Single curl. 21 skills. Builds anything.
+**The $0 AI Build System.** Single curl. 23 skills. 4 agents. Builds anything.
 
 [![CI](https://github.com/Khamel83/oneshot/actions/workflows/ci.yml/badge.svg)](https://github.com/Khamel83/oneshot/actions/workflows/ci.yml)
 
@@ -16,11 +16,12 @@ One curl drops these files into your project:
 
 | File | Purpose |
 |------|---------|
-| `AGENTS.md` | **Skill routing** - triggers the right skill for what you say |
+| `AGENTS.md` | **Skill & agent routing** - triggers the right skill/agent for what you say |
 | `CLAUDE.md` | Project instructions (supplements existing, never overwrites) |
 | `TODO.md` | Task tracking ([todo.md](https://github.com/todomd/todo.md) format) |
 | `LLM-OVERVIEW.md` | Project context for any LLM |
-| `.claude/skills/` | 21 non-overlapping skills |
+| `.claude/skills/` | 23 skills (synchronous, shared context) |
+| `.claude/agents/` | 4 native sub-agents (isolated context, background) |
 
 **Non-destructive**: Existing files are supplemented, never overwritten.
 
@@ -43,7 +44,7 @@ AGENTS.md contains a **skill router** that matches what you say to the right ski
 
 ---
 
-## The 21 Skills
+## The 23 Skills
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -52,9 +53,37 @@ AGENTS.md contains a **skill router** that matches what you say to the right ski
 | **Context** | `create-handoff`, `resume-handoff` | Session persistence |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
 | **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
-| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager` | Support |
+| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync` | Support |
+| **Agent Bridge** | `delegate-to-agent` | Route to native sub-agents |
 
-**Why 21?** Consolidated from 28 to eliminate overlap. Each skill does one thing well.
+**Why 23?** Consolidated from 28, then added agent bridge. Each skill does one thing well.
+
+---
+
+## The 4 Agents
+
+Native Claude Code sub-agents with **isolated context windows**:
+
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| `security-auditor` | sonnet | OWASP/secrets/auth security review |
+| `deep-research` | haiku | Long codebase exploration |
+| `background-worker` | haiku | Parallel test/build execution |
+| `multi-agent-coordinator` | sonnet | Multi-agent orchestration |
+
+### Skills vs Agents
+
+| Aspect | Skills | Agents |
+|--------|--------|--------|
+| **Context** | Shared with main conversation | Isolated window |
+| **Best for** | Quick, synchronous tasks | Long research, background work |
+| **Model** | Inherits from session | Configurable per agent |
+
+**When to use agents:**
+- Task would read 10+ files (prevents context pollution)
+- Security audit requiring isolation
+- Long-running operations (tests, builds)
+- Parallel exploration of multiple areas
 
 ---
 
@@ -138,12 +167,12 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 |------|--------|-----------|
 | `AGENTS.md` | Always | Always |
 | `CLAUDE.md` ONE_SHOT block | Always | Always |
-| Missing skills | Added | Added |
-| Existing skills | Skipped | **Updated** |
+| Missing skills/agents | Added | Added |
+| Existing skills/agents | Skipped | **Updated** |
 | `TODO.md`, `LLM-OVERVIEW.md` | Never | Never |
-| Your custom skills | Never | Never |
+| Your custom skills/agents | Never | Never |
 
-**Note**: Custom skills (not in the 21 standard skills) are never touched.
+**Note**: Custom skills and agents are never touched.
 
 ---
 
@@ -152,14 +181,15 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 ```
 project/
 ├── CLAUDE.md              ← Claude reads first
-│   └── "Read AGENTS.md"   ← Points to skill router
-├── AGENTS.md              ← Skill routing rules
+│   └── "Read AGENTS.md"   ← Points to skill/agent router
+├── AGENTS.md              ← Skill & agent routing rules
 ├── TODO.md                ← Always updated during work
 ├── LLM-OVERVIEW.md        ← Project context
-└── .claude/skills/        ← 21 skills
+├── .claude/skills/        ← 23 skills
+└── .claude/agents/        ← 4 native sub-agents
 ```
 
-**Important info at the top**: AGENTS.md puts the skill router FIRST so it's in the early context window.
+**Important info at the top**: AGENTS.md puts the routers FIRST so they're in the early context window.
 
 ---
 
@@ -202,7 +232,7 @@ A: Yes. Claude Code, Cursor, Aider, Gemini CLI - anything that reads markdown.
 
 ## Version
 
-**v5.2** | 21 Skills | $0 Cost | Non-Destructive
+**v5.3** | 23 Skills | 4 Agents | $0 Cost | Non-Destructive
 
 [GitHub](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
 

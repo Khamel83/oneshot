@@ -1,6 +1,6 @@
 # Skills Index
 
-Complete catalog of ONE_SHOT skills (21 total).
+Complete catalog of ONE_SHOT skills (23 total).
 
 ## Quick Reference
 
@@ -27,6 +27,8 @@ Complete catalog of ONE_SHOT skills (21 total).
 | database-migrator | "migration", "schema" | Schema changes |
 | documentation-generator | "docs", "README" | Generate documentation |
 | secrets-vault-manager | "secrets", "env" | SOPS/Age encryption |
+| secrets-sync | "sync secrets", "push secrets" | Two-way vault sync |
+| delegate-to-agent | "background", "isolated" | Route to native sub-agents |
 
 ---
 
@@ -70,12 +72,18 @@ Complete catalog of ONE_SHOT skills (21 total).
 | docker-composer | 241 | Bash, Read, Write, Edit |
 | observability-setup | 242 | Bash, Read, Write, Edit, Glob |
 
-### Data & Docs (3)
+### Data & Docs (4)
 | Skill | Lines | Tools |
 |-------|-------|-------|
 | database-migrator | 302 | Bash, Read, Write, Edit |
 | documentation-generator | 187 | Read, Write, Edit, Glob |
 | secrets-vault-manager | 154 | Bash, Read, Write, Edit |
+| secrets-sync | ~200 | Bash, Read, Write, Edit |
+
+### Agent Bridge (1)
+| Skill | Lines | Tools |
+|-------|-------|-------|
+| delegate-to-agent | ~180 | Task |
 
 ---
 
@@ -98,6 +106,12 @@ Deploy:
 
 Session Break:
   create-handoff → /clear → resume-handoff
+
+Security Review (with agent):
+  delegate-to-agent → security-auditor agent → report
+
+Deep Research (with agent):
+  delegate-to-agent → deep-research agent → findings
 ```
 
 ---
@@ -119,10 +133,10 @@ Session Break:
 
 | Tool | Skills Using It |
 |------|-----------------|
-| Read | All 21 |
-| Write | 17 |
-| Edit | 15 |
-| Bash | 12 |
-| Glob | 10 |
-| Grep | 10 |
-| Task | 5 |
+| Read | All 23 |
+| Write | 18 |
+| Edit | 16 |
+| Bash | 13 |
+| Glob | 11 |
+| Grep | 11 |
+| Task | 6 |

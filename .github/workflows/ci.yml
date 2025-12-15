@@ -30,6 +30,54 @@ jobs:
       - name: Validate skill format
         run: ./scripts/validate-skills.sh .claude/skills
 
+  validate-agents:
+    name: Validate Agents
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate agent format
+        run: |
+          echo "Validating agent files..."
+          errors=0
+
+          for agent in .claude/agents/*.md; do
+            # Skip INDEX.md and TEMPLATE.md
+            basename=$(basename "$agent")
+            if [[ "$basename" == "INDEX.md" || "$basename" == "TEMPLATE.md" ]]; then
+              continue
+            fi
+
+            echo "Checking $agent..."
+
+            # Check frontmatter exists
+            if ! head -1 "$agent" | grep -q "^---"; then
+              echo "ERROR: $agent missing frontmatter"
+              ((errors++))
+              continue
+            fi
+
+            # Check required fields
+            if ! grep -q "^name:" "$agent"; then
+              echo "ERROR: $agent missing 'name:' field"
+              ((errors++))
+            fi
+
+            if ! grep -q "^description:" "$agent"; then
+              echo "ERROR: $agent missing 'description:' field"
+              ((errors++))
+            fi
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "Found $errors errors"
+            exit 1
+          fi
+
+          echo "All agents valid"
+
   test-oneshot:
     name: Test oneshot.sh
     runs-on: ubuntu-latest
@@ -55,15 +103,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check skill count matches
+      - name: Check skill and agent counts match
         run: |
           # Count SKILL.md files
           skill_count=$(find .claude/skills -name "SKILL.md" | wc -l)
           echo "Found $skill_count skills"
 
-          # Check AGENTS.md mentions same count
-          if ! grep -q "$skill_count skills" AGENTS.md; then
+          # Count agent files (excluding INDEX.md and TEMPLATE.md)
+          agent_count=$(find .claude/agents -maxdepth 1 -name "*.md" ! -name "INDEX.md" ! -name "TEMPLATE.md" | wc -l)
+          echo "Found $agent_count agents"
+
+          # Check AGENTS.md mentions same counts
+          if ! grep -q "Skills: $skill_count" AGENTS.md; then
             echo "Warning: AGENTS.md skill count may be outdated"
+          fi
+
+          if ! grep -q "Agents: $agent_count" AGENTS.md; then
+            echo "Warning: AGENTS.md agent count may be outdated"
           fi
 
       - name: Check no stale references
@@ -90,6 +146,7 @@ jobs:
             "oneshot.sh"
             "CHANGELOG.md"
             ".claude/skills/INDEX.md"
+            ".claude/agents/INDEX.md"
           )
 
           for file in "${required_files[@]}"; do

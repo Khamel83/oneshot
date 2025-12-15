@@ -1,6 +1,6 @@
-# ONE_SHOT Orchestrator v5.2
+# ONE_SHOT Orchestrator v5.3
 
-> **IMPORTANT**: This file controls skill routing. Parse the SKILL ROUTER first.
+> **IMPORTANT**: This file controls skill and agent routing. Parse the routers first.
 
 ---
 
@@ -84,11 +84,86 @@ skill_router:
 
   - pattern: "secrets|env|credentials|api key|encrypt"
     skill: secrets-vault-manager
+
+  # AGENT DELEGATION - For isolated context work
+  - pattern: "delegate|spawn agent|isolated|background task"
+    skill: delegate-to-agent
 ```
 
 ---
 
-## AVAILABLE SKILLS (22)
+## AGENT ROUTER (Native Sub-agents)
+
+**When to use agents instead of skills:**
+- Task would read 10+ files (context pollution)
+- Security audit requiring isolation
+- Long-running operations (tests, builds)
+- Parallel exploration of multiple areas
+
+```yaml
+agent_router:
+  # Security - isolated review
+  - pattern: "security audit|OWASP|vulnerabilities|pentest|secrets scan"
+    agent: security-auditor
+    model: sonnet
+    tools: [Read, Grep, Glob, Bash]
+    reason: "Isolated context for thorough security analysis"
+
+  # Research - deep codebase exploration
+  - pattern: "explore|find all|how does.*work|trace|understand|deep dive"
+    agent: deep-research
+    model: haiku
+    tools: [Read, Grep, Glob, WebFetch, WebSearch]
+    reason: "Long research without polluting main context"
+
+  # Background - long-running tasks
+  - pattern: "background|parallel|run tests|build|long task"
+    agent: background-worker
+    model: haiku
+    tools: [Bash, Read, Write]
+    permissionMode: acceptEdits
+    reason: "Non-blocking execution of long tasks"
+
+  # Coordination - multi-agent orchestration
+  - pattern: "coordinate|multiple agents|parallel exploration|divide and conquer"
+    agent: multi-agent-coordinator
+    model: sonnet
+    tools: [Read, Grep, Glob, Bash]
+    reason: "Orchestrate multiple agents for complex tasks"
+```
+
+---
+
+## SKILLS vs AGENTS
+
+| Aspect | Skills | Agents |
+|--------|--------|--------|
+| **Context** | Shared with main conversation | Isolated window |
+| **Best for** | Quick, synchronous tasks | Long research, background work |
+| **Model** | Inherits from session | Configurable per agent |
+| **Invocation** | Automatic via router | Via Task tool or explicit |
+| **Resumable** | Via handoff files | Via agentId |
+
+**Decision guide:**
+- Quick code review → `code-reviewer` skill
+- Deep security audit → `security-auditor` agent
+- Simple debug → `debugger` skill
+- Multi-file exploration → `deep-research` agent
+
+---
+
+## AVAILABLE AGENTS (4)
+
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| `security-auditor` | sonnet | Isolated OWASP/secrets/auth review |
+| `deep-research` | haiku | Long codebase exploration |
+| `background-worker` | haiku | Parallel test/build execution |
+| `multi-agent-coordinator` | sonnet | Multi-agent orchestration |
+
+---
+
+## AVAILABLE SKILLS (23)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -98,6 +173,7 @@ skill_router:
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
 | **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
 | **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync` | Support |
+| **Agent Bridge** | `delegate-to-agent` | Route to native sub-agents |
 
 ---
 
@@ -153,8 +229,9 @@ chains:
 
 ```yaml
 oneshot:
-  version: 5.2
-  skills: 21
+  version: 5.3
+  skills: 23
+  agents: 4
 
   prime_directive: |
     USER TIME IS PRECIOUS. AGENT COMPUTE IS CHEAP.
@@ -241,6 +318,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 5.2 | **Skills**: 22 | **Cost**: $0
+**Version**: 5.3 | **Skills**: 23 | **Agents**: 4 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI
