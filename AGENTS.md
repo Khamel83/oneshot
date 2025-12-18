@@ -88,6 +88,10 @@ skill_router:
   # AGENT DELEGATION - For isolated context work
   - pattern: "delegate|spawn agent|isolated|background task"
     skill: delegate-to-agent
+
+  # COMMUNICATION - Strategic filtering
+  - pattern: "audit this|filter this|make this strategic|before I send|high-stakes|check this message"
+    skill: the-audit
 ```
 
 ---
@@ -163,7 +167,7 @@ agent_router:
 
 ---
 
-## AVAILABLE SKILLS (23)
+## AVAILABLE SKILLS (24)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -173,6 +177,7 @@ agent_router:
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
 | **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
 | **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync` | Support |
+| **Communication** | `the-audit` | Strategic communication filter |
 | **Agent Bridge** | `delegate-to-agent` | Route to native sub-agents |
 
 ---
@@ -229,8 +234,8 @@ chains:
 
 ```yaml
 oneshot:
-  version: 5.3
-  skills: 23
+  version: 5.4
+  skills: 24
   agents: 4
 
   prime_directive: |
@@ -300,6 +305,7 @@ oneshot:
 | add_feature | "add feature", "extend" | create-plan |
 | deploy | "deploy", "push" | push-to-cloud |
 | stuck | "looping", "confused" | failure-recovery |
+| refine_communication | "audit this", "filter this", "before I send" | the-audit |
 
 ---
 
@@ -318,6 +324,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 5.3 | **Skills**: 23 | **Agents**: 4 | **Cost**: $0
+**Version**: 5.4 | **Skills**: 24 | **Agents**: 4 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI
