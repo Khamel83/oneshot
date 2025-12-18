@@ -4,6 +4,33 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.5] - 2025-12-18
+
+### Added
+- **beads** skill - Git-backed persistent task tracking with dependencies
+  - Cross-session memory (survives /clear and session restarts)
+  - Task dependency graphs with `bd ready` for unblocked work
+  - Multi-agent coordination via hash-based IDs (bd-xxxx)
+  - CLI + hooks approach (1-2k tokens vs 10-50k for MCP)
+- **the-audit** skill - Strategic communication filter (added to SKILLS array)
+- Beads initialization in oneshot.sh (optional, if bd CLI installed)
+- Beads integration in create-handoff (state capture before /clear)
+- Beads integration in resume-handoff (sync on resume)
+- Beads-based coordination in multi-agent-coordinator
+- `.beads/` cache files to .gitignore template
+
+### Changed
+- Skill count: 23 → 25 (added beads, the-audit)
+- Context category: 2 → 3 skills (now includes beads)
+- Version: 5.3 → 5.5
+- AGENTS.md updated with beads pattern in skill router
+- CLAUDE.md template includes beads trigger
+
+### Documentation
+- Updated README.md with beads section and persistent tasks
+- Updated skills INDEX.md with beads and the-audit
+- Added Communication category to INDEX.md
+
 ## [5.3] - 2024-12-15
 
 ### Added

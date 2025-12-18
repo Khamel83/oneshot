@@ -1,6 +1,6 @@
 # ONE_SHOT
 
-**The $0 AI Build System.** Single curl. 23 skills. 4 agents. Builds anything.
+**The $0 AI Build System.** Single curl. 25 skills. 4 agents. Builds anything.
 
 [![CI](https://github.com/Khamel83/oneshot/actions/workflows/ci.yml/badge.svg)](https://github.com/Khamel83/oneshot/actions/workflows/ci.yml)
 
@@ -20,8 +20,9 @@ One curl drops these files into your project:
 | `CLAUDE.md` | Project instructions (supplements existing, never overwrites) |
 | `TODO.md` | Task tracking ([todo.md](https://github.com/todomd/todo.md) format) |
 | `LLM-OVERVIEW.md` | Project context for any LLM |
-| `.claude/skills/` | 23 skills (synchronous, shared context) |
+| `.claude/skills/` | 25 skills (synchronous, shared context) |
 | `.claude/agents/` | 4 native sub-agents (isolated context, background) |
+| `.beads/` | Persistent task tracking (optional, if beads installed) |
 
 **Non-destructive**: Existing files are supplemented, never overwritten.
 
@@ -41,22 +42,24 @@ AGENTS.md contains a **skill router** that matches what you say to the right ski
 | "ultrathink about..." | `thinking-modes` | Deep analysis with expert perspectives |
 | "save context" | `create-handoff` | Preserve state before `/clear` |
 | "resume from handoff" | `resume-handoff` | Continue exactly where you left off |
+| "ready tasks / beads" | `beads` | Persistent task tracking across sessions |
 
 ---
 
-## The 23 Skills
+## The 25 Skills
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
 | **Core** | `oneshot-core`, `failure-recovery`, `thinking-modes` | Orchestration, recovery, cognition |
 | **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
-| **Context** | `create-handoff`, `resume-handoff` | Session persistence |
+| **Context** | `create-handoff`, `resume-handoff`, `beads` | Session persistence, cross-session memory |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
 | **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
 | **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync` | Support |
+| **Communication** | `the-audit` | Strategic communication filter |
 | **Agent Bridge** | `delegate-to-agent` | Route to native sub-agents |
 
-**Why 23?** Consolidated from 28, then added agent bridge. Each skill does one thing well.
+**Why 25?** Consolidated skills, each does one thing well. Added beads for persistent memory.
 
 ---
 
@@ -124,6 +127,41 @@ For complex implementations:
 
 ---
 
+## Persistent Tasks (Beads)
+
+Optional but powerful: [beads](https://github.com/steveyegge/beads) provides git-backed task tracking that survives sessions.
+
+### Install (Optional)
+```bash
+npm install -g @beads/bd
+```
+
+### What Beads Adds
+
+| Feature | TODO.md | Beads |
+|---------|---------|-------|
+| Session persistence | No | Yes (git-backed) |
+| Dependencies | No | Full graph |
+| Multi-agent safe | Conflicts | Hash-based IDs |
+| Ready detection | Manual | `bd ready` |
+
+### Key Commands
+```bash
+bd ready --json       # See unblocked tasks
+bd create "Task" -p 1 # Create task (priority 1)
+bd sync               # Push/pull (CRITICAL before session end)
+```
+
+### Workflow
+1. Start session: `bd sync && bd ready --json`
+2. Claim work: `bd update <id> --status in_progress`
+3. Complete: `bd close <id> --reason "Done"`
+4. End session: `bd sync` (always!)
+
+**Why use both?** TODO.md for immediate visibility, beads for cross-session persistence.
+
+---
+
 ## Quick Start
 
 ### 1. Add to Any Project
@@ -185,8 +223,9 @@ project/
 ├── AGENTS.md              ← Skill & agent routing rules
 ├── TODO.md                ← Always updated during work
 ├── LLM-OVERVIEW.md        ← Project context
-├── .claude/skills/        ← 23 skills
-└── .claude/agents/        ← 4 native sub-agents
+├── .claude/skills/        ← 25 skills
+├── .claude/agents/        ← 4 native sub-agents
+└── .beads/                ← Persistent tasks (optional)
 ```
 
 **Important info at the top**: AGENTS.md puts the routers FIRST so they're in the early context window.
@@ -232,7 +271,7 @@ A: Yes. Claude Code, Cursor, Aider, Gemini CLI - anything that reads markdown.
 
 ## Version
 
-**v5.3** | 23 Skills | 4 Agents | $0 Cost | Non-Destructive
+**v5.5** | 25 Skills | 4 Agents | $0 Cost | Non-Destructive
 
 [GitHub](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
 
@@ -282,6 +321,7 @@ sops secrets/homelab.env.encrypted
 
 ## Research & Similar Projects
 
+- [steveyegge/beads](https://github.com/steveyegge/beads) - Git-backed persistent task tracking (integrated in v5.5)
 - [wshobson/agents](https://github.com/wshobson/agents) - 91 agents, 47 skills, plugin architecture
 - [ruvnet/claude-flow](https://github.com/ruvnet/claude-flow) - Enterprise orchestration with hive-mind
 - [Anthropic Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) - Official guidance

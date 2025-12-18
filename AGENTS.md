@@ -40,6 +40,10 @@ skill_router:
   - pattern: "resume|continue|pick up|where.*left|from handoff"
     skill: resume-handoff
 
+  # PERSISTENT TASKS - Cross-session memory
+  - pattern: "beads|ready tasks|what's next|dependencies|blockers|persistent tasks"
+    skill: beads
+
   # DEVELOPMENT - During building
   - pattern: "bug|error|fix|debug|not working|fails"
     skill: debugger
@@ -167,13 +171,13 @@ agent_router:
 
 ---
 
-## AVAILABLE SKILLS (24)
+## AVAILABLE SKILLS (25)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
 | **Core** | `oneshot-core`, `failure-recovery`, `thinking-modes` | Orchestration, recovery, cognition |
 | **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
-| **Context** | `create-handoff`, `resume-handoff` | Session persistence |
+| **Context** | `create-handoff`, `resume-handoff`, `beads` | Session persistence, cross-session memory |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
 | **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
 | **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync` | Support |
@@ -234,8 +238,8 @@ chains:
 
 ```yaml
 oneshot:
-  version: 5.4
-  skills: 24
+  version: 5.5
+  skills: 25
   agents: 4
 
   prime_directive: |
@@ -324,6 +328,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 5.4 | **Skills**: 24 | **Agents**: 4 | **Cost**: $0
+**Version**: 5.5 | **Skills**: 25 | **Agents**: 4 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI

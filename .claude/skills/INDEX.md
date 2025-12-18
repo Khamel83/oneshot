@@ -1,6 +1,6 @@
 # Skills Index
 
-Complete catalog of ONE_SHOT skills (23 total).
+Complete catalog of ONE_SHOT skills (25 total).
 
 ## Quick Reference
 
@@ -14,6 +14,7 @@ Complete catalog of ONE_SHOT skills (23 total).
 | api-designer | "design API", "endpoints" | REST/GraphQL API design |
 | create-handoff | "save context" | Preserve state before /clear |
 | resume-handoff | "continue", "resume" | Restore from handoff |
+| beads | "ready tasks", "blockers" | Git-backed persistent task tracking |
 | debugger | "bug", "fix", "broken" | Systematic debugging |
 | test-runner | "run tests", "coverage" | Execute and analyze tests |
 | code-reviewer | "review", "is this safe" | Quality and security review |
@@ -28,6 +29,7 @@ Complete catalog of ONE_SHOT skills (23 total).
 | documentation-generator | "docs", "README" | Generate documentation |
 | secrets-vault-manager | "secrets", "env" | SOPS/Age encryption |
 | secrets-sync | "sync secrets", "push secrets" | Two-way vault sync |
+| the-audit | "audit this", "filter this" | Strategic communication filter |
 | delegate-to-agent | "background", "isolated" | Route to native sub-agents |
 
 ---
@@ -48,11 +50,12 @@ Complete catalog of ONE_SHOT skills (23 total).
 | implement-plan | 161 | Read, Glob, Grep, Write, Edit, Bash, Task |
 | api-designer | 379 | Read, Write, Edit |
 
-### Context (2)
+### Context (3)
 | Skill | Lines | Tools |
 |-------|-------|-------|
 | create-handoff | 201 | Read, Glob, Grep, Write, Edit |
 | resume-handoff | 207 | Read, Glob, Grep, Write, Edit, Bash, Task |
+| beads | ~210 | Bash, Read, Write, Edit, Glob |
 
 ### Development (5)
 | Skill | Lines | Tools |
@@ -79,6 +82,11 @@ Complete catalog of ONE_SHOT skills (23 total).
 | documentation-generator | 187 | Read, Write, Edit, Glob |
 | secrets-vault-manager | 154 | Bash, Read, Write, Edit |
 | secrets-sync | ~200 | Bash, Read, Write, Edit |
+
+### Communication (1)
+| Skill | Lines | Tools |
+|-------|-------|-------|
+| the-audit | ~250 | Read, Write, Edit |
 
 ### Agent Bridge (1)
 | Skill | Lines | Tools |
@@ -133,10 +141,10 @@ Deep Research (with agent):
 
 | Tool | Skills Using It |
 |------|-----------------|
-| Read | All 23 |
-| Write | 18 |
-| Edit | 16 |
-| Bash | 13 |
-| Glob | 11 |
+| Read | All 25 |
+| Write | 20 |
+| Edit | 18 |
+| Bash | 15 |
+| Glob | 12 |
 | Grep | 11 |
 | Task | 6 |

@@ -93,11 +93,31 @@ Files currently being worked on:
 | 1 | [Question] | Waiting on user | Asked at HH:MM |
 | 2 | [Blocker] | Investigating | Possible solutions: A, B |
 
+## Beads State (Persistent Tasks)
+
+If project uses beads (.beads/ exists):
+
+### In Progress
+[Output of `bd list --status in_progress --json`]
+
+### Ready Next
+[Output of `bd ready --json`]
+
+### Blocked
+[Tasks with open dependencies]
+
+### Beads Resume Commands
+```bash
+bd sync  # Pull latest from remote
+bd ready --json  # See unblocked tasks
+```
+
 ## Related Artifacts
 
 - **Plan**: `thoughts/shared/plans/YYYY-MM-DD-description.md`
 - **TODO.md**: Updated with current state
 - **PRD**: `PRD.md` (if exists)
+- **Beads**: `.beads/issues.jsonl` (if using beads)
 
 ## Next Steps (Prioritized)
 
@@ -147,6 +167,14 @@ Or manually:
 7. **Prioritize next steps**: What should happen first?
 8. **Reference artifacts**: Link to plan, TODO.md, etc.
 9. **Write resume instructions**: Make it easy to continue
+
+### Phase 3.5: Capture Beads State (If Using Beads)
+
+If project has `.beads/` directory:
+
+10. **Sync beads**: Run `bd sync` to push all changes
+11. **Capture task states**: Document in-progress, ready, and blocked tasks
+12. **Include resume commands**: `bd sync && bd ready --json`
 
 ### Phase 4: Finalize
 

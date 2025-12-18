@@ -169,6 +169,67 @@ Create refactor plan based on findings.
 Carefully apply changes with testing.
 ```
 
+## Beads-Based Coordination
+
+When project uses beads (.beads/ exists), use it for persistent task coordination:
+
+### Task Claiming
+
+Prevent duplicate work by claiming tasks:
+```bash
+# Agent checks what's ready
+bd ready --json
+
+# Agent claims a task (marks in_progress)
+bd update <id> --status in_progress --json
+
+# Sync immediately so others see the claim
+bd sync
+```
+
+### Parallel Work Pattern
+
+Multiple agents can work without conflicts due to hash-based IDs:
+```
+Agent A: bd create "Search auth code" -p 1 → bd-a1b2
+Agent B: bd create "Search API routes" -p 1 → bd-f4c3
+Agent C: bd create "Run tests" -p 2 → bd-g7h8
+
+# No collision - each gets unique hash ID
+```
+
+### Discovery Pattern
+
+When agent discovers sub-work during execution:
+```bash
+bd create "Sub-task found during exploration" \
+  --deps discovered-from:<parent-id> \
+  -p 2 --json
+bd sync
+```
+
+### Agent Handover Pattern
+
+For sequential agent workflows:
+```
+Agent 1 (completing):
+  bd close bd-a1b2 --reason "Completed auth exploration"
+  bd sync  # CRITICAL - push before ending
+
+Agent 2 (starting):
+  bd sync  # Pull Agent 1's changes
+  bd ready --json  # See newly unblocked work
+```
+
+### Coordination Checklist (with Beads)
+
+- [ ] `bd sync` before starting (pull latest)
+- [ ] `bd ready` to see available work
+- [ ] Claim task before working (`bd update --status in_progress`)
+- [ ] `bd sync` after claiming (let others know)
+- [ ] Create child tasks for discovered work
+- [ ] `bd close` and `bd sync` when done
+
 ## Output Format
 
 ```markdown

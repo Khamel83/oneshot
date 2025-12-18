@@ -1,5 +1,5 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v5.3
+# ONE_SHOT Bootstrap Script v5.5
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # Options:
@@ -26,7 +26,7 @@ for arg in "$@"; do
       shift
       ;;
     --help)
-      echo "ONE_SHOT Bootstrap Script v5.3"
+      echo "ONE_SHOT Bootstrap Script v5.5"
       echo ""
       echo "Usage:"
       echo "  curl -sL .../oneshot.sh | bash           # Install (non-destructive)"
@@ -38,7 +38,7 @@ for arg in "$@"; do
       echo ""
       echo "What gets installed:"
       echo "  Always:      AGENTS.md, CLAUDE.md ONE_SHOT block"
-      echo "  Skills:      23 skills in .claude/skills/"
+      echo "  Skills:      25 skills in .claude/skills/"
       echo "  Agents:      4 sub-agents in .claude/agents/"
       echo ""
       echo "What gets updated (--upgrade):"
@@ -62,10 +62,10 @@ NC='\033[0m'
 
 echo ""
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "${BLUE}ONE_SHOT Upgrade v5.3${NC}"
+  echo -e "${BLUE}ONE_SHOT Upgrade v5.5${NC}"
   echo "====================="
 else
-  echo -e "${BLUE}ONE_SHOT Bootstrap v5.3${NC}"
+  echo -e "${BLUE}ONE_SHOT Bootstrap v5.5${NC}"
   echo "========================"
 fi
 echo ""
@@ -87,7 +87,7 @@ echo -e "  ${GREEN}✓${NC} AGENTS.md (orchestrator with skill routing)"
 # =============================================================================
 # 2. CLAUDE.md - Supplement if exists, create if not
 # =============================================================================
-CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.3 -->
+CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.5 -->
 # IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
 #
 # Skills (synchronous, shared context):
@@ -97,6 +97,7 @@ CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.3 -->
 #   \"debug/fix...\"    → debugger
 #   \"deploy...\"       → push-to-cloud
 #   \"ultrathink...\"   → thinking-modes
+#   \"beads/ready...\"  → beads (persistent tasks)
 #
 # Agents (isolated context, background):
 #   \"security audit...\" → security-auditor
@@ -117,12 +118,12 @@ if [ -f CLAUDE.md ]; then
     sed -i.bak '/<!-- ONE_SHOT/,/<!-- \/ONE_SHOT -->/d' CLAUDE.md 2>/dev/null || true
     echo "$CLAUDE_ONESHOT_BLOCK" | cat - CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md
     rm -f CLAUDE.md.bak 2>/dev/null || true
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v5.3)"
+    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v5.5)"
   fi
 else
   # Create new CLAUDE.md with skill and agent routing emphasis
   cat > CLAUDE.md << 'EOF'
-<!-- ONE_SHOT v5.3 -->
+<!-- ONE_SHOT v5.5 -->
 # IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
 #
 # Skills (synchronous, shared context):
@@ -132,6 +133,7 @@ else
 #   "debug/fix..."    → debugger
 #   "deploy..."       → push-to-cloud
 #   "ultrathink..."   → thinking-modes
+#   "beads/ready..."  → beads (persistent tasks)
 #
 # Agents (isolated context, background):
 #   "security audit..." → security-auditor
@@ -249,21 +251,23 @@ else
 fi
 
 # =============================================================================
-# 5. Skills - Consolidated 23 skills (additive only)
+# 5. Skills - Consolidated 25 skills (additive only)
 # =============================================================================
 SKILLS=(
   # Core (3)
   oneshot-core failure-recovery thinking-modes
   # Planning (3)
   create-plan implement-plan api-designer
-  # Context (2)
-  create-handoff resume-handoff
+  # Context (3) - includes beads for persistent task tracking
+  create-handoff resume-handoff beads
   # Development (5)
   debugger test-runner code-reviewer refactorer performance-optimizer
   # Operations (5)
   git-workflow push-to-cloud ci-cd-setup docker-composer observability-setup
   # Data & Docs (4)
   database-migrator documentation-generator secrets-vault-manager secrets-sync
+  # Communication (1)
+  the-audit
   # Agent Bridge (1)
   delegate-to-agent
 )
@@ -291,9 +295,9 @@ for skill in "${SKILLS[@]}"; do
 done
 
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 23 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 25 total)"
 else
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 23 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 25 total)"
 fi
 
 # =============================================================================
@@ -335,6 +339,28 @@ if [ "$UPGRADE_MODE" = true ]; then
   echo -e "  ${GREEN}✓${NC} .claude/agents/ (${AGENTS_ADDED} added, ${AGENTS_UPDATED} updated, 4 total)"
 else
   echo -e "  ${GREEN}✓${NC} .claude/agents/ (${AGENTS_ADDED} added, ${AGENTS_SKIPPED} existing, 4 total)"
+fi
+
+# =============================================================================
+# 6.5 Beads - Optional persistent task tracking (check if available)
+# =============================================================================
+BEADS_INSTALLED=false
+
+# Check if bd command exists
+if command -v bd &> /dev/null; then
+  BEADS_INSTALLED=true
+  echo -e "  ${GREEN}✓${NC} beads CLI detected ($(bd --version 2>/dev/null || echo 'installed'))"
+else
+  echo -e "  ${YELLOW}○${NC} beads not installed (optional - npm install -g @beads/bd)"
+fi
+
+# Initialize beads in project if installed and not already initialized
+if [ "$BEADS_INSTALLED" = true ] && [ ! -d ".beads" ]; then
+  echo -e "  ${BLUE}→${NC} Initializing beads in project..."
+  bd init --stealth 2>/dev/null || true
+  echo -e "  ${GREEN}✓${NC} .beads/ initialized (git-backed persistent tasks)"
+elif [ -d ".beads" ]; then
+  echo -e "  ${GREEN}✓${NC} .beads/ (already initialized)"
 fi
 
 # =============================================================================
@@ -382,7 +408,11 @@ GITIGNORE_BLOCK="
 *.key
 .age/
 !.env.example
-!*.encrypted"
+!*.encrypted
+# Beads local cache (JSONL is tracked)
+.beads/beads.db
+.beads/bd.sock
+.beads/export_hashes.db"
 
 if [ -f .gitignore ]; then
   if ! grep -q "# ONE_SHOT" .gitignore; then
@@ -403,7 +433,7 @@ echo ""
 echo -e "${GREEN}Done!${NC} Project is now ONE_SHOT enabled."
 echo ""
 echo "  Files:"
-echo "    AGENTS.md        - Skill & agent routing (23 skills, 4 agents)"
+echo "    AGENTS.md        - Skill & agent routing (25 skills, 4 agents)"
 echo "    CLAUDE.md        - Project instructions"
 echo "    TODO.md          - Task tracking"
 echo "    LLM-OVERVIEW.md  - Project context"
@@ -414,12 +444,16 @@ echo "    \"plan...\"         → create-plan"
 echo "    \"ultrathink...\"   → thinking-modes"
 echo "    \"debug/fix...\"    → debugger"
 echo "    \"deploy...\"       → push-to-cloud"
+echo "    \"beads/ready...\"  → beads (persistent tasks)"
 echo ""
 echo "  Agents (isolated context, background):"
 echo "    \"security audit\"  → security-auditor"
 echo "    \"explore/find\"    → deep-research"
 echo "    \"background\"      → background-worker"
 echo "    \"coordinate\"      → multi-agent-coordinator"
+echo ""
+echo "  Optional:"
+echo "    beads            - Persistent task tracking (npm install -g @beads/bd)"
 echo ""
 echo "  Commands:"
 echo "    (ONE_SHOT)       - Re-anchor to skill routing"

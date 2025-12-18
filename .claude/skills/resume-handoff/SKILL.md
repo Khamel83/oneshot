@@ -44,6 +44,21 @@ You are an expert at seamlessly continuing work from a handoff document. You res
    - Active files mentioned
 ```
 
+### Phase 1.5: Sync Beads State (If Using Beads)
+
+If project has `.beads/` directory:
+
+```bash
+# Pull latest state (may have changed since handoff)
+bd sync
+
+# See what's ready to work on
+bd ready --json
+
+# Cross-reference with handoff's beads state
+# Note any changes since handoff was created
+```
+
 ### Phase 2: State Verification
 
 ```markdown
@@ -51,6 +66,7 @@ You are an expert at seamlessly continuing work from a handoff document. You res
    - Check commits exist
    - Confirm files are in expected state
    - Note any drift since handoff
+   - If using beads: check for task state changes
 
 5. Check for user responses:
    - Were blockers resolved?
@@ -101,6 +117,8 @@ Before continuing work, verify:
 - [ ] No conflicting changes since handoff
 - [ ] Blockers addressed or acknowledged
 - [ ] User has provided any needed input
+- [ ] Beads synced (if using beads: `bd sync`)
+- [ ] Ready tasks reviewed (if using beads: `bd ready --json`)
 
 ## Handling Common Scenarios
 
