@@ -7,3 +7,7 @@ secrets/*.env
 # Local keys
 .age/
 *.key
+
+# The Audit - source documents (large, copyrighted)
+# Users must provide their own copies
+.claude/skills/the-audit/SOURCE_DOCS/

@@ -177,19 +177,53 @@ Before outputting, check:
 
 ---
 
+## Principle Files (Bundled)
+
+The Audit includes pre-extracted principle summaries with line references:
+
+```
+.claude/skills/the-audit/
+├── principles/
+│   ├── VOSS_PRINCIPLES.md    # Chris Voss - Never Split the Difference (~550 lines)
+│   ├── CAMP_PRINCIPLES.md    # Jim Camp - Start with No (~520 lines)
+│   └── GRIEF_PRINCIPLES.md   # James & Friedman - Grief Recovery (~600 lines)
+└── SOURCE_DOCS/              # .gitignored - user provides their own copies
+    ├── neversplit.md         # Full source (~9,773 lines)
+    ├── start_with_no.md      # Full source (~8,075 lines)
+    └── griefrecovery.md      # Full source (~4,727 lines)
+```
+
+**Principle summaries are committed** - they provide ~1,700 lines of strategic guidance.
+**Source docs are gitignored** - users must provide their own copies for deep reference.
+
+## Using Principles
+
+When auditing, load relevant principles:
+
+1. **Always load:** AUDIT_PRINCIPLES.md (meta-principles)
+2. **For negotiations:** VOSS_PRINCIPLES.md + CAMP_PRINCIPLES.md
+3. **For emotional situations:** GRIEF_PRINCIPLES.md (internal processing check)
+
+Reference line numbers when explaining changes:
+- "Applied labeling (VOSS:L1959)"
+- "Used 3+ technique (CAMP:L4278)"
+- "STERB check (GRIEF:L1790)"
+
 ## Domain Mode
 
-When domain config exists, also:
-1. Load principle files referenced in config
-2. Apply domain-specific decision trees
-3. Reference source material line numbers in explanations
-4. Use domain voice guidelines
+When domain config exists in project (e.g., `NEGOTIATION/DOMAIN_CONFIG.md`):
+1. Load the bundled principle files
+2. Load domain-specific config (context, voice, constraints)
+3. Apply domain-specific decision trees
+4. Reference source material line numbers in explanations
+5. Use domain voice guidelines
 
-Example with NEGOTIATION/ domain:
-- Load VOSS_PRINCIPLES.md, CAMP_PRINCIPLES.md
+Example with NEGOTIATION/ domain in divorce project:
+- Load VOSS, CAMP, GRIEF principles from this skill
+- Load DOMAIN_CONFIG.md from project (Omar's context, Meghan, constraints)
 - Apply accusation audit for openings
 - Use calibrated questions for pushback
-- Reference specific techniques: "Applied labeling (VOSS:L1699)"
+- Reference specific techniques: "Applied labeling (VOSS:L1959)"
 
 ---
 
