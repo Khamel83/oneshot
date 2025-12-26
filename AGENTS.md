@@ -106,6 +106,19 @@ skill_router:
 
 ---
 
+## DIAGNOSTIC MODE
+
+When user says "which skill?" or "what skill would you use for X?":
+1. Identify the skill that would be triggered
+2. Show the matching trigger pattern
+3. Do NOT execute the skill
+
+Example:
+> User: "which skill would you use for: fix this bug"
+> Assistant: "That would trigger **debugger** (pattern: `bug|error|fix|debug`)"
+
+---
+
 ## AGENT ROUTER (Native Sub-agents)
 
 **When to use agents instead of skills:**
@@ -314,6 +327,12 @@ oneshot:
     - "Auth method changes"
     - "Production deployment"
     action: "STOP → Ask user → Wait for approval"
+
+  logging:
+    enabled: true
+    file: SKILL_LOG.md
+    format: "| {date} | {skill} | {trigger} | {result} |"
+    note: "Append entry after each skill invocation"
 ```
 
 ---
