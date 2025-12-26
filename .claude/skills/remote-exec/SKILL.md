@@ -25,14 +25,39 @@ You are an expert at executing commands across a multi-machine Tailscale network
 | Body | homelab | Data storage, Docker services, main data drive |
 | Muscle | macmini | GPU, Whisper, video processing |
 
-## Machine Reference
+## Machine Registry
 
-| Machine | Hostname | User | Repos | Data |
-|---------|----------|------|-------|------|
-| oci-dev | oci-dev.deer-panga.ts.net | ubuntu | ~/projects | N/A |
-| homelab | homelab.deer-panga.ts.net | khamel83 | ~/github | /mnt/main-drive |
-| macmini | omars-mac-mini.deer-panga.ts.net | macmini | ~/github | ~/data |
-| macbook-air | omars-macbook-air.deer-panga.ts.net | khamel83 | ~/github | N/A |
+| Machine | Hostname | User | Purpose |
+|---------|----------|------|---------|
+| oci-dev | oci-dev.deer-panga.ts.net | ubuntu | Claude Code, OCI resources |
+| homelab | homelab.deer-panga.ts.net | khamel83 | Data storage, Docker |
+| macmini | omars-mac-mini.deer-panga.ts.net | macmini | GPU, transcription |
+| macbook-air | omars-macbook-air.deer-panga.ts.net | khamel83 | Local development |
+
+### Resource Breakdown
+
+**oci-dev** (Brain)
+- Repos: ~/dev, ~/github
+- Compute: 4 ARM cores, 24GB RAM, 193GB disk
+- Object Storage: khamel-storage (20GB free)
+- Autonomous DB: khameldb (20GB Oracle free)
+- Purpose: Claude Code execution, lightweight APIs, OCI resources
+
+**homelab** (Body)
+- Repos: ~/github
+- Data: /mnt/main-drive (26TB MergerFS pool)
+- Docker: 53+ services
+- Purpose: Data storage, media, Docker services
+
+**macmini** (Muscle)
+- Repos: ~/github
+- GPU: Apple Silicon
+- Whisper: Local transcription
+- Purpose: GPU processing, video, transcription
+
+**macbook-air** (Mobile)
+- Repos: ~/github
+- Purpose: Local development, testing
 
 ## Prerequisites Check
 

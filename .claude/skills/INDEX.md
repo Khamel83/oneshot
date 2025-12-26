@@ -1,6 +1,6 @@
 # Skills Index
 
-Complete catalog of ONE_SHOT skills (26 total).
+Complete catalog of ONE_SHOT skills (27 total).
 
 ## Quick Reference
 
@@ -32,6 +32,7 @@ Complete catalog of ONE_SHOT skills (26 total).
 | secrets-sync | "sync secrets", "push secrets" | Two-way vault sync |
 | the-audit | "audit this", "filter this" | Strategic communication filter |
 | delegate-to-agent | "background", "isolated" | Route to native sub-agents |
+| oci-resources | "oci database", "object storage" | OCI free-tier resources |
 
 ---
 
@@ -77,13 +78,14 @@ Complete catalog of ONE_SHOT skills (26 total).
 | docker-composer | 241 | Bash, Read, Write, Edit |
 | observability-setup | 242 | Bash, Read, Write, Edit, Glob |
 
-### Data & Docs (4)
+### Data & Docs (5)
 | Skill | Lines | Tools |
 |-------|-------|-------|
 | database-migrator | 302 | Bash, Read, Write, Edit |
 | documentation-generator | 187 | Read, Write, Edit, Glob |
 | secrets-vault-manager | 154 | Bash, Read, Write, Edit |
 | secrets-sync | ~200 | Bash, Read, Write, Edit |
+| oci-resources | ~200 | Bash, Read, Write, Edit |
 
 ### Communication (1)
 | Skill | Lines | Tools |
@@ -143,7 +145,7 @@ Deep Research (with agent):
 
 | Tool | Skills Using It |
 |------|-----------------|
-| Read | All 25 |
+| Read | All 27 |
 | Write | 20 |
 | Edit | 18 |
 | Bash | 15 |

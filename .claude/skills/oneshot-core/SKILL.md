@@ -73,7 +73,7 @@ Next: [specific next step]
 | **Q6** | Project type (CLI/Web/API/etc) | Yes | - |
 | Q7 | Data shape (examples) | If non-default | From Q1 context |
 | Q8 | Data scale (A/B/C) | If non-default | A (Small) |
-| Q9 | Storage (files/SQLite/Postgres) | If non-default | SQLite |
+| Q9 | Storage (SQLite/Files/OCI Autonomous/Supabase) | If non-default | SQLite |
 | Q10 | Dependencies | If non-default | "You decide" |
 | Q11 | Interface shape | If non-default | From Q6 |
 | **Q12** | Done criteria / v1 scope | Yes | - |
@@ -131,6 +131,28 @@ Every ONE_SHOT project MUST have:
 | Files (YAML/JSON) | Default | <1K | Need querying |
 | SQLite | Most projects | <100K | Multi-user or heavy writes |
 | PostgreSQL | Only when needed | 100K+ | Explicit approval required |
+
+### Storage Decision Matrix
+
+| Need | Solution | Why |
+|------|----------|-----|
+| Simple local storage | SQLite | Zero config, portable |
+| User auth with magic links | Supabase | Built-in auth, edge functions |
+| Production DB, multi-user | OCI Autonomous DB | Free 20GB, managed Oracle |
+| File/blob storage | OCI Object Storage | Free 20GB, pre-signed URLs |
+| 26TB media storage | Homelab | /mnt/main-drive |
+| GPU processing | Mac Mini | Apple Silicon |
+
+### When to Use Each Database
+
+| Scenario | SQLite | OCI Autonomous | Supabase |
+|----------|--------|----------------|----------|
+| Personal CLI tool | Best | Overkill | Overkill |
+| Single-user web app | Best | OK | OK |
+| Multi-user production | No | Best | Good |
+| Need built-in auth | No | No | Best |
+| Enterprise SQL features | No | Best | Limited |
+| $0 budget | Yes | Yes (free tier) | Yes (free tier) |
 
 ## Deployment Progression
 
