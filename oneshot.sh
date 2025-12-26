@@ -1,5 +1,5 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v5.5
+# ONE_SHOT Bootstrap Script v5.6
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # Options:
@@ -26,7 +26,7 @@ for arg in "$@"; do
       shift
       ;;
     --help)
-      echo "ONE_SHOT Bootstrap Script v5.5"
+      echo "ONE_SHOT Bootstrap Script v5.6"
       echo ""
       echo "Usage:"
       echo "  curl -sL .../oneshot.sh | bash           # Install (non-destructive)"
@@ -38,7 +38,7 @@ for arg in "$@"; do
       echo ""
       echo "What gets installed:"
       echo "  Always:      AGENTS.md, CLAUDE.md ONE_SHOT block"
-      echo "  Skills:      25 skills in .claude/skills/"
+      echo "  Skills:      26 skills in .claude/skills/"
       echo "  Agents:      4 sub-agents in .claude/agents/"
       echo ""
       echo "What gets updated (--upgrade):"
@@ -62,10 +62,10 @@ NC='\033[0m'
 
 echo ""
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "${BLUE}ONE_SHOT Upgrade v5.5${NC}"
+  echo -e "${BLUE}ONE_SHOT Upgrade v5.6${NC}"
   echo "====================="
 else
-  echo -e "${BLUE}ONE_SHOT Bootstrap v5.5${NC}"
+  echo -e "${BLUE}ONE_SHOT Bootstrap v5.6${NC}"
   echo "========================"
 fi
 echo ""
@@ -87,7 +87,7 @@ echo -e "  ${GREEN}✓${NC} AGENTS.md (orchestrator with skill routing)"
 # =============================================================================
 # 2. CLAUDE.md - Supplement if exists, create if not
 # =============================================================================
-CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.5 -->
+CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.6 -->
 # IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
 #
 # Skills (synchronous, shared context):
@@ -123,7 +123,7 @@ if [ -f CLAUDE.md ]; then
 else
   # Create new CLAUDE.md with skill and agent routing emphasis
   cat > CLAUDE.md << 'EOF'
-<!-- ONE_SHOT v5.5 -->
+<!-- ONE_SHOT v5.6 -->
 # IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
 #
 # Skills (synchronous, shared context):
@@ -262,8 +262,8 @@ SKILLS=(
   create-handoff resume-handoff beads
   # Development (5)
   debugger test-runner code-reviewer refactorer performance-optimizer
-  # Operations (5)
-  git-workflow push-to-cloud ci-cd-setup docker-composer observability-setup
+  # Operations (6)
+  git-workflow push-to-cloud remote-exec ci-cd-setup docker-composer observability-setup
   # Data & Docs (4)
   database-migrator documentation-generator secrets-vault-manager secrets-sync
   # Communication (1)
@@ -295,9 +295,9 @@ for skill in "${SKILLS[@]}"; do
 done
 
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 25 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 26 total)"
 else
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 25 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 26 total)"
 fi
 
 # =============================================================================
@@ -433,7 +433,7 @@ echo ""
 echo -e "${GREEN}Done!${NC} Project is now ONE_SHOT enabled."
 echo ""
 echo "  Files:"
-echo "    AGENTS.md        - Skill & agent routing (25 skills, 4 agents)"
+echo "    AGENTS.md        - Skill & agent routing (26 skills, 4 agents)"
 echo "    CLAUDE.md        - Project instructions"
 echo "    TODO.md          - Task tracking"
 echo "    LLM-OVERVIEW.md  - Project context"

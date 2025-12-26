@@ -67,6 +67,9 @@ skill_router:
   - pattern: "deploy|ship|cloud|host|production|oci"
     skill: push-to-cloud
 
+  - pattern: "run on|execute on|ssh to|sync and run|process on macmini|homelab docker|remote|tmux job"
+    skill: remote-exec
+
   - pattern: "ci|cd|github actions|pipeline|automation"
     skill: ci-cd-setup
 
@@ -171,7 +174,7 @@ agent_router:
 
 ---
 
-## AVAILABLE SKILLS (25)
+## AVAILABLE SKILLS (26)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -179,7 +182,7 @@ agent_router:
 | **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
 | **Context** | `create-handoff`, `resume-handoff`, `beads` | Session persistence, cross-session memory |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
-| **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
+| **Operations** | `git-workflow`, `push-to-cloud`, `remote-exec`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
 | **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync` | Support |
 | **Communication** | `the-audit` | Strategic communication filter |
 | **Agent Bridge** | `delegate-to-agent` | Route to native sub-agents |
@@ -234,17 +237,60 @@ chains:
 
 ---
 
+## PHILOSOPHY: The Spolsky Doctrine
+
+> "It's harder to read code than to write it." — Joel Spolsky
+
+**NEVER rewrite from scratch.** This is the single worst strategic decision in software.
+
+### Why Old Code Isn't Bad
+
+Every line of "ugly" code contains:
+- Bug fixes discovered through real-world use
+- Edge cases that took weeks to reproduce
+- Hard-won knowledge about compatibility and performance
+
+When programmers say code is messy, they're usually wrong. They mistake *unfamiliarity* for *poor quality*.
+
+### The AI Advantage
+
+Unlike humans, AI has no bias toward writing over reading:
+- **Reading unfamiliar code is cheap** for AI — no ego, no fatigue
+- **Understanding existing solutions** takes seconds, not hours
+- **Extending battle-tested code** beats starting fresh every time
+
+### The GitHub Corollary
+
+**If someone already solved this problem, USE THEIR SOLUTION.**
+
+Before writing new code, ask:
+1. Is there a popular library that does this?
+2. Is there an open-source project solving this exact problem?
+3. Can we extend/fork existing work instead of starting from zero?
+
+Popular projects on GitHub represent thousands of hours of debugging, edge-case handling, and real-world testing. That knowledge is free. Use it.
+
+### Refactor, Don't Rewrite
+
+When improving code:
+- **1% of work gets 99% of results** — target bottlenecks, not wholesale replacement
+- **Incremental improvement** beats big-bang rewrites
+- **Preserve institutional knowledge** encoded in existing code
+
+---
+
 ## YAML CONFIG
 
 ```yaml
 oneshot:
-  version: 5.5
-  skills: 25
+  version: 5.6
+  skills: 26
   agents: 4
 
   prime_directive: |
     USER TIME IS PRECIOUS. AGENT COMPUTE IS CHEAP.
     Ask ALL questions UPFRONT. Get ALL info BEFORE coding.
+    NEVER REWRITE FROM SCRATCH. Extend, refactor, use existing solutions.
 
   file_hierarchy:
     1: CLAUDE.md        # Project-specific (read first)
@@ -328,6 +374,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 5.5 | **Skills**: 25 | **Agents**: 4 | **Cost**: $0
+**Version**: 5.6 | **Skills**: 26 | **Agents**: 4 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI

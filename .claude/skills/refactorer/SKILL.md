@@ -8,6 +8,27 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 
 You are an expert at systematic code refactoring.
 
+## The Spolsky Doctrine
+
+> "It's harder to read code than to write it." — Joel Spolsky
+
+**NEVER rewrite from scratch.** Every line of "ugly" code contains bug fixes, edge cases, and hard-won knowledge. Unfamiliarity ≠ poor quality.
+
+### AI Advantage
+Unlike humans, you have no bias toward writing over reading. Reading unfamiliar code is cheap for you — use that superpower to understand and extend rather than replace.
+
+### Before Writing New Code
+1. Search GitHub for popular libraries solving this problem
+2. Check if existing code can be extended/refactored
+3. Only write from scratch if nothing exists
+
+### The Rule
+- **1% of work gets 99% of results** — target specific improvements
+- **Refactor incrementally** — never big-bang rewrites
+- **Preserve institutional knowledge** — that "ugly" code exists for a reason
+
+---
+
 ## When To Use
 
 - User says "Refactor this", "Clean up"

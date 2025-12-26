@@ -1,6 +1,6 @@
 # Skills Index
 
-Complete catalog of ONE_SHOT skills (25 total).
+Complete catalog of ONE_SHOT skills (26 total).
 
 ## Quick Reference
 
@@ -22,6 +22,7 @@ Complete catalog of ONE_SHOT skills (25 total).
 | performance-optimizer | "slow", "optimize" | Profile and improve |
 | git-workflow | "commit", "PR" | Version control operations |
 | push-to-cloud | "deploy", "ship" | Deploy to OCI-Dev |
+| remote-exec | "run on", "sync and run" | Execute on remote machines |
 | ci-cd-setup | "CI", "GitHub Actions" | Pipeline configuration |
 | docker-composer | "docker", "containerize" | Container setup |
 | observability-setup | "monitoring", "logging" | Logging, metrics, alerts |
@@ -66,11 +67,12 @@ Complete catalog of ONE_SHOT skills (25 total).
 | refactorer | 198 | Read, Write, Edit, Glob, Grep |
 | performance-optimizer | 172 | Bash, Read, Write, Edit, Glob |
 
-### Operations (5)
+### Operations (6)
 | Skill | Lines | Tools |
 |-------|-------|-------|
 | git-workflow | 128 | Bash, Read |
 | push-to-cloud | 205 | Read, Write, Edit, Bash, Glob |
+| remote-exec | ~230 | Bash, Read, Glob |
 | ci-cd-setup | 241 | Read, Write, Edit |
 | docker-composer | 241 | Bash, Read, Write, Edit |
 | observability-setup | 242 | Bash, Read, Write, Edit, Glob |
