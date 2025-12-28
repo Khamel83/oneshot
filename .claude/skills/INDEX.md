@@ -1,6 +1,6 @@
 # Skills Index
 
-Complete catalog of ONE_SHOT skills (27 total).
+Complete catalog of ONE_SHOT skills (28 total).
 
 ## Quick Reference
 
@@ -33,6 +33,7 @@ Complete catalog of ONE_SHOT skills (27 total).
 | the-audit | "audit this", "filter this" | Strategic communication filter |
 | delegate-to-agent | "background", "isolated" | Route to native sub-agents |
 | oci-resources | "oci database", "object storage" | OCI free-tier resources |
+| convex-resources | "convex", "reactive" | Convex backend for web apps |
 
 ---
 
@@ -78,7 +79,7 @@ Complete catalog of ONE_SHOT skills (27 total).
 | docker-composer | 241 | Bash, Read, Write, Edit |
 | observability-setup | 242 | Bash, Read, Write, Edit, Glob |
 
-### Data & Docs (5)
+### Data & Docs (6)
 | Skill | Lines | Tools |
 |-------|-------|-------|
 | database-migrator | 302 | Bash, Read, Write, Edit |
@@ -86,6 +87,7 @@ Complete catalog of ONE_SHOT skills (27 total).
 | secrets-vault-manager | 154 | Bash, Read, Write, Edit |
 | secrets-sync | ~200 | Bash, Read, Write, Edit |
 | oci-resources | ~200 | Bash, Read, Write, Edit |
+| convex-resources | ~250 | Bash, Read, Write, Edit |
 
 ### Communication (1)
 | Skill | Lines | Tools |

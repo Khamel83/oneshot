@@ -137,6 +137,7 @@ Every ONE_SHOT project MUST have:
 | Need | Solution | Why |
 |------|----------|-----|
 | Simple local storage | SQLite | Zero config, portable |
+| Real-time web app | Convex | Reactive DB, TypeScript, built-in auth |
 | User auth with magic links | Supabase | Built-in auth, edge functions |
 | Production DB, multi-user | OCI Autonomous DB | Free 20GB, managed Oracle |
 | File/blob storage | OCI Object Storage | Free 20GB, pre-signed URLs |
@@ -145,14 +146,16 @@ Every ONE_SHOT project MUST have:
 
 ### When to Use Each Database
 
-| Scenario | SQLite | OCI Autonomous | Supabase |
-|----------|--------|----------------|----------|
-| Personal CLI tool | Best | Overkill | Overkill |
-| Single-user web app | Best | OK | OK |
-| Multi-user production | No | Best | Good |
-| Need built-in auth | No | No | Best |
-| Enterprise SQL features | No | Best | Limited |
-| $0 budget | Yes | Yes (free tier) | Yes (free tier) |
+| Scenario | SQLite | Convex | OCI Autonomous | Supabase |
+|----------|--------|--------|----------------|----------|
+| Personal CLI tool | Best | Overkill | Overkill | Overkill |
+| Single-user web app | OK | Best | OK | OK |
+| Multi-user web app | No | Best | Good | Good |
+| Real-time features | No | Best | No | OK |
+| TypeScript-first | No | Best | No | OK |
+| Need built-in auth | No | Yes | No | Best |
+| Enterprise SQL | No | No | Best | Limited |
+| $0 budget | Yes | Yes | Yes | Yes |
 
 ## Deployment Progression
 
@@ -167,8 +170,9 @@ Every ONE_SHOT project MUST have:
 
 1. Homelab ($0)
 2. OCI free tier ($0) - 4 OCPU ARM, 24GB RAM, 200GB
-3. GitHub Actions ($0)
-4. Supabase ($0 tier)
+3. Convex Cloud ($0 tier) - default for web apps
+4. GitHub Actions ($0)
+5. Supabase ($0 tier)
 
 ## Yolo Mode Flow
 
@@ -184,10 +188,10 @@ Every ONE_SHOT project MUST have:
 |---------|-------|---------|
 | A. CLI | Python, Click | SQLite |
 | B. Library | Python, pytest | N/A |
-| C. Web | FastAPI, Jinja2 | SQLite |
+| C. Web | Next.js, React | Convex |
 | D. Pipeline | Python, pandas | SQLite |
 | E. Service | Python, APScheduler | SQLite |
-| F. AI Web | FastAPI, OpenRouter | SQLite |
+| F. AI Web | Next.js, React, OpenRouter | Convex |
 | G. Static | HTML/CSS/JS | N/A |
 
 ## Micro Mode Flow

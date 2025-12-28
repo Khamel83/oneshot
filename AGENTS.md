@@ -86,6 +86,9 @@ skill_router:
   - pattern: "oci database|oracle|autonomous|object storage|bucket|khameldb"
     skill: oci-resources
 
+  - pattern: "convex|reactive database|real-time backend|convex setup"
+    skill: convex-resources
+
   - pattern: "docs|readme|documentation|explain"
     skill: documentation-generator
 
@@ -190,7 +193,7 @@ agent_router:
 
 ---
 
-## AVAILABLE SKILLS (27)
+## AVAILABLE SKILLS (28)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -199,7 +202,7 @@ agent_router:
 | **Context** | `create-handoff`, `resume-handoff`, `beads` | Session persistence, cross-session memory |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
 | **Operations** | `git-workflow`, `push-to-cloud`, `remote-exec`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
-| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync`, `oci-resources` | Support |
+| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync`, `oci-resources`, `convex-resources` | Support |
 | **Communication** | `the-audit` | Strategic communication filter |
 | **Agent Bridge** | `delegate-to-agent` | Route to native sub-agents |
 
@@ -299,8 +302,8 @@ When improving code:
 
 ```yaml
 oneshot:
-  version: 5.7
-  skills: 27
+  version: 5.8
+  skills: 28
   agents: 4
 
   prime_directive: |
@@ -396,6 +399,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 5.7 | **Skills**: 27 | **Agents**: 4 | **Cost**: $0
+**Version**: 5.8 | **Skills**: 28 | **Agents**: 4 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI
