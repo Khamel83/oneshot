@@ -38,7 +38,7 @@ for arg in "$@"; do
       echo ""
       echo "What gets installed:"
       echo "  Always:      AGENTS.md, CLAUDE.md ONE_SHOT block"
-      echo "  Skills:      26 skills in .claude/skills/"
+      echo "  Skills:      27 skills in .claude/skills/"
       echo "  Agents:      4 sub-agents in .claude/agents/"
       echo ""
       echo "What gets updated (--upgrade):"
@@ -251,7 +251,7 @@ else
 fi
 
 # =============================================================================
-# 5. Skills - Consolidated 25 skills (additive only)
+# 5. Skills - Consolidated 27 skills (additive only)
 # =============================================================================
 SKILLS=(
   # Core (3)
@@ -260,8 +260,8 @@ SKILLS=(
   create-plan implement-plan api-designer
   # Context (3) - includes beads for persistent task tracking
   create-handoff resume-handoff beads
-  # Development (5)
-  debugger test-runner code-reviewer refactorer performance-optimizer
+  # Development (6)
+  debugger test-runner code-reviewer refactorer performance-optimizer visual-iteration
   # Operations (6)
   git-workflow push-to-cloud remote-exec ci-cd-setup docker-composer observability-setup
   # Data & Docs (4)
@@ -295,9 +295,9 @@ for skill in "${SKILLS[@]}"; do
 done
 
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 26 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 27 total)"
 else
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 26 total)"
+  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 27 total)"
 fi
 
 # =============================================================================
@@ -433,7 +433,7 @@ echo ""
 echo -e "${GREEN}Done!${NC} Project is now ONE_SHOT enabled."
 echo ""
 echo "  Files:"
-echo "    AGENTS.md        - Skill & agent routing (26 skills, 4 agents)"
+echo "    AGENTS.md        - Skill & agent routing (27 skills, 4 agents)"
 echo "    CLAUDE.md        - Project instructions"
 echo "    TODO.md          - Task tracking"
 echo "    LLM-OVERVIEW.md  - Project context"
