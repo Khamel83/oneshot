@@ -6,7 +6,7 @@ Complete catalog of ONE_SHOT skills (28 total).
 
 | Skill | Trigger | Purpose |
 |-------|---------|---------|
-| oneshot-core | "build me", "new project" | Full project creation with PRD |
+| front-door | "build me", "new project", "/interview" | Intelligent interview & routing hub |
 | failure-recovery | "stuck", "looping" | Recovery from agent confusion |
 | thinking-modes | "think", "ultrathink" | Extended analysis with personas |
 | create-plan | "plan this" | Structured planning |
@@ -42,7 +42,7 @@ Complete catalog of ONE_SHOT skills (28 total).
 ### Core (3)
 | Skill | Lines | Tools |
 |-------|-------|-------|
-| oneshot-core | 243 | Read, Write, Edit, Bash, Glob, Grep |
+| front-door | ~320 | Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, Task |
 | failure-recovery | 229 | Read, Bash, Glob, Grep |
 | thinking-modes | 227 | Read, Glob, Grep, Bash, Write, Edit, Task |
 
@@ -107,7 +107,7 @@ Common workflows that compose multiple skills:
 
 ```
 New Project:
-  oneshot-core → create-plan → implement-plan
+  front-door → create-plan → implement-plan
 
 Add Feature:
   create-plan → implement-plan → test-runner
@@ -134,7 +134,7 @@ Deep Research (with agent):
 
 | Skill | Skip When |
 |-------|-----------|
-| oneshot-core | Micro task, single file change |
+| front-door | Micro task, single file change |
 | create-plan | Simple change, already have plan |
 | thinking-modes | Quick question, obvious answer |
 | api-designer | Internal function, no external API |

@@ -1,4 +1,4 @@
-# ONE_SHOT Orchestrator v5.3
+# ONE_SHOT Orchestrator v6.0
 
 > **IMPORTANT**: This file controls skill and agent routing. Parse the routers first.
 
@@ -11,8 +11,8 @@
 ```yaml
 skill_router:
   # CORE - Always check these first
-  - pattern: "new project|build me|start fresh|create.*app|make.*tool"
-    skill: oneshot-core
+  - pattern: "new project|build me|start fresh|create.*app|make.*tool|help me|/interview|/front-door"
+    skill: front-door
     chain: [create-plan, implement-plan]
 
   - pattern: "stuck|looping|confused|not working|start over|broken build"
@@ -197,7 +197,7 @@ agent_router:
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
-| **Core** | `oneshot-core`, `failure-recovery`, `thinking-modes` | Orchestration, recovery, cognition |
+| **Core** | `front-door`, `failure-recovery`, `thinking-modes` | Orchestration, recovery, cognition |
 | **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
 | **Context** | `create-handoff`, `resume-handoff`, `beads` | Session persistence, cross-session memory |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
@@ -229,7 +229,7 @@ Common workflows that compose multiple skills:
 ```yaml
 chains:
   new_project:
-    1: oneshot-core      # Questions → PRD
+    1: front-door        # Interview → Spec
     2: create-plan       # Structure approach
     3: implement-plan    # Build it
 
@@ -302,7 +302,7 @@ When improving code:
 
 ```yaml
 oneshot:
-  version: 5.8
+  version: 6.0
   skills: 28
   agents: 4
 
@@ -374,7 +374,7 @@ oneshot:
 
 | Intent | Signals | Skill |
 |--------|---------|-------|
-| build_new | "new project", "build me" | oneshot-core |
+| build_new | "new project", "build me" | front-door |
 | fix_existing | "broken", "bug", "error" | debugger |
 | continue_work | "resume", "checkpoint" | resume-handoff |
 | add_feature | "add feature", "extend" | create-plan |
@@ -399,6 +399,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 5.8 | **Skills**: 28 | **Agents**: 4 | **Cost**: $0
+**Version**: 6.0 | **Skills**: 28 | **Agents**: 4 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI
