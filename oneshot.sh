@@ -1,5 +1,5 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v5.6
+# ONE_SHOT Bootstrap Script v6.0
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # Options:
@@ -26,7 +26,7 @@ for arg in "$@"; do
       shift
       ;;
     --help)
-      echo "ONE_SHOT Bootstrap Script v5.6"
+      echo "ONE_SHOT Bootstrap Script v6.0"
       echo ""
       echo "Usage:"
       echo "  curl -sL .../oneshot.sh | bash           # Install (non-destructive)"
@@ -62,10 +62,10 @@ NC='\033[0m'
 
 echo ""
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "${BLUE}ONE_SHOT Upgrade v5.6${NC}"
+  echo -e "${BLUE}ONE_SHOT Upgrade v6.0${NC}"
   echo "====================="
 else
-  echo -e "${BLUE}ONE_SHOT Bootstrap v5.6${NC}"
+  echo -e "${BLUE}ONE_SHOT Bootstrap v6.0${NC}"
   echo "========================"
 fi
 echo ""
@@ -87,11 +87,11 @@ echo -e "  ${GREEN}✓${NC} AGENTS.md (orchestrator with skill routing)"
 # =============================================================================
 # 2. CLAUDE.md - Supplement if exists, create if not
 # =============================================================================
-CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v5.6 -->
+CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v6.0 -->
 # IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
 #
 # Skills (synchronous, shared context):
-#   \"build me...\"     → oneshot-core
+#   \"build me...\"     → front-door
 #   \"plan...\"         → create-plan
 #   \"implement...\"    → implement-plan
 #   \"debug/fix...\"    → debugger
@@ -118,16 +118,16 @@ if [ -f CLAUDE.md ]; then
     sed -i.bak '/<!-- ONE_SHOT/,/<!-- \/ONE_SHOT -->/d' CLAUDE.md 2>/dev/null || true
     echo "$CLAUDE_ONESHOT_BLOCK" | cat - CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md
     rm -f CLAUDE.md.bak 2>/dev/null || true
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v5.5)"
+    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v6.0)"
   fi
 else
   # Create new CLAUDE.md with skill and agent routing emphasis
   cat > CLAUDE.md << 'EOF'
-<!-- ONE_SHOT v5.6 -->
+<!-- ONE_SHOT v6.0 -->
 # IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
 #
 # Skills (synchronous, shared context):
-#   "build me..."     → oneshot-core
+#   "build me..."     → front-door
 #   "plan..."         → create-plan
 #   "implement..."    → implement-plan
 #   "debug/fix..."    → debugger
@@ -255,7 +255,7 @@ fi
 # =============================================================================
 SKILLS=(
   # Core (3)
-  oneshot-core failure-recovery thinking-modes
+  front-door failure-recovery thinking-modes
   # Planning (3)
   create-plan implement-plan api-designer
   # Context (3) - includes beads for persistent task tracking
@@ -439,7 +439,7 @@ echo "    TODO.md          - Task tracking"
 echo "    LLM-OVERVIEW.md  - Project context"
 echo ""
 echo "  Skills (synchronous, shared context):"
-echo "    \"build me...\"     → oneshot-core"
+echo "    \"build me...\"     → front-door"
 echo "    \"plan...\"         → create-plan"
 echo "    \"ultrathink...\"   → thinking-modes"
 echo "    \"debug/fix...\"    → debugger"
