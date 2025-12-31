@@ -1,28 +1,19 @@
 # Public Access: Tailscale Funnel + Cloudflare Worker
 
-Expose homelab services to the public internet with short URLs.
+> **Canonical documentation**: [khamel-redirector README](https://github.com/Khamel83/khamel-redirector)
+>
+> This file is a summary. The khamel-redirector repo is the source of truth for all public URL routing.
 
-## Architecture
+## What It Is
+
+**khamel-redirector** is a personal URL shortener and traffic router. All public traffic goes through `khamel.com/*`.
 
 ```
-khamel.com/fd  ──→  Cloudflare Worker  ──→  302 Redirect
-                           ↓
-              https://homelab.deer-panga.ts.net/frontdoor
-                           ↓
-                    Tailscale Funnel
-                           ↓
-                   Your app on port 8080
+khamel.com/photos  →  302 redirect  →  https://homelab.deer-panga.ts.net/photos/
+khamel.com/blog    →  302 redirect  →  https://myblog.com/
 ```
 
-**No port forwarding. No cert management. No Traefik config.**
-
-## Components
-
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| Cloudflare Worker | URL shortener/redirector | `~/github/khamel-redirector` |
-| Tailscale Funnel | HTTPS tunnel to local port | Any machine on Tailnet |
-| Your App | The actual service | Homelab, Mac Mini, etc. |
+**This replaces**: Traefik, nginx reverse proxy, complex DNS configs, SSL cert management.
 
 ## Quick Reference
 
