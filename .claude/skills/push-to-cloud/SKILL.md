@@ -15,6 +15,10 @@ You are an expert at deploying projects to the OCI-Dev cloud instance.
 - Project needs to run 24/7 outside homelab
 - Lightweight Python/Node service needs cloud hosting
 
+> **Homelab Alternative**: For services running on homelab, consider using
+> **Tailscale Funnel + Cloudflare Worker** instead. Simpler setup, no port
+> forwarding, automatic HTTPS. See [docs/public-access.md](../../../docs/public-access.md).
+
 ## Target Machine: OCI-Dev
 
 | Property | Value |

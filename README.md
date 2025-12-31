@@ -277,6 +277,26 @@ A: Yes. Claude Code, Cursor, Aider, Gemini CLI - anything that reads markdown.
 
 ---
 
+## Public Access (Homelab)
+
+Expose homelab services with short URLs using **Tailscale Funnel + Cloudflare Worker**:
+
+```
+khamel.com/fd  →  Cloudflare Worker  →  302 Redirect  →  homelab.deer-panga.ts.net/frontdoor
+```
+
+**No port forwarding. No cert management. No Traefik.**
+
+See [docs/public-access.md](docs/public-access.md) for full setup.
+
+| Quick Commands | |
+|----------------|--|
+| Add route | Edit `~/github/khamel-redirector/src/index.js` |
+| Expose port | `sudo tailscale funnel --bg --set-path=/name http://localhost:PORT` |
+| Deploy | `cd ~/github/khamel-redirector && npx wrangler deploy` |
+
+---
+
 ## Secrets Management
 
 Encrypted secrets are stored in `secrets/` using [SOPS](https://github.com/getsops/sops) + [Age](https://github.com/FiloSottile/age).
