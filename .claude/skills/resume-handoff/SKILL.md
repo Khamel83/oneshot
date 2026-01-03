@@ -46,41 +46,55 @@ When resuming from `thoughts/shared/handoffs/`:
 
 ## Workflow
 
-### Phase 0: Detect Resume Type
+### Phase 0: Check Beads State (Always First)
+
+```bash
+# Always sync beads first
+bd sync
+
+# Check for in-progress work
+bd list --status in_progress --json
+
+# Check for ready work
+bd ready --json
+```
+
+**If beads has in-progress or ready tasks** → Resume from Beads (fast path)
+**If beads is empty** → Resume from Handoff (full path)
+
+### Resume from Beads (Fast Path)
+
+When resuming with beads state:
+
+```bash
+bd sync
+bd ready --json      # Shows next unblocked task
+bd list --status in_progress --json  # Any in-progress?
+```
 
 ```
-1. Check for running state files:
-   ls thoughts/shared/runs/*.md 2>/dev/null | head -1
-2. If running state exists → Resume from Running State workflow
-3. If no running state → Resume from Handoff workflow
-```
-
-### Resume from Running State (Fast Path)
-
-When resuming mid-implementation:
-
-```
-1. Read running state file
-2. Parse: current group, completed tasks, current task
-3. Announce: "Resuming at Group X, Task Y"
-4. Continue with implement-plan workflow
-5. No need to re-read full context - just task groups
+1. Sync beads state
+2. Check in-progress tasks (pick up where left off)
+3. Check ready tasks (next unblocked work)
+4. Announce: "Resuming: [task title]"
+5. Continue with implement-plan workflow
 ```
 
 **Output format**:
 ```markdown
-## Resuming Implementation
+## Resuming from Beads
 
-**Running state**: thoughts/shared/runs/YYYY-MM-DD-plan.md
-**Position**: Group 2 of 4, Task 5
+### In Progress
+- bd-a1b2: "Login endpoint" (started earlier)
 
-### Progress
-- [x] Group 1: Complete (3 tasks)
-- [ ] Group 2: In Progress (2/4 done)
-- [ ] Group 3: Pending
-- [ ] Group 4: Pending
+### Ready Next
+- bd-c3d4: "Logout endpoint"
+- bd-e5f6: "Register endpoint"
 
-Continuing with Task 5...
+### Blocked (waiting on above)
+- bd-g7h8: "Integration tests" [blocked by: bd-c3d4]
+
+Continuing with bd-a1b2...
 ```
 
 ---

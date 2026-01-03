@@ -1,12 +1,12 @@
 ---
 name: implement-plan
-description: "Execute an approved implementation plan with context-aware task grouping."
+description: "Execute an approved implementation plan with beads-backed task tracking."
 allowed-tools: Read, Glob, Grep, Write, Edit, Bash, Task
 ---
 
 # Implement Plan
 
-Execute plans in context-aware task groups with running state persistence.
+Execute plans with persistent beads-backed progress tracking.
 
 ## When To Use
 
@@ -15,10 +15,10 @@ Execute plans in context-aware task groups with running state persistence.
 
 ## Core Behavior
 
-1. **Group tasks** into chunks of 3-5
-2. **Write running state** after each task
-3. **Check context at 50%** → pause, suggest compact
-4. **Resume from running state** after compact
+1. **Parse plan into beads tasks** with dependencies
+2. **Track progress via bd** (survives /clear, /compact)
+3. **Check context at 50%** → pause, sync, suggest compact
+4. **Resume via bd ready** after compact
 
 ---
 
@@ -26,128 +26,102 @@ Execute plans in context-aware task groups with running state persistence.
 
 ### Phase 1: Pre-Implementation Check
 
+```bash
+# Check if beads initialized
+if [ ! -d .beads ]; then
+  bd init --stealth
+fi
+
+# Sync any existing state
+bd sync
+```
+
 ```
 1. Check current context level
 2. If context > 30%:
-   → Create quick handoff
+   → bd sync (save state)
    → Output: "Context at X%. Recommend /compact before starting."
-   → Stop and wait for user
+   → Stop and wait
 3. If context < 30%:
    → Proceed to Phase 2
 ```
 
-### Phase 2: Setup
+### Phase 2: Setup - Create Beads Tasks
 
+```bash
+# Create epic for the plan
+bd create "Implement: [Plan Name]" -t epic --json
+# Returns bd-xxxx (epic ID)
+
+# Create task group 1
+bd create "Group 1: [Description]" --deps parent:$EPIC_ID -p 1 --json
+bd create "Task 1.1: [Description]" --deps parent:$GROUP1_ID -p 1 --json
+bd create "Task 1.2: [Description]" --deps parent:$GROUP1_ID -p 1 --json
+
+# Create task group 2 (depends on group 1)
+bd create "Group 2: [Description]" --deps parent:$EPIC_ID -p 1 --json
+bd dep add $GROUP2_ID $GROUP1_ID --type blocks
+
+# ... continue for all groups
 ```
-1. Read plan file completely
-2. Verify Status is "Approved"
-3. Parse tasks into groups of 3-5
-4. Create running state file
-5. Announce: "Plan has N tasks in M groups. Starting Group 1."
-```
+
+**Task grouping**: 3-5 tasks per group, dependencies between groups.
 
 ### Phase 3: Execute (by group)
 
-For each task group:
+```bash
+# Get first ready task
+bd ready --json
 
+# For each task:
+bd update $TASK_ID --status in_progress --json
 ```
-1. Announce: "Starting Group X of Y (tasks A-B)"
-2. For each task in group:
-   a. Mark in_progress in running state
-   b. Implement the task
-   c. Test
-   d. Commit: "feat(scope): description - step X.Y"
-   e. Mark completed in running state
-   f. Update running state file immediately
-3. After group complete:
-   a. Commit running state
-   b. Check context level
-   c. If context > 50%:
-      → Output: "Group X complete. Context at Y%. Recommend /compact."
-      → Output: "Run /compact then 'continue' to resume at Group X+1"
-      → Stop
-   d. If context < 50%:
-      → Continue to next group
+
+For each task:
+```
+1. Implement the task
+2. Test
+3. Commit: "feat(scope): description - step X.Y"
+4. Close the task:
+   bd close $TASK_ID --reason "commit: abc123" --json
+5. Check context level
+6. If context > 50%:
+   → bd sync
+   → Output: "Context at Y%. Recommend /compact."
+   → Output: "After compact, say 'continue' - beads knows where you are"
+   → Stop
 ```
 
 ### Phase 4: Completion
 
-```
-1. All groups complete
-2. Run test suite
-3. Update plan Status to "Completed"
-4. Delete running state file (or archive)
-5. Summary of what was implemented
-```
+```bash
+# All tasks done
+bd close $EPIC_ID --reason "Plan completed" --json
+bd sync
 
----
-
-## Running State File
-
-**Location**: `thoughts/shared/runs/YYYY-MM-DD-{plan-name}.md`
-
-**Format**:
-```markdown
-# Run: [Plan Name]
-
-**Plan**: thoughts/shared/plans/YYYY-MM-DD-plan.md
-**Started**: YYYY-MM-DD HH:MM
-**Current Group**: 2 of 4
-
-## Task Groups
-
-### Group 1: [Description] - COMPLETE
-- [x] Task 1 (commit: abc123)
-- [x] Task 2 (commit: def456)
-- [x] Task 3 (commit: ghi789)
-
-### Group 2: [Description] - IN PROGRESS
-- [x] Task 4 (commit: jkl012)
-- [ ] Task 5 ← CURRENT
-- [ ] Task 6
-
-### Group 3: [Description] - PENDING
-- [ ] Task 7
-- [ ] Task 8
-- [ ] Task 9
-
-## Progress Log
-
-| Time | Task | Status | Commit |
-|------|------|--------|--------|
-| 10:05 | Task 1 | Done | abc123 |
-| 10:12 | Task 2 | Done | def456 |
-| 10:20 | Task 3 | Done | ghi789 |
-| 10:28 | Task 4 | Done | jkl012 |
-| 10:35 | Task 5 | In Progress | - |
-
-## Current Context
-
-- **Working on**: `src/file.ts:45-80`
-- **Decisions made**: [Key decisions this session]
-- **Blockers**: None
-
-## Resume Command
-
-After /compact:
-```
-continue implementing @thoughts/shared/runs/YYYY-MM-DD-plan-name.md
-```
+# Verify
+bd list --status closed --json | grep $EPIC_ID
 ```
 
 ---
 
-## Task Grouping Logic
+## Beads Task Structure
 
 ```
-Total tasks: N
-Group size: 3-5 (prefer 4)
-Number of groups: ceil(N / 4)
-
-Group by:
-1. Logical phases (if plan has phases)
-2. File proximity (related files together)
-3. Dependency order (blockers first)
+Epic: "Implement: Auth System"
+├── Group 1: "Setup" (3 tasks)
+│   ├── Task 1.1: "Create user model"
+│   ├── Task 1.2: "Add password hashing"
+│   └── Task 1.3: "Create auth middleware"
+├── Group 2: "Endpoints" (4 tasks) [blocked by Group 1]
+│   ├── Task 2.1: "Login endpoint"
+│   ├── Task 2.2: "Logout endpoint"
+│   ├── Task 2.3: "Register endpoint"
+│   └── Task 2.4: "Password reset"
+└── Group 3: "Tests" (3 tasks) [blocked by Group 2]
+    ├── Task 3.1: "Unit tests"
+    ├── Task 3.2: "Integration tests"
+    └── Task 3.3: "E2E tests"
 ```
 
 ---
@@ -158,8 +132,22 @@ Group by:
 |-------|--------|
 | < 30% | Start/continue normally |
 | 30-50% | Continue with caution |
-| > 50% | **Pause after current group** |
-| > 70% | **Stop immediately**, create handoff |
+| > 50% | **Pause, bd sync, suggest compact** |
+| > 70% | **Stop immediately**, bd sync |
+
+---
+
+## Resuming After Compact
+
+After `/compact`, beads knows exactly where you are:
+
+```bash
+bd sync              # Pull latest state
+bd ready --json      # Shows next unblocked task
+bd list --status in_progress --json  # Shows any in-progress
+```
+
+User just says "continue" and you pick up exactly where you left off.
 
 ---
 
@@ -171,28 +159,50 @@ type(scope): description - step X.Y
 Types: feat, fix, refactor, test, docs, chore
 ```
 
+Each commit references the beads task:
+```bash
+bd close $ID --reason "commit: abc123"
+```
+
+---
+
+## Session End (Critical!)
+
+Before ending any session:
+
+```bash
+bd sync  # ALWAYS sync before session end
+```
+
+This ensures all progress is persisted and resumable.
+
 ---
 
 ## Handling Issues
 
 ### Context Running Low
-1. Complete current task (if close)
-2. Update running state with exact position
-3. Output: "Context at X%. Stopping at Task Y."
-4. Suggest: "/compact then 'continue from run state'"
+1. Complete current task if close
+2. `bd sync` to save all progress
+3. Output: "Context at X%. Stopping."
+4. Suggest: "/compact then 'continue'"
 
 ### Unexpected Complexity
-1. Note in running state under "Blockers"
+1. Create new beads task for the complexity:
+   ```bash
+   bd create "Handle edge case: X" --deps parent:$CURRENT -p 0 --json
+   ```
 2. If blocking, pause and ask user
 3. Don't deviate from plan without approval
 
 ### Test Failures
 1. Fix immediately if simple
-2. Note in running state if complex
-3. Don't proceed past failing tests
+2. Create blocker task if complex:
+   ```bash
+   bd create "Fix: test failure in X" -t bug -p 0 --json
+   ```
 
 ---
 
 ## Keywords
 
-implement plan, execute plan, run plan, build it, continue implementing
+implement plan, execute plan, run plan, build it, continue, bd ready

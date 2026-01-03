@@ -1,10 +1,10 @@
 # Skills Index
 
-ONE_SHOT v7.0 - Context-first skill organization.
+ONE_SHOT v7.1 - Context-first skill organization with beads-backed persistence.
 
 ---
 
-## Core Skills (10) - Always in Router
+## Core Skills (11) - Always in Router
 
 These skills are auto-routed based on patterns. Use them naturally.
 
@@ -12,18 +12,19 @@ These skills are auto-routed based on patterns. Use them naturally.
 |-------|---------|---------|
 | **front-door** | "build me", "new project" | Interview & routing hub |
 | **create-plan** | "plan", "design" | Structured planning |
-| **implement-plan** | "implement", "build it" | Execute with task groups |
+| **implement-plan** | "implement", "build it" | Execute with beads tracking |
+| **beads** | "ready tasks", "what's next" | Persistent task tracking |
 | **debugger** | "bug", "fix", "broken" | Systematic debugging |
 | **code-reviewer** | "review", "is this safe" | Quality & security review |
 | **create-handoff** | "handoff", "save context" | Preserve state before clear |
-| **resume-handoff** | "resume", "continue" | Restore from handoff/running state |
+| **resume-handoff** | "resume", "continue" | Restore from beads/handoff |
 | **failure-recovery** | "stuck", "looping" | Recovery from confusion |
 | **thinking-modes** | "think", "ultrathink" | Extended analysis |
 | **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
 
 ---
 
-## On-Demand Skills (19) - Available by Name
+## On-Demand Skills (18) - Available by Name
 
 These skills are **not auto-routed** but available when explicitly requested.
 Use `/skill-name` or "use the X skill" to invoke.
@@ -62,7 +63,6 @@ Use `/skill-name` or "use the X skill" to invoke.
 | Skill | Use When |
 |-------|----------|
 | **the-audit** | Strategic communication filtering |
-| **beads** | Persistent cross-session task tracking |
 | **visual-iteration** | Self-scoring UI design loop |
 | **hooks-manager** | Configure lifecycle automation |
 | **delegate-to-agent** | Spawn isolated sub-agents |
@@ -72,19 +72,29 @@ Use `/skill-name` or "use the X skill" to invoke.
 
 ## Context Management
 
-### Running State vs Handoff
+### Beads = Persistent State
 
-| File | Location | Use |
-|------|----------|-----|
-| **Running state** | `thoughts/shared/runs/` | Mid-implementation (minimal) |
-| **Handoff** | `thoughts/shared/handoffs/` | Full context preservation |
+| What | Command | Purpose |
+|------|---------|---------|
+| **What's next?** | `bd ready --json` | Unblocked tasks |
+| **In progress?** | `bd list --status in_progress` | Current work |
+| **Save state** | `bd sync` | Push to git |
 
 ### Flow
 ```
-implement-plan → writes running state → context > 50% → pause
+implement-plan → creates beads tasks → tracks via bd
+context > 50% → bd sync → pause → suggest /compact
 /compact
-resume → reads running state → continues at exact task
+resume → bd sync → bd ready → continues at exact task
 ```
+
+### Beads vs Handoff
+
+| Need | Use |
+|------|-----|
+| Track task progress | beads (bd ready) |
+| Save conversation context | handoff |
+| Resume after /compact | beads first, then handoff |
 
 ---
 
@@ -117,4 +127,4 @@ Session Break:
 
 ---
 
-**Version**: 7.0 | **Core**: 10 | **On-Demand**: 19
+**Version**: 7.1 | **Core**: 11 | **On-Demand**: 18
