@@ -2,6 +2,12 @@
 
 **Tell it an idea. Come back with the thing built.**
 
+A skill system for [Claude Code](https://claude.com/claude-code) that adds structured workflows, persistent task tracking, and autonomous execution to your projects.
+
+> See it in action: [examples/weather-cli](examples/weather-cli) - a complete project built autonomously in 6 iterations.
+
+---
+
 ## Prerequisites
 
 ```bash
@@ -140,12 +146,14 @@ Beads survives /clear, /compact, session restarts. Your tasks don't disappear.
 
 ```
 project/
-├── AGENTS.md         ← Skill router (118 lines, read first)
-├── CLAUDE.md         ← Project instructions (never overwritten)
-├── TODO.md           ← Session visibility
-├── LLM-OVERVIEW.md   ← Project context
-├── .claude/skills/   ← 29 skills
-└── .beads/           ← Persistent tasks (local only)
+├── AGENTS.md           ← Skill router (read first)
+├── CLAUDE.md           ← Project instructions
+├── TODO.md             ← Session visibility
+├── LLM-OVERVIEW.md     ← Project context
+├── .claude/skills/     ← 29 skills
+├── .beads/             ← Persistent tasks
+└── scripts/
+    └── oneshot-build   ← Autonomous builder script
 ```
 
 For autonomous mode:
@@ -179,7 +187,8 @@ Open in Claude Code. Say what you want:
 
 ### 4. Autonomous Mode
 ```bash
-oneshot-build "A Python CLI that fetches weather data"
+# oneshot-build is downloaded to scripts/ by the bootstrap
+./scripts/oneshot-build "A Python CLI that fetches weather data"
 tail -f .agent/STATUS.md  # Monitor progress
 ```
 

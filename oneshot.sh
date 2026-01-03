@@ -437,6 +437,18 @@ else
 fi
 
 # =============================================================================
+# 10. oneshot-build script (for autonomous mode)
+# =============================================================================
+mkdir -p scripts
+if [ ! -f "scripts/oneshot-build" ] || [ "$UPGRADE_MODE" = true ]; then
+  curl -sL "$ONESHOT_BASE/scripts/oneshot-build" -o "scripts/oneshot-build" 2>/dev/null
+  chmod +x "scripts/oneshot-build"
+  echo -e "  ${GREEN}✓${NC} scripts/oneshot-build (autonomous builder)"
+else
+  echo -e "  ${GREEN}✓${NC} scripts/oneshot-build (exists)"
+fi
+
+# =============================================================================
 # Done
 # =============================================================================
 echo ""
