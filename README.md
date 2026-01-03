@@ -1,8 +1,6 @@
 # ONE_SHOT
 
-**The $0 AI Build System.** Single curl. 25 skills. 4 agents. Builds anything.
-
-[![CI](https://github.com/Khamel83/oneshot/actions/workflows/ci.yml/badge.svg)](https://github.com/Khamel83/oneshot/actions/workflows/ci.yml)
+**Tell it an idea. Come back with the thing built.**
 
 ```bash
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
@@ -10,155 +8,142 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 
 ---
 
-## What Happens
+## Two Modes
 
-One curl drops these files into your project:
-
-| File | Purpose |
-|------|---------|
-| `AGENTS.md` | **Skill & agent routing** - triggers the right skill/agent for what you say |
-| `CLAUDE.md` | Project instructions (supplements existing, never overwrites) |
-| `TODO.md` | Task tracking ([todo.md](https://github.com/todomd/todo.md) format) |
-| `LLM-OVERVIEW.md` | Project context for any LLM |
-| `.claude/skills/` | 25 skills (synchronous, shared context) |
-| `.claude/agents/` | 4 native sub-agents (isolated context, background) |
-| `.beads/` | Persistent task tracking (optional, if beads installed) |
-
-**Non-destructive**: Existing files are supplemented, never overwritten.
-
----
-
-## How Skills Get Triggered
-
-AGENTS.md contains a **skill router** that matches what you say to the right skill:
-
-| You Say | Skill Triggered | What Happens |
-|---------|-----------------|--------------|
-| "build me a CLI..." | `oneshot-core` | Questions → PRD → autonomous build |
-| "plan the feature..." | `create-plan` | Structured planning with decisions |
-| "implement the plan" | `implement-plan` | Systematic execution with commits |
-| "it's broken / fix..." | `debugger` | Systematic debugging |
-| "deploy to cloud" | `push-to-cloud` | OCI/cloud deployment |
-| "ultrathink about..." | `thinking-modes` | Deep analysis with expert perspectives |
-| "save context" | `create-handoff` | Preserve state before `/clear` |
-| "resume from handoff" | `resume-handoff` | Continue exactly where you left off |
-| "ready tasks / beads" | `beads` | Persistent task tracking across sessions |
-
----
-
-## The 25 Skills
-
-| Category | Skills | Purpose |
-|----------|--------|---------|
-| **Core** | `oneshot-core`, `failure-recovery`, `thinking-modes` | Orchestration, recovery, cognition |
-| **Planning** | `create-plan`, `implement-plan`, `api-designer` | Design before building |
-| **Context** | `create-handoff`, `resume-handoff`, `beads` | Session persistence, cross-session memory |
-| **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
-| **Operations** | `git-workflow`, `push-to-cloud`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
-| **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync` | Support |
-| **Communication** | `the-audit` | Strategic communication filter |
-| **Agent Bridge** | `delegate-to-agent` | Route to native sub-agents |
-
-**Why 25?** Consolidated skills, each does one thing well. Added beads for persistent memory.
-
----
-
-## The 4 Agents
-
-Native Claude Code sub-agents with **isolated context windows**:
-
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| `security-auditor` | sonnet | OWASP/secrets/auth security review |
-| `deep-research` | haiku | Long codebase exploration |
-| `background-worker` | haiku | Parallel test/build execution |
-| `multi-agent-coordinator` | sonnet | Multi-agent orchestration |
-
-### Skills vs Agents
-
-| Aspect | Skills | Agents |
-|--------|--------|--------|
-| **Context** | Shared with main conversation | Isolated window |
-| **Best for** | Quick, synchronous tasks | Long research, background work |
-| **Model** | Inherits from session | Configurable per agent |
-
-**When to use agents:**
-- Task would read 10+ files (prevents context pollution)
-- Security audit requiring isolation
-- Long-running operations (tests, builds)
-- Parallel exploration of multiple areas
-
----
-
-## Thinking Modes
-
-Activate deeper analysis:
-
-| Level | Say This | Use For |
-|-------|----------|---------|
-| Think | "think about..." | Quick sanity check |
-| Think Hard | "think hard about..." | Trade-off analysis |
-| Ultrathink | "ultrathink..." | Architecture decisions |
-| Super Think | "super think..." | System-wide design |
-| Mega Think | "mega think..." | Strategic decisions |
-
-> **Pro tip**: "ultrathink please do a good job" for maximum depth
-
----
-
-## Plan Workflow
-
-For complex implementations:
+### Interactive Mode (Default)
+You're in the loop. Claude asks questions, you approve plans, you guide execution.
 
 ```
-/create_plan [idea]      → thoughts/shared/plans/YYYY-MM-DD-desc.md
-  └─ answer questions, get approval
-
-/implement_plan @[plan]  → systematic execution with commits
-  └─ context getting low?
-
-/create_handoff          → thoughts/shared/handoffs/YYYY-MM-DD.md
-  └─ /clear
-
-/resume_handoff @[file]  → continue exactly where left off
+You: "Build me a task manager CLI in Python"
+Claude: [asks clarifying questions]
+Claude: [creates plan, asks for approval]
+You: "looks good, implement it"
+Claude: [builds it step by step]
 ```
 
-**Why handoffs > auto-compact**: Explicit control, versioned, no context loss.
+### Autonomous Mode (Headless)
+You give an idea. Come back later with a working artifact.
 
----
-
-## Persistent Tasks (Beads)
-
-Optional but powerful: [beads](https://github.com/steveyegge/beads) provides git-backed task tracking that survives sessions.
-
-### Install (Optional)
 ```bash
-npm install -g @beads/bd
+oneshot-build "A CLI tool that converts markdown to PDF with syntax highlighting"
+# ...agent runs autonomously...
+# Check progress: tail -f .agent/STATUS.md
+# Returns with 50-99% complete implementation
 ```
 
-### What Beads Adds
+---
 
-| Feature | TODO.md | Beads |
-|---------|---------|-------|
-| Session persistence | No | Yes (git-backed) |
-| Dependencies | No | Full graph |
-| Multi-agent safe | Conflicts | Hash-based IDs |
-| Ready detection | Manual | `bd ready` |
+## When To Use What
 
-### Key Commands
+| Situation | Mode | Why |
+|-----------|------|-----|
+| Complex feature, need control | Interactive | You guide decisions |
+| Simple/well-defined idea | Autonomous | Just build it |
+| Overnight batch work | Autonomous | Let it run |
+| Learning the codebase | Interactive | Stay in the loop |
+| Debugging | Interactive | Need back-and-forth |
+
+---
+
+## The 12 Core Skills
+
+These trigger automatically based on what you say:
+
+| You Say | Skill | What Happens |
+|---------|-------|--------------|
+| "build me...", "new project" | `front-door` | Interview → spec → plan |
+| "just build it", "autonomous" | `autonomous-builder` | Headless execution |
+| "plan this", "design" | `create-plan` | Structured planning |
+| "implement", "build it" | `implement-plan` | Execute with beads tracking |
+| "what's next", "ready tasks" | `beads` | Persistent task state |
+| "bug", "fix", "broken" | `debugger` | Systematic debugging |
+| "review", "is this safe" | `code-reviewer` | Quality check |
+| "save context", "handoff" | `create-handoff` | Preserve before /clear |
+| "resume", "continue" | `resume-handoff` | Pick up where left off |
+| "stuck", "looping" | `failure-recovery` | Get unstuck |
+| "think", "ultrathink" | `thinking-modes` | Deep analysis |
+| "secrets", "env" | `secrets-vault-manager` | SOPS encryption |
+
+**17 more skills** available on-demand. See INDEX.md.
+
+---
+
+## Core Workflow
+
+### For New Features
+
+```
+1. "plan a feature that does X"     → create-plan
+2. [approve the plan]
+3. "implement it"                   → implement-plan
+4. [context getting full?]
+5. "save context"                   → create-handoff
+6. /compact
+7. "continue"                       → resume-handoff
+8. [repeat until done]
+```
+
+### For Quick Fixes
+
+```
+1. "fix this bug: [description]"    → debugger
+2. [Claude fixes it]
+3. Done
+```
+
+### For Autonomous Builds
+
 ```bash
-bd ready --json       # See unblocked tasks
-bd create "Task" -p 1 # Create task (priority 1)
-bd sync               # Push/pull (CRITICAL before session end)
+oneshot-build "Your idea"
+# Wait...
+# Check .agent/STATUS.md for progress
+# bd list --json for task state
 ```
 
-### Workflow
-1. Start session: `bd sync && bd ready --json`
-2. Claim work: `bd update <id> --status in_progress`
-3. Complete: `bd close <id> --reason "Done"`
-4. End session: `bd sync` (always!)
+---
 
-**Why use both?** TODO.md for immediate visibility, beads for cross-session persistence.
+## Context Management
+
+**Context is the scarce resource.** ONE_SHOT manages it:
+
+| Problem | Solution |
+|---------|----------|
+| Context fills up | Handoff → /compact → resume |
+| Lose track of tasks | Beads tracks persistently |
+| Forget decisions | Beads stores in git |
+| Agent loops | Loop detection stops gracefully |
+
+### Beads = Persistent Memory
+
+```bash
+bd ready --json      # What's next?
+bd list --json       # All tasks
+bd sync              # Save to git (CRITICAL before session end)
+```
+
+Beads survives /clear, /compact, session restarts. Your tasks don't disappear.
+
+---
+
+## Files Created
+
+```
+project/
+├── AGENTS.md         ← Skill router (118 lines, read first)
+├── CLAUDE.md         ← Project instructions (never overwritten)
+├── TODO.md           ← Session visibility
+├── LLM-OVERVIEW.md   ← Project context
+├── .claude/skills/   ← 29 skills
+└── .beads/           ← Persistent tasks (local only)
+```
+
+For autonomous mode:
+```
+.agent/
+├── STATUS.md         ← Real-time progress
+├── ITERATIONS.md     ← Loop counter
+└── LAST_ERROR.md     ← If something failed
+```
 
 ---
 
@@ -170,180 +155,76 @@ cd your-project
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 ```
 
-### 2. Open in Claude Code
-Claude reads `CLAUDE.md` → `AGENTS.md` automatically.
+### 2. Interactive Mode
+Open in Claude Code. Say what you want:
+```
+"Build me a REST API for user management"
+```
 
-### 3. Say What You Want
+### 3. Autonomous Mode
+```bash
+oneshot-build "A Python CLI that fetches weather data"
+tail -f .agent/STATUS.md  # Monitor progress
 ```
-"Build me a task management CLI in Python"
-"Add user authentication to this app"
-"Debug why the tests are failing"
-"ultrathink about the architecture"
-```
+
+---
+
+## Thinking Modes
+
+For complex decisions:
+
+| Say | Depth | Use For |
+|-----|-------|---------|
+| "think" | Light | Quick check |
+| "think hard" | Medium | Trade-offs |
+| "ultrathink" | Deep | Architecture |
+| "super think" | Very deep | System design |
+| "mega think" | Maximum | Strategic |
+
+---
+
+## Philosophy
+
+1. **Context is scarce** - Load minimal, checkpoint often
+2. **Beads for memory** - Don't lose state between sessions
+3. **Commit often** - Every file edit, every task
+4. **Best effort** - 50% working > 0% perfect
+5. **Stop gracefully** - When stuck, save and stop
 
 ---
 
 ## Upgrading
 
-### Update to Latest Version
-
-Re-run the bootstrap to get latest AGENTS.md and any new skills:
 ```bash
+# Normal update (adds missing files)
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
-```
 
-### Full Upgrade (Update All Skills)
-
-Use `--upgrade` to overwrite existing skills with latest versions:
-```bash
+# Full upgrade (updates all skills)
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash -s -- --upgrade
 ```
 
-### What Gets Updated
-
-| File | Normal | --upgrade |
-|------|--------|-----------|
-| `AGENTS.md` | Always | Always |
-| `CLAUDE.md` ONE_SHOT block | Always | Always |
-| Missing skills/agents | Added | Added |
-| Existing skills/agents | Skipped | **Updated** |
-| `TODO.md`, `LLM-OVERVIEW.md` | Never | Never |
-| Your custom skills/agents | Never | Never |
-
-**Note**: Custom skills and agents are never touched.
-
 ---
 
-## File Hierarchy
+## Troubleshooting
 
-```
-project/
-├── CLAUDE.md              ← Claude reads first
-│   └── "Read AGENTS.md"   ← Points to skill/agent router
-├── AGENTS.md              ← Skill & agent routing rules
-├── TODO.md                ← Always updated during work
-├── LLM-OVERVIEW.md        ← Project context
-├── .claude/skills/        ← 25 skills
-├── .claude/agents/        ← 4 native sub-agents
-└── .beads/                ← Persistent tasks (optional)
-```
-
-**Important info at the top**: AGENTS.md puts the routers FIRST so they're in the early context window.
-
----
-
-## Core Principles
-
-1. **Non-Destructive**: Only adds, never overwrites
-2. **Skills Always Triggered**: CLAUDE.md → AGENTS.md routing ensures skills fire
-3. **TODO.md Always Updated**: Every task state change
-4. **Context Preservation**: Handoffs > auto-compact
-5. **$0 Infrastructure**: Homelab, OCI Free Tier, no lock-in
-
----
-
-## Commands
-
-| Command | What It Does |
-|---------|--------------|
-| `(ONE_SHOT)` | Re-anchor to skill routing rules |
-| `/create_plan` | Start structured planning |
-| `/create_handoff` | Save context before `/clear` |
-| `ultrathink` | Deep analysis mode |
-
----
-
-## FAQ
-
-**Q: Does this overwrite my existing CLAUDE.md?**
-A: No. It prepends a skill routing reference. Your content stays.
-
-**Q: What if a skill doesn't trigger?**
-A: Say `(ONE_SHOT)` to re-anchor, then try clearer trigger words.
-
-**Q: Can I add my own skills?**
-A: Yes. Create `.claude/skills/my-skill/SKILL.md`.
-
-**Q: Works with other AI tools?**
-A: Yes. Claude Code, Cursor, Aider, Gemini CLI - anything that reads markdown.
+| Problem | Solution |
+|---------|----------|
+| Skill not triggering | Say `(ONE_SHOT)` to re-anchor |
+| Agent stuck in loop | Check `.agent/LAST_ERROR.md`, restart |
+| Lost context | `bd ready --json` shows your tasks |
+| Beads not working | `bd init --stealth` to initialize |
 
 ---
 
 ## Version
 
-**v5.5** | 25 Skills | 4 Agents | $0 Cost | Non-Destructive
-
-[GitHub](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
+**v7.2** | 12 Core Skills | 17 On-Demand | Autonomous Builder | Beads Integration
 
 ---
 
-## Public Access (Homelab)
+## Links
 
-Expose homelab services with short URLs using **Tailscale Funnel + Cloudflare Worker**:
-
-```
-khamel.com/fd  →  Cloudflare Worker  →  302 Redirect  →  homelab.deer-panga.ts.net/frontdoor
-```
-
-**No port forwarding. No cert management. No Traefik.**
-
-See [docs/public-access.md](docs/public-access.md) for full setup.
-
-| Quick Commands | |
-|----------------|--|
-| Add route | Edit `~/github/khamel-redirector/src/index.js` |
-| Expose port | `sudo tailscale funnel --bg --set-path=/name http://localhost:PORT` |
-| Deploy | `cd ~/github/khamel-redirector && npx wrangler deploy` |
-
----
-
-## Secrets Management
-
-Encrypted secrets are stored in `secrets/` using [SOPS](https://github.com/getsops/sops) + [Age](https://github.com/FiloSottile/age).
-
-### Setup (One Time)
-
-```bash
-# Install Age
-sudo apt install age  # or: brew install age
-
-# Generate key (save backup in 1Password)
-mkdir -p ~/.age
-age-keygen -o ~/.age/key.txt
-
-# Export for SOPS
-export SOPS_AGE_KEY_FILE=~/.age/key.txt
-```
-
-### Using Secrets
-
-```bash
-# Decrypt to use
-sops -d secrets/homelab.env.encrypted > .env
-
-# Encrypt after editing
-sops -e .env > secrets/homelab.env.encrypted
-
-# Edit in-place (decrypts, opens editor, re-encrypts)
-sops secrets/homelab.env.encrypted
-```
-
-### Available Secret Files
-
-| File | Contents |
-|------|----------|
-| `secrets/homelab.env.encrypted` | Homelab service credentials |
-| `secrets/secrets.env.encrypted` | General API keys |
-
-**Safe to commit**: Only encrypted files (`.encrypted`) are tracked. Plaintext `.env` files are gitignored.
-
----
-
-## Research & Similar Projects
-
-- [steveyegge/beads](https://github.com/steveyegge/beads) - Git-backed persistent task tracking (integrated in v5.5)
-- [wshobson/agents](https://github.com/wshobson/agents) - 91 agents, 47 skills, plugin architecture
-- [ruvnet/claude-flow](https://github.com/ruvnet/claude-flow) - Enterprise orchestration with hive-mind
-- [Anthropic Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) - Official guidance
-
-OneShot is **lightweight files** vs heavyweight frameworks. Different philosophy, both valid.
+- [GitHub](https://github.com/Khamel83/oneshot)
+- [INDEX.md](.claude/skills/INDEX.md) - Full skill reference
+- [Beads](https://github.com/steveyegge/beads) - Persistent task tracking
+- [RepoMirror](https://github.com/repomirrorhq/repomirror) - Inspiration for autonomous mode
