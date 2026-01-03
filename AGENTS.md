@@ -98,6 +98,10 @@ skill_router:
   - pattern: "secrets|env|credentials|api key|encrypt"
     skill: secrets-vault-manager
 
+  # AUTOMATION - Lifecycle hooks
+  - pattern: "hooks|setup hooks|configure hooks|secrets scan|auto-format|audit log"
+    skill: hooks-manager
+
   # AGENT DELEGATION - For isolated context work
   - pattern: "delegate|spawn agent|isolated|background task"
     skill: delegate-to-agent
@@ -193,7 +197,7 @@ agent_router:
 
 ---
 
-## AVAILABLE SKILLS (28)
+## AVAILABLE SKILLS (29)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -202,6 +206,7 @@ agent_router:
 | **Context** | `create-handoff`, `resume-handoff`, `beads` | Session persistence, cross-session memory |
 | **Development** | `debugger`, `test-runner`, `code-reviewer`, `refactorer`, `performance-optimizer` | Build & quality |
 | **Operations** | `git-workflow`, `push-to-cloud`, `remote-exec`, `ci-cd-setup`, `docker-composer`, `observability-setup` | Deploy & maintain |
+| **Automation** | `hooks-manager` | Lifecycle hooks (secrets-scan, auto-format, audit) |
 | **Data & Docs** | `database-migrator`, `documentation-generator`, `secrets-vault-manager`, `secrets-sync`, `oci-resources`, `convex-resources` | Support |
 | **Communication** | `the-audit` | Strategic communication filter |
 | **Agent Bridge** | `delegate-to-agent` | Route to native sub-agents |
@@ -302,8 +307,8 @@ When improving code:
 
 ```yaml
 oneshot:
-  version: 6.0
-  skills: 28
+  version: 6.1
+  skills: 29
   agents: 4
 
   prime_directive: |
@@ -399,6 +404,6 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 6.0 | **Skills**: 28 | **Agents**: 4 | **Cost**: $0
+**Version**: 6.1 | **Skills**: 29 | **Agents**: 4 | **Cost**: $0
 
 Compatible: Claude Code, Cursor, Aider, Gemini CLI

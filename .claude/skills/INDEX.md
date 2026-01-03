@@ -1,6 +1,6 @@
 # Skills Index
 
-Complete catalog of ONE_SHOT skills (28 total).
+Complete catalog of ONE_SHOT skills (29 total).
 
 ## Quick Reference
 
@@ -34,6 +34,7 @@ Complete catalog of ONE_SHOT skills (28 total).
 | delegate-to-agent | "background", "isolated" | Route to native sub-agents |
 | oci-resources | "oci database", "object storage" | OCI free-tier resources |
 | convex-resources | "convex", "reactive" | Convex backend for web apps |
+| hooks-manager | "setup hooks", "secrets scan" | Lifecycle hooks automation |
 
 ---
 
@@ -98,6 +99,11 @@ Complete catalog of ONE_SHOT skills (28 total).
 | Skill | Lines | Tools |
 |-------|-------|-------|
 | delegate-to-agent | ~180 | Task |
+
+### Automation (1)
+| Skill | Lines | Tools |
+|-------|-------|-------|
+| hooks-manager | ~80 | Read, Write, Bash |
 
 ---
 
