@@ -1,15 +1,60 @@
 # Skills Index
 
-ONE_SHOT v7.2 - Context-first with autonomous builder mode.
+ONE_SHOT v7.3 - Context-first with autonomous builder mode.
 
 ---
 
-## Core Skills (12) - Always in Router
+## Start Here (5 Core Skills)
 
-These skills are auto-routed based on patterns. Use them naturally.
+These are the skills you'll use 90% of the time. Just say these phrases:
 
-| Skill | Trigger | Purpose |
-|-------|---------|---------|
+| Say This | Skill | What Happens |
+|----------|-------|--------------|
+| **"build me..."** | front-door | Interview → spec → structured plan |
+| **"plan this..."** | create-plan | Create implementation plan |
+| **"implement"** | implement-plan | Execute plan with beads tracking |
+| **"debug this"** | debugger | Systematic hypothesis-based debugging |
+| **"review code"** | code-reviewer | Quality + security review |
+
+**Examples:**
+- "Build me a REST API for user management"
+- "Plan a feature that adds dark mode"
+- "Implement the authentication plan"
+- "Debug this TypeError in the login flow"
+- "Review the new payment code for security issues"
+
+---
+
+## Context Management (Always Available)
+
+| Command | What It Does |
+|---------|--------------|
+| `bd ready` | See next available tasks |
+| `bd list` | All tasks with status |
+| "create handoff" | Save context before /clear |
+| "resume" | Continue after /clear |
+| "what's next" | Same as bd ready |
+
+---
+
+## Autonomous Mode
+
+```bash
+# Run Claude headless, come back with artifact
+oneshot-build "A Python CLI that fetches weather data"
+
+# Monitor progress
+tail -f .agent/STATUS.md
+```
+
+---
+
+## All Skills Reference
+
+### Core (12) - Auto-Routed
+
+| Skill | Triggers | Purpose |
+|-------|----------|---------|
 | **front-door** | "build me", "new project" | Interview & routing hub |
 | **autonomous-builder** | "headless", "just build it" | Idea → artifact autonomously |
 | **create-plan** | "plan", "design" | Structured planning |
@@ -20,82 +65,41 @@ These skills are auto-routed based on patterns. Use them naturally.
 | **create-handoff** | "handoff", "save context" | Preserve state before clear |
 | **resume-handoff** | "resume", "continue" | Restore from beads/handoff |
 | **failure-recovery** | "stuck", "looping" | Recovery + loop detection |
-| **thinking-modes** | "think", "ultrathink" | Extended analysis |
+| **thinking-modes** | "think", "ultrathink" | Extended analysis (5 levels) |
 | **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
 
----
+### Advanced (17) - On-Demand
 
-## On-Demand Skills (17) - Available by Name
+Use `/skill-name` or "use the X skill" to invoke these explicitly.
 
-These skills are **not auto-routed** but available when explicitly requested.
-Use `/skill-name` or "use the X skill" to invoke.
+**Development:**
+- **refactorer** - "refactor", "clean up code"
+- **test-runner** - "run tests", "coverage"
+- **performance-optimizer** - "slow", "optimize speed"
 
-### Development
-| Skill | Use When |
-|-------|----------|
-| **refactorer** | "refactor", "clean up code" |
-| **test-runner** | "run tests", "coverage" |
-| **performance-optimizer** | "slow", "optimize speed" |
+**Operations:**
+- **git-workflow** - Conventional commits, PR creation
+- **docker-composer** - Docker/Compose setup
+- **ci-cd-setup** - GitHub Actions, pipelines
+- **push-to-cloud** - Deploy to OCI-Dev
+- **remote-exec** - SSH, tmux jobs
+- **observability-setup** - Logging, metrics, alerts
 
-### Operations
-| Skill | Use When |
-|-------|----------|
-| **git-workflow** | Need conventional commits, PR creation |
-| **docker-composer** | Setting up containers |
-| **ci-cd-setup** | GitHub Actions, pipelines |
-| **push-to-cloud** | Deploy to OCI-Dev |
-| **remote-exec** | Run on remote machines, tmux jobs |
-| **observability-setup** | Logging, metrics, health checks |
+**Data & APIs:**
+- **database-migrator** - Schema changes, migrations
+- **api-designer** - REST/GraphQL API design
+- **oci-resources** - OCI database, object storage
+- **convex-resources** - Convex reactive backend
 
-### Data & APIs
-| Skill | Use When |
-|-------|----------|
-| **database-migrator** | Schema changes, migrations |
-| **api-designer** | Design REST/GraphQL APIs |
-| **oci-resources** | OCI database, object storage |
-| **convex-resources** | Convex reactive backend |
+**Documentation:**
+- **documentation-generator** - README, LLM-OVERVIEW, ADRs
 
-### Documentation
-| Skill | Use When |
-|-------|----------|
-| **documentation-generator** | README, LLM-OVERVIEW, ADRs |
-
-### Specialized
-| Skill | Use When |
-|-------|----------|
-| **the-audit** | Strategic communication filtering |
-| **visual-iteration** | Self-scoring UI design loop |
-| **hooks-manager** | Configure lifecycle automation |
-| **delegate-to-agent** | Spawn isolated sub-agents |
-| **secrets-sync** | Two-way vault synchronization |
-
----
-
-## Context Management
-
-### Beads = Persistent State
-
-| What | Command | Purpose |
-|------|---------|---------|
-| **What's next?** | `bd ready --json` | Unblocked tasks |
-| **In progress?** | `bd list --status in_progress` | Current work |
-| **Save state** | `bd sync` | Push to git |
-
-### Flow
-```
-implement-plan → creates beads tasks → tracks via bd
-context > 50% → bd sync → pause → suggest /compact
-/compact
-resume → bd sync → bd ready → continues at exact task
-```
-
-### Beads vs Handoff
-
-| Need | Use |
-|------|-----|
-| Track task progress | beads (bd ready) |
-| Save conversation context | handoff |
-| Resume after /compact | beads first, then handoff |
+**Specialized:**
+- **the-audit** - Strategic communication filter
+- **visual-iteration** - Self-scoring UI design
+- **delegate-to-agent** - Spawn isolated sub-agents
+- **secrets-sync** - Two-way vault sync
+- **hooks-manager** - Lifecycle automation
 
 ---
 
@@ -121,11 +125,11 @@ Session Break:
 
 | Skill | Skip When |
 |-------|-----------|
-| front-door | Micro task, single file change |
-| create-plan | Simple change, user gave explicit steps |
-| thinking-modes | Obvious answer, quick question |
-| implement-plan | Just 1-2 tasks (do directly) |
+| front-door | Single file change, micro task |
+| create-plan | User gave explicit steps |
+| thinking-modes | Obvious answer |
+| implement-plan | Just 1-2 quick tasks |
 
 ---
 
-**Version**: 7.2 | **Core**: 12 | **On-Demand**: 17
+**Version**: 7.3 | **Core**: 12 | **Advanced**: 17

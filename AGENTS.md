@@ -1,4 +1,4 @@
-# ONE_SHOT v7.0
+# ONE_SHOT v7.3
 
 > **Context is the scarce resource.** Load minimal, atomize work, write state to disk.
 
@@ -125,4 +125,4 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 7.2 | **Core Skills**: 12 | **On-Demand**: 17 | **Agents**: 4
+**Version**: 7.3 | **Core Skills**: 12 | **Advanced**: 17 | **Beads**: Required

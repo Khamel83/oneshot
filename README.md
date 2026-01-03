@@ -2,6 +2,17 @@
 
 **Tell it an idea. Come back with the thing built.**
 
+## Prerequisites
+
+```bash
+# Beads CLI is REQUIRED for task tracking
+npm install -g @beads/bd
+# or: brew install steveyegge/beads/bd
+# or: go install github.com/steveyegge/beads/cmd/bd@latest
+```
+
+## Install
+
 ```bash
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 ```
@@ -149,19 +160,24 @@ For autonomous mode:
 
 ## Quick Start
 
-### 1. Add to Any Project
+### 1. Install Prerequisites
+```bash
+npm install -g @beads/bd   # Required for task tracking
+```
+
+### 2. Add to Any Project
 ```bash
 cd your-project
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 ```
 
-### 2. Interactive Mode
+### 3. Interactive Mode
 Open in Claude Code. Say what you want:
 ```
 "Build me a REST API for user management"
 ```
 
-### 3. Autonomous Mode
+### 4. Autonomous Mode
 ```bash
 oneshot-build "A Python CLI that fetches weather data"
 tail -f .agent/STATUS.md  # Monitor progress
@@ -209,16 +225,17 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 
 | Problem | Solution |
 |---------|----------|
+| Bootstrap fails "beads not found" | Install beads: `npm install -g @beads/bd` |
 | Skill not triggering | Say `(ONE_SHOT)` to re-anchor |
 | Agent stuck in loop | Check `.agent/LAST_ERROR.md`, restart |
 | Lost context | `bd ready --json` shows your tasks |
-| Beads not working | `bd init --stealth` to initialize |
+| Beads not initialized | `bd init --stealth` in project directory |
 
 ---
 
 ## Version
 
-**v7.2** | 12 Core Skills | 17 On-Demand | Autonomous Builder | Beads Integration
+**v7.3** | 12 Core Skills | 17 Advanced | Beads Required | Autonomous Builder
 
 ---
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v6.0
+# ONE_SHOT Bootstrap Script v7.3
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # Options:
@@ -11,7 +11,12 @@
 # - Existing TODO.md, LLM-OVERVIEW.md? We skip them
 # - Existing skills? We add new ones, never remove yours (unless --upgrade)
 #
-# Requires: ~/.age/key.txt (your Age private key) for secrets encryption
+# REQUIRES: beads CLI for persistent task tracking
+# Install: npm install -g @beads/bd
+#   - or:  brew install steveyegge/beads/bd
+#   - or:  go install github.com/steveyegge/beads/cmd/bd@latest
+#
+# Optional: ~/.age/key.txt for secrets encryption
 # Get Age: sudo apt install age || brew install age
 # Generate key: age-keygen -o ~/.age/key.txt
 
@@ -26,26 +31,27 @@ for arg in "$@"; do
       shift
       ;;
     --help)
-      echo "ONE_SHOT Bootstrap Script v6.0"
+      echo "ONE_SHOT Bootstrap Script v7.3"
       echo ""
       echo "Usage:"
-      echo "  curl -sL .../oneshot.sh | bash           # Install (non-destructive)"
-      echo "  curl -sL .../oneshot.sh | bash -s -- --upgrade  # Update all skills/agents"
+      echo "  curl -sL .../oneshot.sh | bash                   # Install"
+      echo "  curl -sL .../oneshot.sh | bash -s -- --upgrade   # Update skills"
+      echo ""
+      echo "Prerequisites:"
+      echo "  beads CLI   npm install -g @beads/bd (REQUIRED)"
+      echo "  age         sudo apt install age (optional, for secrets)"
       echo ""
       echo "Options:"
       echo "  --upgrade    Update all skills and agents to latest version"
       echo "  --help       Show this help"
       echo ""
       echo "What gets installed:"
-      echo "  Always:      AGENTS.md, CLAUDE.md ONE_SHOT block"
+      echo "  Always:      AGENTS.md, CLAUDE.md block, .beads/"
       echo "  Skills:      27 skills in .claude/skills/"
       echo "  Agents:      4 sub-agents in .claude/agents/"
       echo ""
-      echo "What gets updated (--upgrade):"
-      echo "  All skills and agents (overwrites existing)"
-      echo ""
       echo "Never touched:"
-      echo "  TODO.md, LLM-OVERVIEW.md, your custom skills/agents"
+      echo "  TODO.md, LLM-OVERVIEW.md, your custom skills"
       exit 0
       ;;
   esac
@@ -60,22 +66,37 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+RED='\033[0;31m'
+
 echo ""
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "${BLUE}ONE_SHOT Upgrade v6.0${NC}"
+  echo -e "${BLUE}ONE_SHOT Upgrade v7.3${NC}"
   echo "====================="
 else
-  echo -e "${BLUE}ONE_SHOT Bootstrap v6.0${NC}"
+  echo -e "${BLUE}ONE_SHOT Bootstrap v7.3${NC}"
   echo "========================"
 fi
 echo ""
 
+# Check for beads CLI (REQUIRED)
+if ! command -v bd &> /dev/null; then
+  echo -e "${RED}Error: beads CLI not found (REQUIRED)${NC}"
+  echo ""
+  echo "Install beads first:"
+  echo "  npm install -g @beads/bd"
+  echo "  # or: brew install steveyegge/beads/bd"
+  echo "  # or: go install github.com/steveyegge/beads/cmd/bd@latest"
+  echo ""
+  echo "Then re-run this script."
+  exit 1
+fi
+echo -e "  ${GREEN}✓${NC} beads CLI detected"
+
 # Check for Age key (optional)
 if [ ! -f ~/.age/key.txt ]; then
-  echo -e "${YELLOW}Note:${NC} No Age key at ~/.age/key.txt (optional for secrets encryption)"
-  echo "  To create: mkdir -p ~/.age && age-keygen -o ~/.age/key.txt"
-  echo ""
+  echo -e "  ${YELLOW}○${NC} Age key (optional for secrets): mkdir -p ~/.age && age-keygen -o ~/.age/key.txt"
 fi
+echo ""
 
 # =============================================================================
 # 1. AGENTS.md - The orchestrator (always update, this is OneShot's file)
@@ -342,24 +363,13 @@ else
 fi
 
 # =============================================================================
-# 6.5 Beads - Optional persistent task tracking (check if available)
+# 6.5 Beads - Initialize persistent task tracking (REQUIRED - already checked)
 # =============================================================================
-BEADS_INSTALLED=false
-
-# Check if bd command exists
-if command -v bd &> /dev/null; then
-  BEADS_INSTALLED=true
-  echo -e "  ${GREEN}✓${NC} beads CLI detected ($(bd --version 2>/dev/null || echo 'installed'))"
-else
-  echo -e "  ${YELLOW}○${NC} beads not installed (optional - npm install -g @beads/bd)"
-fi
-
-# Initialize beads in project if installed and not already initialized
-if [ "$BEADS_INSTALLED" = true ] && [ ! -d ".beads" ]; then
-  echo -e "  ${BLUE}→${NC} Initializing beads in project..."
+if [ ! -d ".beads" ]; then
+  echo -e "  ${BLUE}→${NC} Initializing beads..."
   bd init --stealth 2>/dev/null || true
   echo -e "  ${GREEN}✓${NC} .beads/ initialized (git-backed persistent tasks)"
-elif [ -d ".beads" ]; then
+else
   echo -e "  ${GREEN}✓${NC} .beads/ (already initialized)"
 fi
 
@@ -430,33 +440,40 @@ fi
 # Done
 # =============================================================================
 echo ""
-echo -e "${GREEN}Done!${NC} Project is now ONE_SHOT enabled."
+echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║                    ONE_SHOT v7.3 Ready!                       ║${NC}"
+echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
-echo "  Files:"
-echo "    AGENTS.md        - Skill & agent routing (27 skills, 4 agents)"
-echo "    CLAUDE.md        - Project instructions"
-echo "    TODO.md          - Task tracking"
-echo "    LLM-OVERVIEW.md  - Project context"
+echo -e "${BLUE}🚀 TRY THIS FIRST:${NC}"
 echo ""
-echo "  Skills (synchronous, shared context):"
-echo "    \"build me...\"     → front-door"
-echo "    \"plan...\"         → create-plan"
-echo "    \"ultrathink...\"   → thinking-modes"
-echo "    \"debug/fix...\"    → debugger"
-echo "    \"deploy...\"       → push-to-cloud"
-echo "    \"beads/ready...\"  → beads (persistent tasks)"
+echo "  Interactive mode (Claude Code):"
+echo "    Open project in Claude Code, then say:"
+echo "    → \"build me a REST API for managing todos\""
+echo "    → \"plan a feature that adds user authentication\""
 echo ""
-echo "  Agents (isolated context, background):"
-echo "    \"security audit\"  → security-auditor"
-echo "    \"explore/find\"    → deep-research"
-echo "    \"background\"      → background-worker"
-echo "    \"coordinate\"      → multi-agent-coordinator"
+echo "  Autonomous mode (headless):"
+echo "    oneshot-build \"A Python CLI that fetches weather data\""
+echo "    # Monitor: tail -f .agent/STATUS.md"
 echo ""
-echo "  Optional:"
-echo "    beads            - Persistent task tracking (npm install -g @beads/bd)"
+echo -e "${BLUE}📖 Quick Reference:${NC}"
 echo ""
-echo "  Commands:"
-echo "    (ONE_SHOT)       - Re-anchor to skill routing"
-echo "    /create_plan     - Start structured planning"
-echo "    /create_handoff  - Save context before /clear"
+echo "  Core Skills (say these phrases):"
+echo "    \"build me...\"      → Interview + spec + plan"
+echo "    \"plan this...\"     → Create structured plan"
+echo "    \"implement...\"     → Execute with task tracking"
+echo "    \"debug/fix...\"     → Systematic debugging"
+echo "    \"review code...\"   → Quality & security check"
+echo ""
+echo "  Context Management:"
+echo "    bd ready           → See next tasks"
+echo "    bd list            → All tasks"
+echo "    \"create handoff\"   → Save before /clear"
+echo "    \"resume\"           → Continue after /clear"
+echo ""
+echo -e "${BLUE}📁 Files Created:${NC}"
+echo "    AGENTS.md          Skill routing"
+echo "    CLAUDE.md          Project instructions"
+echo "    .beads/            Persistent task state"
+echo ""
+echo "Full docs: See README.md and .claude/skills/INDEX.md"
 echo ""
