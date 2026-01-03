@@ -1,161 +1,198 @@
 ---
 name: implement-plan
-description: "Execute an approved implementation plan. Use when user says 'implement plan', 'execute plan', or references a plan file."
+description: "Execute an approved implementation plan with context-aware task grouping."
 allowed-tools: Read, Glob, Grep, Write, Edit, Bash, Task
 ---
 
 # Implement Plan
 
-You are an expert at executing structured implementation plans systematically. You follow plans precisely while adapting to discoveries during implementation.
+Execute plans in context-aware task groups with running state persistence.
 
 ## When To Use
 
-- User says "implement plan" or "/implement_plan"
-- User says "execute plan" or "run the plan"
+- User says "implement plan", "execute plan", "build it"
 - User references a plan file with "@thoughts/shared/plans/..."
-- After a plan has been approved
 
-## Inputs
+## Core Behavior
 
-- Path to approved plan file (e.g., `thoughts/shared/plans/YYYY-MM-DD-description.md`)
-- Plan must have Status: Approved
+1. **Group tasks** into chunks of 3-5
+2. **Write running state** after each task
+3. **Check context at 50%** → pause, suggest compact
+4. **Resume from running state** after compact
 
-## Outputs
-
-- Implemented features per plan
-- Updated TODO.md with progress
-- Commits after each significant step
-- Plan file updated to reflect progress
-
-## Pre-Implementation Checklist
-
-Before starting:
-
-1. **Read the plan completely**
-2. **Verify Status is "Approved"**
-3. **Check all decisions are filled in** (no "_pending_" entries)
-4. **Identify dependencies** - are they met?
-5. **Understand success criteria**
-
-If any decisions are pending, STOP and ask user to complete them.
+---
 
 ## Workflow
 
-### Phase 1: Setup
+### Phase 1: Pre-Implementation Check
 
-```markdown
+```
+1. Check current context level
+2. If context > 30%:
+   → Create quick handoff
+   → Output: "Context at X%. Recommend /compact before starting."
+   → Stop and wait for user
+3. If context < 30%:
+   → Proceed to Phase 2
+```
+
+### Phase 2: Setup
+
+```
 1. Read plan file completely
-2. Parse implementation steps into TODO.md format
-3. Identify first actionable step
-4. Announce: "Starting implementation of [Plan Title]"
+2. Verify Status is "Approved"
+3. Parse tasks into groups of 3-5
+4. Create running state file
+5. Announce: "Plan has N tasks in M groups. Starting Group 1."
 ```
 
-### Phase 2: Execute (Build Loop)
+### Phase 3: Execute (by group)
 
-For each implementation step:
-
-```
-1. Mark step as in_progress in TODO.md
-2. Implement the step
-3. Test the implementation
-4. Commit with message: "feat([scope]): [description] - implements step X.Y"
-5. Mark step as completed in TODO.md
-6. Update plan file with progress
-7. Move to next step
-```
-
-### Phase 3: Verification
-
-After all steps complete:
+For each task group:
 
 ```
-1. Run full test suite
-2. Verify all success criteria met
+1. Announce: "Starting Group X of Y (tasks A-B)"
+2. For each task in group:
+   a. Mark in_progress in running state
+   b. Implement the task
+   c. Test
+   d. Commit: "feat(scope): description - step X.Y"
+   e. Mark completed in running state
+   f. Update running state file immediately
+3. After group complete:
+   a. Commit running state
+   b. Check context level
+   c. If context > 50%:
+      → Output: "Group X complete. Context at Y%. Recommend /compact."
+      → Output: "Run /compact then 'continue' to resume at Group X+1"
+      → Stop
+   d. If context < 50%:
+      → Continue to next group
+```
+
+### Phase 4: Completion
+
+```
+1. All groups complete
+2. Run test suite
 3. Update plan Status to "Completed"
-4. Create summary of what was implemented
+4. Delete running state file (or archive)
+5. Summary of what was implemented
 ```
 
-## Progress Tracking
+---
 
-Update both files during implementation:
+## Running State File
 
-### TODO.md Format
+**Location**: `thoughts/shared/runs/YYYY-MM-DD-{plan-name}.md`
+
+**Format**:
 ```markdown
-## In Progress
-- [ ] Step 2.1: Implementing user model
+# Run: [Plan Name]
 
-## Completed
-- [x] Step 1.1: Created project structure
-- [x] Step 1.2: Set up dependencies
+**Plan**: thoughts/shared/plans/YYYY-MM-DD-plan.md
+**Started**: YYYY-MM-DD HH:MM
+**Current Group**: 2 of 4
 
-## Blocked
-- [ ] Step 3.1: Waiting on API key (needs user input)
+## Task Groups
+
+### Group 1: [Description] - COMPLETE
+- [x] Task 1 (commit: abc123)
+- [x] Task 2 (commit: def456)
+- [x] Task 3 (commit: ghi789)
+
+### Group 2: [Description] - IN PROGRESS
+- [x] Task 4 (commit: jkl012)
+- [ ] Task 5 ← CURRENT
+- [ ] Task 6
+
+### Group 3: [Description] - PENDING
+- [ ] Task 7
+- [ ] Task 8
+- [ ] Task 9
+
+## Progress Log
+
+| Time | Task | Status | Commit |
+|------|------|--------|--------|
+| 10:05 | Task 1 | Done | abc123 |
+| 10:12 | Task 2 | Done | def456 |
+| 10:20 | Task 3 | Done | ghi789 |
+| 10:28 | Task 4 | Done | jkl012 |
+| 10:35 | Task 5 | In Progress | - |
+
+## Current Context
+
+- **Working on**: `src/file.ts:45-80`
+- **Decisions made**: [Key decisions this session]
+- **Blockers**: None
+
+## Resume Command
+
+After /compact:
+```
+continue implementing @thoughts/shared/runs/YYYY-MM-DD-plan-name.md
+```
 ```
 
-### Plan File Updates
-```markdown
-## Implementation Steps
+---
 
-### Phase 1: Setup [COMPLETED]
-- [x] Step 1.1 (commit: abc123)
-- [x] Step 1.2 (commit: def456)
-
-### Phase 2: Core Features [IN PROGRESS]
-- [x] Step 2.1 (commit: ghi789)
-- [ ] Step 2.2 <- CURRENT
-```
-
-## Commit Message Format
+## Task Grouping Logic
 
 ```
-type(scope): description - implements step X.Y
+Total tasks: N
+Group size: 3-5 (prefer 4)
+Number of groups: ceil(N / 4)
+
+Group by:
+1. Logical phases (if plan has phases)
+2. File proximity (related files together)
+3. Dependency order (blockers first)
+```
+
+---
+
+## Context Thresholds
+
+| Level | Action |
+|-------|--------|
+| < 30% | Start/continue normally |
+| 30-50% | Continue with caution |
+| > 50% | **Pause after current group** |
+| > 70% | **Stop immediately**, create handoff |
+
+---
+
+## Commit Format
+
+```
+type(scope): description - step X.Y
 
 Types: feat, fix, refactor, test, docs, chore
-Scope: component or area affected
-Step reference: links back to plan
 ```
 
-Examples:
-```
-feat(auth): add user login endpoint - implements step 2.1
-test(auth): add unit tests for login - implements step 2.2
-fix(auth): handle invalid tokens - implements step 2.3
-```
+---
 
 ## Handling Issues
 
-### Unexpected Complexity
-1. Document the issue in plan file under "Implementation Notes"
-2. If blocking, create handoff and ask for guidance
-3. Don't deviate significantly from plan without approval
+### Context Running Low
+1. Complete current task (if close)
+2. Update running state with exact position
+3. Output: "Context at X%. Stopping at Task Y."
+4. Suggest: "/compact then 'continue from run state'"
 
-### Missing Requirements
-1. Note what's missing
-2. Add to "Decisions Needed" section
-3. Pause that step, continue with others if possible
-4. Ask user for input
+### Unexpected Complexity
+1. Note in running state under "Blockers"
+2. If blocking, pause and ask user
+3. Don't deviate from plan without approval
 
 ### Test Failures
 1. Fix immediately if simple
-2. Document if complex
+2. Note in running state if complex
 3. Don't proceed past failing tests
 
-## Context Management
-
-When context is running low (< 10% remaining):
-
-1. Complete current step if close to done
-2. Update plan with exact progress
-3. Use `/create_handoff` to preserve context
-4. After `/clear`, use `/resume_handoff` to continue
-
-## Integration with OneShot
-
-- Follow ONE_SHOT build loop: implement -> test -> commit -> update TODO.md
-- Respect hard stops (storage, auth, deployment)
-- Use appropriate thinking modes for complex decisions
-- Create handoff before context exhaustion
+---
 
 ## Keywords
 
-implement plan, execute plan, run plan, start implementation, follow plan, plan file, approved plan
+implement plan, execute plan, run plan, build it, continue implementing

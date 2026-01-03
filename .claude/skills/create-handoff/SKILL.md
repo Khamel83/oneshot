@@ -16,6 +16,24 @@ You are an expert at capturing context for seamless session continuation. Handof
 - At natural breakpoints in long implementations
 - When switching tasks temporarily
 - End of work session
+- **Pre-implementation**: Before starting implement-plan (if context > 30%)
+
+## Modes
+
+### Standard Mode (Default)
+Full handoff with all context preserved. Use at end of session or before `/clear`.
+
+### Pre-Implementation Mode
+Lightweight handoff before starting a plan. Triggered when:
+- User is about to run implement-plan
+- Context is already > 30%
+
+**Pre-implementation handoff captures**:
+- Current conversation summary (2-3 sentences)
+- Any decisions already made
+- Reference to the plan file
+
+**Then suggests**: "Run `/compact` then `implement plan @plan-file`"
 
 ## Why Handoffs > Auto-Compact
 

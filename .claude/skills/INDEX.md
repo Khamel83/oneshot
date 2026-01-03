@@ -1,162 +1,120 @@
 # Skills Index
 
-Complete catalog of ONE_SHOT skills (29 total).
-
-## Quick Reference
-
-| Skill | Trigger | Purpose |
-|-------|---------|---------|
-| front-door | "build me", "new project", "/interview" | Intelligent interview & routing hub |
-| failure-recovery | "stuck", "looping" | Recovery from agent confusion |
-| thinking-modes | "think", "ultrathink" | Extended analysis with personas |
-| create-plan | "plan this" | Structured planning |
-| implement-plan | "implement", "build it" | Execute approved plans |
-| api-designer | "design API", "endpoints" | REST/GraphQL API design |
-| create-handoff | "save context" | Preserve state before /clear |
-| resume-handoff | "continue", "resume" | Restore from handoff |
-| beads | "ready tasks", "blockers" | Git-backed persistent task tracking |
-| debugger | "bug", "fix", "broken" | Systematic debugging |
-| test-runner | "run tests", "coverage" | Execute and analyze tests |
-| code-reviewer | "review", "is this safe" | Quality and security review |
-| refactorer | "refactor", "clean up" | Safe code restructuring |
-| performance-optimizer | "slow", "optimize" | Profile and improve |
-| git-workflow | "commit", "PR" | Version control operations |
-| push-to-cloud | "deploy", "ship" | Deploy to OCI-Dev |
-| remote-exec | "run on", "sync and run" | Execute on remote machines |
-| ci-cd-setup | "CI", "GitHub Actions" | Pipeline configuration |
-| docker-composer | "docker", "containerize" | Container setup |
-| observability-setup | "monitoring", "logging" | Logging, metrics, alerts |
-| database-migrator | "migration", "schema" | Schema changes |
-| documentation-generator | "docs", "README" | Generate documentation |
-| secrets-vault-manager | "secrets", "env" | SOPS/Age encryption |
-| secrets-sync | "sync secrets", "push secrets" | Two-way vault sync |
-| the-audit | "audit this", "filter this" | Strategic communication filter |
-| delegate-to-agent | "background", "isolated" | Route to native sub-agents |
-| oci-resources | "oci database", "object storage" | OCI free-tier resources |
-| convex-resources | "convex", "reactive" | Convex backend for web apps |
-| hooks-manager | "setup hooks", "secrets scan" | Lifecycle hooks automation |
+ONE_SHOT v7.0 - Context-first skill organization.
 
 ---
 
-## By Category
+## Core Skills (10) - Always in Router
 
-### Core (3)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| front-door | ~320 | Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, Task |
-| failure-recovery | 229 | Read, Bash, Glob, Grep |
-| thinking-modes | 227 | Read, Glob, Grep, Bash, Write, Edit, Task |
+These skills are auto-routed based on patterns. Use them naturally.
 
-### Planning (3)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| create-plan | 174 | Read, Glob, Grep, Write, Edit, Task |
-| implement-plan | 161 | Read, Glob, Grep, Write, Edit, Bash, Task |
-| api-designer | 379 | Read, Write, Edit |
+| Skill | Trigger | Purpose |
+|-------|---------|---------|
+| **front-door** | "build me", "new project" | Interview & routing hub |
+| **create-plan** | "plan", "design" | Structured planning |
+| **implement-plan** | "implement", "build it" | Execute with task groups |
+| **debugger** | "bug", "fix", "broken" | Systematic debugging |
+| **code-reviewer** | "review", "is this safe" | Quality & security review |
+| **create-handoff** | "handoff", "save context" | Preserve state before clear |
+| **resume-handoff** | "resume", "continue" | Restore from handoff/running state |
+| **failure-recovery** | "stuck", "looping" | Recovery from confusion |
+| **thinking-modes** | "think", "ultrathink" | Extended analysis |
+| **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
 
-### Context (3)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| create-handoff | 201 | Read, Glob, Grep, Write, Edit |
-| resume-handoff | 207 | Read, Glob, Grep, Write, Edit, Bash, Task |
-| beads | ~210 | Bash, Read, Write, Edit, Glob |
+---
 
-### Development (5)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| debugger | 159 | Bash, Read, Glob, Grep |
-| test-runner | 200 | Bash, Read, Write, Edit |
-| code-reviewer | 237 | Read, Glob, Grep |
-| refactorer | 198 | Read, Write, Edit, Glob, Grep |
-| performance-optimizer | 172 | Bash, Read, Write, Edit, Glob |
+## On-Demand Skills (19) - Available by Name
 
-### Operations (6)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| git-workflow | 128 | Bash, Read |
-| push-to-cloud | 205 | Read, Write, Edit, Bash, Glob |
-| remote-exec | ~230 | Bash, Read, Glob |
-| ci-cd-setup | 241 | Read, Write, Edit |
-| docker-composer | 241 | Bash, Read, Write, Edit |
-| observability-setup | 242 | Bash, Read, Write, Edit, Glob |
+These skills are **not auto-routed** but available when explicitly requested.
+Use `/skill-name` or "use the X skill" to invoke.
 
-### Data & Docs (6)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| database-migrator | 302 | Bash, Read, Write, Edit |
-| documentation-generator | 187 | Read, Write, Edit, Glob |
-| secrets-vault-manager | 154 | Bash, Read, Write, Edit |
-| secrets-sync | ~200 | Bash, Read, Write, Edit |
-| oci-resources | ~200 | Bash, Read, Write, Edit |
-| convex-resources | ~250 | Bash, Read, Write, Edit |
+### Development
+| Skill | Use When |
+|-------|----------|
+| **refactorer** | "refactor", "clean up code" |
+| **test-runner** | "run tests", "coverage" |
+| **performance-optimizer** | "slow", "optimize speed" |
 
-### Communication (1)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| the-audit | ~250 | Read, Write, Edit |
+### Operations
+| Skill | Use When |
+|-------|----------|
+| **git-workflow** | Need conventional commits, PR creation |
+| **docker-composer** | Setting up containers |
+| **ci-cd-setup** | GitHub Actions, pipelines |
+| **push-to-cloud** | Deploy to OCI-Dev |
+| **remote-exec** | Run on remote machines, tmux jobs |
+| **observability-setup** | Logging, metrics, health checks |
 
-### Agent Bridge (1)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| delegate-to-agent | ~180 | Task |
+### Data & APIs
+| Skill | Use When |
+|-------|----------|
+| **database-migrator** | Schema changes, migrations |
+| **api-designer** | Design REST/GraphQL APIs |
+| **oci-resources** | OCI database, object storage |
+| **convex-resources** | Convex reactive backend |
 
-### Automation (1)
-| Skill | Lines | Tools |
-|-------|-------|-------|
-| hooks-manager | ~80 | Read, Write, Bash |
+### Documentation
+| Skill | Use When |
+|-------|----------|
+| **documentation-generator** | README, LLM-OVERVIEW, ADRs |
+
+### Specialized
+| Skill | Use When |
+|-------|----------|
+| **the-audit** | Strategic communication filtering |
+| **beads** | Persistent cross-session task tracking |
+| **visual-iteration** | Self-scoring UI design loop |
+| **hooks-manager** | Configure lifecycle automation |
+| **delegate-to-agent** | Spawn isolated sub-agents |
+| **secrets-sync** | Two-way vault synchronization |
+
+---
+
+## Context Management
+
+### Running State vs Handoff
+
+| File | Location | Use |
+|------|----------|-----|
+| **Running state** | `thoughts/shared/runs/` | Mid-implementation (minimal) |
+| **Handoff** | `thoughts/shared/handoffs/` | Full context preservation |
+
+### Flow
+```
+implement-plan → writes running state → context > 50% → pause
+/compact
+resume → reads running state → continues at exact task
+```
 
 ---
 
 ## Skill Chains
 
-Common workflows that compose multiple skills:
-
 ```
 New Project:
-  front-door → create-plan → implement-plan
+  front-door → create-plan → [compact] → implement-plan
 
 Add Feature:
-  create-plan → implement-plan → test-runner
+  create-plan → [compact] → implement-plan
 
 Debug Issue:
   thinking-modes → debugger → test-runner
 
-Deploy:
-  code-reviewer → push-to-cloud → ci-cd-setup
-
 Session Break:
-  create-handoff → /clear → resume-handoff
-
-Security Review (with agent):
-  delegate-to-agent → security-auditor agent → report
-
-Deep Research (with agent):
-  delegate-to-agent → deep-research agent → findings
+  create-handoff → /compact → resume-handoff
 ```
 
 ---
 
-## When NOT to Use
+## When NOT to Use Skills
 
 | Skill | Skip When |
 |-------|-----------|
 | front-door | Micro task, single file change |
-| create-plan | Simple change, already have plan |
-| thinking-modes | Quick question, obvious answer |
-| api-designer | Internal function, no external API |
-| database-migrator | No schema change, just data |
-| ci-cd-setup | Local-only project |
+| create-plan | Simple change, user gave explicit steps |
+| thinking-modes | Obvious answer, quick question |
+| implement-plan | Just 1-2 tasks (do directly) |
 
 ---
 
-## Tool Availability
-
-| Tool | Skills Using It |
-|------|-----------------|
-| Read | All 27 |
-| Write | 20 |
-| Edit | 18 |
-| Bash | 15 |
-| Glob | 12 |
-| Grep | 11 |
-| Task | 6 |
+**Version**: 7.0 | **Core**: 10 | **On-Demand**: 19

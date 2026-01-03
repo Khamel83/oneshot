@@ -11,14 +11,31 @@ You are an expert at seamlessly continuing work from a handoff document. You res
 ## When To Use
 
 - User says "resume handoff" or "/resume_handoff"
-- User says "continue from handoff"
+- User says "continue from handoff" or just "continue"
 - User references a handoff file with "@thoughts/shared/handoffs/..."
-- After a `/clear` when previous session created a handoff
+- User references a running state with "@thoughts/shared/runs/..."
+- After a `/clear` or `/compact`
 - Starting a new session to continue previous work
 
 ## Inputs
 
-- Path to handoff file (e.g., `thoughts/shared/handoffs/YYYY-MM-DD-description.md`)
+**Priority order** (check in this order):
+1. **Running state file** - `thoughts/shared/runs/YYYY-MM-DD-{plan}.md` (mid-implementation)
+2. **Handoff file** - `thoughts/shared/handoffs/YYYY-MM-DD-description.md` (full context)
+
+## Resume Modes
+
+### From Running State (Implementation in Progress)
+When resuming from `thoughts/shared/runs/`:
+- Minimal context restoration (just task groups + current position)
+- Jump directly to next task group
+- Continue implement-plan workflow
+
+### From Handoff (Full Context)
+When resuming from `thoughts/shared/handoffs/`:
+- Full context restoration (decisions, discoveries, blockers)
+- May need to re-read more files
+- Standard resume workflow
 
 ## Outputs
 
@@ -28,6 +45,47 @@ You are an expert at seamlessly continuing work from a handoff document. You res
 - Progress on next steps
 
 ## Workflow
+
+### Phase 0: Detect Resume Type
+
+```
+1. Check for running state files:
+   ls thoughts/shared/runs/*.md 2>/dev/null | head -1
+2. If running state exists → Resume from Running State workflow
+3. If no running state → Resume from Handoff workflow
+```
+
+### Resume from Running State (Fast Path)
+
+When resuming mid-implementation:
+
+```
+1. Read running state file
+2. Parse: current group, completed tasks, current task
+3. Announce: "Resuming at Group X, Task Y"
+4. Continue with implement-plan workflow
+5. No need to re-read full context - just task groups
+```
+
+**Output format**:
+```markdown
+## Resuming Implementation
+
+**Running state**: thoughts/shared/runs/YYYY-MM-DD-plan.md
+**Position**: Group 2 of 4, Task 5
+
+### Progress
+- [x] Group 1: Complete (3 tasks)
+- [ ] Group 2: In Progress (2/4 done)
+- [ ] Group 3: Pending
+- [ ] Group 4: Pending
+
+Continuing with Task 5...
+```
+
+---
+
+### Resume from Handoff (Full Path)
 
 ### Phase 1: Context Restoration (First 30 Seconds)
 
