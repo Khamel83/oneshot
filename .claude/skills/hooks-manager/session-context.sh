@@ -5,9 +5,20 @@
 set -uo pipefail
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+ONESHOT_SKILLS="${HOME}/.claude/skills/oneshot"
 
 # Build context from available files
 CONTEXT=""
+
+# Auto-update ONE_SHOT (rate-limited to once/day, updates automatically)
+UPDATE_SCRIPT="${ONESHOT_SKILLS}/auto-updater/oneshot-update.sh"
+if [ -x "$UPDATE_SCRIPT" ]; then
+    # Run in background to not block session start
+    UPDATE_RESULT=$("$UPDATE_SCRIPT" auto 2>/dev/null || echo "SKIP")
+    if echo "$UPDATE_RESULT" | grep -q "UPDATED"; then
+        CONTEXT="$CONTEXT\n\n## ONE_SHOT Auto-Updated\nONE_SHOT skills have been automatically updated to the latest version. New features and improvements are now available."
+    fi
+fi
 
 # Check for LLM-OVERVIEW.md
 if [ -f "$PROJECT_DIR/LLM-OVERVIEW.md" ]; then

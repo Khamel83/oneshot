@@ -26,15 +26,20 @@ Like a capable underling: takes an idea, uses best judgment at every step, and r
 ## Quick Start
 
 ```bash
-# From project directory:
+# From project directory (runs in resilient tmux session):
 oneshot-build "A CLI tool that converts markdown to PDF"
 
 # Monitor progress:
 tail -f .agent/STATUS.md
 
+# Attach to running session:
+tmux attach -t oneshot-build
+
 # Check tasks:
 bd list --json
 ```
+
+**Resilient by default**: All builds run in tmux. Survives terminal disconnect.
 
 ---
 
@@ -133,6 +138,48 @@ The autonomous builder uses these principles:
 
 ---
 
+## Resilient Execution (v7.4)
+
+**All builds run in tmux by default** - survives terminal disconnect, SSH drops, etc.
+
+### How It Works
+
+```
+oneshot-build "idea"
+  ├─ Creates tmux session: oneshot-build-{timestamp}
+  ├─ Starts heartbeat (every 30s)
+  ├─ Starts checkpointer (every 5 min)
+  ├─ Runs Claude with aggressive sync rules
+  └─ Logs everything to .agent/session.log
+```
+
+### Aggressive State Persistence
+
+During build, state is saved:
+- **Before** each task: `bd update && bd sync`
+- **After** each task: `bd close && bd sync`
+- **Every commit**: `bd sync`
+- **Every 5 minutes**: checkpoint commit + `bd sync`
+- **On any error**: `bd sync` (preserve before crash)
+
+### If Terminal Disconnects
+
+The build continues! When you reconnect:
+
+```bash
+# 1. Check if session running
+tmux list-sessions | grep oneshot
+
+# 2. Reattach
+tmux attach -t oneshot-build
+
+# 3. If session died, check beads
+bd sync && bd ready --json
+
+# 4. Resume from state
+claude -p "Resume from beads"
+```
+
 ## Recovery
 
 If the builder stops unexpectedly:
@@ -141,9 +188,14 @@ If the builder stops unexpectedly:
 # Check what happened
 cat .agent/STATUS.md
 cat .agent/LAST_ERROR.md
+cat .agent/HEARTBEAT | tail -5  # When did it die?
 
 # See remaining tasks
+bd sync
 bd ready --json
+
+# Check session log
+less .agent/session.log
 
 # Continue manually or restart
 oneshot-build "same idea"  # Will pick up from beads state

@@ -1,6 +1,6 @@
 # Skills Index
 
-ONE_SHOT v7.3 - Context-first with autonomous builder mode.
+ONE_SHOT v7.4 - Aggressive delegation, parallel execution, auto-updates.
 
 ---
 
@@ -51,20 +51,25 @@ tail -f .agent/STATUS.md
 
 ## All Skills Reference
 
-### Core (12) - Auto-Routed
+### Core (17) - Auto-Routed
 
 | Skill | Triggers | Purpose |
 |-------|----------|---------|
-| **front-door** | "build me", "new project" | Interview & routing hub |
-| **autonomous-builder** | "headless", "just build it" | Idea → artifact autonomously |
+| **front-door** | "build me", "new project" | Interview & routing hub (now with auto-delegation) |
+| **autonomous-builder** | "headless", "just build it" | Idea → artifact (resilient, survives disconnect) |
+| **resilient-executor** | "keep running", "survive disconnect" | Disconnect-proof execution via tmux |
 | **create-plan** | "plan", "design" | Structured planning |
-| **implement-plan** | "implement", "build it" | Execute with beads tracking |
-| **beads** | "ready tasks", "what's next" | Persistent task tracking |
+| **implement-plan** | "implement", "build it" | Execute with beads + parallel tasks |
+| **beads** | "ready tasks", "what's next" | Persistent task tracking (aggressive sync) |
 | **debugger** | "bug", "fix", "broken" | Systematic debugging |
 | **code-reviewer** | "review", "is this safe" | Quality & security review |
+| **delegate-to-agent** | (auto-triggered) | Aggressive subagent delegation |
+| **parallel-validator** | "validate", "check everything" | Run tests/lint/security in parallel |
+| **batch-processor** | "rename across", "update all" | Apply changes to many files in parallel |
+| **auto-updater** | (auto on session start) | Auto-update skills from GitHub |
 | **create-handoff** | "handoff", "save context" | Preserve state before clear |
 | **resume-handoff** | "resume", "continue" | Restore from beads/handoff |
-| **failure-recovery** | "stuck", "looping" | Recovery + loop detection |
+| **failure-recovery** | "stuck", "looping" | Recovery + predictive context |
 | **thinking-modes** | "think", "ultrathink" | Extended analysis (5 levels) |
 | **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
 
@@ -132,4 +137,4 @@ Session Break:
 
 ---
 
-**Version**: 7.3 | **Core**: 12 | **Advanced**: 17
+**Version**: 7.4 | **Core**: 17 | **Advanced**: 17 | **Auto-Update**: Enabled | **Resilient**: tmux

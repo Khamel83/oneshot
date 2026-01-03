@@ -202,6 +202,73 @@ bd sync  # Pull latest
 bd ready --json  # See available work
 ```
 
+## Background Agent Tracking
+
+Beads can track background agents across sessions for result retrieval.
+
+### New Fields for Background Tasks
+
+When creating tasks that spawn background agents:
+
+```bash
+# Create task with agent tracking
+bd create "Run security audit" -t agent_task --json --meta '{"agent_id": "abc123", "agent_type": "security-auditor", "poll_status": "running"}'
+```
+
+**Meta fields for agent tasks:**
+- `agent_id`: Background agent/task ID (from Task tool response)
+- `agent_type`: Type of agent spawned (security-auditor, background-worker, etc.)
+- `poll_status`: pending | running | completed | failed
+- `started_at`: ISO timestamp when spawned
+- `completed_at`: ISO timestamp when finished
+
+### Agent Task Workflow
+
+```bash
+# 1. Spawn background agent and record in beads
+bd create "Security audit before PR" -t agent_task --json \
+  --meta '{"agent_id": "sec_xyz", "agent_type": "security-auditor", "poll_status": "running"}'
+# Returns bd-f1a2
+
+# 2. Check agent status (updates poll_status)
+bd poll bd-f1a2
+# Uses TaskOutput internally, returns: "running" or "completed: [summary]"
+
+# 3. Get full results
+bd results bd-f1a2
+# Returns full agent output, updates poll_status to "completed"
+
+# 4. Close task with findings
+bd close bd-f1a2 --reason "Security audit passed, no issues"
+```
+
+### Polling Multiple Agents
+
+```bash
+# List all running agent tasks
+bd list --type agent_task --meta-filter 'poll_status=running' --json
+
+# Poll all running agents
+bd poll-all --json
+# Returns: [{"id": "bd-f1a2", "status": "completed"}, {"id": "bd-g3h4", "status": "running"}]
+```
+
+### Cross-Session Agent Resumption
+
+Agent IDs persist across sessions:
+
+```bash
+# Session 1: Start long security audit
+bd create "Deep security scan" -t agent_task --meta '{"agent_id": "deep_sec_123"}'
+bd sync
+# Session ends
+
+# Session 2: Check on agent
+bd sync
+bd poll bd-f1a2  # Agent still running or completed
+bd results bd-f1a2  # Get findings
+```
+
 ## Common Patterns
 
 ### Breaking Down Work
@@ -231,6 +298,65 @@ bd dep add <current-task> bd-x1y2 --type blocks
 bd init --stealth  # Keeps .beads/ local to you
 ```
 
+## Aggressive Persistence (Disconnect-Proof)
+
+**NEW in v7.4**: Sync state aggressively to survive terminal disconnection.
+
+### Sync Triggers (ALWAYS sync on these)
+
+| Event | Action |
+|-------|--------|
+| Task started | `bd update --status in_progress && bd sync` |
+| Task completed | `bd close && bd sync` |
+| File committed | `bd sync` (after git commit) |
+| Every 5 minutes | Background checkpoint sync |
+| Before risky operation | `bd sync` |
+| On any error | `bd sync` (preserve state before crash) |
+
+### Resilient Workflow
+
+```bash
+# Start task (sync immediately)
+bd update $ID --status in_progress --json
+bd sync
+
+# Do work...
+
+# Complete task (sync immediately)
+bd close $ID --reason "commit: xyz" --json
+bd sync  # Don't wait, sync now!
+
+# If error occurs
+bd sync  # Save state before handling error
+```
+
+### Recovery After Disconnect
+
+```bash
+# 1. Pull latest state
+bd sync
+
+# 2. See where we left off
+bd list --status in_progress --json  # What was in progress?
+bd ready --json                       # What's next?
+
+# 3. Check what was completed
+bd list --status closed --json | tail -5
+
+# 4. Resume
+# If task was in_progress but not complete, continue it
+# If task was closed, move to next ready task
+```
+
+### Background Auto-Sync
+
+When running in resilient mode, beads syncs automatically:
+
+```bash
+# Add to your session (done automatically by resilient-executor)
+( while true; do sleep 300; bd sync 2>/dev/null || true; done ) &
+```
+
 ## Anti-Patterns
 
 - Creating beads issues for trivial tasks (use TODO.md instead)
@@ -238,6 +364,8 @@ bd init --stealth  # Keeps .beads/ local to you
 - Not using `--json` flag for structured output
 - Creating dependencies on closed issues
 - Over-engineering dependency graphs for simple work
+- **NEW**: Waiting to batch syncs (sync immediately after each action)
+- **NEW**: Assuming terminal will stay connected (always use resilient mode)
 
 ## Beads vs Handoffs
 

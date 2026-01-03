@@ -1,8 +1,10 @@
-# ONE_SHOT
+# ONE_SHOT v7.4
 
 **Tell it an idea. Come back with the thing built.**
 
 A skill system for [Claude Code](https://claude.com/claude-code) that adds structured workflows, persistent task tracking, and autonomous execution to your projects.
+
+**New in v7.4:** Resilient execution (survives disconnect), aggressive subagent delegation, auto-updates from GitHub.
 
 > See it in action: [examples/weather-cli](examples/weather-cli) - a complete project built autonomously in 6 iterations.
 
@@ -15,13 +17,82 @@ A skill system for [Claude Code](https://claude.com/claude-code) that adds struc
 npm install -g @beads/bd
 # or: brew install steveyegge/beads/bd
 # or: go install github.com/steveyegge/beads/cmd/bd@latest
+
+# tmux is REQUIRED for resilient execution
+brew install tmux  # macOS
+apt install tmux   # Linux
 ```
 
 ## Install
 
 ```bash
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
+git clone https://github.com/Khamel83/oneshot.git ~/github/oneshot
+cd ~/github/oneshot && ./install.sh
 ```
+
+This installs the `oneshot` command and sets up auto-updates.
+
+---
+
+## The `oneshot` Command
+
+Everything is managed through one command. You never touch tmux directly.
+
+```bash
+# Build something autonomously (survives disconnect!)
+oneshot build "A Python CLI that fetches weather data"
+
+# Run any Claude prompt resiliently
+oneshot run "implement the auth feature"
+
+# Check what's happening
+oneshot status
+
+# Watch the work
+oneshot attach
+
+# Stop and save state
+oneshot stop
+
+# Resume later (picks up from beads state)
+oneshot resume
+```
+
+### All Commands
+
+```
+oneshot build <idea>     Build something autonomously
+oneshot run <prompt>     Run prompt in resilient session
+oneshot attach           Connect to running session
+oneshot status           Show current status
+oneshot log              View full session log
+oneshot follow           Follow log live
+oneshot stop             Stop current session (saves state)
+oneshot resume           Resume from beads state
+oneshot list             List all sessions
+oneshot killall          Stop all sessions
+oneshot update           Update ONE_SHOT from GitHub
+```
+
+---
+
+## Resilient Execution
+
+**Your work survives if you disconnect.** All sessions run in tmux with:
+
+- **Heartbeat** - Proves session is alive (every 30s)
+- **Checkpointer** - Commits + syncs state (every 5 min)
+- **Full logging** - Everything in `.agent/session.log`
+- **Beads sync** - Task state saved after every action
+
+If you disconnect:
+1. Session keeps running
+2. State keeps syncing
+3. Reconnect with `oneshot attach`
+
+If something crashes:
+1. Beads state is synced
+2. `oneshot resume` picks up where it left off
 
 ---
 
@@ -42,10 +113,15 @@ Claude: [builds it step by step]
 You give an idea. Come back later with a working artifact.
 
 ```bash
-oneshot-build "A CLI tool that converts markdown to PDF with syntax highlighting"
-# ...agent runs autonomously...
-# Check progress: tail -f .agent/STATUS.md
-# Returns with 50-99% complete implementation
+oneshot build "A CLI tool that converts markdown to PDF with syntax highlighting"
+
+# Check progress anytime
+oneshot status
+
+# Watch it work
+oneshot attach
+
+# Disconnect whenever - it keeps running!
 ```
 
 ---

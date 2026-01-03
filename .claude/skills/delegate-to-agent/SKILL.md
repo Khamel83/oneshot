@@ -17,6 +17,52 @@ You are an intelligent router that decides when to delegate tasks to native sub-
 - Complex multi-area exploration
 - User says "deep dive" or "thorough exploration"
 
+---
+
+## Very Aggressive Auto-Triggers (NO user request needed)
+
+**CRITICAL**: These triggers fire AUTOMATICALLY based on context signals. Do NOT wait for user to say "background" or "parallel".
+
+### Exploration Triggers (→ Explore or deep-research agent)
+| Signal | Action |
+|--------|--------|
+| Glob/Grep will return >5 files | Spawn Explore agent instead of running directly |
+| "Find all", "where is", "how does X work" | Delegate immediately to deep-research |
+| Codebase question without specific file path | Delegate to Explore |
+| Need to understand unfamiliar code area | Delegate to deep-research |
+
+### Duration Triggers (→ background-worker with run_in_background: true)
+| Command Pattern | Action |
+|-----------------|--------|
+| `npm install/build/test` | Always run in background |
+| `pytest/jest/go test/cargo test` | Always run in background |
+| `docker build/compose` | Always run in background |
+| Any `--watch` flag | Always run in background |
+| Estimated >15 seconds | Run in background |
+
+### Security Triggers (→ security-auditor in background)
+| Signal | Action |
+|--------|--------|
+| About to edit auth/login/password/token files | Spawn security-auditor |
+| Touching .env, secrets, credentials, API keys | Spawn security-auditor |
+| Before any PR creation | Spawn security-auditor |
+| Modifying auth middleware or CORS config | Spawn security-auditor |
+
+### Context Triggers (→ delegate + checkpoint)
+| Context Level | Action |
+|---------------|--------|
+| >30% AND complex task ahead | Delegate exploration to subagent |
+| >40% | Delegate ALL remaining discovery work |
+| >50% | Create handoff, delegate remaining implementation |
+| >60% | Stop, create handoff, instruct /compact |
+
+### Parallel Triggers (→ multi-agent-coordinator)
+| Signal | Action |
+|--------|--------|
+| Multiple independent file groups identified | Spawn parallel agents |
+| "Review all X" across codebase | Batch into parallel agents |
+| 3+ validators apply (tests, lint, security) | Run all in parallel |
+
 ## When NOT to Use
 
 - Simple, quick tasks
@@ -25,16 +71,20 @@ You are an intelligent router that decides when to delegate tasks to native sub-
 - Single file operations
 - User wants to see progress in real-time
 
-## Decision Matrix
+## Decision Matrix (Aggressive Thresholds)
 
-| Condition | Agent | Reason |
-|-----------|-------|--------|
-| Security review | security-auditor | Isolated, thorough |
-| Find all X across codebase | deep-research | Context-heavy |
-| Run tests/build | background-worker | Long-running |
-| Multiple exploration areas | multi-agent-coordinator | Parallel efficiency |
-| Quick lookup | None (use skill) | Overhead not worth it |
-| Need real-time feedback | None (use skill) | Agents return on completion |
+| Condition | Agent | Threshold | Reason |
+|-----------|-------|-----------|--------|
+| File search/exploration | Explore | >5 files | Context savings 87% |
+| Security review | security-auditor | Any auth file | Isolated, thorough |
+| Find all X across codebase | deep-research | Always | Context-heavy |
+| Run tests/build | background-worker | >15 seconds | Non-blocking |
+| Multiple exploration areas | multi-agent-coordinator | 3+ areas | Parallel efficiency |
+| Codebase understanding | Explore | Any "how does" | Fast haiku agent |
+| Quick single-file lookup | None (direct) | 1-2 files | Overhead not worth it |
+| Need real-time feedback | None (direct) | User watching | Agents return on completion |
+
+**Key Change from v7.3:** Threshold reduced from 10 files to 5 files. Bias toward delegation.
 
 ## Agent Routing
 
@@ -93,6 +143,39 @@ Delegate to multi-agent-coordinator when:
 ```
 
 ## Workflow
+
+### 0. Auto-Delegation Check (BEFORE any action)
+
+**Run this check BEFORE every tool use in any skill:**
+
+```
+1. FILE COUNT CHECK
+   Question: Will this search/read >5 files?
+   If YES → Spawn Explore agent, return summary only
+
+2. DURATION CHECK
+   Question: Is this npm/pytest/docker/build command?
+   If YES → Use run_in_background: true, store task_id
+
+3. CONTEXT CHECK
+   Question: Is context >30%?
+   If YES + complex task → Delegate exploration
+   If >50% → Create handoff, delegate remaining
+
+4. SECURITY CHECK
+   Question: Touching auth/secrets/credentials?
+   If YES → Spawn security-auditor in background
+```
+
+**Example: Before running a Grep**
+```
+About to: Grep for "handleAuth" across codebase
+Check 1: Will return >5 files? → Likely yes
+Action: Spawn Explore agent instead
+        Prompt: "Find all handleAuth usages, return file:line summary"
+        Agent returns: 8 files listed with context
+        Main context: receives 500 tokens, not 8000
+```
 
 ### 1. Analyze Request
 
@@ -206,6 +289,56 @@ Subtasks:
 Synthesize findings into unified report.
 ```
 
+## Background Task Patterns
+
+### Using run_in_background: true
+
+For long-running commands (>15 seconds), use background execution:
+
+```
+Task:
+  subagent_type: background-worker
+  description: "Run test suite"
+  prompt: "Run pytest, report pass/fail summary"
+  run_in_background: true
+```
+
+This returns immediately with a `task_id`. Continue working on other tasks.
+
+### Polling with TaskOutput
+
+Check background task status when needed:
+
+```
+TaskOutput:
+  task_id: "abc123"
+  block: false  # Non-blocking check
+```
+
+Returns:
+- `status`: running | completed | failed
+- `result`: Output when completed
+
+### Parallel Background Pattern
+
+Spawn multiple background tasks simultaneously:
+
+```
+# In single message, spawn 3 agents:
+Task: { subagent_type: "background-worker", prompt: "npm test", run_in_background: true }
+Task: { subagent_type: "background-worker", prompt: "npm lint", run_in_background: true }
+Task: { subagent_type: "security-auditor", prompt: "Security scan", run_in_background: true }
+
+# Continue with implementation work...
+
+# Before commit, poll all:
+TaskOutput: { task_id: "test_id" }
+TaskOutput: { task_id: "lint_id" }
+TaskOutput: { task_id: "security_id" }
+
+# Aggregate: "Tests: PASS, Lint: 2 warnings, Security: No issues"
+```
+
 ## Anti-Patterns
 
 - Delegating trivial tasks (overhead exceeds benefit)
@@ -213,6 +346,8 @@ Synthesize findings into unified report.
 - Running agents when real-time feedback needed
 - Over-parallelizing simple sequential tasks
 - Not summarizing agent results for user
+- **NEW:** Waiting for background tasks when you could continue working
+- **NEW:** Running tests/builds synchronously when they could be background
 
 ## Integration with Skills
 

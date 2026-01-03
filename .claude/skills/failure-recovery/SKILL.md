@@ -141,6 +141,123 @@ recovery_context_exhaustion:
 
 ---
 
+## Predictive Context Management (PROACTIVE)
+
+**NEW in v7.4**: Don't wait for exhaustion - predict and prevent.
+
+### Token Usage Estimation
+
+Track rolling average of tokens per operation:
+
+| Operation | Avg Tokens |
+|-----------|------------|
+| File read | ~500 |
+| Grep result (per match) | ~200 |
+| Tool output | ~1000 |
+| Subagent summary | ~300 |
+| User message | ~100 |
+
+### Pre-emptive Action Thresholds
+
+| Context Level | Prediction | Action |
+|---------------|------------|--------|
+| **<30%** | Safe zone | Continue normally |
+| **30-40%** | Approaching limit | Start delegating exploration to subagents |
+| **40-50%** | Warning zone | Delegate ALL remaining discovery work |
+| **50-60%** | Critical zone | Create handoff checkpoint, delegate implementation |
+| **>60%** | Danger zone | Stop, create handoff, instruct /compact |
+
+### Pre-emptive Delegation Pattern
+
+At 30% context, start offloading to subagents:
+
+```
+Context at 35%. Complex exploration ahead.
+
+Action: Delegate to Explore agent
+Prompt: "Find all files matching X, return summary only"
+Result: Agent explores in isolated context
+Main context: receives 300-token summary, not 5000-token search results
+```
+
+### Pre-emptive Checkpoint Pattern
+
+At 40% context, create checkpoint before continuing:
+
+```
+Context at 42%.
+
+Action:
+1. bd sync (save beads state)
+2. Update TODO.md with current position
+3. Continue with caution flag
+
+If next operation would push >50%:
+  → Create handoff immediately
+  → Delegate remaining work to background agent
+  → Report: "Checkpointed at [position]. Background agent continuing."
+```
+
+### Background Handoff Pattern
+
+At 50% context, continue work via delegation instead of stopping:
+
+```
+Context at 52%. Would normally stop here.
+
+Instead:
+1. Create handoff document
+2. Spawn background agent with remaining tasks:
+
+   Task:
+     subagent_type: general-purpose
+     description: "Continue implementation"
+     prompt: |
+       Continuing from handoff: [path]
+       Remaining tasks from beads:
+       - [task 1]
+       - [task 2]
+       - [task 3]
+
+       Implement each, commit, close in beads.
+     run_in_background: true
+
+3. Report to user:
+   "Context high. Handed off to background agent.
+    Agent ID: [id]
+    Use 'bd poll-all' to check progress.
+    Or start new session and 'resume handoff'."
+
+4. User can:
+   - Wait for background agent to finish
+   - Start new session with /compact
+   - Poll agent results via TaskOutput
+```
+
+### Context Prediction Indicators
+
+Watch for these signals to predict exhaustion:
+
+| Signal | Meaning |
+|--------|---------|
+| Large file reads queued | Will consume significant context |
+| Many grep matches expected | High token consumption ahead |
+| User requesting "find all" | Exploration will be heavy |
+| Complex implementation ahead | Multiple file reads/writes |
+| Already at 25% with more to go | Pre-emptively delegate now |
+
+### Proactive vs Reactive
+
+| Reactive (OLD) | Proactive (NEW) |
+|----------------|-----------------|
+| Wait until 50% to warn | Start delegating at 30% |
+| Stop work at high context | Continue via background agents |
+| User must /compact manually | Background agent keeps working |
+| Context lost on compact | Handoff preserves everything |
+| Resume requires reading files again | Background agent has full context |
+
+---
+
 ## "I'm Lost" Recovery
 
 **Trigger**: Request doesn't match any category, project state unclear, contradictory context

@@ -92,6 +92,85 @@ For each task:
    → Stop
 ```
 
+### Phase 3b: Parallel Execution for Independent Tasks
+
+**Key Insight:** Within a task group, tasks without dependencies on each other can run in parallel.
+
+#### Dependency Analysis
+
+```bash
+# Get all ready tasks (may be multiple!)
+bd ready --json
+# Returns: [{"id": "bd-a1b2", "title": "Task A"}, {"id": "bd-c3d4", "title": "Task B"}]
+```
+
+If multiple tasks are ready simultaneously, they have NO dependencies on each other.
+
+#### Parallel Execution Pattern
+
+```
+1. ANALYZE: Get all ready tasks
+2. CLASSIFY:
+   - File-disjoint? (different files) → Can parallelize
+   - Same files? → Must be sequential
+3. SPAWN: For file-disjoint tasks, spawn background agents:
+
+Task:
+  subagent_type: general-purpose
+  description: "Implement Task A"
+  prompt: |
+    Implement: [Task A description]
+    Files: [list of files]
+    Tests: [test requirements]
+    Commit when done with message: "feat(scope): Task A"
+  run_in_background: true
+
+Task:
+  subagent_type: general-purpose
+  description: "Implement Task B"
+  prompt: |
+    Implement: [Task B description]
+    Files: [list of files]
+    Tests: [test requirements]
+    Commit when done with message: "feat(scope): Task B"
+  run_in_background: true
+
+4. CONTINUE: Main agent can work on another task or wait
+5. POLL: Check background agents via TaskOutput
+6. CLOSE: Mark completed tasks in beads
+```
+
+#### Example: Parallel Independent Tasks
+
+```
+Given ready tasks:
+- bd-a1: "Create user model" (touches: models/user.py)
+- bd-b2: "Create product model" (touches: models/product.py)
+- bd-c3: "Add auth middleware" (touches: middleware/auth.py)
+
+Analysis: All touch DIFFERENT files → Parallelize ALL
+
+Spawn 3 background agents simultaneously.
+Main agent polls periodically.
+As each completes: bd close <id> --reason "commit: xyz"
+```
+
+#### Parallel Execution Benefits
+
+| Sequential | Parallel |
+|------------|----------|
+| Task A (5 min) | Spawn A, B, C (instant) |
+| Task B (5 min) | All run concurrently |
+| Task C (5 min) | Poll when ready |
+| **Total: 15 min** | **Total: 5 min** |
+
+#### When NOT to Parallelize
+
+- Tasks modify same files
+- Task B uses output from Task A
+- Beads shows dependency: `bd dep tree` shows blocker
+- Context already high (>40%) - sequential is safer
+
 ### Phase 4: Completion
 
 ```bash

@@ -1,10 +1,10 @@
-# ONE_SHOT v7.3
+# ONE_SHOT v7.4
 
-> **Context is the scarce resource.** Load minimal, atomize work, write state to disk.
+> **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
 ---
 
-## SKILL ROUTER (12 Core Skills)
+## SKILL ROUTER (14 Core Skills)
 
 ```yaml
 skill_router:
@@ -34,6 +34,13 @@ skill_router:
   - pattern: "review|check code|is this safe|pr review"
     skill: code-reviewer
 
+  # Parallel Execution (NEW in v7.4)
+  - pattern: "validate|check everything|run all checks|pre-commit"
+    skill: parallel-validator
+
+  - pattern: "rename across|update all|batch|bulk|mass update"
+    skill: batch-processor
+
   # Context Management
   - pattern: "handoff|save context|before clear|context low"
     skill: create-handoff
@@ -54,6 +61,65 @@ skill_router:
 ```
 
 **All other skills**: Available on-demand via `/skill-name` or explicit request. See INDEX.md.
+
+---
+
+## AUTO-DELEGATION (v7.4)
+
+**CRITICAL**: These fire AUTOMATICALLY without user request.
+
+```yaml
+auto_delegation:
+  # File count triggers (>5 files → delegate)
+  - signal: "Glob/Grep returning >5 files"
+    action: "Spawn Explore agent, return summary only"
+
+  # Duration triggers (>15s → background)
+  - signal: "npm|pytest|docker|build command"
+    action: "run_in_background: true"
+
+  # Security triggers (auto-audit)
+  - signal: "Editing auth/secrets/credentials files"
+    action: "Spawn security-auditor in background"
+
+  # Context triggers (pre-emptive)
+  - signal: "Context >30% + complex task"
+    action: "Delegate exploration to subagent"
+  - signal: "Context >50%"
+    action: "Create handoff, delegate remaining"
+```
+
+**Key change from v7.3:** Bias toward delegation. Don't wait for user to say "background".
+
+---
+
+## RESILIENT EXECUTION (v7.4)
+
+**All long-running work runs in tmux** - survives terminal disconnect.
+
+```yaml
+resilience:
+  # Default: All builds use tmux
+  - command: "oneshot-build"
+    mode: tmux_session
+    heartbeat: 30s
+    checkpoint: 5m
+
+  # Aggressive state sync
+  - trigger: "task status change"
+    action: "bd sync immediately"
+  - trigger: "file committed"
+    action: "bd sync"
+  - trigger: "every 5 minutes"
+    action: "checkpoint commit + bd sync"
+
+  # Recovery
+  - on_disconnect: "work continues in tmux"
+  - on_reconnect: "tmux attach -t oneshot-*"
+  - on_crash: "bd sync && bd ready to resume"
+```
+
+**Key principle:** If terminal dies, work continues. If work dies, state is recoverable.
 
 ---
 
@@ -125,4 +191,4 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 7.3 | **Core Skills**: 12 | **Advanced**: 17 | **Beads**: Required
+**Version**: 7.4 | **Core Skills**: 17 | **Advanced**: 17 | **Beads**: Required | **Auto-Delegation**: Aggressive | **Resilient**: tmux

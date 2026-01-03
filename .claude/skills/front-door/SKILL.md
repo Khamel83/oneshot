@@ -62,6 +62,86 @@ Next: [specific next step]
 
 ---
 
+## Auto-Delegation During Triage (Context Optimization)
+
+**CRITICAL**: For modify_existing, fix_existing, or understand intents, delegate exploration BEFORE interviewing.
+
+### Immediate Delegation (before interview starts)
+
+```
+IF intent IN [modify_existing, fix_existing, understand]:
+  1. Spawn Explore agent IMMEDIATELY (non-blocking)
+  2. Start interview while agent explores
+  3. Inject findings when agent returns
+```
+
+### Spawn Pattern
+
+```
+Task:
+  subagent_type: Explore
+  description: "Map codebase for {intent}"
+  prompt: |
+    User wants to: {user_request}
+
+    Find and summarize:
+    - Relevant files (max 10, ranked by relevance)
+    - Existing patterns that apply
+    - Key dependencies and imports
+    - Related test files
+
+    Return a 500-token summary with file:line references.
+    Do NOT paste file contents - just paths and brief context.
+```
+
+### Non-Blocking Interview
+
+```
+1. Spawn Explore agent (returns immediately)
+2. Ask first interview question (don't wait for agent)
+3. Agent explores in parallel while user answers
+4. When agent returns, inject under "## Discovery" in spec
+5. Use discovered patterns to inform later questions
+```
+
+### Why This Matters
+
+| Old Flow | New Flow |
+|----------|----------|
+| Read 10 files (10k tokens) | Interview starts immediately |
+| Interview (200 tokens) | Agent explores in background |
+| Spec file created | Agent returns summary (500 tokens) |
+| **Total: 10,200 tokens** | **Total: 700 tokens** |
+
+**Context reduction: 93%**
+
+### Example
+
+```
+User: "Help me add rate limiting to the API"
+
+1. Triage: intent=modify_existing, scope=medium
+
+2. Spawn Explore agent:
+   "User wants to add rate limiting to API.
+    Find: middleware files, existing auth patterns,
+    API route structure, any existing rate limit code."
+
+3. Ask user (while agent explores):
+   "What rate limiting strategy? Per-user, per-IP, or per-endpoint?"
+
+4. Agent returns:
+   "Found:
+    - src/middleware/auth.ts:45 - existing middleware pattern
+    - src/routes/api/*.ts - 12 route files, all use withAuth wrapper
+    - No existing rate limiting
+    - Uses Express with express-async-handler"
+
+5. Inject into spec, continue interview with context
+```
+
+---
+
 ## Interview Mechanics
 
 ### Core Tool: AskUserQuestion
