@@ -4,13 +4,17 @@
 
 ---
 
-## SKILL ROUTER (11 Core Skills)
+## SKILL ROUTER (12 Core Skills)
 
 ```yaml
 skill_router:
   # Entry
   - pattern: "new project|build me|help me|/interview|/front-door"
     skill: front-door
+
+  # Autonomous (headless mode)
+  - pattern: "autonomous|headless|background|overnight|just build it"
+    skill: autonomous-builder
 
   # Planning
   - pattern: "plan|design|how should|what's the approach"
@@ -121,4 +125,4 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 7.1 | **Core Skills**: 11 | **On-Demand**: 18 | **Agents**: 4
+**Version**: 7.2 | **Core Skills**: 12 | **On-Demand**: 17 | **Agents**: 4

@@ -1,16 +1,17 @@
 # Skills Index
 
-ONE_SHOT v7.1 - Context-first skill organization with beads-backed persistence.
+ONE_SHOT v7.2 - Context-first with autonomous builder mode.
 
 ---
 
-## Core Skills (11) - Always in Router
+## Core Skills (12) - Always in Router
 
 These skills are auto-routed based on patterns. Use them naturally.
 
 | Skill | Trigger | Purpose |
 |-------|---------|---------|
 | **front-door** | "build me", "new project" | Interview & routing hub |
+| **autonomous-builder** | "headless", "just build it" | Idea → artifact autonomously |
 | **create-plan** | "plan", "design" | Structured planning |
 | **implement-plan** | "implement", "build it" | Execute with beads tracking |
 | **beads** | "ready tasks", "what's next" | Persistent task tracking |
@@ -18,13 +19,13 @@ These skills are auto-routed based on patterns. Use them naturally.
 | **code-reviewer** | "review", "is this safe" | Quality & security review |
 | **create-handoff** | "handoff", "save context" | Preserve state before clear |
 | **resume-handoff** | "resume", "continue" | Restore from beads/handoff |
-| **failure-recovery** | "stuck", "looping" | Recovery from confusion |
+| **failure-recovery** | "stuck", "looping" | Recovery + loop detection |
 | **thinking-modes** | "think", "ultrathink" | Extended analysis |
 | **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
 
 ---
 
-## On-Demand Skills (18) - Available by Name
+## On-Demand Skills (17) - Available by Name
 
 These skills are **not auto-routed** but available when explicitly requested.
 Use `/skill-name` or "use the X skill" to invoke.
@@ -127,4 +128,4 @@ Session Break:
 
 ---
 
-**Version**: 7.1 | **Core**: 11 | **On-Demand**: 18
+**Version**: 7.2 | **Core**: 12 | **On-Demand**: 17

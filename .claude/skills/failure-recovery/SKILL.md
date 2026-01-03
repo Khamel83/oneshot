@@ -199,6 +199,50 @@ recovery_dependency_hell:
 
 ---
 
+## Loop Detection (Autonomous Mode)
+
+**Trigger**: Agent running autonomously, possibly stuck in infinite loop
+
+```yaml
+recovery_loop_detection:
+  detection_methods:
+    iteration_count:
+      threshold: 100
+      action: "Stop after MAX_ITERATIONS"
+
+    stuck_detection:
+      check: "Compare beads state hash between iterations"
+      threshold: 5  # Same state for 5 iterations
+      action: "Stop, write to .agent/LAST_ERROR.md"
+
+    error_threshold:
+      consecutive_errors: 3
+      action: "Stop and report"
+
+  indicators:
+    - "Same bd ready output for multiple iterations"
+    - "Repeating same commit messages"
+    - "No progress on any beads task"
+    - "Iteration count > 50 with few tasks completed"
+
+  recovery:
+    step_1: "Write state to .agent/STATUS.md"
+    step_2: "bd sync (save beads state)"
+    step_3: "Exit gracefully (exit 1)"
+    step_4: "User reviews .agent/ and decides next action"
+
+  manual_check:
+    commands:
+      - "cat .agent/ITERATIONS.md"    # How many iterations?
+      - "cat .agent/LAST_ERROR.md"    # What went wrong?
+      - "bd list --json"              # What's the task state?
+      - "git log --oneline -10"       # What was committed?
+```
+
+**Key principle**: Better to stop early and let user review than to burn compute looping.
+
+---
+
 ## Recovery Decision Tree
 
 ```
@@ -207,6 +251,7 @@ Problem detected
     ├─ Agent acting weird?     → Agent Confusion Recovery
     ├─ Responses degrading?    → Context Window Exhaustion
     ├─ Package conflicts?      → Dependency Hell Recovery
+    ├─ Infinite loop?          → Loop Detection Recovery
     ├─ Completely lost?        → "I'm Lost" Recovery
     └─ Unknown?                → Generate handoff, start fresh session
 ```

@@ -4,6 +4,10 @@ secrets/*.env
 !*.encrypted
 !.env.example
 
+# Agent working directories (local only)
+.agent/
+.beads/
+
 # Local keys
 .age/
 *.key
