@@ -34,6 +34,10 @@ skill_router:
   - pattern: "review|check code|is this safe|pr review"
     skill: code-reviewer
 
+  # Lessons Learned (NEW)
+  - pattern: "oops|save this mistake|remember this|lessons learned|/lessons"
+    skill: oops
+
   # Parallel Execution (NEW in v7.4)
   - pattern: "validate|check everything|run all checks|pre-commit"
     skill: parallel-validator

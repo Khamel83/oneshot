@@ -55,6 +55,25 @@ Network → Process → Config → Dependencies → Data → Code
 - Database accessible?
 - Logic error in code?
 
+### 3.5 Check Past Lessons
+
+Before forming a hypothesis, check if we've seen similar issues before:
+
+```bash
+# Query lessons database for related tags
+cd ~/.claude && bd list -l lesson --json 2>/dev/null | jq -r '.[] | select(.labels | any(test("LAYER_TAG"))) | "- \(.title): \(.description | split("\n")[0])"'
+```
+
+Replace `LAYER_TAG` with the layer you're investigating (network, docker, git, database, etc.)
+
+If a matching lesson exists:
+- **Announce it**: "Note: We've seen a similar issue before: [lesson title]"
+- **Show the fix**: Present the documented fix from the lesson
+- **Verify applicability**: Check if the same fix applies here
+
+After successfully debugging, suggest:
+> "Would you like me to save this as a lesson? Just say `/oops`"
+
 ### 4. Form Hypothesis
 
 - Based on evidence, what's the most likely cause?

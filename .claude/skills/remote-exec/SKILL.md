@@ -37,7 +37,7 @@ You are an expert at executing commands across a multi-machine Tailscale network
 ### Resource Breakdown
 
 **oci-dev** (Brain)
-- Repos: ~/dev, ~/github
+- Repos: ~/github
 - Compute: 4 ARM cores, 24GB RAM, 193GB disk
 - Object Storage: khamel-storage (20GB free)
 - Autonomous DB: khameldb (20GB Oracle free)
@@ -59,14 +59,35 @@ You are an expert at executing commands across a multi-machine Tailscale network
 - Repos: ~/github
 - Purpose: Local development, testing
 
+## SSH Config (Required)
+
+Each machine must have SSH aliases configured in `~/.ssh/config` using Tailscale IPs:
+
+```bash
+# ~/.ssh/config on each machine
+Host homelab
+    HostName 100.112.130.100
+    User khamel83
+    IdentityFile ~/.ssh/id_ed25519
+
+Host macmini
+    HostName 100.113.216.27
+    User macmini
+    IdentityFile ~/.ssh/id_ed25519
+
+Host oci-dev
+    HostName 100.126.13.70
+    User ubuntu
+    IdentityFile ~/.ssh/id_ed25519
+```
+
 ## Prerequisites Check
 
 ```bash
-echo "=== Testing SSH Connectivity ==="
-ssh -o BatchMode=yes -o ConnectTimeout=5 ubuntu@oci-dev.deer-panga.ts.net "echo 'oci-dev: OK'" 2>/dev/null || echo "oci-dev: FAILED"
-ssh -o BatchMode=yes -o ConnectTimeout=5 khamel83@homelab.deer-panga.ts.net "echo 'homelab: OK'" 2>/dev/null || echo "homelab: FAILED"
-ssh -o BatchMode=yes -o ConnectTimeout=5 macmini@omars-mac-mini.deer-panga.ts.net "echo 'macmini: OK'" 2>/dev/null || echo "macmini: FAILED"
-ssh -o BatchMode=yes -o ConnectTimeout=5 khamel83@omars-macbook-air.deer-panga.ts.net "echo 'macbook-air: OK'" 2>/dev/null || echo "macbook-air: FAILED"
+echo "=== Testing SSH Connectivity (via aliases) ==="
+ssh -o BatchMode=yes -o ConnectTimeout=5 oci-dev "echo 'oci-dev: OK'" 2>/dev/null || echo "oci-dev: FAILED"
+ssh -o BatchMode=yes -o ConnectTimeout=5 homelab "echo 'homelab: OK'" 2>/dev/null || echo "homelab: FAILED"
+ssh -o BatchMode=yes -o ConnectTimeout=5 macmini "echo 'macmini: OK'" 2>/dev/null || echo "macmini: FAILED"
 echo "=== Tailscale Status ==="
 tailscale status 2>/dev/null | head -10 || echo "Tailscale not installed locally"
 ```
@@ -109,7 +130,7 @@ COMMAND="python scripts/process.py"
 
 # Machine lookup
 case "$TARGET" in
-  oci-dev) USER="ubuntu"; HOST="oci-dev.deer-panga.ts.net"; REPO_BASE="~/projects" ;;
+  oci-dev) USER="ubuntu"; HOST="oci-dev.deer-panga.ts.net"; REPO_BASE="~/github" ;;
   homelab) USER="khamel83"; HOST="homelab.deer-panga.ts.net"; REPO_BASE="~/github" ;;
   macmini) USER="macmini"; HOST="omars-mac-mini.deer-panga.ts.net"; REPO_BASE="~/github" ;;
   macbook-air) USER="khamel83"; HOST="omars-macbook-air.deer-panga.ts.net"; REPO_BASE="~/github" ;;
