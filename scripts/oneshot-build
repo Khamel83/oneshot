@@ -229,7 +229,7 @@ main() {
     trap cleanup EXIT
 
     echo -e "${GREEN}╔═══════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║     ONE_SHOT Autonomous Builder v7.3      ║${NC}"
+    echo -e "${GREEN}║     ONE_SHOT Autonomous Builder v7.4      ║${NC}"
     echo -e "${GREEN}╚═══════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "${BLUE}Idea:${NC} $IDEA"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# test_workflow.bats - E2E workflow tests for ONE_SHOT v7.3
+# test_workflow.bats - E2E workflow tests for ONE_SHOT v7.4
 # Tests the full skill chain: bootstrap → oneshot-build → beads integration
 #
 # Install: brew install bats-core OR apt install bats
