@@ -15,6 +15,19 @@ skill_router:
   - pattern: "new project|build me|help me|/interview|/front-door"
     skill: front-door
 
+  # Interview Depth Overrides
+  - pattern: "/full-interview|full interview mode"
+    skill: full-interview
+    note: "Forces all 13+ questions, no bypass"
+
+  - pattern: "/quick-interview|quick interview mode"
+    skill: quick-interview
+    note: "Only Q1, Q2, Q6, Q12 with smart defaults"
+
+  - pattern: "/smart-interview|reset interview"
+    skill: smart-interview
+    note: "Reset to auto-detect depth (default)"
+
   # Autonomous (headless mode)
   - pattern: "autonomous|headless|background|overnight|just build it"
     skill: autonomous-builder
@@ -65,6 +78,10 @@ skill_router:
   # Secrets
   - pattern: "secrets|env|credentials|api key"
     skill: secrets-vault-manager
+
+  # Skills Discovery
+  - pattern: "browse skills|skillsmp|find skills|skill marketplace"
+    skill: skillsmp-browser
 ```
 
 **All other skills**: Available on-demand via `/skill-name` or explicit request. See INDEX.md.
@@ -198,4 +215,4 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 7.4 | **Core Skills**: 17 | **Advanced**: 17 | **Beads**: Required | **Auto-Delegation**: Aggressive | **Resilient**: tmux
+**Version**: 7.4 | **Core Skills**: 20 | **Advanced**: 17 | **Beads**: Required | **Auto-Delegation**: Aggressive | **Resilient**: tmux

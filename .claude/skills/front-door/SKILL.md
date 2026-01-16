@@ -35,9 +35,50 @@ Any of these signals invoke the interview flow:
 **One triage question first:**
 > "This seems straightforward - proceed directly or discuss first?"
 
-**Bypass signals**: "typo", "rename", "single file", "just add", "quick fix"
+**Bypass signals** (STRICT - all must apply):
+- "typo" → Single word/character fix only
+- "rename" → Search-replace operation with explicit before/after
+- Explicit file path provided + estimated <10 lines change
+
+**Signals that DO NOT bypass** (require at least mini-interview):
+- "just add" → Still need to understand where and how
+- "quick fix" → Could hide complexity
+- "simple change" → Subjective, verify first
 
 User can always force interview with `/front-door` or `/interview`.
+
+---
+
+## Interview Depth Control
+
+Check `ONESHOT_INTERVIEW_DEPTH` environment variable OR session override:
+
+| Mode | Trigger | Questions | Behavior |
+|------|---------|-----------|----------|
+| `full` | `ONESHOT_INTERVIEW_DEPTH=full` or `/full-interview` | All 13+ questions | No bypass, no auto-delegation, ask everything |
+| `smart` | Default (no env var) | Auto-detect (5-13) | Full for greenfield, shorter for mods |
+| `quick` | `ONESHOT_INTERVIEW_DEPTH=quick` or `/quick-interview` | Q1, Q2, Q6, Q12 only | Skip non-essential, use smart defaults |
+
+### Depth Detection Logic
+
+```
+1. Check env var: $ONESHOT_INTERVIEW_DEPTH
+2. Check session override: /full-interview or /quick-interview
+3. If neither set, use smart detection:
+   - "new project" + no existing code → full
+   - "modify" + existing code → smart (5-8 questions)
+   - "micro" or <100 lines → quick
+```
+
+### Session Override Commands
+
+| Command | Effect |
+|---------|--------|
+| `/full-interview` | Force full depth this session (all 13+ questions) |
+| `/quick-interview` | Force quick depth this session (Q1, Q2, Q6, Q12) |
+| `/smart-interview` | Reset to smart detection (default) |
+
+**When in doubt, prefer full.** Missing requirements → rework.
 
 ---
 

@@ -25,6 +25,20 @@ These are the skills you'll use 90% of the time. Just say these phrases:
 
 ---
 
+## Interview Depth Control
+
+Control how thorough the front-door interview is:
+
+| Command | Questions | When to Use |
+|---------|-----------|-------------|
+| `/full-interview` | All 13+ | Greenfield projects, avoid rework |
+| `/quick-interview` | Q1,Q2,Q6,Q12 | Experienced user, well-defined task |
+| `/smart-interview` | Auto-detect | Reset to default behavior |
+
+Or set `ONESHOT_INTERVIEW_DEPTH=full|smart|quick` in environment.
+
+---
+
 ## Context Management (Always Available)
 
 | Command | What It Does |
@@ -105,6 +119,7 @@ Use `/skill-name` or "use the X skill" to invoke these explicitly.
 - **delegate-to-agent** - Spawn isolated sub-agents
 - **secrets-sync** - Two-way vault sync
 - **hooks-manager** - Lifecycle automation
+- **skillsmp-browser** - Browse & compare external skill marketplaces
 
 ---
 
@@ -137,4 +152,4 @@ Session Break:
 
 ---
 
-**Version**: 7.4 | **Core**: 17 | **Advanced**: 17 | **Auto-Update**: Enabled | **Resilient**: tmux
+**Version**: 7.4 | **Core**: 21 | **Advanced**: 18 | **Auto-Update**: Enabled | **Resilient**: tmux
