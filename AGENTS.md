@@ -1,3 +1,6 @@
+<!-- FOR CLAUDE - NOT FOR HUMANS -->
+<!-- Humans: See README.md for setup, INDEX.md for skill reference -->
+
 # ONE_SHOT v7.4
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.

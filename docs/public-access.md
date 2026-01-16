@@ -1,12 +1,14 @@
 # Public Access: Tailscale Funnel + Cloudflare Worker
 
-> **Canonical documentation**: [khamel-redirector README](https://github.com/Khamel83/khamel-redirector)
+> **Canonical documentation**: [poytz README](https://github.com/Khamel83/poytz)
 >
-> This file is a summary. The khamel-redirector repo is the source of truth for all public URL routing.
+> This file is a summary. The poytz repo is the source of truth for all public URL routing.
+>
+> **Historical note**: The previous implementation was [khamel-redirector](https://github.com/Khamel83/khamel-redirector), now archived.
 
 ## What It Is
 
-**khamel-redirector** is a personal URL shortener and traffic router. All public traffic goes through `khamel.com/*`.
+**poytz** is a personal cloud infrastructure platform on Cloudflare Workers. All public traffic goes through `khamel.com/*`.
 
 ```
 khamel.com/photos  →  302 redirect  →  https://homelab.deer-panga.ts.net/photos/
@@ -37,24 +39,18 @@ uvicorn app:app --host 127.0.0.1 --port 8080
 sudo tailscale funnel --bg --set-path=/myservice http://localhost:8080
 ```
 
-**3. Add route to Cloudflare Worker:**
-
-Edit `~/github/khamel-redirector/src/index.js`:
-```javascript
-const ROUTES = {
-  'fd': 'https://homelab.deer-panga.ts.net/frontdoor/',
-  'myservice': 'https://homelab.deer-panga.ts.net/myservice/',  // Add this
-};
-```
-
-**4. Deploy the worker:**
+**3. Add route via poytz API:**
 ```bash
-cd ~/github/khamel-redirector
-source <(sops -d ~/github/oneshot/secrets/secrets.env.encrypted)
-npx wrangler deploy
+# Add route dynamically
+curl -X POST https://khamel.com/api/routes \
+  -H "X-API-Key: $POYTZ_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "myservice", "target": "https://homelab.deer-panga.ts.net/myservice/"}'
 ```
 
-**5. Test:**
+Or use the web UI at `https://khamel.com/admin`
+
+**4. Test:**
 ```bash
 curl -I https://khamel.com/myservice
 ```
@@ -155,5 +151,6 @@ curl -s https://api.cloudflare.com/client/v4/user/tokens/verify \
 
 | Repo | Purpose |
 |------|---------|
-| [khamel-redirector](https://github.com/Khamel83/khamel-redirector) | Cloudflare Worker code |
+| [poytz](https://github.com/Khamel83/poytz) | Cloudflare Worker + API + UI |
+| [khamel-redirector](https://github.com/Khamel83/khamel-redirector) | **ARCHIVED** - Previous implementation |
 | [oneshot](https://github.com/Khamel83/oneshot) | Secrets + this documentation |

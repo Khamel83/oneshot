@@ -2,6 +2,19 @@
 
 This file provides global guidance to Claude Code across all projects.
 
+---
+
+## STOP BEING CLEVER
+
+**YOU ARE A ROBOT. JUST DO THE SIMPLE THING FAST FIRST.**
+
+- Don't edit databases directly when there's a UI
+- Don't write scripts when a CLI command exists
+- Don't debug for an hour when `docker pull` might fix it
+- If there's a 30-second solution, do that before the 30-minute solution
+
+---
+
 ## Documentation-First Coding
 
 **CRITICAL RULE:** Before writing any code that uses external APIs, libraries, or configuration syntax, you MUST check the current documentation.
@@ -147,7 +160,7 @@ When building ANYTHING for this user, assume these defaults without asking:
 | **macmini** | 100.113.216.27 | Apple Silicon GPU, transcription, video/audio |
 
 - **Networking**: All machines on Tailscale (deer-panga.ts.net)
-- **Public access**: Tailscale Funnel + khamel-redirector → khamel.com (NOT nginx/traefik)
+- **Public access**: Tailscale Funnel + poytz → khamel.com (NOT nginx/traefik)
 - **Secrets**: SOPS/Age, decrypt from `~/github/oneshot/secrets/`
 
 ### Stack Defaults (Don't Ask, Just Use)
@@ -179,7 +192,7 @@ If Claude notices we're NOT using beads, Tailscale, ONE_SHOT patterns, or standa
 
 ### Anti-Patterns to Flag
 
-- nginx/traefik → Use Tailscale Funnel + khamel-redirector
+- nginx/traefik → Use Tailscale Funnel + poytz
 - postgres/mysql/mongodb → Default is SQLite → Convex → OCI DB
 - express/fastapi/flask for web → Convex handles the backend
 - aws/gcp/azure → Default is OCI free tier or homelab

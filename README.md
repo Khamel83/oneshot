@@ -2,11 +2,97 @@
 
 **Tell it an idea. Come back with the thing built.**
 
-A skill system for [Claude Code](https://claude.com/claude-code) that adds structured workflows, persistent task tracking, and autonomous execution to your projects.
+A skill system for [Claude Code](https://claude.com/claude-code) that adds structured workflows, persistent task tracking, and autonomous execution.
 
-**New in v7.4:** Resilient execution (survives disconnect), aggressive subagent delegation, auto-updates from GitHub.
+---
 
-> See it in action: [examples/weather-cli](examples/weather-cli) - a complete project built autonomously in 6 iterations.
+## Quick Start
+
+### For Any Project (Recommended)
+
+```bash
+# 1. Install beads CLI (required)
+npm install -g @beads/bd
+
+# 2. Add ONE_SHOT to your project
+cd your-project
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
+```
+
+**Verify it worked:**
+```bash
+bd list        # Should show "No open issues"
+ls .beads/     # Should exist
+```
+
+Then open your project in Claude Code and say: `"build me a REST API for user management"`
+
+### For Local Development
+
+```bash
+git clone https://github.com/Khamel83/oneshot.git ~/github/oneshot
+cd ~/github/oneshot && ./install.sh
+```
+
+This installs the `oneshot` command for resilient execution.
+
+---
+
+## What You Say, What Happens
+
+These are the skills you'll use 90% of the time. Just say these phrases:
+
+| Say This | Skill | What Happens |
+|----------|-------|--------------|
+| **"build me..."** | front-door | Interview → spec → structured plan |
+| **"plan this..."** | create-plan | Create implementation plan |
+| **"implement"** | implement-plan | Execute plan with beads tracking |
+| **"debug this"** | debugger | Systematic hypothesis-based debugging |
+| **"review code"** | code-reviewer | Quality + security review |
+
+**Examples:**
+- "Build me a REST API for user management"
+- "Plan a feature that adds dark mode"
+- "Debug this TypeError in the login flow"
+
+**12 core skills** trigger automatically. 17 more available on-demand. See [INDEX.md](.claude/skills/INDEX.md).
+
+---
+
+## Two Modes
+
+### Interactive Mode (Default)
+You're in the loop. Claude asks questions, you approve plans, you guide execution.
+
+```
+You: "Build me a task manager CLI in Python"
+Claude: [asks clarifying questions]
+Claude: [creates plan, asks for approval]
+You: "looks good, implement it"
+Claude: [builds it step by step]
+```
+
+### Autonomous Mode (Headless)
+You give an idea. Come back later with a working artifact.
+
+```bash
+oneshot build "A CLI tool that converts markdown to PDF"
+
+# Check progress anytime
+oneshot status
+
+# Watch it work
+oneshot attach
+
+# Disconnect whenever - it keeps running!
+```
+
+| Situation | Mode | Why |
+|-----------|------|-----|
+| Complex feature, need control | Interactive | You guide decisions |
+| Simple/well-defined idea | Autonomous | Just build it |
+| Overnight batch work | Autonomous | Let it run |
+| Debugging | Interactive | Need back-and-forth |
 
 ---
 
@@ -18,19 +104,10 @@ npm install -g @beads/bd
 # or: brew install steveyegge/beads/bd
 # or: go install github.com/steveyegge/beads/cmd/bd@latest
 
-# tmux is REQUIRED for resilient execution
+# tmux is REQUIRED for resilient execution (autonomous mode)
 brew install tmux  # macOS
 apt install tmux   # Linux
 ```
-
-## Install
-
-```bash
-git clone https://github.com/Khamel83/oneshot.git ~/github/oneshot
-cd ~/github/oneshot && ./install.sh
-```
-
-This installs the `oneshot` command and sets up auto-updates.
 
 ---
 
@@ -96,105 +173,6 @@ If something crashes:
 
 ---
 
-## Two Modes
-
-### Interactive Mode (Default)
-You're in the loop. Claude asks questions, you approve plans, you guide execution.
-
-```
-You: "Build me a task manager CLI in Python"
-Claude: [asks clarifying questions]
-Claude: [creates plan, asks for approval]
-You: "looks good, implement it"
-Claude: [builds it step by step]
-```
-
-### Autonomous Mode (Headless)
-You give an idea. Come back later with a working artifact.
-
-```bash
-oneshot build "A CLI tool that converts markdown to PDF with syntax highlighting"
-
-# Check progress anytime
-oneshot status
-
-# Watch it work
-oneshot attach
-
-# Disconnect whenever - it keeps running!
-```
-
----
-
-## When To Use What
-
-| Situation | Mode | Why |
-|-----------|------|-----|
-| Complex feature, need control | Interactive | You guide decisions |
-| Simple/well-defined idea | Autonomous | Just build it |
-| Overnight batch work | Autonomous | Let it run |
-| Learning the codebase | Interactive | Stay in the loop |
-| Debugging | Interactive | Need back-and-forth |
-
----
-
-## The 12 Core Skills
-
-These trigger automatically based on what you say:
-
-| You Say | Skill | What Happens |
-|---------|-------|--------------|
-| "build me...", "new project" | `front-door` | Interview → spec → plan |
-| "just build it", "autonomous" | `autonomous-builder` | Headless execution |
-| "plan this", "design" | `create-plan` | Structured planning |
-| "implement", "build it" | `implement-plan` | Execute with beads tracking |
-| "what's next", "ready tasks" | `beads` | Persistent task state |
-| "bug", "fix", "broken" | `debugger` | Systematic debugging |
-| "review", "is this safe" | `code-reviewer` | Quality check |
-| "save context", "handoff" | `create-handoff` | Preserve before /clear |
-| "resume", "continue" | `resume-handoff` | Pick up where left off |
-| "stuck", "looping" | `failure-recovery` | Get unstuck |
-| "think", "ultrathink" | `thinking-modes` | Deep analysis |
-| "secrets", "env" | `secrets-vault-manager` | SOPS encryption |
-
-**17 more skills** available on-demand. See INDEX.md.
-
----
-
-## Core Workflow
-
-### For New Features
-
-```
-1. "plan a feature that does X"     → create-plan
-2. [approve the plan]
-3. "implement it"                   → implement-plan
-4. [context getting full?]
-5. "save context"                   → create-handoff
-6. /compact
-7. "continue"                       → resume-handoff
-8. [repeat until done]
-```
-
-### For Quick Fixes
-
-```
-1. "fix this bug: [description]"    → debugger
-2. [Claude fixes it]
-3. Done
-```
-
-### For Autonomous Builds
-
-```bash
-oneshot-build "Your idea"
-# Wait...
-# Check .agent/STATUS.md for progress
-# bd list --json for task state
-```
-
----
-
 ## Context Management
 
 **Context is the scarce resource.** ONE_SHOT manages it:
@@ -209,9 +187,9 @@ oneshot-build "Your idea"
 ### Beads = Persistent Memory
 
 ```bash
-bd ready --json      # What's next?
-bd list --json       # All tasks
-bd sync              # Save to git (CRITICAL before session end)
+bd ready      # What's next?
+bd list       # All tasks
+bd sync       # Save to git (CRITICAL before session end)
 ```
 
 Beads survives /clear, /compact, session restarts. Your tasks don't disappear.
@@ -222,7 +200,7 @@ Beads survives /clear, /compact, session restarts. Your tasks don't disappear.
 
 ```
 project/
-├── AGENTS.md           ← Skill router (read first)
+├── AGENTS.md           ← Skill router (Claude reads this)
 ├── CLAUDE.md           ← Project instructions
 ├── TODO.md             ← Session visibility
 ├── LLM-OVERVIEW.md     ← Project context
@@ -242,34 +220,6 @@ For autonomous mode:
 
 ---
 
-## Quick Start
-
-### 1. Install Prerequisites
-```bash
-npm install -g @beads/bd   # Required for task tracking
-```
-
-### 2. Add to Any Project
-```bash
-cd your-project
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
-```
-
-### 3. Interactive Mode
-Open in Claude Code. Say what you want:
-```
-"Build me a REST API for user management"
-```
-
-### 4. Autonomous Mode
-```bash
-# oneshot-build is downloaded to scripts/ by the bootstrap
-./scripts/oneshot-build "A Python CLI that fetches weather data"
-tail -f .agent/STATUS.md  # Monitor progress
-```
-
----
-
 ## Thinking Modes
 
 For complex decisions:
@@ -281,16 +231,6 @@ For complex decisions:
 | "ultrathink" | Deep | Architecture |
 | "super think" | Very deep | System design |
 | "mega think" | Maximum | Strategic |
-
----
-
-## Philosophy
-
-1. **Context is scarce** - Load minimal, checkpoint often
-2. **Beads for memory** - Don't lose state between sessions
-3. **Commit often** - Every file edit, every task
-4. **Best effort** - 50% working > 0% perfect
-5. **Stop gracefully** - When stuck, save and stop
 
 ---
 
@@ -313,14 +253,22 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 | Bootstrap fails "beads not found" | Install beads: `npm install -g @beads/bd` |
 | Skill not triggering | Say `(ONE_SHOT)` to re-anchor |
 | Agent stuck in loop | Check `.agent/LAST_ERROR.md`, restart |
-| Lost context | `bd ready --json` shows your tasks |
+| Lost context | `bd ready` shows your tasks |
 | Beads not initialized | `bd init --stealth` in project directory |
 
 ---
 
-## Version
+## Philosophy
 
-**v7.3** | 12 Core Skills | 17 Advanced | Beads Required | Autonomous Builder
+1. **Context is scarce** - Load minimal, checkpoint often
+2. **Beads for memory** - Don't lose state between sessions
+3. **Commit often** - Every file edit, every task
+4. **Best effort** - 50% working > 0% perfect
+5. **Stop gracefully** - When stuck, save and stop
+
+---
+
+**v7.4** | 17 Core Skills | 17 Advanced | Beads Required | Autonomous Builder
 
 ---
 
@@ -329,4 +277,4 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 - [GitHub](https://github.com/Khamel83/oneshot)
 - [INDEX.md](.claude/skills/INDEX.md) - Full skill reference
 - [Beads](https://github.com/steveyegge/beads) - Persistent task tracking
-- [RepoMirror](https://github.com/repomirrorhq/repomirror) - Inspiration for autonomous mode
+- [Example Project](examples/weather-cli) - Complete autonomous build
