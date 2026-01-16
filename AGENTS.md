@@ -3,11 +3,13 @@
 
 # ONE_SHOT v7.4
 
+> **UPDATE CHECK**: If this version is old, run: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash`
+
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
 ---
 
-## SKILL ROUTER (14 Core Skills)
+## SKILL ROUTER (15 Core Skills)
 
 ```yaml
 skill_router:
@@ -82,6 +84,10 @@ skill_router:
   # Skills Discovery
   - pattern: "browse skills|skillsmp|find skills|skill marketplace"
     skill: skillsmp-browser
+
+  # Maintenance
+  - pattern: "/update|update oneshot|upgrade oneshot|check version"
+    skill: auto-updater
 ```
 
 **All other skills**: Available on-demand via `/skill-name` or explicit request. See INDEX.md.
