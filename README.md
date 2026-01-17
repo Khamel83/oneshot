@@ -266,6 +266,34 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 
 ---
 
+## Shell Utilities
+
+### Claude Code Shortcuts (`scripts/claude-shell-setup.sh`)
+
+Adds two commands to your shell:
+- `cc` - Claude Code via Anthropic Pro (your $20/mo plan)
+- `zai` - Claude Code via [z.ai GLM API](https://z.ai/devpack)
+
+**Setup on a new machine:**
+```bash
+# 1. Download the script
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/claude-shell-setup.sh > ~/claude-shell-setup.sh
+
+# 2. Edit and add your ZAI API key (get one at https://z.ai/devpack)
+nano ~/claude-shell-setup.sh
+
+# 3. Install to .bashrc
+bash ~/claude-shell-setup.sh --install
+
+# 4. Activate
+source ~/.bashrc
+```
+
+**Update GLM model version:**
+When z.ai releases a new model (e.g., glm-4.8), edit `GLM_MODEL` in your `~/.bashrc`.
+
+---
+
 ## Troubleshooting
 
 | Problem | Solution |
