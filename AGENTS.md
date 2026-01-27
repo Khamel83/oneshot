@@ -1,9 +1,11 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for setup, INDEX.md for skill reference -->
 
-# ONE_SHOT v7.4
+# ONE_SHOT v7.5
 
 > **UPDATE CHECK**: If this version is old, run: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash`
+
+> **v7.5 UPGRADE**: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-7.5.sh | bash`
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
@@ -221,4 +223,4 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 7.4 | **Core Skills**: 20 | **Advanced**: 17 | **Beads**: Required | **Auto-Delegation**: Aggressive | **Resilient**: tmux
+**Version**: 7.5 | **Core Skills**: 20 | **Advanced**: 17 | **Beads**: Required | **Auto-Delegation**: Aggressive | **Resilient**: tmux | **Context**: Compressed JSON (94% savings)

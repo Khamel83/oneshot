@@ -206,3 +206,35 @@ Lessons are stored as beads in `~/.claude/.beads/` with label `lesson`.
 - Auto-extracted at session end (no manual `/oops` needed)
 - Injected at session start
 - Query with: `cd ~/.claude && bd list -l lesson`
+
+---
+
+## ONE_SHOT v7.5 Context Interpreter
+
+When you see `CTX:{"v":1,...}` at session start, parse this JSON:
+
+```python
+# Parse compact context
+import json
+ctx = json.loads(CTX_JSON)
+
+# Infrastructure (ctx.i) - Use without asking
+oci_dev_ip = ctx["i"]["oci-dev"]      # 100.126.13.70
+homelab_ip = ctx["i"]["homelab"]      # 100.112.130.100
+macmini_ip = ctx["i"]["macmini"]      # 100.113.216.27
+
+# Stacks (ctx.s) - Default tech stacks
+web_stack = ctx["s"]["web"]           # Convex+Next.js+Clerk->Vercel
+cli_stack = ctx["s"]["cli"]           # Python+Click+SQLite
+service_stack = ctx["s"]["service"]   # Python+systemd->oci-dev
+
+# Lessons (ctx.l) - Avoid repeating these (max 3 titles)
+# Tasks (ctx.t) - Open beads tasks (max 5, use `bd ready`)
+# Project (ctx.p) - Setup status, suggest `bd init` if beads=False
+```
+
+**Key behaviors:**
+- Deploy services → oci-dev without asking
+- New CLI → Python+Click+SQLite without asking
+- New web app → Convex+Next.js+Clerk without asking
+- Suggest `bd init` if ctx.p["beads"] is False/missing

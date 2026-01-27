@@ -1,6 +1,6 @@
 # Skills Index
 
-ONE_SHOT v7.4 - Aggressive delegation, parallel execution, auto-updates.
+ONE_SHOT v7.5 - Aggressive delegation, parallel execution, auto-updates, compressed context.
 
 ---
 
