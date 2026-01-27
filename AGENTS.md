@@ -1,11 +1,11 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for setup, INDEX.md for skill reference -->
 
-# ONE_SHOT v7.5
+# ONE_SHOT v8
 
-> **UPDATE CHECK**: If this version is old, run: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash`
+> **UPDATE CHECK**: Run: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-v8.sh | bash`
 
-> **v7.5 UPGRADE**: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-7.5.sh | bash`
+> **v8 = ULTRA-COMPRESSED** - 2k system tokens (down from 20k). All prose → JSON.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
@@ -223,4 +223,4 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 7.5 | **Core Skills**: 20 | **Advanced**: 17 | **Beads**: Required | **Auto-Delegation**: Aggressive | **Resilient**: tmux | **Context**: Compressed JSON (94% savings)
+**Version**: 8.0 | **System Tokens**: ~2k (down from 20k) | **Core Skills**: 10 | **Context**: Ultra-compressed JSON

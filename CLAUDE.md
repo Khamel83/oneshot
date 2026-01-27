@@ -209,32 +209,65 @@ Lessons are stored as beads in `~/.claude/.beads/` with label `lesson`.
 
 ---
 
-## ONE_SHOT v7.5 Context Interpreter
+## ONE_SHOT v8 Context (Ultra-Compressed)
 
-When you see `CTX:{"v":1,...}` at session start, parse this JSON:
+When you see `CTX:{"v":8,...}` at session start, parse this JSON:
 
 ```python
-# Parse compact context
 import json
 ctx = json.loads(CTX_JSON)
 
-# Infrastructure (ctx.i) - Use without asking
-oci_dev_ip = ctx["i"]["oci-dev"]      # 100.126.13.70
-homelab_ip = ctx["i"]["homelab"]      # 100.112.130.100
-macmini_ip = ctx["i"]["macmini"]      # 100.113.216.27
+# Skill router (ctx.s) - [[trigger, skill], ...]
+skills = ctx["s"]  # Auto-routes to skills like "front-door", "debugger"
 
-# Stacks (ctx.s) - Default tech stacks
-web_stack = ctx["s"]["web"]           # Convex+Next.js+Clerk->Vercel
-cli_stack = ctx["s"]["cli"]           # Python+Click+SQLite
-service_stack = ctx["s"]["service"]   # Python+systemd->oci-dev
+# Infrastructure (ctx.i) - Use IPs without asking
+oci = ctx["i"]["oci"]   # 100.126.13.70
+home = ctx["i"]["home"] # 100.112.130.100
+mac = ctx["i"]["mac"]   # 100.113.216.27
 
-# Lessons (ctx.l) - Avoid repeating these (max 3 titles)
-# Tasks (ctx.t) - Open beads tasks (max 5, use `bd ready`)
-# Project (ctx.p) - Setup status, suggest `bd init` if beads=False
+# Stacks (ctx.k) - Default tech stacks
+web = ctx["k"]["web"]   # Convex+Next.js+Clerk->Vercel
+cli = ctx["k"]["cli"]   # Python+Click+SQLite
+svc = ctx["k"]["svc"]   # Python+systemd->oci
+
+# Beads (ctx.b) - Status counts
+ready = ctx["b"]["ready"]  # Tasks ready to work
+open_total = ctx["b"]["open"]  # Total open tasks
+
+# Tasks (ctx.t) - Open tasks [{"id":"1","t":"title"}, ...]
+# Lessons (ctx.l) - Recent lessons ["lesson1", ...]
+# Project (ctx.p) - Setup status {"b":bool,"m":bool,"o":bool,"a":bool}
 ```
 
 **Key behaviors:**
-- Deploy services → oci-dev without asking
+- Auto-route: "build me X" → front-door skill
+- Deploy → oci (100.126.13.70) without asking
 - New CLI → Python+Click+SQLite without asking
-- New web app → Convex+Next.js+Clerk without asking
-- Suggest `bd init` if ctx.p["beads"] is False/missing
+- Suggest `bd init` if ctx.p["b"] is False
+
+---
+
+## Beads Context (Compressed)
+
+When you see `BEADS:{"proto":"git",...}` at session start:
+
+```python
+import json
+bd = json.loads(BEADS_JSON)
+
+# Session close protocol (bd.end)
+# ["status","add","sync","commit","sync","push"]
+# Run this sequence before saying "done"
+
+# Ready tasks (bd.ready)
+# [{"id":"1","title":"..."}, ...]
+# Use `bd show <id>` for details, `bd update <id> --status=in_progress` to claim
+```
+
+**Session close checklist:**
+1. `git status` - check what changed
+2. `git add <files>` - stage changes
+3. `bd sync` - commit beads
+4. `git commit -m "..."` - commit code
+5. `bd sync` - commit any new beads changes
+6. `git push` - push to remote
