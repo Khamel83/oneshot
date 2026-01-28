@@ -61,10 +61,21 @@ You are an expert at executing commands across a multi-machine Tailscale network
 
 ## SSH Config (Required)
 
-Each machine must have SSH aliases configured in `~/.ssh/config` using Tailscale IPs:
+Each machine must have SSH aliases configured. Use the installer:
 
 ```bash
-# ~/.ssh/config on each machine
+# Quick install - fetches latest config from oneshot repo
+curl -fsSL https://raw.githubusercontent.com/Khamel83/oneshot/master/ssh/install.sh | bash
+```
+
+The installer:
+- Adds/updates managed SSH aliases (oci, homelab, macmini, etc.)
+- Detects conflicts with existing manual entries
+- Backs up your config before making changes
+- Supports both LAN and Tailscale IPs (use `-ts` suffix for Tailscale)
+
+**Manual config** (if installer fails, add this to `~/.ssh/config`):
+```bash
 Host homelab
     HostName 100.112.130.100
     User khamel83
