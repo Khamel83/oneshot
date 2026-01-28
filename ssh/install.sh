@@ -19,6 +19,41 @@ trap 'rm -f "$tmp"' EXIT
 
 curl -fsSL "$CONF_URL" -o "$tmp"
 
+# === CONFLICT DETECTION ===
+# Find Host entries in new config
+new_hosts=$(grep -E '^Host ' "$tmp" | awk '{print $2}' | sort)
+
+# Find Host entries BEFORE the managed block in existing config
+# (everything before "# === OMAR SSH ALIASES")
+pre_managed=$(awk '/# === OMAR SSH ALIASES \(managed\) ===/{exit} /^Host /{print $2}' "$CFG" 2>/dev/null || true)
+
+# Check for conflicts
+conflicts=""
+for host in $new_hosts; do
+  if echo "$pre_managed" | grep -qx "$host"; then
+    conflicts="$conflicts  - $host\n"
+  fi
+done
+
+if [ -n "$conflicts" ]; then
+  echo "⚠️  WARNING: Duplicate SSH aliases found in your config:"
+  echo -e "$conflicts"
+  echo ""
+  echo "You have manual entries that conflict with the managed aliases."
+  echo ""
+  echo "Options:"
+  echo "  1) Cancel and clean up manually (nano ~/.ssh/config)"
+  echo "  2) Proceed anyway (managed block will shadow manual entries)"
+  echo ""
+  read -p "Proceed? [y/N] " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Cancelled. Backup saved at $CFG.bak.$(date +%F_%H%M%S)"
+    exit 1
+  fi
+fi
+
+# === APPLY CHANGES ===
 # Remove any prior managed block, then append the latest block from GitHub.
 perl -0777 -i -pe '
   s{(?ms)^[ \t]*# === OMAR SSH ALIASES \(managed\) ===\n.*?^[ \t]*# === END OMAR SSH ALIASES ===\n?}{}g;
