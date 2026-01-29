@@ -83,6 +83,16 @@ skill_router:
   - pattern: "secrets|env|credentials|api key"
     skill: secrets-vault-manager
 
+  # Research (NEW)
+  - pattern: "research|investigate|look into|find out about|deep dive|what do you know about"
+    skill: deep-research
+    note: "Background Gemini CLI + free search APIs, saves Claude tokens"
+
+  # Search Fallback (NEW)
+  - pattern: "web search failed|search not working|429|rate limit|search fallback|use search api"
+    skill: search-fallback
+    note: "Auto-fallback to Tavily/Brave/Bing APIs when WebSearch fails"
+
   # Skills Discovery
   - pattern: "browse skills|skillsmp|find skills|skill marketplace"
     skill: skillsmp-browser
@@ -113,6 +123,10 @@ auto_delegation:
   # Security triggers (auto-audit)
   - signal: "Editing auth/secrets/credentials files"
     action: "Spawn security-auditor in background"
+
+  # Search failure triggers (auto-fallback)
+  - signal: "WebSearch returns 429/rate limit/error"
+    action: "Invoke search-fallback skill automatically"
 
   # Context triggers (pre-emptive)
   - signal: "Context >30% + complex task"
