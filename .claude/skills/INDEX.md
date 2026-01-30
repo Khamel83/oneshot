@@ -1,6 +1,6 @@
 # Skills Index
 
-ONE_SHOT v8 - Ultra-compressed context (~2k tokens), aggressive delegation, parallel execution.
+ONE_SHOT v8.1 - Ultra-compressed context (~2k tokens), aggressive delegation, parallel execution, Gemini CLI research.
 
 ---
 
@@ -22,6 +22,17 @@ These are the skills you'll use 90% of the time. Just say these phrases:
 - "Implement the authentication plan"
 - "Debug this TypeError in the login flow"
 - "Review the new payment code for security issues"
+
+---
+
+## Free Research
+
+| Command | What It Does | Claude Tokens |
+|---------|--------------|---------------|
+| `/freesearch [topic]` | Research via Gemini CLI, zero tokens | ✅ FREE |
+| `/deep-research [topic]` | Research via Claude sub-agent | ❌ Uses tokens |
+
+**Use `/freesearch`** for token-free research. Same quality, direct execution.
 
 ---
 
@@ -65,7 +76,32 @@ tail -f .agent/STATUS.md
 
 ## All Skills Reference
 
-### Core (17) - Auto-Routed
+### Core (20) - Auto-Routed
+
+| Skill | Triggers | Purpose |
+|-------|----------|---------|
+| **front-door** | "build me", "new project" | Interview & routing hub (now with auto-delegation) |
+| **autonomous-builder** | "headless", "just build it" | Idea → artifact (resilient, survives disconnect) |
+| **resilient-executor** | "keep running", "survive disconnect" | Disconnect-proof execution via tmux |
+| **create-plan** | "plan", "design" | Structured planning |
+| **implement-plan** | "implement", "build it" | Execute with beads + parallel tasks |
+| **beads** | "ready tasks", "what'snext" | Persistent task tracking (aggressive sync) |
+| **debugger** | "bug", "fix", "broken" | Systematic debugging |
+| **code-reviewer** | "review", "is this safe" | Quality & security review |
+| **freesearch** | `/freesearch [topic]` | **FREE** research via Gemini CLI (0 Claude tokens) |
+| **deep-research** | "research", "investigate" | Background research via Gemini CLI or APIs |
+| **search-fallback** | "web search failed", "429" | Fallback to Perplexity/Context7/Tavily/Brave/Bing |
+| **delegate-to-agent** | (auto-triggered) | Aggressive subagent delegation |
+| **parallel-validator** | "validate", "check everything" | Run tests/lint/security in parallel |
+| **batch-processor** | "rename across", "update all" | Apply changes to many files in parallel |
+| **auto-updater** | (auto on session start) | Auto-update skills from GitHub |
+| **create-handoff** | "handoff", "save context" | Preserve state before clear |
+| **resume-handoff** | "resume", "continue" | Restore from beads/handoff |
+| **failure-recovery** | "stuck", "looping" | Recovery + predictive context |
+| **thinking-modes** | "think", "ultrathink" | Extended analysis (5 levels) |
+| **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
+
+### Advanced (15) - On-Demand
 
 | Skill | Triggers | Purpose |
 |-------|----------|---------|
@@ -87,7 +123,7 @@ tail -f .agent/STATUS.md
 | **thinking-modes** | "think", "ultrathink" | Extended analysis (5 levels) |
 | **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
 
-### Advanced (17) - On-Demand
+### Advanced (22) - On-Demand
 
 Use `/skill-name` or "use the X skill" to invoke these explicitly.
 
@@ -152,4 +188,4 @@ Session Break:
 
 ---
 
-**Version**: 7.4 | **Core**: 21 | **Advanced**: 18 | **Auto-Update**: Enabled | **Resilient**: tmux
+**Version**: 8.1 | **Core**: 20 | **Advanced**: 22 | **Total**: 42 | **Auto-Update**: Enabled | **Resilient**: tmux | **Slash Commands**: Yes | **/freesearch**: ✅ FREE
