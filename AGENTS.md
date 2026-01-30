@@ -11,7 +11,7 @@
 
 ---
 
-## SKILL ROUTER (15 Core Skills)
+## SKILL ROUTER (17 Core Skills)
 
 ```yaml
 skill_router:
@@ -99,6 +99,18 @@ skill_router:
     note: "Auto-fallback to Perplexity/Context7/Tavily/Brave/Bing APIs when WebSearch fails"
     slash: "/search-fallback"
 
+  # Free Research (v8.1)
+  - pattern: "freesearch|free research|/freesearch"
+    skill: freesearch
+    note: "Direct Gemini CLI via Bash, 0 Claude tokens"
+    slash: "/freesearch"
+
+  # Multi-Model Dispatch (v8.1)
+  - pattern: "dispatch|route to|use codex|use gemini|multi-model|/dispatch"
+    skill: dispatch
+    note: "Route to local CLIs (claude/codex/gemini/qwen), minimize Claude tokens"
+    slash: "/dispatch"
+
   # Skills Discovery
   - pattern: "browse skills|skillsmp|find skills|skill marketplace"
     skill: skillsmp-browser
@@ -123,6 +135,8 @@ All skills can be invoked via `/skill-name`. Core slash commands:
 | `/quick-interview` | Quick mode (Q1, Q2, Q6, Q12 only) |
 | `/smart-interview` | Reset to auto-detect depth |
 | `/deep-research` | Background research via Gemini CLI or APIs |
+| `/freesearch` | TRULY FREE research via Gemini CLI (0 tokens) |
+| `/dispatch` | Route tasks to local AI CLIs (codex/gemini/qwen) |
 | `/search-fallback` | Fallback search APIs when WebSearch fails |
 | `/update` | Update ONE_SHOT from GitHub |
 | `/beads` or `/bd` | Task tracking commands |

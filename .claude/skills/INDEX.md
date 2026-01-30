@@ -25,14 +25,15 @@ These are the skills you'll use 90% of the time. Just say these phrases:
 
 ---
 
-## Free Research
+## Free Research & Multi-Model Dispatch
 
 | Command | What It Does | Claude Tokens |
 |---------|--------------|---------------|
 | `/freesearch [topic]` | Research via Gemini CLI, zero tokens | ✅ FREE |
+| `/dispatch [task]` | Route to best local CLI (codex/gemini/qwen) | ✅ FREE |
 | `/deep-research [topic]` | Research via Claude sub-agent | ❌ Uses tokens |
 
-**Use `/freesearch`** for token-free research. Same quality, direct execution.
+**Use `/freesearch`** for token-free research. **Use `/dispatch`** to offload work to specialized CLIs.
 
 ---
 
@@ -89,6 +90,7 @@ tail -f .agent/STATUS.md
 | **debugger** | "bug", "fix", "broken" | Systematic debugging |
 | **code-reviewer** | "review", "is this safe" | Quality & security review |
 | **freesearch** | `/freesearch [topic]` | **FREE** research via Gemini CLI (0 Claude tokens) |
+| **dispatch** | `/dispatch [task]` | Route to local CLIs (codex/gemini/qwen), 0 Claude tokens |
 | **deep-research** | "research", "investigate" | Background research via Gemini CLI or APIs |
 | **search-fallback** | "web search failed", "429" | Fallback to Perplexity/Context7/Tavily/Brave/Bing |
 | **delegate-to-agent** | (auto-triggered) | Aggressive subagent delegation |
@@ -188,4 +190,4 @@ Session Break:
 
 ---
 
-**Version**: 8.1 | **Core**: 20 | **Advanced**: 22 | **Total**: 42 | **Auto-Update**: Enabled | **Resilient**: tmux | **Slash Commands**: Yes | **/freesearch**: ✅ FREE
+**Version**: 8.1 | **Core**: 21 | **Advanced**: 22 | **Total**: 43 | **Auto-Update**: Enabled | **Resilient**: tmux | **Slash Commands**: Yes | **/freesearch**: ✅ FREE | **/dispatch**: ✅ NEW
