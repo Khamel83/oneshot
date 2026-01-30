@@ -8,6 +8,10 @@ secrets/*.env
 .agent/
 .beads/
 
+# Output directories (runtime generated, not source)
+dispatch/
+research/
+
 # Local keys
 .age/
 *.key
