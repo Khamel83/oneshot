@@ -1,11 +1,11 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for setup, INDEX.md for skill reference -->
 
-# ONE_SHOT v8
+# ONE_SHOT v8.1
 
 > **UPDATE CHECK**: Run: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-v8.sh | bash`
 
-> **v8 = ULTRA-COMPRESSED** - 2k system tokens (down from 20k). All prose → JSON.
+> **v8.1 = ULTRA-COMPRESSED + GEMINI RESEARCH** - 2k system tokens (down from 20k). All prose → JSON.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
@@ -18,19 +18,23 @@ skill_router:
   # Entry
   - pattern: "new project|build me|help me|/interview|/front-door"
     skill: front-door
+    slash: "/front-door or /interview"
 
-  # Interview Depth Overrides
+  # Interview Depth Overrides (v8.1 - with slash commands)
   - pattern: "/full-interview|full interview mode"
     skill: full-interview
     note: "Forces all 13+ questions, no bypass"
+    slash: "/full-interview"
 
   - pattern: "/quick-interview|quick interview mode"
     skill: quick-interview
     note: "Only Q1, Q2, Q6, Q12 with smart defaults"
+    slash: "/quick-interview"
 
   - pattern: "/smart-interview|reset interview"
     skill: smart-interview
     note: "Reset to auto-detect depth (default)"
+    slash: "/smart-interview"
 
   # Autonomous (headless mode)
   - pattern: "autonomous|headless|background|overnight|just build it"
@@ -83,15 +87,17 @@ skill_router:
   - pattern: "secrets|env|credentials|api key"
     skill: secrets-vault-manager
 
-  # Research (NEW)
+  # Research (v8.1 - enhanced)
   - pattern: "research|investigate|look into|find out about|deep dive|what do you know about"
     skill: deep-research
-    note: "Background Gemini CLI + free search APIs, saves Claude tokens"
+    note: "Background Gemini CLI + Perplexity/Context7/Tavily APIs, saves Claude tokens"
+    slash: "/deep-research"
 
-  # Search Fallback (NEW)
+  # Search Fallback (v8.1)
   - pattern: "web search failed|search not working|429|rate limit|search fallback|use search api"
     skill: search-fallback
-    note: "Auto-fallback to Tavily/Brave/Bing APIs when WebSearch fails"
+    note: "Auto-fallback to Perplexity/Context7/Tavily/Brave/Bing APIs when WebSearch fails"
+    slash: "/search-fallback"
 
   # Skills Discovery
   - pattern: "browse skills|skillsmp|find skills|skill marketplace"
@@ -103,6 +109,27 @@ skill_router:
 ```
 
 **All other skills**: Available on-demand via `/skill-name` or explicit request. See INDEX.md.
+
+---
+
+## SLASH COMMANDS (v8.1)
+
+All skills can be invoked via `/skill-name`. Core slash commands:
+
+| Command | Purpose |
+|---------|---------|
+| `/front-door` or `/interview` | Force interview mode |
+| `/full-interview` | Full depth (all 13+ questions) |
+| `/quick-interview` | Quick mode (Q1, Q2, Q6, Q12 only) |
+| `/smart-interview` | Reset to auto-detect depth |
+| `/deep-research` | Background research via Gemini CLI or APIs |
+| `/search-fallback` | Fallback search APIs when WebSearch fails |
+| `/update` | Update ONE_SHOT from GitHub |
+| `/beads` or `/bd` | Task tracking commands |
+| `/oops` | Save lessons learned |
+| `/lessons` | View lessons learned |
+
+**Any skill** can be invoked as `/skill-name` - e.g., `/debugger`, `/code-reviewer`, `/create-plan`
 
 ---
 
@@ -126,6 +153,12 @@ auto_delegation:
 
   # Search failure triggers (auto-fallback)
   - signal: "WebSearch returns 429/rate limit/error"
+    action: "Invoke search-fallback skill automatically"
+
+  - signal: "Monthly usage limit exceeded|zai search limit|MCP usage limit|GLM search quota|quota exceeded"
+    action: "Invoke search-fallback skill automatically"
+
+  - signal: "WebSearch failed|search not working|SearchAPI error"
     action: "Invoke search-fallback skill automatically"
 
   # Context triggers (pre-emptive)
@@ -237,4 +270,4 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 8.0 | **System Tokens**: ~2k (down from 20k) | **Core Skills**: 10 | **Context**: Ultra-compressed JSON
+**Version**: 8.1 | **System Tokens**: ~2k (down from 20k) | **Core Skills**: 15 | **Total Skills**: 41 | **Slash Commands**: Yes | **Context**: Ultra-compressed JSON

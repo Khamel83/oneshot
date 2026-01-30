@@ -1,8 +1,8 @@
-# ONE_SHOT v8
+# ONE_SHOT v8.1
 
 **Tell it an idea. Come back with the thing built.**
 
-Skill system for [Claude Code](https://claude.com/claude-code) with persistent task tracking and autonomous execution.
+Skill system for [Claude Code](https://claude.com/claude-code) with persistent task tracking, autonomous execution, and Gemini CLI research.
 
 ---
 
@@ -55,6 +55,7 @@ curl -fsSL https://raw.githubusercontent.com/Khamel83/oneshot/master/ssh/install
 | **"implement"** | Execute plan with beads tracking |
 | **"debug this"** | Systematic hypothesis-based debugging |
 | **"review code"** | Quality + security review |
+| **"research..."** | Background research via Gemini CLI or APIs |
 
 **Example:**
 ```
@@ -101,10 +102,10 @@ Beads survives /clear, /compact, restarts. Your tasks don't disappear.
 
 ```
 project/
-├── AGENTS.md           ← Skill router
+├── AGENTS.md           ← Skill router (v8.1)
 ├── CLAUDE.md           ← Project instructions
 ├── .beads/             ← Persistent tasks
-└── .claude/skills/     ← 29 skills
+└── .claude/skills/     ← 41 skills (symlinked)
 ```
 
 ---
@@ -130,7 +131,7 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/claud
 
 ---
 
-**v8** | 29 Skills | Beads | Autonomous Builder | Ultra-compressed Context
+**v8.1** | 41 Skills | Beads | Autonomous Builder | Gemini CLI Research | Ultra-compressed Context | Slash Commands
 
 ---
 

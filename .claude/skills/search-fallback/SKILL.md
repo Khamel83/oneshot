@@ -43,7 +43,9 @@ sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypte
 
 **1. Perplexity** (Best - AI answers with web search + citations):
 ```bash
-PERPLEXITY_KEY=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted | grep PERPLEXITY_API_KEY | cut -d= -f2)
+OUTPUT=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted 2>/dev/null)
+OUTPUT=${OUTPUT#data=}
+PERPLEXITY_KEY=$(echo "$OUTPUT" | grep -oP 'PERPLEXITY_API_KEY=\K[^\\]+')
 
 curl -s -X POST "https://api.perplexity.ai/chat/completions" \
   -H "Authorization: Bearer $PERPLEXITY_KEY" \
@@ -57,7 +59,9 @@ curl -s -X POST "https://api.perplexity.ai/chat/completions" \
 
 **2. Context7** (Code documentation search - perfect for finding code examples):
 ```bash
-CONTEXT7_KEY=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted | grep CONTEXT7_API_KEY | cut -d= -f2)
+OUTPUT=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted 2>/dev/null)
+OUTPUT=${OUTPUT#data=}
+CONTEXT7_KEY=$(echo "$OUTPUT" | grep -oP 'CONTEXT7_API_KEY=\K[^\\]+')
 
 curl -s "https://context7.com/api/v1/search?query=$QUERY&numResults=5" \
   -H "Authorization: Bearer $CONTEXT7_KEY" | jq -r '.results[] | "- \(.title): \(.id)\n  \(.description)"'
@@ -65,7 +69,9 @@ curl -s "https://context7.com/api/v1/search?query=$QUERY&numResults=5" \
 
 **3. Tavily** (AI answers + sources - if keys are valid):
 ```bash
-TAVILY_KEY=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted | grep TAVILY_API_KEY | cut -d= -f2)
+OUTPUT=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted 2>/dev/null)
+OUTPUT=${OUTPUT#data=}
+TAVILY_KEY=$(echo "$OUTPUT" | grep -oP 'TAVILY_API_KEY=\K[^\\]+')
 
 curl -s https://api.tavily.com/search \
   -H "Content-Type: application/json" \
@@ -112,20 +118,19 @@ Format the search results clearly with:
 When you need to run a quick search fallback:
 
 ```bash
-# Perplexity (recommended - has AI answers + citations)
-sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted | grep PERPLEXITY_API_KEY | cut -d= -f2 | xargs -I {KEY} curl -s -X POST "https://api.perplexity.ai/chat/completions" -H "Authorization: Bearer {KEY}" -H "Content-Type: application/json" -d '{"model":"sonar","messages":[{"role":"user","content":"YOUR_QUERY"}],"max_tokens":500}' | jq -r '.choices[0].message.content'
+# Helper to extract keys (sops outputs "data=" prefix)
+OUTPUT=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted 2>/dev/null)
+OUTPUT=${OUTPUT#data=}
 
-# Context7 (code/documentation search - perfect for code examples)
-sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted | grep CONTEXT7_API_KEY | cut -d= -f2 | xargs -I {KEY} curl -s "https://context7.com/api/v1/search?query=YOUR_QUERY&numResults=5" -H "Authorization: Bearer {KEY}" | jq -r '.results[] | "- \(.title): \(.id)"'
+# Tavily (working - AI answers + sources)
+TAVILY_KEY=$(echo "$OUTPUT" | grep -oP 'TAVILY_API_KEY=\K[^\\]+')
+curl -s https://api.tavily.com/search -H "Content-Type: application/json" \
+  -d "{\"api_key\":\"$TAVILY_KEY\",\"query\":\"YOUR_QUERY\",\"include_answer\":true}" | jq -r '.answer'
 
-# Tavily (working with current key)
-sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted | grep TAVILY_API_KEY | cut -d= -f2 | xargs -I {} curl -s https://api.tavily.com/search -H "Content-Type: application/json" -d "{\"api_key\":\"{}\",\"query\":\"YOUR_QUERY\",\"include_answer\":true}" | jq
-
-# Brave (not configured)
-sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted | grep BRAVE_API_KEY | cut -d= -f2 | xargs -I {} curl -s "https://api.search.brave.com/res/v1/web/search?q=YOUR_QUERY&count=5" -H "X-Subscription-Token:{}" | jq
-
-# Bing (not configured)
-sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted | grep BING_API_KEY | cut -d= -f2 | xargs -I {} curl -s "https://api.bing.microsoft.com/v7.0/search?q=YOUR_QUERY&count=5" -H "Ocp-Apim-Subscription-Key:{}" | jq
+# Context7 (code/documentation search)
+CONTEXT7_KEY=$(echo "$OUTPUT" | grep -oP 'CONTEXT7_API_KEY=\K[^\\]+')
+curl -s "https://api.context7.io/v1/search?query=YOUR_QUERY&numResults=5" \
+  -H "Authorization: Bearer $CONTEXT7_KEY" | jq -r '.results[] | "- \(.title): \(.id)"'
 ```
 
 ---
@@ -177,12 +182,14 @@ sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypte
 
 | API | Free Tier | Best For | AI Answer | Status |
 |-----|-----------|----------|-----------|--------|
-| **Perplexity** | varies | Research with citations | ✅ Yes | ✅ Working |
-| **Context7** | varies | Code/docs search | ✅ Yes | ✅ Working |
 | **Tavily** | varies | Research, learning | ✅ Yes | ✅ Working |
+| **Perplexity** | varies | Research with citations | ✅ Yes | ⚠️ 401 errors |
+| **Context7** | varies | Code/docs search | ✅ Yes | ⚠️ API uncertain |
 | **Firecrawl** | varies | Web scraping | ❌ No | ⚠️ Out of credits |
 | **Brave** | 2000/month | Quick facts | ❌ No | Not configured |
 | **Bing** | 1000/month | Familiar format | ❌ No | Not configured |
+
+**Recommended**: Use Tavily as primary fallback - confirmed working with current key.
 
 ---
 

@@ -4,6 +4,30 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [8.1] - 2025-01-29
+
+### Added
+- **Slash commands** - All skills can now be invoked via `/skill-name`
+- **Slash command documentation** - New section in AGENTS.md listing all slash commands
+- **deep-research skill documentation** - Gemini CLI + free search APIs (Perplexity, Context7, Tavily)
+- **search-fallback skill documentation** - Perplexity, Context7, Tavily, Brave, Bing APIs
+- **Interview depth slash commands** - `/full-interview`, `/quick-interview`, `/smart-interview` documented
+- **Research slash commands** - `/deep-research`, `/search-fallback` documented
+
+### Changed
+- Version: 8.0 → 8.1
+- Core skills count: 17 → 19 (added deep-research, search-fallback to core routing)
+- Skill count: 29 → 41 (actual count of skills in the system)
+- AGENTS.md enhanced with slash command references in skill router
+- INDEX.md updated with deep-research and search-fallback entries
+- README.md updated with research capability and skill count
+
+### Documentation
+- AGENTS.md now has SLASH COMMANDS section documenting all `/` commands
+- deep-research skill now documented as core with Gemini CLI primary mode
+- search-fallback skill now documented with 5 API options
+- All documentation updated to reflect v8.1
+
 ## [5.5] - 2025-12-18
 
 ### Added
