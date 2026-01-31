@@ -15,8 +15,8 @@ else
   CURRENT="unknown"
 fi
 
-# Get latest from Hugging Face
-LATEST=$("$SCRIPT_DIR/detect-latest-glm.sh" 2>/dev/null) || exit 2
+# Get latest from Hugging Face (fallback to current if detection fails)
+LATEST=$("$SCRIPT_DIR/detect-latest-glm.sh" 2>/dev/null) || LATEST="$CURRENT"
 
 if [[ "$LATEST" == "$CURRENT" ]]; then
   echo "✓ GLM: $CURRENT (up to date)"

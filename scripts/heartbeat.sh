@@ -17,6 +17,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/state.sh"
 
+# Source environment for API keys check
+# Try to load from .bashrc/.zshrc if not already set
+if [[ -z "${ZAI_API_KEY:-}" ]]; then
+  if [[ -f "$HOME/.bashrc" ]]; then
+    # Extract and export ZAI_API_KEY from bashrc (non-interactive)
+    eval "$(grep "^ZAI_API_KEY=" "$HOME/.bashrc" 2>/dev/null | head -1)"
+  fi
+fi
+
 # Parse arguments
 QUIET=""
 FORCE=""
