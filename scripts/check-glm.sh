@@ -37,12 +37,16 @@ else
 fi
 
 if [[ -f "$SHELLRC" ]]; then
-  # Update GLM_MODEL in shell config
+  # Update GLM_MODEL in shell config (new format)
   if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS requires -i '' for in-place editing
     sed -i '' "s/^GLM_MODEL=.*/GLM_MODEL=\"$LATEST\"/" "$SHELLRC" 2>/dev/null || true
+    # Also update old format: ${ZAI_MODEL:-glm-X.X} default
+    sed -i '' "s/\${ZAI_MODEL:-glm-[0-9.]*}/\${ZAI_MODEL:-$LATEST}/" "$SHELLRC" 2>/dev/null || true
   else
     sed -i "s/^GLM_MODEL=.*/GLM_MODEL=\"$LATEST\"/" "$SHELLRC" 2>/dev/null || true
+    # Also update old format: ${ZAI_MODEL:-glm-X.X} default
+    sed -i "s/\${ZAI_MODEL:-glm-[0-9.]*}/\${ZAI_MODEL:-$LATEST}/" "$SHELLRC" 2>/dev/null || true
   fi
 fi
 

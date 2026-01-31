@@ -55,9 +55,9 @@ if [[ "$1" == "--install" ]]; then
         SHELLRC="$HOME/.bashrc"
     fi
 
-    # Remove old block if exists
-    if grep -q "$MARKER" "$SHELLRC" 2>/dev/null; then
-        sed -i "/$MARKER/,/##### end Claude Code + ZAI shortcuts #####/d" "$SHELLRC"
+    # Remove old block if exists (handles variants like "(oci-dev)" suffix)
+    if grep -q "##### Claude Code + ZAI shortcuts" "$SHELLRC" 2>/dev/null; then
+        sed -i "/##### Claude Code + ZAI shortcuts/,/##### end Claude Code + ZAI shortcuts #####/d" "$SHELLRC"
         echo "Removed old Claude/ZAI block from $SHELLRC"
     fi
 
@@ -139,8 +139,8 @@ ZSH_HOOK
     else
         # Remove old hook if exists
         sed -i '/PROMPT_COMMAND.*_oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
-        # Add bash hook
-        cat >> "$SHELLRC" << 'BASH_HOOK'
+        # Add bash hook (unquoted heredoc so \$ becomes $ in the file)
+        cat >> "$SHELLRC" << BASH_HOOK
 
 # ONE-SHOT Heartbeat: bash PROMPT_COMMAND hook
 PROMPT_COMMAND="_oneshot_heartbeat\${PROMPT_COMMAND:+;\$PROMPT_COMMAND}"
