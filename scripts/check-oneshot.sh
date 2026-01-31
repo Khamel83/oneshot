@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Check if ONE-SHOT repo is up to date
+# Auto-update ONE-SHOT repo from origin
 
 set -euo pipefail
 
@@ -26,6 +26,12 @@ if [[ "$LOCAL" == "$REMOTE" ]]; then
   echo "✓ ONE-SHOT: up to date"
   exit 0
 else
-  echo "⚠️  ONE-SHOT: updates available (cd ~/github/oneshot && git pull)"
-  exit 1
+  echo "⚠️  ONE-SHOT: updating..."
+  if git pull --quiet >/dev/null 2>&1; then
+    echo "✓ ONE-SHOT: updated to latest"
+    exit 0
+  else
+    echo "⚠️  ONE-SHOT: update failed (merge conflict or network issue)"
+    exit 1
+  fi
 fi

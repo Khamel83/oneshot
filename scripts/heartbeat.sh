@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
-# ONE-SHOT Heartbeat - Daily health check system
+# ONE-SHOT Heartbeat - Auto-updating health system
 # Usage: ./heartbeat.sh [--force] [--quiet] [--background]
 #
-# Checks (once per day):
-#   - GLM model version (Hugging Face API)
-#   - CLI versions (Claude Code, Gemini, Qwen, Codex)
-#   - API key validation (ZAI, Tavily, Exa, Apify, Context7)
-#   - MCP server health
-#   - SOPS/Age secrets
-#   - Connections (Tailscale, internet)
-#   - ONE-SHOT repo sync
-#   - Beads sync
+# Auto-actions (once per day):
+#   1. ONE-SHOT: Auto git pull from origin
+#   2. GLM Model: Auto-update models.env and shell config
+#   3. Secrets: Sync and verify decryptability
+#   4. Checks: CLIs, API keys, MCPs, connections
+#   5. Beads: Sync health data
 
 set -euo pipefail
 
@@ -18,10 +15,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/state.sh"
 
 # Source environment for API keys check
-# Try to load from .bashrc/.zshrc if not already set
 if [[ -z "${ZAI_API_KEY:-}" ]]; then
   if [[ -f "$HOME/.bashrc" ]]; then
-    # Extract and export ZAI_API_KEY from bashrc (non-interactive)
     eval "$(grep "^ZAI_API_KEY=" "$HOME/.bashrc" 2>/dev/null | head -1)"
   fi
 fi
@@ -49,12 +44,12 @@ if [[ "$FORCE" != "--force" ]] && [[ "$LAST_CHECK" == "$TODAY" ]]; then
   exit 0
 fi
 
-[[ -z "$QUIET" ]] && echo "Heartbeat: running daily health check..."
+[[ -z "$QUIET" ]] && echo "Heartbeat: running daily auto-update..."
 
-# Run all checks
+# Run auto-actions and checks
 RESULTS=()
 
-# Check each component
+# Auto-actions first (in order)
 check() {
   local name="$1"
   local script="$2"
@@ -69,13 +64,20 @@ check() {
   fi
 }
 
+# 1. Update ONE-SHOT repo first (pulls latest scripts/secrets)
+check "ONE-SHOT" "$SCRIPT_DIR/check-oneshot.sh"
+
+# 2. Auto-update GLM model if newer version available
 check "GLM Model" "$SCRIPT_DIR/check-glm.sh"
+
+# 3. Sync and verify secrets
+check "Secrets" "$SCRIPT_DIR/sync-secrets.sh"
+
+# 4. Health checks (informational, can't auto-fix)
 check "CLI Versions" "$SCRIPT_DIR/check-clis.sh"
 check "API Keys" "$SCRIPT_DIR/check-apis.sh"
 check "MCP Servers" "$SCRIPT_DIR/check-mcps.sh"
-check "Secrets" "$SCRIPT_DIR/check-secrets.sh"
 check "Connections" "$SCRIPT_DIR/check-connections.sh"
-check "ONE-SHOT" "$SCRIPT_DIR/check-oneshot.sh"
 
 # Update state
 state_set_last_check "$TODAY"
@@ -99,8 +101,5 @@ if [[ -z "$QUIET" ]]; then
   done
   echo ""
 fi
-
-# Sync state to oneshot repo
-state_sync_to_repo "${QUIET:-}"
 
 exit 0
