@@ -28,7 +28,12 @@ Keep ONE_SHOT skills up-to-date by automatically pulling from GitHub.
    - Stashes local changes, pulls, restores
    - All happens silently in background
 
-2. **Rate Limiting**:
+2. **Manual Update** (when user says "update oneshot"):
+   - Pulls latest from GitHub to ~/github/oneshot
+   - Syncs skills/agents to the **current working project**
+   - Detects current project from $PWD or ONESHOT_PROJECT_DIR env var
+
+3. **Rate Limiting**:
    - Checks cached to once per 24 hours
    - Cache file: `~/github/oneshot/.cache/last-update-check`
    - Won't slow down every session, just first of the day
@@ -36,17 +41,20 @@ Keep ONE_SHOT skills up-to-date by automatically pulling from GitHub.
 ## Commands
 
 ```bash
+# Auto-check and update (used by session start hook)
+~/.claude/skills/oneshot/auto-updater/oneshot-update.sh auto
+
 # Check for updates (rate-limited)
 ~/.claude/skills/oneshot/auto-updater/oneshot-update.sh check
 
-# Force check (bypasses rate limit)
-~/.claude/skills/oneshot/auto-updater/oneshot-update.sh force-check
-
-# Perform update
-~/.claude/skills/oneshot/auto-updater/oneshot-update.sh update
+# Force update from GitHub AND sync to current project
+~/.claude/skills/oneshot/auto-updater/oneshot-update.sh force
 
 # Show status
 ~/.claude/skills/oneshot/auto-updater/oneshot-update.sh status
+
+# Sync skills/agents to a specific project (after manual git pull)
+~/.claude/skills/oneshot/auto-updater/oneshot-update.sh sync [project-dir]
 ```
 
 ## Session Start Integration
@@ -83,14 +91,14 @@ Session starts
 User: "update oneshot"
 
 1. Force check for updates
-2. If update available:
-   "Update available: [new features/fixes summary]
-    Update now? (This will pull latest from GitHub)"
-3. On confirmation:
-   → Run oneshot-update.sh update
-   → Report result
-4. If already up-to-date:
-   "ONE_SHOT is already at the latest version (v7.4)"
+2. Pull latest from GitHub to ~/github/oneshot
+3. Sync skills/agents to current project (detected from $PWD)
+4. Report results
+
+Alternative: Just sync after manual git pull
+User: "sync oneshot"
+→ Runs oneshot-update.sh sync
+→ Syncs skills/agents from ~/github/oneshot to current project
 ```
 
 ## Rate Limiting
@@ -120,6 +128,14 @@ SKILLS_SYMLINK="$HOME/.claude/skills/oneshot"  # Skills symlink
 
 ## What Gets Updated
 
+When you run `update oneshot`:
+
+1. **~/github/oneshot** - Pulls latest from GitHub
+2. **Current project** - Syncs `.claude/skills/` and `.claude/agents/` from oneshot
+   - Detects project by walking up from $PWD looking for `.claude/` folder
+   - Or set `ONESHOT_PROJECT_DIR` env var to override
+
+Synced content:
 - All skills in `.claude/skills/`
 - Agent definitions in `.claude/agents/`
 - AGENTS.md (orchestration spec)

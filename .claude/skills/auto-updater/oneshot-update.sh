@@ -12,6 +12,28 @@ LOG_FILE="${ONESHOT_DIR}/.cache/update.log"
 GITHUB_REPO="Khamel83/oneshot"
 UPDATE_CHECK_INTERVAL=86400  # 24 hours in seconds
 
+# Detect current project directory (for syncing skills/agents)
+# Uses ONESHOT_PROJECT_DIR env var, or finds .claude in current dir ancestry
+detect_project_dir() {
+    if [ -n "${ONESHOT_PROJECT_DIR:-}" ]; then
+        echo "$ONESHOT_PROJECT_DIR"
+        return 0
+    fi
+
+    # Walk up from current directory looking for .claude folder
+    local dir="$PWD"
+    while [ "$dir" != "/" ]; do
+        if [ -d "$dir/.claude" ]; then
+            echo "$dir"
+            return 0
+        fi
+        dir=$(dirname "$dir")
+    done
+
+    # No .claude found, return empty (no project to sync to)
+    echo ""
+}
+
 # Ensure cache directory exists
 mkdir -p "$(dirname "$CACHE_FILE")"
 
@@ -78,6 +100,46 @@ do_update() {
     fi
 }
 
+# Sync skills and agents from oneshot to a project directory
+sync_to_project() {
+    local target_dir="${1:-$(detect_project_dir)}"
+
+    if [ -z "$target_dir" ]; then
+        log "No project directory found for sync"
+        echo "NO_PROJECT"
+        return 1
+    fi
+
+    if [ ! -d "$target_dir/.claude" ]; then
+        log "Target .claude directory not found: $target_dir/.claude"
+        echo "NO_CLAUDE_DIR"
+        return 1
+    fi
+
+    log "Syncing to project: $target_dir"
+
+    # Sync skills (use --delete to remove obsolete skills)
+    if rsync -av --delete "$ONESHOT_DIR/.claude/skills/" "$target_dir/.claude/skills/" 2>>"$LOG_FILE"; then
+        log "Skills synced successfully"
+    else
+        log "Skills sync failed"
+        echo "SYNC_FAILED"
+        return 1
+    fi
+
+    # Sync agents if they exist in both places
+    if [ -d "$ONESHOT_DIR/.claude/agents" ] && [ -d "$target_dir/.claude/agents" ]; then
+        if rsync -av --delete "$ONESHOT_DIR/.claude/agents/" "$target_dir/.claude/agents/" 2>>"$LOG_FILE"; then
+            log "Agents synced successfully"
+        else
+            log "Agents sync failed"
+        fi
+    fi
+
+    echo "SYNCED:$target_dir"
+    return 0
+}
+
 # Update cache timestamp
 update_cache() {
     echo "$(date +%s)" > "$CACHE_FILE"
@@ -137,9 +199,28 @@ main() {
             fi
             ;;
         force)
-            # Force update now (bypass rate limit)
+            # Force update now (bypass rate limit) AND sync to current project
             do_update
             update_cache
+
+            # After successful update, sync to current project
+            if [ "$?" -eq 0 ]; then
+                sync_result=$(sync_to_project)
+                if [[ "$sync_result" == SYNCED:* ]]; then
+                    project="${sync_result#SYNCED:}"
+                    log "Synced to project: $project"
+                elif [ "$sync_result" = "NO_PROJECT" ]; then
+                    log "No project found to sync to (not in a project directory)"
+                elif [ "$sync_result" = "NO_CLAUDE_DIR" ]; then
+                    log "Target project has no .claude directory"
+                fi
+            fi
+            ;;
+        sync)
+            # Just sync to current project (after manual git pull)
+            project_dir="${2:-}"
+            sync_result=$(sync_to_project "$project_dir")
+            echo "$sync_result"
             ;;
         status)
             echo "ONESHOT_DIR: $ONESHOT_DIR"
@@ -149,10 +230,11 @@ main() {
             echo "LOG: $LOG_FILE"
             ;;
         *)
-            echo "Usage: oneshot-update.sh [auto|check|force|status]"
-            echo "  auto   - Check and auto-update if available (default)"
-            echo "  check  - Just check for updates"
-            echo "  force  - Force update now"
+            echo "Usage: oneshot-update.sh [auto|check|force|sync|status]"
+            echo "  auto   - Check and auto-update if available (default, session start)"
+            echo "  check  - Just check for updates (rate-limited)"
+            echo "  force  - Force update from GitHub AND sync to current project"
+            echo "  sync   - Sync skills/agents to current project (after manual git pull)"
             echo "  status - Show current status"
             exit 1
             ;;
