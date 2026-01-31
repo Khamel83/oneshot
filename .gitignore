@@ -10,7 +10,9 @@ secrets/*.env
 
 # Output directories (runtime generated, not source)
 dispatch/
-research/
+
+# But DO track research results
+!docs/research/
 
 # Local keys
 .age/
