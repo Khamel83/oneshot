@@ -1,6 +1,6 @@
 # Skills Index
 
-ONE_SHOT v8.1 - Ultra-compressed context (~2k tokens), aggressive delegation, parallel execution, Gemini CLI research.
+ONE_SHOT v8.2 - Ultra-compressed context (~2k tokens), aggressive delegation, parallel execution, Exa API research. NEW: /browse, diff-preview, skill-analytics, bd test.
 
 ---
 
@@ -29,11 +29,12 @@ These are the skills you'll use 90% of the time. Just say these phrases:
 
 | Command | What It Does | Claude Tokens |
 |---------|--------------|---------------|
-| `/freesearch [topic]` | Research via Gemini CLI, zero tokens | ✅ FREE |
+| `/freesearch [topic]` | Research via Exa API, zero tokens | ✅ FREE |
 | `/dispatch [task]` | Route to best local CLI (codex/gemini/qwen) | ✅ FREE |
+| `/browse [keyword]` | Fuzzy search through 46 skills | ✅ FREE |
 | `/deep-research [topic]` | Research via Claude sub-agent | ❌ Uses tokens |
 
-**Use `/freesearch`** for token-free research. **Use `/dispatch`** to offload work to specialized CLIs.
+**Use `/freesearch`** for token-free research. **Use `/dispatch`** to offload work to specialized CLIs. **Use `/browse`** to find skills.
 
 ---
 
@@ -77,7 +78,7 @@ tail -f .agent/STATUS.md
 
 ## All Skills Reference
 
-### Core (20) - Auto-Routed
+### Core (21) - Auto-Routed
 
 | Skill | Triggers | Purpose |
 |-------|----------|---------|
@@ -86,10 +87,10 @@ tail -f .agent/STATUS.md
 | **resilient-executor** | "keep running", "survive disconnect" | Disconnect-proof execution via tmux |
 | **create-plan** | "plan", "design" | Structured planning |
 | **implement-plan** | "implement", "build it" | Execute with beads + parallel tasks |
-| **beads** | "ready tasks", "what'snext" | Persistent task tracking (aggressive sync) |
+| **beads** | "ready tasks", "what'snext" | Persistent task tracking + skill testing (`bd test`) |
 | **debugger** | "bug", "fix", "broken" | Systematic debugging |
 | **code-reviewer** | "review", "is this safe" | Quality & security review |
-| **freesearch** | `/freesearch [topic]` | **FREE** research via Gemini CLI (0 Claude tokens) |
+| **freesearch** | `/freesearch [topic]` | **FREE** research via Exa API (0 Claude tokens) |
 | **dispatch** | `/dispatch [task]` | Route to local CLIs (codex/gemini/qwen), 0 Claude tokens |
 | **deep-research** | "research", "investigate" | Background research via Gemini CLI or APIs |
 | **search-fallback** | "web search failed", "429" | Fallback to Perplexity/Context7/Tavily/Brave/Bing |
@@ -102,30 +103,9 @@ tail -f .agent/STATUS.md
 | **failure-recovery** | "stuck", "looping" | Recovery + predictive context |
 | **thinking-modes** | "think", "ultrathink" | Extended analysis (5 levels) |
 | **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
+| **skills-browser** | `/browse [keyword]` | Fuzzy search through 46 ONE_SHOT skills |
 
-### Advanced (15) - On-Demand
-
-| Skill | Triggers | Purpose |
-|-------|----------|---------|
-| **front-door** | "build me", "new project" | Interview & routing hub (now with auto-delegation) |
-| **autonomous-builder** | "headless", "just build it" | Idea → artifact (resilient, survives disconnect) |
-| **resilient-executor** | "keep running", "survive disconnect" | Disconnect-proof execution via tmux |
-| **create-plan** | "plan", "design" | Structured planning |
-| **implement-plan** | "implement", "build it" | Execute with beads + parallel tasks |
-| **beads** | "ready tasks", "what's next" | Persistent task tracking (aggressive sync) |
-| **debugger** | "bug", "fix", "broken" | Systematic debugging |
-| **code-reviewer** | "review", "is this safe" | Quality & security review |
-| **delegate-to-agent** | (auto-triggered) | Aggressive subagent delegation |
-| **parallel-validator** | "validate", "check everything" | Run tests/lint/security in parallel |
-| **batch-processor** | "rename across", "update all" | Apply changes to many files in parallel |
-| **auto-updater** | (auto on session start) | Auto-update skills from GitHub |
-| **create-handoff** | "handoff", "save context" | Preserve state before clear |
-| **resume-handoff** | "resume", "continue" | Restore from beads/handoff |
-| **failure-recovery** | "stuck", "looping" | Recovery + predictive context |
-| **thinking-modes** | "think", "ultrathink" | Extended analysis (5 levels) |
-| **secrets-vault-manager** | "secrets", "env" | SOPS/Age encryption |
-
-### Advanced (22) - On-Demand
+### Advanced (25) - On-Demand
 
 Use `/skill-name` or "use the X skill" to invoke these explicitly.
 
@@ -158,6 +138,9 @@ Use `/skill-name` or "use the X skill" to invoke these explicitly.
 - **secrets-sync** - Two-way vault sync
 - **hooks-manager** - Lifecycle automation
 - **skillsmp-browser** - Browse & compare external skill marketplaces
+- **skills-browser** - Fuzzy search through 46 ONE_SHOT skills
+- **diff-preview** - Preview changes before applying
+- **skill-analytics** - Track usage patterns, token savings
 
 ---
 
@@ -190,4 +173,4 @@ Session Break:
 
 ---
 
-**Version**: 8.1 | **Core**: 21 | **Advanced**: 22 | **Total**: 43 | **Auto-Update**: Enabled | **Resilient**: tmux | **Slash Commands**: Yes | **/freesearch**: ✅ FREE | **/dispatch**: ✅ NEW
+**Version**: 8.2 | **Core**: 21 | **Advanced**: 25 | **Total**: 46 | **Auto-Update**: Enabled | **Resilient**: tmux | **Slash Commands**: Yes | **/freesearch**: ✅ FREE | **/dispatch**: ✅ | **NEW**: skills-browser, diff-preview, skill-analytics, bd test
