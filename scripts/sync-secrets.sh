@@ -4,6 +4,9 @@
 
 set -euo pipefail
 
+# Add common binary locations to PATH (macOS Homebrew, Linux, nvm)
+export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin:$HOME/.nvm/versions/node/*/bin"
+
 ONESHOT_DIR="${ONESHOT_DIR:-$HOME/github/oneshot}"
 SECRETS_DIR="$ONESHOT_DIR/secrets"
 
