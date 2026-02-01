@@ -44,6 +44,18 @@ check_claude_cli() {
 
   local version
   version=$(claude --version 2>/dev/null | head -1 || echo "unknown")
+
+  # Check if version is outdated (2.0.x vs 2.1.x)
+  if [[ "$FIX_MODE" == "--fix" ]] && [[ "$version" == *"2.0"* ]]; then
+    echo "⚠️  Claude Code CLI: $version → updating..."
+    if npm update -g @anthropic-ai/claude-code >/dev/null 2>&1; then
+      hash -r
+      version=$(claude --version 2>/dev/null | head -1 || echo "unknown")
+      echo "✓ Claude Code CLI: $version (updated)"
+      return 0
+    fi
+  fi
+
   echo "✓ Claude Code CLI: $version"
   return 0
 }
