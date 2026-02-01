@@ -24,7 +24,7 @@ fi
 SECRET_FILE=$(find "$SECRETS_DIR" -name "*.encrypted" -o -name "*.env.encrypted" 2>/dev/null | head -1)
 
 if [[ -n "$SECRET_FILE" ]]; then
-  if sops --decrypt --input-type dotenv --output-type dotenv "$SECRET_FILE" >/dev/null 2>&1; then
+  if SOPS_AGE_KEY_FILE="$SOPS_KEY" sops --decrypt --input-type dotenv --output-type dotenv "$SECRET_FILE" >/dev/null 2>&1; then
     echo "✓ Secrets: synced and decryptable"
     exit 0
   else
