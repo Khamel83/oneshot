@@ -1,14 +1,14 @@
-# ONE_SHOT v8.1
+# ONE_SHOT v8.2
 
 **Tell it an idea. Come back with the thing built.**
 
-A skill system for [Claude Code](https://claude.com/claude-code) that provides persistent task tracking, autonomous execution, multi-model CLI orchestration, and Gemini-powered research—all while minimizing Claude token usage through aggressive delegation.
+A skill system for [Claude Code](https://claude.com/claude-code) that provides persistent task tracking, autonomous execution, multi-model CLI orchestration, automatic fleet management, and Gemini-powered research—all while minimizing Claude token usage through aggressive delegation.
 
 ---
 
 ## What Is ONE_SHOT?
 
-ONE_SHOT turns Claude Code into a full autonomous development environment. It's not just a collection of prompts—it's a coordinated system of 43+ skills that:
+ONE_SHOT turns Claude Code into a full autonomous development environment with fleet-wide health monitoring. It's not just a collection of prompts—it's a coordinated system of 43+ skills that:
 
 - **Interviews you** to understand requirements (front-door)
 - **Creates structured plans** for complex work (create-plan)
@@ -17,8 +17,9 @@ ONE_SHOT turns Claude Code into a full autonomous development environment. It's 
 - **Routes to specialized AI CLIs** to save tokens (dispatch)
 - **Researches for free** via Gemini CLI (freesearch)
 - **Recovers from failures** automatically (failure-recovery)
+- **Auto-updates across machines** (heartbeat + fleet-status)
 
-**Philosophy**: Context is scarce. Delegate aggressively. Write state to disk. Survive disconnections.
+**Philosophy**: Context is scarce. Delegate aggressively. Write state to disk. Survive disconnections. Keep everything in sync.
 
 ---
 
@@ -67,6 +68,195 @@ Claude will:
 2. Create a structured implementation plan
 3. Build it with persistent task tracking
 4. Survive /clear, restarts, and disconnections
+
+---
+
+## Heartbeat System - Automatic Fleet Maintenance
+
+ONE_SHOT heartbeat keeps all your machines synchronized and healthy automatically. It runs daily (or on `cd` to projects with `CLAUDE.md`) and performs:
+
+### What Heartbeat Does
+
+| Action | Description |
+|--------|-------------|
+| **ONE-SHOT Repo** | Auto `git pull` latest code and secrets |
+| **GLM Model** | Auto-update to latest version in `models.env` and shell configs |
+| **Secrets** | Verify SOPS/Age decryptability across all machines |
+| **Claude Code CLI** | Auto-install if missing, auto-upgrade 2.0.x → 2.1.x |
+| **API Keys** | Validate ZAI_API_KEY and other credentials |
+| **Connections** | Check Tailscale and internet connectivity |
+| **Beads** | Sync health data to git-backed task tracker |
+
+### Running Heartbeat
+
+```bash
+# Manual run with force
+bash ~/github/oneshot/scripts/heartbeat.sh --force
+
+# Quiet mode (for cron/hooks)
+bash ~/github/oneshot/scripts/heartbeat.sh --quiet --background
+```
+
+### Heartbeat Hooks
+
+Heartbeat auto-runs when you `cd` into directories with `CLAUDE.md`:
+
+**Bash:** `PROMPT_COMMAND="_oneshot_heartbeat${PROMPT_COMMAND:+;$PROMPT_COMMAND}"`
+
+**Zsh:** `add-zsh-hook chpwd _oneshot_heartbeat`
+
+### Heartbeat Output
+
+```
+Heartbeat: running daily auto-update...
+✓ ONE-SHOT: up to date
+✓ GLM: glm-4.7 (up to date)
+✓ Secrets: synced and decryptable
+✓ Claude Code CLI: 2.1.29 (Claude Code)
+✓ ZAI_API_KEY: set (988f4e23...)
+✓ Tailscale: connected
+✓ Internet: connected
+
+Heartbeat Results:
+   ✓ ONE-SHOT
+   ✓ GLM Model
+   ✓ Secrets
+   ✓ CLI Versions
+   ✓ API Keys
+   ✓ MCP Servers
+   ✓ Connections
+
+✓ Beads: synced heartbeat data
+```
+
+---
+
+## Fleet Management - Multi-Machine Health
+
+Manage all your machines from one place with `fleet-status.sh`:
+
+### Check All Machines
+
+```bash
+bash ~/github/oneshot/scripts/fleet-status.sh
+```
+
+Output:
+```
+ONE-SHOT Fleet Status (2026-01-31)
+===========================================
+
+=== homelab ===
+  ✓ SSH: connected
+  ✓ Claude: 2.1.29 (Claude Code)
+  ✓ oneshot: up to date
+  ℹ️  GLM: glm-4.7
+
+=== macmini ===
+  ✓ SSH: connected
+  ✓ Claude: 2.1.29 (Claude Code)
+  ✓ oneshot: up to date
+  ℹ️  GLM: glm-4.7
+
+=== oci ===
+  ℹ️  (this machine)
+2.1.29 (Claude Code)
+```
+
+### Auto-Repair Fleet
+
+```bash
+bash ~/github/oneshot/scripts/fleet-status.sh --fix
+```
+
+This automatically:
+- Git pulls oneshot on all machines
+- Updates GLM model versions
+- Installs/upgrades Claude Code CLI
+- Verifies secrets accessibility
+
+### Configuring Your Fleet
+
+Edit `scripts/fleet-status.sh` to add your machines:
+
+```bash
+MACHINES=(
+  "homelab:khamel83@100.112.130.100"
+  "macmini:macmini@100.113.216.27"
+  "oci:ubuntu@100.126.13.70"
+  # Add your machines:
+  # "nickname:user@host-or-ip"
+)
+```
+
+---
+
+## Secrets Management (SOPS/Age)
+
+ONE_SHOT uses [SOPS](https://github.com/getsops/sops) with [Age](https://github.com/FiloSottile/age) for encrypted secrets.
+
+### Setup
+
+1. **Generate Age key** (once, on your primary machine):
+```bash
+age-keygen -o ~/.age/key.txt
+```
+
+2. **Distribute public key** - Add to `secrets/.sops.yaml`:
+```yaml
+creation_rules:
+  - age: age1YOUR_PUBLIC_KEY_HERE
+```
+
+3. **Encrypt secrets**:
+```bash
+sops --encrypt --input-type dotenv --output-type dotenv secrets.env > secrets.env.encrypted
+```
+
+4. **Decrypt secrets**:
+```bash
+sops --decrypt --input-type dotenv --output-type dotenv secrets.env.encrypted
+```
+
+### Distributing Age Key to Machines
+
+Copy `~/.age/key.txt` to each machine (secure channel required):
+
+```bash
+scp ~/.age/key.txt homelab:~/.age/key.txt
+scp ~/.age/key.txt macmini:~/.age/key.txt
+ssh homelab "chmod 600 ~/.age/key.txt"
+ssh macmini "chmod 600 ~/.age/key.txt"
+```
+
+**Important**: The Age key must match the one in `.sops.yaml` or decryption will fail.
+
+---
+
+## Shell Setup (Claude Code Shortcuts)
+
+ONE_SHOT provides unified shell setup for Claude Code shortcuts.
+
+### Installation
+
+```bash
+cd ~/github/oneshot/scripts
+# Edit claude-shell-setup.sh with your ZAI_API_KEY, then:
+bash claude-shell-setup.sh --install
+```
+
+This configures:
+
+| Shortcut | Description |
+|----------|-------------|
+| `cc` | Claude Code via Anthropic Pro (YOLO mode) |
+| `zai` | Claude Code via z.ai GLM API (YOLO mode) |
+
+### Environment Variables
+
+The setup exports:
+- `ZAI_API_KEY` - Your z.ai API key for GLM access
+- `GLM_MODEL` - Current GLM model version (auto-updated by heartbeat)
 
 ---
 
@@ -322,7 +512,7 @@ bash ~/claude-shell-setup.sh --install
 
 ```
 oneshot/
-├── AGENTS.md              # Skill router (v8.1, 287 lines)
+├── AGENTS.md              # Skill router (v8.2, 287 lines)
 ├── CLAUDE.md              # Global project instructions
 ├── README.md              # This file
 ├── SPEC.md                # Skill specifications
@@ -337,10 +527,18 @@ oneshot/
 │       └── [43 skills]/   # Individual skill directories
 │           └── SKILL.md
 ├── scripts/               # Utility scripts
+│   ├── heartbeat.sh       # Daily health checks & auto-updates
+│   ├── fleet-status.sh    # Multi-machine fleet management
+│   ├── check-clis.sh      # CLI version checks
+│   ├── check-glm.sh       # GLM model updates
+│   ├── sync-secrets.sh    # SOPS/Age secrets verification
+│   ├── claude-shell-setup.sh  # Shell configuration
+│   └── state.sh           # State management for heartbeat
 ├── examples/              # Example projects
 ├── tests/                 # Skill tests
 ├── docs/                  # Additional docs
 ├── secrets/               # SOPS-encrypted secrets template
+│   └── .sops.yaml         # Age public key configuration
 ├── ssh/                   # SSH alias installer
 ├── archive/               # Deprecated versions
 ├── dispatch/              # /dispatch output directory
@@ -351,7 +549,22 @@ oneshot/
 
 ## Version History
 
-**v8.1** (Current)
+**v8.2** (Current - 2026-01-31)
+- **Heartbeat System** - Daily auto-updates across all machines
+  - Auto-updates ONE-SHOT repo, GLM model, Claude Code CLI
+  - Verifies secrets decryptability (SOPS/Age)
+  - Runs on `cd` to directories with `CLAUDE.md`
+- **Fleet Management** - Multi-machine health monitoring
+  - `scripts/fleet-status.sh` - Check all machines at once
+  - `--fix` flag for auto-repair across fleet
+- **SOPS/Age Secrets** - Encrypted secrets management
+  - Age key distribution across machines
+  - `scripts/sync-secrets.sh` - Verify decryptability
+- **Shell Setup** - Unified bash/zsh configuration
+  - `cc` (Anthropic Pro) and `zai` (GLM API) shortcuts
+  - Heartbeat PROMPT_COMMAND/chpwd hooks
+
+**v8.1**
 - 43 total skills (21 Core, 22 Advanced)
 - `/freesearch` - Zero-token research via Gemini CLI
 - `/dispatch` - Multi-model CLI orchestration (claude/codex/gemini/qwen)
@@ -409,4 +622,4 @@ oneshot/
 
 ---
 
-**v8.1** | 43 Skills | Beads | Autonomous Builder | Gemini CLI Research | Multi-Model Dispatch | Ultra-Compressed Context | Slash Commands
+**v8.2** | 43 Skills | Beads | Heartbeat | Fleet Management | SOPS/Age Secrets | Autonomous Builder | Gemini CLI Research | Multi-Model Dispatch

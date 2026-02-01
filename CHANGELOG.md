@@ -4,6 +4,47 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [8.2] - 2026-01-31
+
+### Added
+- **Heartbeat System** - Daily automatic health checks and updates
+  - Auto-updates ONE-SHOT repo via `git pull`
+  - Auto-updates GLM model version in `models.env` and shell configs
+  - Verifies secrets decryptability (SOPS/Age)
+  - Auto-installs Claude Code CLI if missing
+  - Auto-upgrades Claude Code 2.0.x → 2.1.x
+  - Tracks last check date in project CLAUDE.md
+  - Syncs health data to beads
+- **Fleet Management** - Multi-machine health monitoring
+  - `scripts/fleet-status.sh` - Check all machines at once
+  - `--fix` flag for auto-repair across fleet
+  - Supports macOS Homebrew, Linux, nvm environments
+- **SOPS/Age Secrets** - Encrypted secrets management
+  - Age key distribution across machines
+  - `scripts/sync-secrets.sh` - Verify decryptability
+  - `scripts/secrets-vault-manager` skill for managing secrets
+- **Shell Setup Improvements**
+  - `scripts/claude-shell-setup.sh` - Unified setup for bash/zsh
+  - Auto-configures `cc` (Anthropic Pro) and `zai` (GLM API) shortcuts
+  - Heartbeat PROMPT_COMMAND/chpwd hooks for auto-runs
+
+### Changed
+- **Heartbeat auto-runs** when `cd` to directories with `CLAUDE.md`
+- **GLM model updates** now commit and push to git automatically
+- **check-clis.sh** now sources nvm and adds Homebrew to PATH
+- **sync-secrets.sh** passes SOPS_AGE_KEY_FILE to sops commands
+
+### Fixed
+- PROMPT_COMMAND escaping bug (quoted heredoc → unquoted for variable expansion)
+- check-glm.sh now handles both old (`${ZAI_MODEL:-glm-X.X}`) and new (`GLM_MODEL=`) formats
+- ZAI_API_KEY detection - now exports variable for child processes
+- Age key not found errors - fixed PATH issues on macOS Homebrew
+
+### Documentation
+- Updated README.md with Heartbeat and Fleet Management sections
+- Added comprehensive machine setup documentation
+- Documented Age key distribution process
+
 ## [8.1] - 2025-01-29
 
 ### Added
