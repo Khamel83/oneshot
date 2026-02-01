@@ -4,6 +4,15 @@
 
 set -euo pipefail
 
+# Add common binary locations to PATH (macOS Homebrew, Linux, nvm)
+export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin:$HOME/.nvm/versions/node/*/bin"
+
+# Source nvm if available (for Node.js tools like claude)
+if [[ -f "$HOME/.nvm/nvm.sh" ]]; then
+  export NVM_DIR="$HOME/.nvm"
+  . "$NVM_DIR/nvm.sh"
+fi
+
 ISSUES=0
 
 # Check Claude Code CLI
