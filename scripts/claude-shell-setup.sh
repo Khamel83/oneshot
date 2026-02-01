@@ -74,8 +74,8 @@ if [[ "$1" == "--install" ]]; then
 # Portable setup: github.com/Khamel83/oneshot/scripts/claude-shell-setup.sh
 # To reinstall: bash claude-shell-setup.sh --install
 
-ZAI_API_KEY="__ZAI_API_KEY__"
-GLM_MODEL="__GLM_MODEL__"
+export ZAI_API_KEY="__ZAI_API_KEY__"
+export GLM_MODEL="__GLM_MODEL__"
 
 unalias cc zai 2>/dev/null || true
 unset -f cc zai 2>/dev/null || true

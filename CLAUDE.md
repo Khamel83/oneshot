@@ -283,3 +283,33 @@ bd = json.loads(BEADS_JSON)
   oneshot:last-check: 2026-01-31
   oneshot:machine: instance-first
 -->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-01-31
+  oneshot:machine: instance-first
+-->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-01-31
+  oneshot:machine: instance-first
+-->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-01-31
+  oneshot:machine: instance-first
+-->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-01-31
+  oneshot:machine: instance-first
+-->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-01-31
+  oneshot:machine: instance-first
+-->
