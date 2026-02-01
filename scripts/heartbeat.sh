@@ -17,7 +17,8 @@ source "$SCRIPT_DIR/state.sh"
 # Source environment for API keys check
 if [[ -z "${ZAI_API_KEY:-}" ]]; then
   if [[ -f "$HOME/.bashrc" ]]; then
-    eval "$(grep "export ZAI_API_KEY=" "$HOME/.bashrc" 2>/dev/null | sed 's/^[[:space:]]*export //')"
+    ZAI_API_KEY=$(grep "export ZAI_API_KEY=" "$HOME/.bashrc" 2>/dev/null | sed 's/^[[:space:]]*export ZAI_API_KEY=//' | head -1 | tr -d '"')
+    export ZAI_API_KEY
   fi
 fi
 
