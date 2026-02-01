@@ -54,8 +54,11 @@ RESULTS=()
 check() {
   local name="$1"
   local script="$2"
+  local fix_flag=""
+  # Pass --fix to CLI check if in force mode (for auto-updates)
+  [[ "$FORCE" == "--force" && "$script" == *"check-clis.sh" ]] && fix_flag="--fix"
   if [[ -f "$script" ]]; then
-    if "$script" "${QUIET:-}"; then
+    if "$script" "${QUIET:-}" $fix_flag; then
       RESULTS+=("✓ $name")
     else
       RESULTS+=("⚠️  $name")

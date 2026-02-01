@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Check if CLIs are installed and up to date
 # Checks: Claude Code, Gemini CLI, Qwen CLI, Codex
+# Usage: ./check-clis.sh [--fix]
 
 set -euo pipefail
+
+FIX_MODE="${1:-}"
 
 # Add common binary locations to PATH (macOS Homebrew, Linux, nvm)
 export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin:$HOME/.nvm/versions/node/*/bin"
@@ -18,6 +21,23 @@ ISSUES=0
 # Check Claude Code CLI
 check_claude_cli() {
   if ! command -v claude >/dev/null 2>&1; then
+    if [[ "$FIX_MODE" == "--fix" ]]; then
+      echo "⚠️  Claude Code CLI: not installed → installing..."
+      if npm install -g @anthropic-ai/claude-code >/dev/null 2>&1; then
+        # Refresh path after install
+        if [[ -f "$HOME/.nvm/nvm.sh" ]]; then
+          . "$NVM_DIR/nvm.sh"
+        fi
+        hash -r
+        local version
+        version=$(claude --version 2>/dev/null | head -1 || echo "unknown")
+        echo "✓ Claude Code CLI: $version (newly installed)"
+        return 0
+      else
+        echo "⚠️  Claude Code CLI: installation failed"
+        return 1
+      fi
+    fi
     echo "⚠️  Claude Code CLI: not installed (npm install -g @anthropic-ai/claude-code)"
     return 1
   fi
