@@ -1,436 +1,207 @@
-# ONE_SHOT v8.2
+# ONE_SHOT v9
 
 **Tell it an idea. Come back with the thing built.**
 
-A skill system for [Claude Code](https://claude.com/claude-code) that provides persistent task tracking, autonomous execution, multi-model CLI orchestration, automatic fleet management, and Gemini-powered research—all while minimizing Claude token usage through aggressive delegation.
+A skill system for Claude Code that provides persistent task tracking, autonomous execution, and multi-model coordination.
 
 ---
 
-## What Is ONE_SHOT?
-
-ONE_SHOT turns Claude Code into a full autonomous development environment with fleet-wide health monitoring. It's not just a collection of prompts—it's a coordinated system of 43+ skills that:
-
-- **Interviews you** to understand requirements (front-door)
-- **Creates structured plans** for complex work (create-plan)
-- **Tracks tasks persistently** across sessions (beads)
-- **Executes autonomously** in background tmux sessions (resilient-executor)
-- **Routes to specialized AI CLIs** to save tokens (dispatch)
-- **Researches for free** via Gemini CLI (freesearch)
-- **Recovers from failures** automatically (failure-recovery)
-- **Auto-updates across machines** (heartbeat + fleet-status)
-
-**Philosophy**: Context is scarce. Delegate aggressively. Write state to disk. Survive disconnections. Keep everything in sync.
-
----
-
-## Quick Start
-
-### Prerequisites
+## Quick Start (3 Steps)
 
 ```bash
-# 1. Install beads (REQUIRED for task tracking)
-npm install -g @beads/bd
-
-# 2. Install Gemini CLI (for free research)
-npm install -g @google/gemini-cli
-gemini auth login
-```
-
-### Installation
-
-```bash
-# In your project directory
+# 1. In your project directory
 cd your-project
+
+# 2. Install ONE_SHOT
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
-```
 
-This creates:
-```
-your-project/
-├── AGENTS.md           ← Skill router & orchestration
-├── CLAUDE.md           ← Project-specific instructions
-├── .beads/             ← Persistent task tracking
-└── .claude/skills/     ← 43+ skills (symlinked from ~/.claude/skills/oneshot)
-```
-
-### Your First Build
-
-```bash
-# Open in Claude Code
+# 3. Open in Claude Code
 claude .
 
-# Say:
-"build me a task manager CLI in Python"
+# Then say: "Build me a [thing you want]"
 ```
 
-Claude will:
-1. Ask you targeted questions (front-door skill)
-2. Create a structured implementation plan
-3. Build it with persistent task tracking
-4. Survive /clear, restarts, and disconnections
+That's it. Claude will interview you, plan it, build it.
 
 ---
 
-## Heartbeat System - Automatic Fleet Maintenance
+## How to Use ONE_SHOT
 
-ONE_SHOT heartbeat keeps all your machines synchronized and healthy automatically. It runs daily (or on `cd` to projects with `CLAUDE.md`) and performs:
-
-### What Heartbeat Does
-
-| Action | Description |
-|--------|-------------|
-| **ONE-SHOT Repo** | Auto `git pull` latest code and secrets |
-| **GLM Model** | Auto-update to latest version in `models.env` and shell configs |
-| **Secrets** | Verify SOPS/Age decryptability across all machines |
-| **Claude Code CLI** | Auto-install if missing, auto-upgrade 2.0.x → 2.1.x |
-| **API Keys** | Validate ZAI_API_KEY and other credentials |
-| **Connections** | Check Tailscale and internet connectivity |
-| **Beads** | Sync health data to git-backed task tracker |
-
-### Running Heartbeat
-
-```bash
-# Manual run with force
-bash ~/github/oneshot/scripts/heartbeat.sh --force
-
-# Quiet mode (for cron/hooks)
-bash ~/github/oneshot/scripts/heartbeat.sh --quiet --background
-```
-
-### Heartbeat Hooks
-
-Heartbeat auto-runs when you `cd` into directories with `CLAUDE.md`:
-
-**Bash:** `PROMPT_COMMAND="_oneshot_heartbeat${PROMPT_COMMAND:+;$PROMPT_COMMAND}"`
-
-**Zsh:** `add-zsh-hook chpwd _oneshot_heartbeat`
-
-### Heartbeat Output
+### The Basic Workflow
 
 ```
-Heartbeat: running daily auto-update...
-✓ ONE-SHOT: up to date
-✓ GLM: glm-4.7 (up to date)
-✓ Secrets: synced and decryptable
-✓ Claude Code CLI: 2.1.29 (Claude Code)
-✓ ZAI_API_KEY: set (988f4e23...)
-✓ Tailscale: connected
-✓ Internet: connected
-
-Heartbeat Results:
-   ✓ ONE-SHOT
-   ✓ GLM Model
-   ✓ Secrets
-   ✓ CLI Versions
-   ✓ API Keys
-   ✓ MCP Servers
-   ✓ Connections
-
-✓ Beads: synced heartbeat data
+You say what you want
+    ↓
+Claude interviews you (front-door skill)
+    ↓
+Claude creates a plan (create-plan skill)
+    ↓
+Claude builds it (implement-plan skill)
+    ↓
+Progress tracked in beads (survives everything)
 ```
+
+### What to Say
+
+| You Say | What Happens |
+|---------|--------------|
+| "Build me X" | Claude interviews you, then builds it |
+| "Plan this" | Creates a structured implementation plan |
+| "Implement" | Executes the plan with task tracking |
+| "Debug this" | Systematic debugging with hypotheses |
+| "What's next?" | Shows your next unblocked task |
+| "Create handoff" | Saves context before `/clear` |
+| "Resume" | Restores context after `/clear` |
+
+### You Don't Need to Remember Skills
+
+Claude automatically picks the right skill based on what you say. There are 50+ skills, but you never need to memorize their names.
 
 ---
 
-## Fleet Management - Multi-Machine Health
+## Example Session
 
-Manage all your machines from one place with `fleet-status.sh`:
+```
+You: "Build me a CLI tool for task management"
 
-### Check All Machines
+Claude: [Asks questions via front-door skill]
+      - What language? (Python, Go, Rust?)
+      - What features? (add, list, complete, delete?)
+      - Where should data be stored? (SQLite, files, API?)
 
-```bash
-bash ~/github/oneshot/scripts/fleet-status.sh
+      [Creates plan via create-plan skill]
+
+      [Implements via implement-plan skill]
+      - Writes code
+      - Runs tests
+      - Commits to git
+      - Tracks progress in beads
 ```
 
-Output:
-```
-ONE-SHOT Fleet Status (2026-01-31)
-===========================================
-
-=== homelab ===
-  ✓ SSH: connected
-  ✓ Claude: 2.1.29 (Claude Code)
-  ✓ oneshot: up to date
-  ℹ️  GLM: glm-4.7
-
-=== macmini ===
-  ✓ SSH: connected
-  ✓ Claude: 2.1.29 (Claude Code)
-  ✓ oneshot: up to date
-  ℹ️  GLM: glm-4.7
-
-=== oci ===
-  ℹ️  (this machine)
-2.1.29 (Claude Code)
-```
-
-### Auto-Repair Fleet
-
-```bash
-bash ~/github/oneshot/scripts/fleet-status.sh --fix
-```
-
-This automatically:
-- Git pulls oneshot on all machines
-- Updates GLM model versions
-- Installs/upgrades Claude Code CLI
-- Verifies secrets accessibility
-
-### Configuring Your Fleet
-
-Edit `scripts/fleet-status.sh` to add your machines:
-
-```bash
-MACHINES=(
-  "homelab:khamel83@100.112.130.100"
-  "macmini:macmini@100.113.216.27"
-  "oci:ubuntu@100.126.13.70"
-  # Add your machines:
-  # "nickname:user@host-or-ip"
-)
-```
+Your tasks survive `/clear`, restarts, disconnections.
 
 ---
 
-## Secrets Management (SOPS/Age)
+## Task Tracking (Beads)
 
-ONE_SHOT uses [SOPS](https://github.com/getsops/sops) with [Age](https://github.com/FiloSottile/age) for encrypted secrets.
-
-### Setup
-
-1. **Generate Age key** (once, on your primary machine):
-```bash
-age-keygen -o ~/.age/key.txt
-```
-
-2. **Distribute public key** - Add to `secrets/.sops.yaml`:
-```yaml
-creation_rules:
-  - age: age1YOUR_PUBLIC_KEY_HERE
-```
-
-3. **Encrypt secrets**:
-```bash
-sops --encrypt --input-type dotenv --output-type dotenv secrets.env > secrets.env.encrypted
-```
-
-4. **Decrypt secrets**:
-```bash
-sops --decrypt --input-type dotenv --output-type dotenv secrets.env.encrypted
-```
-
-### Distributing Age Key to Machines
-
-Copy `~/.age/key.txt` to each machine (secure channel required):
-
-```bash
-scp ~/.age/key.txt homelab:~/.age/key.txt
-scp ~/.age/key.txt macmini:~/.age/key.txt
-ssh homelab "chmod 600 ~/.age/key.txt"
-ssh macmini "chmod 600 ~/.age/key.txt"
-```
-
-**Important**: The Age key must match the one in `.sops.yaml` or decryption will fail.
-
----
-
-## Shell Setup (Claude Code Shortcuts)
-
-ONE_SHOT provides unified shell setup for Claude Code shortcuts.
-
-### Installation
-
-```bash
-cd ~/github/oneshot/scripts
-# Edit claude-shell-setup.sh with your ZAI_API_KEY, then:
-bash claude-shell-setup.sh --install
-```
-
-This configures:
-
-| Shortcut | Description |
-|----------|-------------|
-| `cc` | Claude Code via Anthropic Pro (YOLO mode) |
-| `zai` | Claude Code via z.ai GLM API (YOLO mode) |
-
-### Environment Variables
-
-The setup exports:
-- `ZAI_API_KEY` - Your z.ai API key for GLM access
-- `GLM_MODEL` - Current GLM model version (auto-updated by heartbeat)
-
----
-
-## Update ONE_SHOT
-
-**Single command—always gets latest v8:**
-
-```bash
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-v8.sh | bash
-```
-
-This updates AGENTS.md, skills, and compresses context to ~2k tokens.
-
----
-
-## Core Skills (What You Say)
-
-| Say This | Skill | What Happens |
-|----------|-------|--------------|
-| **"build me..."** | front-door | Interview → spec → structured plan |
-| **"plan this..."** | create-plan | Create implementation plan |
-| **"implement"** | implement-plan | Execute plan with beads tracking |
-| **"debug this"** | debugger | Systematic hypothesis-based debugging |
-| **"review code"** | code-reviewer | Quality + security review |
-
-**Example:**
-```
-You: "Build me a REST API for user management"
-
-Claude: [Asks 5-7 targeted questions via front-door]
-      [Creates structured plan with create-plan]
-      [Implements with implement-plan + beads tracking]
-      [Survives /clear with resume-handoff]
-```
-
----
-
-## Token-Saving Features
-
-### `/freesearch` - Zero-Token Research
-
-```bash
-# Research WITHOUT burning Claude tokens
-/freesearch "Polymarket API best practices"
-
-# Routes to Gemini CLI directly
-# Claude only uses tokens for summary (~500 vs 10,000+)
-```
-
-**How it works**: Calls `gemini --yolo "prompt"` via Bash. 0 Claude tokens for the actual research.
-
-### `/dispatch` - Multi-Model Orchestration
-
-```bash
-# Route to the best CLI for the job
-/dispatch "Research WebSocket patterns"    # → gemini (free)
-/dispatch "Write a rate limiter function"  # → codex (code specialist)
-/dispatch "Design a microservices architecture"  # → claude (reasoning)
-
-# Available CLIs:
-# - claude (2.1.25) - Max plan
-# - codex (0.92.0) - OpenAI
-# - gemini (0.26.0) - Google (FREE)
-# - qwen (0.8.2) - 2K free requests/day
-```
-
-**Model selection matrix**:
-| Task Pattern | Routes To | Why |
-|--------------|-----------|-----|
-| "research", "explain", "what is" | `gemini` | Free, has web search |
-| "write code", "implement", "refactor" | `codex` | Optimized for code |
-| "plan", "design", "architect" | `claude` | Best reasoning |
-| Ambiguous | Ask user or default to `gemini` | Cheapest |
-
----
-
-## Autonomous Mode
-
-Build something, disconnect whenever. Work survives.
-
-```bash
-# Start headless build
-oneshot-build "A CLI tool that converts markdown to PDF"
-
-# Monitor progress anytime
-oneshot status
-
-# Watch it work live
-oneshot attach
-```
-
-**Under the hood**: Uses tmux + resilient state saving. Your work survives:
-- Terminal disconnections
-- /clear commands
-- Context exhaustion
-- System restarts
-
----
-
-## Beads = Persistent Memory
-
-Tasks survive everything. Never lose track of what you're doing.
+Beads = Persistent memory. Never lose track of what you're doing.
 
 ```bash
 bd ready      # "What's next?" → Shows unblocked tasks
 bd list       # All tasks with status
 bd show 42    # Details of task #42
-bd sync       # Save to git (CRITICAL before /clear)
+bd sync       # Save to git (do this often!)
 ```
 
-**Beads integration**:
-- Tasks tracked in `.beads/tasks.json`
-- Synced to git automatically
-- Survives /clear, /compact, restarts
-- Supports dependencies and blockers
+Tasks are tracked in `.beads/tasks.json` and synced to git.
 
----
+### Context Survival
 
-## Interview Depth Control
+Claude's context window gets cleared. Your work shouldn't.
 
-Control how thorough the front-door interview is:
-
-| Command | Questions | When to Use |
-|---------|-----------|-------------|
-| `/full-interview` | All 13+ | Greenfield projects, avoid rework |
-| `/quick-interview` | Q1, Q2, Q6, Q12 only | Experienced user, well-defined task |
-| `/smart-interview` | Auto-detect | Reset to default behavior |
-
-**Or set via environment:**
+**Before `/clear`:**
 ```bash
-export ONESHOT_INTERVIEW_DEPTH=full|smart|quick
+You: "Create handoff"
+Claude: Saves context to `.handoff.md`
+```
+
+**After `/clear`:**
+```bash
+You: "Resume"
+Claude: Restores from handoff + beads
 ```
 
 ---
 
-## SSH Aliases (All Your Machines)
+## Advanced Features
 
-**Install on any machine:**
+### Continuous Planning (v8+)
+
+For complex projects, use the 3-file pattern:
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Khamel83/oneshot/master/ssh/install.sh | bash
+You: "Create a continuous plan for [complex project]"
 ```
 
-**Then use:**
+Creates:
+- `task_plan.md` - The plan with skill sequences
+- `findings.md` - Research and discoveries
+- `progress.md` - Session log
+
+These files survive `/clear` and enable multi-model coordination.
+
+### Skill Discovery (v9+)
+
+Not sure which skills exist?
+
 ```bash
-ssh oci          # OCI cloud (oci-dev)
-ssh oci-ts       # Via Tailscale
-ssh homelab      # Homelab server
-ssh homelab-ts   # Via Tailscale
-ssh macmini      # Mac mini (Apple Silicon)
-ssh macmini-ts   # Via Tailscale
+You: "What skills do I have for testing?"
+You: "Search skillsmp for database skills"
+```
+
+### Multi-Model Dispatch
+
+Save Claude tokens by routing to specialized AI CLIs:
+
+```bash
+/dispatch "Research WebSocket patterns"    # → Gemini (free)
+/dispatch "Write a rate limiter function"  # → Codex (code)
+/dispatch "Design a microservices architecture"  # → Claude (plan)
 ```
 
 ---
 
-## Context Management
+## Slash Commands
 
-| Command | What Happens |
+| Command | What It Does |
 |---------|--------------|
-| "create handoff" | Saves context to `.handoff.md` before /clear |
-| "resume" | Restores from handoff + beads |
-| "what's next" | Same as `bd ready` |
-| `/compact` | Summarize conversation to free tokens |
+| `/full-interview` | Ask all 13+ questions (thorough) |
+| `/quick-interview` | Ask only 4 questions (fast) |
+| `/smart-interview` | Auto-detect depth (default) |
+| `/freesearch` | Research via Gemini (0 Claude tokens) |
+| `/compact` | Summarize to free tokens |
+| `/run-plan` | Execute skill sequences deterministically (v9) |
 
 ---
 
-## All 43 Skills
+## What You Get
 
-**Core (21)** - Auto-routed:
-- front-door, autonomous-builder, resilient-executor, create-plan, implement-plan, beads, debugger, code-reviewer, freesearch, dispatch, deep-research, search-fallback, delegate-to-agent, parallel-validator, batch-processor, auto-updater, create-handoff, resume-handoff, failure-recovery, thinking-modes, secrets-vault-manager
+| Feature | Description |
+|---------|-------------|
+| **Smart Interview** | Claude asks the right questions upfront |
+| **Structured Plans** | Clear phases, decisions, dependencies |
+| **Persistent Tracking** | Tasks survive `/clear`, restarts, disconnections |
+| **Multi-Model** | Routes to best AI (Claude, Gemini, Codex) |
+| **Autonomous Mode** | Headless execution that survives disconnects |
+| **50+ Skills** | Specialized tools for every development task |
+| **SkillsMP Access** | 26,000+ external skills (v9) |
 
-**Advanced (22)** - On-demand:
-- refactorer, test-runner, performance-optimizer, git-workflow, docker-composer, ci-cd-setup, push-to-cloud, remote-exec, observability-setup, database-migrator, api-designer, oci-resources, convex-resources, documentation-generator, the-audit, visual-iteration, secrets-sync, hooks-manager, skillsmp-browser, full-interview, quick-interview, smart-interview
+---
 
-**Full reference:** [.claude/skills/INDEX.md](.claude/skills/INDEX.md)
+## Project Structure
+
+After installation, your project has:
+
+```
+your-project/
+├── AGENTS.md           # Skill router (LLM instructions)
+├── CLAUDE.md           # Your project-specific instructions
+├── .beads/             # Persistent task tracking
+└── .claude/skills/     # 50+ skills (symlinked from ~/.claude/skills/oneshot)
+```
+
+---
+
+## Prerequisites
+
+```bash
+# Required: Beads (task tracking)
+npm install -g @beads/bd
+
+# Optional: Gemini CLI (for free research)
+npm install -g @google/gemini-cli
+gemini auth login
+```
 
 ---
 
@@ -438,188 +209,101 @@ ssh macmini-ts   # Via Tailscale
 
 | Problem | Solution |
 |---------|----------|
-| Bootstrap fails "beads not found" | `npm install -g @beads/bd` |
 | Skill not triggering | Say `(ONE_SHOT)` to re-anchor |
-| Agent stuck in loop | Check `.agent/LAST_ERROR.md` |
-| Lost context after /clear | `bd ready` shows your tasks |
-| `/freesearch` fails | `gemini auth login` |
-| `/dispatch` fails | Check CLI is installed and authenticated |
+| Lost context after `/clear` | Say "resume" |
+| "What's next?" shows nothing | `bd list` to see all tasks |
+| `/freesearch` fails | Run `gemini auth login` first |
+| Beads not found | `npm install -g @beads/bd` |
 
 ---
 
-## Shell Utilities
+## What's Different?
 
-**Claude Code shortcuts** (cc = official, zai = GLM API):
+| Traditional Claude | ONE_SHOT |
+|-------------------|----------|
+| Say "build X" → gets halfway, forgets | Say "build X" → interviews, plans, executes, tracks |
+| Context lost on `/clear` | Handoffs + beads survive anything |
+| No task tracking | Beads tracks everything, forever |
+| One AI, one context | Routes to best AI per task |
+| Restart from scratch | Resume exactly where you left off |
+
+---
+
+## Updating ONE_SHOT
 
 ```bash
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/claude-shell-setup.sh > ~/claude-shell-setup.sh
-# Edit with your ZAI_API_KEY, then:
-bash ~/claude-shell-setup.sh --install
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-v8.sh | bash
 ```
 
 ---
 
-## Architecture
+## For LLMs: Documentation Maintenance
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    User Request                             │
-└──────────────────────────┬──────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│   AGENTS.md (Skill Router) - 287 lines, ~2k tokens         │
-│   - Keyword matching → skill selection                      │
-│   - Auto-delegation thresholds                              │
-│   - Slash command registry                                  │
-└──────────────────────────┬──────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│              Skill (e.g., front-door)                       │
-│   - AskUserQuestion for interviews                          │
-│   - Task tool for delegation                                │
-│   - Write/Read for state persistence                        │
-└──────────────────────────┬──────────────────────────────────┘
-                           ↓
-        ┌──────────────────┴──────────────────┐
-        ↓                                     ↓
-┌─────────────────┐                  ┌────────────────┐
-│  Claude Code    │                  │  External CLIs │
-│  (main context) │                  │  (via Bash)    │
-│  - Planning     │                  │  - gemini      │
-│  - Coordination │                  │  - codex       │
-│  - Summary      │                  │  - qwen        │
-└─────────────────┘                  └────────────────┘
-        ↑                                     ↑
-        └──────────────────┬──────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│               Beads (Persistent State)                      │
-│   - .beads/tasks.json (git-tracked)                        │
-│   - Survives /clear, restarts, disconnects                  │
-└─────────────────────────────────────────────────────────────┘
-```
+### When to Update This README
 
-**Token optimization strategy**:
-1. **Aggressive delegation**: Spawn sub-agents for isolated work
-2. **External CLI routing**: Use gemini/codex/qwen via /dispatch
-3. **State to disk**: Write progress to files, not context
-4. **Compression**: /compact summarizes conversation history
-5. **Resume from handoff**: Don't keep history, restore from disk
+Update when:
+- New skills are added to core router
+- New user-facing features are added
+- Version changes (v8 → v9, etc.)
+- Workflow changes significantly
+- New slash commands are added
 
----
+### How to Update
 
-## Project Structure
+1. **Read current README** to understand existing content
+2. **Make changes** that are:
+   - Clear for users (simple language, examples)
+   - Accurate for LLMs (technical details correct)
+   - Minimal (don't add, remove what's not needed)
+3. **Test**: Can a new user follow this and succeed?
+4. **Commit**: Use conventional commit format
 
-```
-oneshot/
-├── AGENTS.md              # Skill router (v8.2, 287 lines)
-├── CLAUDE.md              # Global project instructions
-├── README.md              # This file
-├── SPEC.md                # Skill specifications
-├── CHANGELOG.md           # Version history
-├── oneshot.sh             # Main installer
-├── upgrade-v8.sh          # Updater
-├── install.sh             # Bootstrap
-├── .claude/
-│   └── skills/
-│       ├── INDEX.md       # Skills catalog
-│       ├── TEMPLATE.md    # Skill template
-│       └── [43 skills]/   # Individual skill directories
-│           └── SKILL.md
-├── scripts/               # Utility scripts
-│   ├── heartbeat.sh       # Daily health checks & auto-updates
-│   ├── fleet-status.sh    # Multi-machine fleet management
-│   ├── check-clis.sh      # CLI version checks
-│   ├── check-glm.sh       # GLM model updates
-│   ├── sync-secrets.sh    # SOPS/Age secrets verification
-│   ├── claude-shell-setup.sh  # Shell configuration
-│   └── state.sh           # State management for heartbeat
-├── examples/              # Example projects
-├── tests/                 # Skill tests
-├── docs/                  # Additional docs
-├── secrets/               # SOPS-encrypted secrets template
-│   └── .sops.yaml         # Age public key configuration
-├── ssh/                   # SSH alias installer
-├── archive/               # Deprecated versions
-├── dispatch/              # /dispatch output directory
-└── research/              # /freesearch output directory
-```
+### Section Guidelines
+
+| Section | Audience | Purpose |
+|---------|----------|---------|
+| Quick Start | User | Get started in 3 steps |
+| How to Use | User | Clear workflow examples |
+| What to Say | User | Reference for common commands |
+| For LLMs | LLM | Documentation maintenance rules |
+| Troubleshooting | Both | Common problems and solutions |
+
+### Documentation Principles
+
+1. **Users first** - Write for humans, optimize for clarity
+2. **Examples work** - Every example should be tested
+3. **Remove friction** - Delete anything that doesn't help users succeed
+4. **LLM-friendly** - Keep structure clear so LLMs can parse and update
+5. **Single source** - This README is the primary user doc, keep it that way
+
+### Related Files
+
+| File | Purpose | Who Reads It |
+|------|---------|--------------|
+| `README.md` | User guide + docs maintenance | Users + LLMs |
+| `AGENTS.md` | Skill router + LLM orchestration | LLMs only |
+| `CLAUDE.md` | Project-specific instructions | LLMs only |
+| `INDEX.md` | Complete skill reference | Users + LLMs |
+
+### Version Update Checklist
+
+When bumping version (e.g., v8 → v9):
+- [ ] Update version in header
+- [ ] Add new features to "What You Get" table
+- [ ] Update "What's Different" if relevant
+- [ ] Add new slash commands
+- [ ] Update troubleshooting if new issues
+- [ ] Check all examples still work
+- [ ] Run user guide through a test scenario
 
 ---
 
-## Version History
+## Links
 
-**v8.2** (Current - 2026-01-31)
-- **Heartbeat System** - Daily auto-updates across all machines
-  - Auto-updates ONE-SHOT repo, GLM model, Claude Code CLI
-  - Verifies secrets decryptability (SOPS/Age)
-  - Runs on `cd` to directories with `CLAUDE.md`
-- **Fleet Management** - Multi-machine health monitoring
-  - `scripts/fleet-status.sh` - Check all machines at once
-  - `--fix` flag for auto-repair across fleet
-- **SOPS/Age Secrets** - Encrypted secrets management
-  - Age key distribution across machines
-  - `scripts/sync-secrets.sh` - Verify decryptability
-- **Shell Setup** - Unified bash/zsh configuration
-  - `cc` (Anthropic Pro) and `zai` (GLM API) shortcuts
-  - Heartbeat PROMPT_COMMAND/chpwd hooks
-
-**v8.1**
-- 43 total skills (21 Core, 22 Advanced)
-- `/freesearch` - Zero-token research via Gemini CLI
-- `/dispatch` - Multi-model CLI orchestration (claude/codex/gemini/qwen)
-- Ultra-compressed AGENTS.md (~2k tokens)
-- Slash commands for all core skills
-
-**v8.0**
-- AGENTS.md compression (20k → 2k tokens)
-- Auto-updater on session start
-- Background research via Gemini CLI
-
-**v7.5**
-- Resilient executor (tmux-based)
-- Parallel validation
-- Batch processor
-
-**v7.0**
-- Beads integration for persistent task tracking
-- Plan mode (create-plan → implement-plan)
-- Failure recovery protocols
-
-**v6.0**
-- front-door skill (interview-first approach)
-- Replaced oneshot-core
+- **GitHub**: https://github.com/Khamel83/oneshot
+- **Skills Reference**: [.claude/skills/INDEX.md](.claude/skills/INDEX.md)
+- **Beads**: https://github.com/steveyegge/beads
 
 ---
 
-## Contributing
-
-**To add a new skill:**
-
-1. Create skill directory:
-   ```bash
-   mkdir -p ~/.claude/skills/oneshot/your-skill
-   ```
-
-2. Write SKILL.md using TEMPLATE.md
-
-3. Add to AGENTS.md skill router (if core)
-
-4. Add to INDEX.md
-
-5. Test: Say "use the your-skill skill" in Claude Code
-
-6. Submit PR to oneshot repo
-
----
-
-**Links**
-
-- [GitHub](https://github.com/Khamel83/oneshot)
-- [Beads](https://github.com/steveyegge/beads) - Persistent task tracking
-- [Example Project](examples/weather-cli)
-- [Skills Reference](.claude/skills/INDEX.md)
-
----
-
-**v8.2** | 43 Skills | Beads | Heartbeat | Fleet Management | SOPS/Age Secrets | Autonomous Builder | Gemini CLI Research | Multi-Model Dispatch
+**v9** | 50+ Skills | Beads | Continuous Planning | SkillsMP Integration | Deterministic Execution

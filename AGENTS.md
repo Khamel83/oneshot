@@ -1,11 +1,9 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
-<!-- Humans: See README.md for setup, INDEX.md for skill reference -->
+<!-- Humans: See README.md for user guide, INDEX.md for skill reference -->
 
-# ONE_SHOT v8.3
+# ONE_SHOT v9
 
-> **UPDATE CHECK**: Run: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-v8.sh | bash`
-
-> **v8.3 = CONTINUOUS PLANNING** - 3-file pattern (task_plan.md, findings.md, progress.md) for living plans that survive /clear and enable multi-model coordination.
+> **v9 = PLAY CALLING** - Explicit skill sequences in task_plan.md, automatic skill discovery, SkillsMP marketplace integration, deterministic execution via /run-plan.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
@@ -286,6 +284,63 @@ Ask ALL questions UPFRONT. Get ALL info BEFORE coding.
 ## RESET
 
 Say `(ONE_SHOT)` to re-anchor to these rules.
+
+---
+
+## DOCUMENTATION MAINTENANCE (For LLMs)
+
+### When to Update Documentation
+
+| File | Update Trigger |
+|------|----------------|
+| `README.md` | New user-facing features, version bumps, workflow changes |
+| `AGENTS.md` | New skills added to router, orchestration changes |
+| `INDEX.md` | Skills added/removed/renamed |
+
+### README.md Update Rules
+
+README.md is the PRIMARY user documentation. Keep it:
+1. **User-focused** - Write for humans, not LLMs
+2. **Clear** - Simple language, examples that work
+3. **Minimal** - Remove what doesn't help users succeed
+4. **Single source** - Don't duplicate content elsewhere
+
+**When updating README.md:**
+- Add to "For LLMs: Documentation Maintenance" section
+- Follow existing structure (Quick Start → How to Use → Advanced → For LLMs)
+- Test examples before committing
+- Update version bump checklist
+
+### AGENTS.md Update Rules
+
+AGENTS.md is for LLMs only. Keep it:
+1. **Precise** - Every word matters for routing
+2. **Minimal** - Compress context, remove redundancy
+3. **Technical** - LLMs parse this, not humans
+4. **Current** - Version must match actual release
+
+**When updating AGENTS.md:**
+- Update version header when releasing
+- Add skills to router if they're core (used frequently)
+- Keep patterns grep-friendly
+- Test routing after changes
+
+### Related Files Matrix
+
+| File | Audience | Changes Require |
+|------|----------|-----------------|
+| README.md | Users + LLMs | User-facing feature changes |
+| AGENTS.md | LLMs only | Skill router changes |
+| CLAUDE.md | LLMs only | Project-specific rules |
+| INDEX.md | Users + LLMs | Skills catalog changes |
+
+### Documentation Sync
+
+When updating user-facing features:
+1. Update README.md first (user perspective)
+2. Update AGENTS.md if router changes needed (LLM perspective)
+3. Test both work together
+4. Commit together or in quick succession
 
 ---
 
