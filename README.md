@@ -141,13 +141,14 @@ You: "Search skillsmp for database skills"
 
 ### Multi-Model Dispatch
 
-Save Claude tokens by routing to specialized AI CLIs:
+Route work to locally-installed AI CLIs (saves Claude tokens):
 
 ```bash
-/dispatch "Research WebSocket patterns"    # → Gemini (free)
-/dispatch "Write a rate limiter function"  # → Codex (code)
-/dispatch "Design a microservices architecture"  # → Claude (plan)
+/dispatch "Write a rate limiter function"  # → Codex (code generation)
+/dispatch "Design a microservices architecture"  # → Claude (planning)
 ```
+
+Note: Requires installing additional AI CLIs (see dispatch skill documentation).
 
 ---
 
@@ -158,7 +159,6 @@ Save Claude tokens by routing to specialized AI CLIs:
 | `/full-interview` | Ask all 13+ questions (thorough) |
 | `/quick-interview` | Ask only 4 questions (fast) |
 | `/smart-interview` | Auto-detect depth (default) |
-| `/freesearch` | Research via Gemini (0 Claude tokens) |
 | `/compact` | Summarize to free tokens |
 | `/run-plan` | Execute skill sequences deterministically (v9) |
 
@@ -171,7 +171,7 @@ Save Claude tokens by routing to specialized AI CLIs:
 | **Smart Interview** | Claude asks the right questions upfront |
 | **Structured Plans** | Clear phases, decisions, dependencies |
 | **Persistent Tracking** | Tasks survive `/clear`, restarts, disconnections |
-| **Multi-Model** | Routes to best AI (Claude, Gemini, Codex) |
+| **Search Fallback** | Auto-falls back to alternate APIs when WebSearch fails |
 | **Autonomous Mode** | Headless execution that survives disconnects |
 | **50+ Skills** | Specialized tools for every development task |
 | **SkillsMP Access** | 26,000+ external skills (v9) |
@@ -198,9 +198,8 @@ your-project/
 # Required: Beads (task tracking)
 npm install -g @beads/bd
 
-# Optional: Gemini CLI (for free research)
-npm install -g @google/gemini-cli
-gemini auth login
+# Optional: Search API keys (for search-fallback when WebSearch fails)
+# See: https://github.com/Khamel83/oneshot/blob/master/.claude/skills/search-fallback/SKILL.md
 ```
 
 ---
@@ -212,8 +211,9 @@ gemini auth login
 | Skill not triggering | Say `(ONE_SHOT)` to re-anchor |
 | Lost context after `/clear` | Say "resume" |
 | "What's next?" shows nothing | `bd list` to see all tasks |
-| `/freesearch` fails | Run `gemini auth login` first |
+| WebSearch fails/rate-limits | System auto-falls back to search APIs (if configured) |
 | Beads not found | `npm install -g @beads/bd` |
+| How do I get search fallback? | Configure API keys in ~/github/oneshot/secrets/ |
 
 ---
 
@@ -231,9 +231,25 @@ gemini auth login
 
 ## Updating ONE_SHOT
 
+### Option 1: Update your project (recommended)
+
+Run this from your project directory to get latest skills and AGENTS.md:
+
 ```bash
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-v8.sh | bash
+cd your-project
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash -s -- --upgrade
 ```
+
+### Option 2: Update the oneshot repo
+
+If you cloned oneshot to ~/github/oneshot:
+
+```bash
+cd ~/github/oneshot
+git pull origin master
+```
+
+Then re-run Option 1 in your project(s) to get the updated files.
 
 ---
 
