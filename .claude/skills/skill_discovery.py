@@ -11,8 +11,12 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
+
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
 from urllib.parse import quote
 
 # Load skills inventory
@@ -135,25 +139,33 @@ def search_skillsmp(query, limit=5, use_ai_search=False):
     if not SKILLSMP_API_KEY:
         return None  # No API key configured
 
-    endpoint = "/skills/ai-search"  # AI search works with current auth
-    url = f"{SKILLSMP_API_BASE}{endpoint}?q={quote(query)}&limit={limit}"
+    if not HAS_REQUESTS:
+        print("⚠️  requests library not installed. Install with: pip install requests")
+        return None
+
+    endpoint = "/skills/ai-search" if use_ai_search else "/skills/search"
 
     try:
-        req = Request(url)
-        req.add_header("Authorization", f"Bearer {SKILLSMP_API_KEY}")
-        req.add_header("User-Agent", "ONE-SHOT/v9")  # Required by SkillsMP API
+        response = requests.get(
+            f"{SKILLSMP_API_BASE}{endpoint}",
+            params={"q": query, "limit": limit},
+            headers={"Authorization": f"Bearer {SKILLSMP_API_KEY}"},
+            timeout=10
+        )
+        response.raise_for_status()
+        data = response.json()
 
-        with urlopen(req, timeout=10) as response:
-            data = json.loads(response.read().decode())
-            return data.get("skills", [])
-    except HTTPError as e:
-        if e.code == 401:
-            print(f"⚠️  SkillsMP API key invalid. Set SKILLSMP_API_KEY env var.")
+        if data.get("success"):
+            return data.get("data", {}).get("skills", [])
         else:
-            print(f"⚠️  SkillsMP API error: {e.code}")
-        return None
-    except (URLError,TimeoutError) as e:
-        print(f"⚠️  SkillsMP unreachable: {e}")
+            error = data.get("error", {})
+            print(f"⚠️  SkillsMP API error: {error.get('code', 'unknown')}")
+            return None
+    except requests.HTTPError as e:
+        if e.response.status_code == 401:
+            print(f"⚠️  SkillsMP API key invalid or expired.")
+        else:
+            print(f"⚠️  SkillsMP API error: {e.response.status_code}")
         return None
     except Exception as e:
         print(f"⚠️  SkillsMP error: {e}")
