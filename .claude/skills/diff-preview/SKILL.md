@@ -2,6 +2,7 @@
 name: diff-preview
 description: Preview changes before applying them. Shows git diffs, prompts for confirmation, safer than direct edits.
 homepage: https://github.com/Khamel83/oneshot
+allowed-tools: Read, Write, Edit, Bash
 metadata: {"oneshot":{"emoji":"👁️","requires":{"bins":["git"]}}}
 ---
 

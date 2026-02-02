@@ -1,3 +1,11 @@
+---
+name: hooks-manager
+description: Manage Claude Code lifecycle hooks for automation (secrets scan, auto-format, audit log, session context).
+homepage: https://github.com/Khamel83/oneshot
+allowed-tools: Read, Write, Edit, Bash
+metadata: {"oneshot":{"emoji":"🪝","requires":{"bins":["bash"]}}}
+---
+
 # Hooks Manager
 
 Manage Claude Code lifecycle hooks for automation.

@@ -2,6 +2,7 @@
 name: dispatch
 description: Multi-model CLI orchestrator. Routes tasks to locally-installed AI CLIs (claude, codex, gemini, qwen). Zero Claude tokens for executed work.
 homepage: https://github.com/Khamel83/oneshot
+allowed-tools: Read, Write, Edit, Bash
 metadata: {"oneshot":{"emoji":"\ud83d\udce5","requires":{"bins":["claude","codex","gemini"]}}}
 ---
 

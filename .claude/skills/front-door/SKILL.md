@@ -471,18 +471,6 @@ Every project from front-door MUST have:
 
 ---
 
-## Integration with Plan Mode
-
-front-door becomes **Phase 0** of plan mode:
-1. **Phase 0 (NEW):** Interview & spec writing
-2. Phase 1: Exploration (existing)
-3. Phase 2: Design (existing)
-4. Phase 3: Review (existing)
-5. Phase 4: Final plan (existing)
-6. Phase 5: Exit (existing)
-
----
-
 ## Workflow Summary
 
 ```

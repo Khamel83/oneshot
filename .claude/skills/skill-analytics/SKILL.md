@@ -2,6 +2,7 @@
 name: skill-analytics
 description: Track skill usage patterns, most-used skills, token savings, and skill health metrics.
 homepage: https://github.com/Khamel83/oneshot
+allowed-tools: Read, Write, Edit, Bash
 metadata: {"oneshot":{"emoji":"📊","requires":{"bins":[]}}}
 ---
 

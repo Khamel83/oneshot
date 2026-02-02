@@ -2,6 +2,7 @@
 name: skills-browser
 description: Visual skill discovery with fuzzy search, categorization, and usage stats for 43+ ONE_SHOT skills.
 homepage: https://github.com/Khamel83/oneshot
+allowed-tools: Read, Write, Edit, Bash
 metadata: {"oneshot":{"emoji":"🔍","requires":{"bins":[]}}}
 ---
 

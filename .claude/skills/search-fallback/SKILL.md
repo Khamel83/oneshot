@@ -2,6 +2,7 @@
 name: search-fallback
 description: Fallback to free search APIs (Tavily, Brave, Bing) when WebSearch fails or rate-limits.
 homepage: https://github.com/Khamel83/oneshot
+allowed-tools: Read, Write, Edit, Bash
 metadata: {"oneshot":{"emoji":"🔍","requires":{"bins":["curl"]}}}
 ---
 
@@ -214,3 +215,7 @@ When WebSearch fails, the workflow is:
 - All APIs have generous free tiers suitable for personal use
 - Rate limits are per-month, not per-day
 - Keys are encrypted with SOPS, stored in `~/github/oneshot/secrets/research_keys.env.encrypted`
+
+## Keywords
+
+search fallback, tavily, brave, bing, perplexity, websearch rate limit

@@ -2,7 +2,8 @@
 name: freesearch
 description: TRULY FREE research via Exa API - zero Claude tokens. Uses Exa directly, no Gemini CLI wrapper.
 homepage: https://github.com/Khamel83/oneshot
-metadata: {"oneshot":{"emoji":"🆓","requires":{"bins":["curl"]}}
+allowed-tools: Read, Write, Edit, Bash
+metadata: {"oneshot":{"emoji":"🆓","requires":{"bins":["curl"]}}}
 ---
 
 # /freesearch - TRULY FREE Research
@@ -205,3 +206,7 @@ The `deep-research` skill wraps Gemini CLI in a Claude sub-agent, which still bu
 - Always save to `docs/research/` NOT `~/github/oneshot/research/`
 - Include user's goal in the prompt for better results
 - Link in-progress file in final report for drill-down
+
+## Keywords
+
+free research, exa api, zero tokens, web search, research save

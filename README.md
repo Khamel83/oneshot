@@ -231,8 +231,18 @@ gemini auth login
 
 ## Updating ONE_SHOT
 
+### To update your project with latest skills and AGENTS.md:
+
 ```bash
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-v8.sh | bash
+cd your-project
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash -s -- --upgrade
+```
+
+### To update the oneshot repo itself:
+
+```bash
+cd ~/github/oneshot
+git pull origin master
 ```
 
 ---

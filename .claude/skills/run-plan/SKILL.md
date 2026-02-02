@@ -85,3 +85,7 @@ After execution:
 - findings.md: Research, errors, discoveries
 - progress.md: Execution log with checkpoints
 - beads: Tasks marked complete
+
+## Keywords
+
+run plan, execute plan, deterministic, skill sequence, continuous plan, task_plan.md

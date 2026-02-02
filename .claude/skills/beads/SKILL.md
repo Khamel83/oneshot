@@ -427,126 +427,18 @@ Each skill can have test scenarios in `.claude/skills/<skill-name>/TESTS.md`:
 3. Return correct triggers
 **Status:** PASS | FAIL
 
-## Scenario 2: Trigger Detection
-**Input:** "build me a web app"
-**Expected:** Routes to front-door skill
-**Steps:**
-1. Match input against skill triggers
-2. Confirm front-door is highest match
-3. Verify skill is available
-**Status:** PASS | FAIL
-
-## Scenario 3: Tool Requirements
-**Input:** Skill invocation
-**Expected:** Required tools are available
-**Steps:**
-1. Parse allowed-tools from frontmatter
-2. Check each tool exists in environment
-3. Report missing tools
-**Status:** PASS | FAIL
-```
-
-### Built-in Test Categories
-
-| Category | Tests | Purpose |
-|----------|-------|---------|
-| **syntax** | Frontmatter valid YAML | Ensure skill can be loaded |
-| **triggers** | Trigger phrase matching | Verify auto-routing works |
-| **tools** | Required tools available | Check environment compatibility |
-| **metadata** | Required fields present | Ensure complete skill definition |
-| **integration** | Handoff/resume compatibility | Test skill works in workflows |
-
-### Test Results Format
+## Test Scenarios
 
 ```bash
-$ bd test front-door
+# Test a specific skill
+bd test <skill-name>
 
-Testing skill: front-door
-✓ syntax (10ms)
-✓ triggers (25ms)
-✓ tools (15ms)
-✗ metadata (5ms) - Missing 'category' field
-✓ integration (45ms)
+# Test coverage report
+bd test --coverage
 
-4/5 passed (80%)
-Failed: metadata
-
-Details:
-- Expected field 'category' not found in frontmatter
-- Recommended: Add `category: Core` to metadata
+# Health score
+bd test --health
 ```
-
-### Coverage Report
-
-```bash
-$ bd test --coverage
-
-ONE_SHOT Skill Test Coverage
-
-Core Skills:         5/5 tested (100%)
-Development:         7/7 tested (100%)
-Operations:          4/6 tested (67%)  ← git-workflow, ci-cd-setup
-Research:            4/4 tested (100%)
-Data & APIs:         2/4 tested (50%)  ← api-designer, oci-resources
-
-Overall:            22/43 tested (51%)
-
-Untested skills (priority order):
-1. git-workflow (Core) - High priority
-2. ci-cd-setup (Operations) - Medium priority
-3. api-designer (Data) - Low priority
-```
-
-### Auto-Generate Test Scenarios
-
-```bash
-# Generate test skeleton for a skill
-bd test --generate <skill-name>
-
-# Creates .claude/skills/<skill-name>/TESTS.md with:
-# - Syntax validation
-# - Trigger detection tests
-# - Tool availability checks
-```
-
-### Skill Health Score
-
-```bash
-$ bd test --health
-
-ONE_SHOT Skill Health Score: 87/100
-
-Breakdown:
-- Test Coverage: 51% (22/43) → +15 points
-- Syntax Valid: 100% (43/43) → +30 points
-- Tools Available: 95% (41/43) → +25 points
-- Recent Updates: 70% (30/43 updated in 30 days) → +17 points
-
-Recommendations:
-1. Add tests for git-workflow (high priority)
-2. Update ci-cd-setup (last updated 90 days ago)
-3. Check oci-resources tool requirements
-```
-
-### Continuous Testing
-
-```bash
-# Run tests before committing changes
-bd test --pre-commit
-
-# Exit code 1 if any test fails (for CI/CD)
-bd test --ci
-
-# Watch mode: re-run on file changes
-bd test --watch
-```
-
-### Test In Skills Workflow
-
-When implementing or modifying skills:
-1. Write test scenarios first (TDD)
-2. Run `bd test <skill-name>` to verify
-3. Make changes until tests pass
 4. Run `bd test --coverage` to ensure overall health
 
 ---

@@ -2,6 +2,7 @@
 name: deep-research
 description: Deep research via Gemini CLI OR free search APIs — runs in background sub-agent to save Claude tokens.
 homepage: https://github.com/Khamel83/oneshot
+allowed-tools: Read, Write, Edit, Bash, Task, TaskOutput
 metadata: {"oneshot":{"emoji":"🔬","requires":{"bins":["gemini"],"optional":["curl"]}}}
 ---
 
@@ -262,3 +263,7 @@ Add:
 - Always include conversation context in the task
 - Use slugified names (e.g., "quantum-computing-basics")
 - The `--yolo` flag in gemini auto-approves file operations
+
+## Keywords
+
+research, deep research, gemini, background agent, tavily, brave search, bing search
