@@ -7,6 +7,21 @@
 ## Summary
 [One-paragraph overview of what we're building and why]
 
+## Skill Sequence (The Playbook)
+
+> This section lists the skills that will be used to execute this plan deterministically.
+
+| Step | Skill | Purpose | Input | Output | Status |
+|------|-------|---------|-------|--------|--------|
+| 1 | front-door | Interview/triage | User request | requirements.yaml | ⏸️ Pending |
+| 2 | [skill-name] | [purpose] | [from previous] | [produces] | ⏸️ Pending |
+| 3 | [skill-name] | [purpose] | [from previous] | [produces] | ⏸️ Pending |
+| 4 | implement-plan | Execute skills deterministically | All above | Completed project | ⏸️ Pending |
+
+**Skill Inventory Check:**
+- Run: `python3 ~/.claude/skills/skill_discovery.py "[GOAL]"`
+- Add discovered skills to this sequence
+
 ## Problem Statement
 [What problem this solves, who has it, and why it matters]
 

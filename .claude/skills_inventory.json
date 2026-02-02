@@ -1,0 +1,338 @@
+[
+  {
+    "name": "api-designer",
+    "directory": "api-designer",
+    "description": "Design RESTful or GraphQL APIs with proper conventions. Creates endpoint specifications, request/response schemas, and documentation. Use when user says ",
+    "lines": 380,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/api-designer"
+  },
+  {
+    "name": "auto-updater",
+    "directory": "auto-updater",
+    "description": "Automatically update ONE_SHOT skills from GitHub on session start. Checks once per day and updates silently. Use /update to force update.",
+    "lines": 154,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/auto-updater"
+  },
+  {
+    "name": "autonomous-builder",
+    "directory": "autonomous-builder",
+    "description": "Run headless implementation from idea to artifact. Use when user says ",
+    "lines": 256,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/autonomous-builder"
+  },
+  {
+    "name": "batch-processor",
+    "directory": "batch-processor",
+    "description": "Apply operations across multiple files in parallel. Use when user says ",
+    "lines": 316,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/batch-processor"
+  },
+  {
+    "name": "beads",
+    "directory": "beads",
+    "description": "Git-backed persistent task tracking with dependencies. Use when user says ",
+    "lines": 557,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/beads"
+  },
+  {
+    "name": "ci-cd-setup",
+    "directory": "ci-cd-setup",
+    "description": "Set up GitHub Actions or other CI/CD pipelines. Creates automated testing, building, and deployment workflows. Use when user says ",
+    "lines": 242,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/ci-cd-setup"
+  },
+  {
+    "name": "code-reviewer",
+    "directory": "code-reviewer",
+    "description": "Perform structured code reviews for quality and security. Checks OWASP top 10, code quality, and provides actionable feedback. Use when user says ",
+    "lines": 238,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/code-reviewer"
+  },
+  {
+    "name": "continuous-planner",
+    "directory": "continuous-planner",
+    "description": "Create a living 3-file continuous plan (task_plan.md, findings.md, progress.md). Use when user says ",
+    "lines": 316,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/continuous-planner"
+  },
+  {
+    "name": "convex-resources",
+    "directory": "convex-resources",
+    "description": "Use Convex for reactive web app backends. Default for project types C (Web) and F (AI Web). Use when user says ",
+    "lines": 366,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/convex-resources"
+  },
+  {
+    "name": "create-handoff",
+    "directory": "create-handoff",
+    "description": "Create a handoff document to preserve context before clearing. Use when user says ",
+    "lines": 248,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/create-handoff"
+  },
+  {
+    "name": "create-plan",
+    "directory": "create-plan",
+    "description": "Create a structured implementation plan. Use when user says ",
+    "lines": 175,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/create-plan"
+  },
+  {
+    "name": "database-migrator",
+    "directory": "database-migrator",
+    "description": "Handle schema changes and data migrations safely. Creates migration files with rollback plans. Use when user says ",
+    "lines": 303,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/database-migrator"
+  },
+  {
+    "name": "debugger",
+    "directory": "debugger",
+    "description": "Systematically debug issues using isolation and evidence-based diagnosis. Follows a structured approach to find root causes. Use when user says ",
+    "lines": 179,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/debugger"
+  },
+  {
+    "name": "deep-research",
+    "directory": "deep-research",
+    "description": "Gemini research: [topic]",
+    "lines": 265,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/deep-research"
+  },
+  {
+    "name": "delegate-to-agent",
+    "directory": "delegate-to-agent",
+    "description": "Intelligently delegate to native sub-agents for isolated context work. Use when user says ",
+    "lines": 364,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/delegate-to-agent"
+  },
+  {
+    "name": "diff-preview",
+    "directory": "diff-preview",
+    "description": "No description",
+    "lines": 256,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/diff-preview"
+  },
+  {
+    "name": "dispatch",
+    "directory": "dispatch",
+    "description": "No description",
+    "lines": 286,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/dispatch"
+  },
+  {
+    "name": "docker-composer",
+    "directory": "docker-composer",
+    "description": "Create and manage Docker and Docker Compose configurations. Builds optimized Dockerfiles and multi-service compose setups. Use when user says ",
+    "lines": 242,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/docker-composer"
+  },
+  {
+    "name": "documentation-generator",
+    "directory": "documentation-generator",
+    "description": "Generate and update project documentation including README, LLM-OVERVIEW, and ADRs. Ensures docs match current code state. Use when user says ",
+    "lines": 188,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/documentation-generator"
+  },
+  {
+    "name": "failure-recovery",
+    "directory": "failure-recovery",
+    "description": "Recovery protocols for stuck agents, context exhaustion, build failures, and confusion. Use when agent is looping, responses degrading, builds failing repeatedly, or user says ",
+    "lines": 396,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/failure-recovery"
+  },
+  {
+    "name": "freesearch",
+    "directory": "freesearch",
+    "description": "No description",
+    "lines": 208,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/freesearch"
+  },
+  {
+    "name": "front-door",
+    "directory": "front-door",
+    "description": "Intelligent entry point for all tasks. Interviews, triages, and routes. Use when starting any non-trivial work, when user says ",
+    "lines": 513,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/front-door"
+  },
+  {
+    "name": "full-interview",
+    "directory": "full-interview",
+    "description": "Force full interview depth for this session. Use when user says ",
+    "lines": 59,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/full-interview"
+  },
+  {
+    "name": "git-workflow",
+    "directory": "git-workflow",
+    "description": "Handle branches, commits, and PR prep using conventional commits. Creates clean git history with proper commit messages. Use when user says ",
+    "lines": 129,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/git-workflow"
+  },
+  {
+    "name": "hooks-manager",
+    "directory": "hooks-manager",
+    "description": "No description",
+    "lines": 154,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/hooks-manager"
+  },
+  {
+    "name": "implement-plan",
+    "directory": "implement-plan",
+    "description": "Execute an approved implementation plan with beads-backed task tracking.",
+    "lines": 288,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/implement-plan"
+  },
+  {
+    "name": "observability-setup",
+    "directory": "observability-setup",
+    "description": "Set up logging, metrics, health checks, and alerting. Creates observability infrastructure for production systems. Use when user says ",
+    "lines": 294,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/observability-setup"
+  },
+  {
+    "name": "oci-resources",
+    "directory": "oci-resources",
+    "description": "Use OCI free-tier resources (Object Storage, Autonomous Database). Use when user says ",
+    "lines": 243,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/oci-resources"
+  },
+  {
+    "name": "oops",
+    "directory": "oops",
+    "description": "Zero-friction mistake capture. Analyzes recent conversation to extract lessons learned and stores them in global beads. Use when user says ",
+    "lines": 160,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/oops"
+  },
+  {
+    "name": "parallel-validator",
+    "directory": "parallel-validator",
+    "description": "Run validation suite in parallel background workers. Auto-triggered after code changes when multiple validators apply. Use when tests, lint, and security checks should run simultaneously.",
+    "lines": 223,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/parallel-validator"
+  },
+  {
+    "name": "performance-optimizer",
+    "directory": "performance-optimizer",
+    "description": "Profile and optimize slow code, queries, or systems. Uses evidence-based profiling before optimizing. Use when user says ",
+    "lines": 173,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/performance-optimizer"
+  },
+  {
+    "name": "push-to-cloud",
+    "directory": "push-to-cloud",
+    "description": "Deploy projects to OCI-Dev cloud instance with full automation. Handles rsync, systemd service creation, and optional DNS/Traefik setup. Use when user says ",
+    "lines": 210,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/push-to-cloud"
+  },
+  {
+    "name": "quick-interview",
+    "directory": "quick-interview",
+    "description": "Force quick interview depth for this session. Use when user says ",
+    "lines": 118,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/quick-interview"
+  },
+  {
+    "name": "refactorer",
+    "directory": "refactorer",
+    "description": "Apply systematic refactoring patterns to improve code quality. Performs safe, tested refactoring one step at a time. Use when user says ",
+    "lines": 220,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/refactorer"
+  },
+  {
+    "name": "remote-exec",
+    "directory": "remote-exec",
+    "description": "Execute commands on remote machines via SSH. Handles git sync, file transfer, and long-running jobs. Use when user says ",
+    "lines": 331,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/remote-exec"
+  },
+  {
+    "name": "resilient-executor",
+    "directory": "resilient-executor",
+    "description": "Execute work that survives terminal disconnection. Uses tmux for persistence, aggressive state saving, and recovery. Use when user says ",
+    "lines": 349,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/resilient-executor"
+  },
+  {
+    "name": "resume-handoff",
+    "directory": "resume-handoff",
+    "description": "Resume work from a handoff document. Use when user says ",
+    "lines": 298,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/resume-handoff"
+  },
+  {
+    "name": "search-fallback",
+    "directory": "search-fallback",
+    "description": "No description",
+    "lines": 217,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/search-fallback"
+  },
+  {
+    "name": "secrets-sync",
+    "directory": "secrets-sync",
+    "description": "Two-way secret synchronization between master vault and projects. Detects new secrets, namespaces by project, and handles SOPS re-encryption. Use when user says ",
+    "lines": 224,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/secrets-sync"
+  },
+  {
+    "name": "secrets-vault-manager",
+    "directory": "secrets-vault-manager",
+    "description": "Handle SOPS + Age secrets for ONE_SHOT projects. Manages encrypted secrets, decryption, and secret rotation. Use when user mentions ",
+    "lines": 156,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/secrets-vault-manager"
+  },
+  {
+    "name": "skill-analytics",
+    "directory": "skill-analytics",
+    "description": "No description",
+    "lines": 266,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/skill-analytics"
+  },
+  {
+    "name": "skills-browser",
+    "directory": "skills-browser",
+    "description": "No description",
+    "lines": 222,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/skills-browser"
+  },
+  {
+    "name": "skillsmp-browser",
+    "directory": "skillsmp-browser",
+    "description": "Browse and compare skills from SkillsMP and Anthropic",
+    "lines": 136,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/skillsmp-browser"
+  },
+  {
+    "name": "smart-interview",
+    "directory": "smart-interview",
+    "description": "Reset to smart interview depth (default). Use when user says ",
+    "lines": 74,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/smart-interview"
+  },
+  {
+    "name": "test-runner",
+    "directory": "test-runner",
+    "description": "Run tests, analyze results, and improve coverage. Supports pytest, jest, go test, and cargo test. Use when user says ",
+    "lines": 201,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/test-runner"
+  },
+  {
+    "name": "the-audit",
+    "directory": "the-audit",
+    "description": "Strategic communication filter. Transforms raw emotional input into strategic output. Use when user says ",
+    "lines": 244,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/the-audit"
+  },
+  {
+    "name": "thinking-modes",
+    "directory": "thinking-modes",
+    "description": "Extended thinking modes for deeper analysis. Use when user says ",
+    "lines": 228,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/thinking-modes"
+  },
+  {
+    "name": "visual-iteration",
+    "directory": "visual-iteration",
+    "description": "Self-scoring visual feedback loop for web UI polish. Use when user says ",
+    "lines": 186,
+    "path": "/home/ubuntu/github/oneshot/.claude/skills/visual-iteration"
+  }
+]

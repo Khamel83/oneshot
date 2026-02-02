@@ -1,14 +1,14 @@
 ---
 name: continuous-planner
-description: "Create a living 3-file continuous plan (task_plan.md, findings.md, progress.md). Use when user says 'continuous plan', 'living plan', '3-file plan', or 'plan with files'."
-allowed-tools: Read, Glob, Grep, Write, Edit, Task
+description: "Create a living 3-file continuous plan (task_plan.md, findings.md, progress.md) with explicit skill sequences. Use when user says 'continuous plan', 'living plan', '3-file plan', or 'plan with files'."
+allowed-tools: Read, Glob, Grep, Write, Edit, Task, Bash
 homepage: https://github.com/OthmanAdi/planning-with-files
-metadata: {"oneshot":{"emoji":"\u2139\ufe0f","requires":{"bins":["bd"]}}}
+metadata: {"oneshot":{"emoji":"\u2139\ufe0f","requires":{"bins":["bd", "python3"]}}}
 ---
 
-# Continuous Planner - 3-File Pattern
+# Continuous Planner - 3-File Pattern (v9)
 
-**Create a living plan that survives session breaks and enables multi-model coordination.**
+**Create a living plan that survives session breaks and enables multi-model coordination with explicit skill sequences.**
 
 ## Core Philosophy
 
@@ -123,6 +123,34 @@ else
 fi
 
 mkdir -p "$PLAN_DIR"
+```
+
+### Step 2.5: Discover Required Skills (v9)
+
+**Use skill discovery to find which skills to use:**
+
+```bash
+# Run skill discovery for the goal
+python3 ~/.claude/skills/skill_discovery.py "$GOAL"
+```
+
+This will:
+1. Match local skills to the goal
+2. Identify skill gaps
+3. Suggest SkillsMP searches if needed
+
+**Add skill sequence to task_plan.md:**
+
+```markdown
+## Skill Sequence (The Playbook)
+
+1. **front-door** → requirements
+   - Interview and triage
+   - Status: ⏸️ Pending
+
+2. **[discovered-skill]** → [output]
+   - Description of what it does
+   - Status: ⏸️ Pending
 ```
 
 ### Step 3: Initialize Files from Templates
