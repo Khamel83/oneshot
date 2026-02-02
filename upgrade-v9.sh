@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# ONE_SHOT v8 Upgrade Script
+# ONE_SHOT v9 Upgrade Script
 # Ultra-compressed context: 2k tokens (down from 20k)
 #
 set -e
@@ -9,7 +9,7 @@ CLAUDE_DIR="$HOME/.claude"
 BACKUP_DIR="$CLAUDE_DIR/v7.5.backup"
 BASE_URL="https://raw.githubusercontent.com/Khamel83/oneshot/master/.claude/hooks"
 
-echo "=== ONE_SHOT v8 Upgrade ==="
+echo "=== ONE_SHOT v9 Upgrade ==="
 echo "Target: ~2k system tokens (down from ~20k)"
 echo ""
 
@@ -20,14 +20,14 @@ cp "$CLAUDE_DIR/settings.json" "$BACKUP_DIR/" 2>/dev/null || true
 cp "$CLAUDE_DIR/hooks/context.py" "$BACKUP_DIR/" 2>/dev/null || true
 echo "✓ Backed up to $BACKUP_DIR"
 
-# Download v8 hooks
+# Download v9 hooks
 echo ""
-echo "Step 2: Download v8 hooks..."
-curl -fsSL "$BASE_URL/context-v8.py" -o "$CLAUDE_DIR/hooks/context.py" || {
+echo "Step 2: Download v9 hooks..."
+curl -fsSL "$BASE_URL/context-v9.py" -o "$CLAUDE_DIR/hooks/context.py" || {
     echo "✗ Download failed"
     exit 1
 }
-curl -fsSL "$BASE_URL/beads-v8.py" -o "$CLAUDE_DIR/hooks/beads.py" || {
+curl -fsSL "$BASE_URL/beads-v9.py" -o "$CLAUDE_DIR/hooks/beads.py" || {
     echo "✗ Download failed"
     exit 1
 }
@@ -71,10 +71,10 @@ if grep -q "v7.5 Context Interpreter" "$CLAUDE_DIR/CLAUDE.md" 2>/dev/null; then
     # Remove v7.5 section
     sed -i '/## ONE_SHOT v7.5 Context Interpreter/,/^--$/d' "$CLAUDE_DIR/CLAUDE.md"
 fi
-if ! grep -q "v8 Context" "$CLAUDE_DIR/CLAUDE.md" 2>/dev/null; then
+if ! grep -q "v9 Context" "$CLAUDE_DIR/CLAUDE.md" 2>/dev/null; then
     cat >> "$CLAUDE_DIR/CLAUDE.md" << 'EOF'
 
-## ONE_SHOT v8 Context (Ultra-Compressed)
+## ONE_SHOT v9 Context (Ultra-Compressed)
 
 When you see `CTX:{"v":8,...}` at session start, parse this JSON:
 
@@ -152,7 +152,7 @@ python3 "$CLAUDE_DIR/hooks/beads.py" >/dev/null 2>&1 || {
 echo "✓ Hooks working"
 
 echo ""
-echo "=== v8 Upgrade Complete ==="
+echo "=== v9 Upgrade Complete ==="
 echo ""
 echo "Next: Start new Claude Code session, run /context to verify ~2k tokens"
 echo "Rollback: cp $BACKUP_DIR/settings.json ~/.claude/settings.json"

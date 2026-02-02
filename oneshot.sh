@@ -1,5 +1,5 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v7.4
+# ONE_SHOT Bootstrap Script v9
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # Options:
@@ -31,7 +31,7 @@ for arg in "$@"; do
       shift
       ;;
     --help)
-      echo "ONE_SHOT Bootstrap Script v7.4"
+      echo "ONE_SHOT Bootstrap Script v9"
       echo ""
       echo "Usage:"
       echo "  curl -sL .../oneshot.sh | bash                   # Install"
@@ -70,10 +70,10 @@ RED='\033[0;31m'
 
 echo ""
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "${BLUE}ONE_SHOT Upgrade v7.4${NC}"
+  echo -e "${BLUE}ONE_SHOT Upgrade v9${NC}"
   echo "====================="
 else
-  echo -e "${BLUE}ONE_SHOT Bootstrap v7.4${NC}"
+  echo -e "${BLUE}ONE_SHOT Bootstrap v9${NC}"
   echo "========================"
 fi
 echo ""
@@ -453,7 +453,7 @@ fi
 # =============================================================================
 echo ""
 echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║                    ONE_SHOT v7.4 Ready!                       ║${NC}"
+echo -e "${GREEN}║                    ONE_SHOT v9 Ready!                       ║${NC}"
 echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${BLUE}🚀 TRY THIS FIRST:${NC}"
