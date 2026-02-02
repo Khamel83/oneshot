@@ -60,29 +60,31 @@ Beads: Track progress
 
 ## Implementation Phases
 
-### Phase 1: Fix Context Bloat (Status: In Progress)
-- [ ] 1.1: Create skills_inventory.json with names + descriptions
-- [ ] 1.2: Modify skill loading to lazy-load full content
-- [ ] 1.3: Measure context before/after
-- [ ] 1.4: Test with real workflows
+### Phase 1: Fix Context Bloat (Status: ✅ Complete)
+- [x] 1.1: Create skills_inventory.json with names + descriptions
+- [ ] 1.2: Modify skill loading to lazy-load full content (DEFERRED - not needed)
+- [x] 1.3: Measure context before/after (Skills only 2.2K/1.1% - not a problem)
+- [x] 1.4: Test with real workflows
 
-**Bead**: oneshot-5kd
+**Bead**: oneshot-5kd ✅ Closed
 
-### Phase 2: Make Skills Explicit in Plans (Status: pending)
-- [ ] 2.1: Enhance create-plan to list required skills
-- [ ] 2.2: Enhance continuous-planner to show skill sequences
-- [ ] 2.3: Update implement-plan to follow skill list
-- [ ] 2.4: Test deterministic execution
+### Phase 2: Make Skills Explicit in Plans (Status: ✅ Complete)
+- [x] 2.1: Enhance create-plan to list required skills
+- [x] 2.2: Enhance continuous-planner to show skill sequences
+- [x] 2.3: Update implement-plan to follow skill list
+- [x] 2.4: Test deterministic execution
 
-**Dependency**: Phase 1 complete
+**Result**: Skill Sequence table added to task_plan.md template
 
-### Phase 3: Skill Discovery (Status: pending)
-- [ ] 3.1: Create SkillsMP API wrapper
-- [ ] 3.2: Add automatic skill lookup during planning
-- [ ] 3.3: Install SkillsMP skills on-demand
-- [ ] 3.4: Test with real scenarios
+### Phase 3: SkillsMP Integration (Status: ✅ Complete)
+- [x] 3.1: Create SkillsMP API wrapper
+- [x] 3.2: Add automatic skill lookup during planning
+- [x] 3.3: Install SkillsMP skills on-demand
+- [x] 3.4: Test with real scenarios
 
-**Dependency**: Phase 2 complete
+**Result**: skill_discovery.py with --skillsmp flag, skillsmp-search skill created
+
+**Note**: API key intermittently returns 401 - may need verification from skillsmp.com
 
 ## Dependencies
 - Continuous planner skill (already created)
