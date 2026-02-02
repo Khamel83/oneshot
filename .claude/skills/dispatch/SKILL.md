@@ -28,6 +28,7 @@ User says:
 | `codex` | 0.92.0 | OpenAI | Code generation, refactoring | $$ |
 | `gemini` | 0.26.0 | Google | Research, Q&A, free tier | FREE |
 | `qwen` | TBD | Qwen | General tasks (2K free/day) | FREE |
+| `zai` | TBD | ZAI | High-token execution (GLM 4.7, 128K context) | FREE/TBD |
 
 ---
 
@@ -121,6 +122,24 @@ qwen -i "Implement this feature"
 qwen --file main.ts "Add error handling"
 ```
 
+### ZAI CLI (after installation)
+```bash
+# Install ZAI CLI
+npm install -g @zai/cli
+
+# Authenticate
+zai auth login
+
+# High-context execution (GLM 4.7, 128K tokens)
+zai exec "Implement this large feature with full context"
+
+# With model specification
+zai --model glm-4.7 "Complex multi-file implementation"
+
+# Check quota
+zai quota
+```
+
 ---
 
 ## Output Location
@@ -148,6 +167,11 @@ cli_router:
 
   claude:
     keywords: ["plan", "design", "architect", "complex", "analyze trade-offs", "multi-step"]
+
+  zai:
+    keywords: ["execute", "implement", "high context", "large task", "multi-file"]
+    model: "glm-4.7"
+    context: "128K tokens - best for large implementation tasks"
 
   qwen:
     keywords: ["general task", "quick question", "simple"]
