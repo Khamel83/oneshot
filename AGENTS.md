@@ -1,17 +1,17 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for setup, INDEX.md for skill reference -->
 
-# ONE_SHOT v8.1
+# ONE_SHOT v8.3
 
 > **UPDATE CHECK**: Run: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/upgrade-v8.sh | bash`
 
-> **v8.1 = ULTRA-COMPRESSED + GEMINI RESEARCH** - 2k system tokens (down from 20k). All prose → JSON.
+> **v8.3 = CONTINUOUS PLANNING** - 3-file pattern (task_plan.md, findings.md, progress.md) for living plans that survive /clear and enable multi-model coordination.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
 ---
 
-## SKILL ROUTER (17 Core Skills)
+## SKILL ROUTER (18 Core Skills)
 
 ```yaml
 skill_router:
@@ -128,7 +128,7 @@ skill_router:
 
 ---
 
-## SLASH COMMANDS (v8.1)
+## SLASH COMMANDS (v8.3)
 
 All skills can be invoked via `/skill-name`. Core slash commands:
 
@@ -138,9 +138,10 @@ All skills can be invoked via `/skill-name`. Core slash commands:
 | `/full-interview` | Full depth (all 13+ questions) |
 | `/quick-interview` | Quick mode (Q1, Q2, Q6, Q12 only) |
 | `/smart-interview` | Reset to auto-detect depth |
+| `/continuous-planner` | Create living 3-file plan (survives /clear) |
 | `/deep-research` | Background research via Gemini CLI or APIs |
 | `/freesearch` | TRULY FREE research via Gemini CLI (0 tokens) |
-| `/dispatch` | Route tasks to local AI CLIs (codex/gemini/qwen) |
+| `/dispatch` | Route tasks to local AI CLIs (codex/gemini/qwen/zai) |
 | `/search-fallback` | Fallback search APIs when WebSearch fails |
 | `/update` | Update ONE_SHOT from GitHub |
 | `/beads` or `/bd` | Task tracking commands |
@@ -288,4 +289,4 @@ Say `(ONE_SHOT)` to re-anchor to these rules.
 
 ---
 
-**Version**: 8.1 | **System Tokens**: ~2k (down from 20k) | **Core Skills**: 15 | **Total Skills**: 41 | **Slash Commands**: Yes | **Context**: Ultra-compressed JSON
+**Version**: 8.3 | **System Tokens**: ~2k (down from 20k) | **Core Skills**: 18 | **Total Skills**: 51 | **Slash Commands**: Yes | **Context**: Ultra-compressed JSON | **New**: Continuous Planning (3-file pattern)
