@@ -13,6 +13,7 @@ import subprocess
 from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
+from urllib.parse import quote
 
 # Load skills inventory
 INVENTORY_PATH = Path("/home/ubuntu/github/oneshot/.claude/skills_inventory.json")
@@ -84,6 +85,9 @@ def find_skill_gaps(goal, inventory=None):
         'monitoring': ['monitor', 'metrics', 'logging', 'observability', 'alert'],
         'frontend': ['frontend', 'ui', 'react', 'vue', 'angular', 'css', 'html'],
         'backend': ['backend', 'server', 'api', 'service'],
+        'blockchain': ['blockchain', 'web3', 'smart contract', 'crypto', 'nft', 'defi'],
+        'cli': ['cli', 'command line', 'terminal', 'shell script'],
+        'mobile': ['mobile', 'ios', 'android', 'app', 'react native', 'flutter'],
     }
 
     if inventory is None:
@@ -132,12 +136,12 @@ def search_skillsmp(query, limit=5, use_ai_search=False):
         return None  # No API key configured
 
     endpoint = "/skills/ai-search"  # AI search works with current auth
-    url = f"{SKILLSMP_API_BASE}{endpoint}?q={query}&limit={limit}"
+    url = f"{SKILLSMP_API_BASE}{endpoint}?q={quote(query)}&limit={limit}"
 
     try:
         req = Request(url)
         req.add_header("Authorization", f"Bearer {SKILLSMP_API_KEY}")
-        req.add_header("User-Agent", "ONE-SHOT/v9")
+        req.add_header("User-Agent", "ONE-SHOT/v9")  # Required by SkillsMP API
 
         with urlopen(req, timeout=10) as response:
             data = json.loads(response.read().decode())
@@ -186,14 +190,14 @@ def install_skillsmp_skill(skill_name):
         return False
 
 
-def recommend_skills(goal, limit=5, search_skillsmp=False):
+def recommend_skills(goal, limit=5, use_skillsmp=False):
     """
     Recommend skills for a given goal.
 
     Args:
         goal: User's goal
         limit: Max number of recommendations
-        search_skillsmp: Whether to search SkillsMP for gaps
+        use_skillsmp: Whether to search SkillsMP for gaps
 
     Returns:
         Dict with local_skills, skill_gaps, and skillsmp_results
@@ -208,7 +212,7 @@ def recommend_skills(goal, limit=5, search_skillsmp=False):
 
     # Search SkillsMP if requested and gaps found
     skillsmp_results = []
-    if search_skillsmp and gaps:
+    if use_skillsmp and gaps:
         for gap in gaps[:3]:  # Limit SkillsMP searches
             results = search_skillsmp(gap['suggested_search'], limit=3)
             if results:
@@ -258,7 +262,7 @@ if __name__ == '__main__':
     result = recommend_skills(
         goal,
         limit=args.limit,
-        search_skillsmp=args.skillsmp
+        use_skillsmp=args.skillsmp
     )
 
     print(f"📦 Local skills found: {result['total_local_found']}\n")
