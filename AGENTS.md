@@ -44,6 +44,10 @@ skill_router:
   - pattern: "plan|design|how should|what's the approach"
     skill: create-plan
 
+  - pattern: "continuous plan|living plan|3-file plan|plan with files|multi-model coordination"
+    skill: continuous-planner
+    note: "3-file pattern (task_plan.md, findings.md, progress.md) - survives /clear, multi-model coordination"
+
   - pattern: "implement|execute|build it|run the plan"
     skill: implement-plan
 
