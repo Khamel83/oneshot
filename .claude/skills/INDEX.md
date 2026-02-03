@@ -32,6 +32,7 @@ These are the skills you'll use 90% of the time. Just say these phrases:
 | `/freesearch [topic]` | Research via Exa API, zero tokens | ✅ FREE |
 | `/dispatch [task]` | Route to best local CLI (codex/gemini/qwen) | ✅ FREE |
 | `/browse [keyword]` | Fuzzy search through 46 skills | ✅ FREE |
+| `/cp [project]` | Create a 3-file continuous plan | - |
 | `/deep-research [topic]` | Research via Claude sub-agent | ❌ Uses tokens |
 
 **Use `/freesearch`** for token-free research. **Use `/dispatch`** to offload work to specialized CLIs. **Use `/browse`** to find skills.

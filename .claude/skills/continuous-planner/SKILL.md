@@ -1,12 +1,12 @@
 ---
 name: continuous-planner
-description: "Create a living 3-file continuous plan (task_plan.md, findings.md, progress.md) with explicit skill sequences. Use when user says 'continuous plan', 'living plan', '3-file plan', or 'plan with files'."
+description: "Create a living 3-file continuous plan (task_plan.md, findings.md, progress.md) with explicit skill sequences. Use when user says '/cp', 'continuous plan', 'living plan', '3-file plan', or 'plan with files'."
 allowed-tools: Read, Glob, Grep, Write, Edit, Task, Bash
 homepage: https://github.com/OthmanAdi/planning-with-files
 metadata: {"oneshot":{"emoji":"\u2139\ufe0f","requires":{"bins":["bd", "python3"]}}}
 ---
 
-# Continuous Planner - 3-File Pattern (v9)
+# /cp - Continuous Planner - 3-File Pattern (v9)
 
 **Create a living plan that survives session breaks and enables multi-model coordination with explicit skill sequences.**
 
@@ -23,6 +23,7 @@ The 3-file pattern keeps plans alive across sessions, /clear operations, and eve
 ## When To Use
 
 User says:
+- `/cp [project]` - Quick shortcut for continuous planner
 - "continuous plan", "living plan", "3-file plan", "plan with files"
 - "create a continuous plan for [project]"
 - "I want a plan that survives /clear"
