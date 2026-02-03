@@ -313,3 +313,9 @@ bd = json.loads(BEADS_JSON)
   oneshot:last-check: 2026-02-02
   oneshot:machine: instance-first
 -->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-02-03
+  oneshot:machine: instance-first
+-->
