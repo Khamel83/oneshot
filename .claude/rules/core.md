@@ -13,6 +13,15 @@ These rules load for every project.
 
 ---
 
+## Work Discipline
+
+- **Plan first**: Always start with a plan before coding. Think, then do.
+- **Commit per task**: Don't batch commits to end-of-session. Commit each completed task immediately.
+- **Keep tasks small**: Break work so each subtask completes well within context. If it's too big, split it.
+- **Vanilla over complex**: Simple direct work beats elaborate multi-agent orchestration for small tasks.
+
+---
+
 ## Documentation-First Coding
 
 **CRITICAL RULE:** Before writing code that uses external APIs, libraries, or configuration syntax, you MUST check the current documentation.
