@@ -1,9 +1,9 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for user guide, INDEX.md for skill reference -->
 
-# ONE_SHOT v9
+# ONE_SHOT v10.2
 
-> **v9 = PLAY CALLING** - Explicit skill sequences in task_plan.md, automatic skill discovery, SkillsMP marketplace integration, deterministic execution via /run-plan.
+> **v10.2 = WAIT FOR NATIVE** - Progressive disclosure rules, slash commands on-demand, beads for task tracking, ~93% token reduction from v9.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
@@ -344,4 +344,4 @@ When updating user-facing features:
 
 ---
 
-**Version**: 8.3 | **System Tokens**: ~2k (down from 20k) | **Core Skills**: 18 | **Total Skills**: 51 | **Slash Commands**: Yes | **Context**: Ultra-compressed JSON | **New**: Continuous Planning (3-file pattern)
+**Version**: 10.2 | **System Tokens**: ~400 (down from 5.8k) | **Slash Commands**: 16 | **Rules**: 7 | **Context**: Progressive disclosure | **New**: Work discipline, beads operational rules, beads_viewer (bv)

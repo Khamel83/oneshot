@@ -1,4 +1,4 @@
-# ONE_SHOT v10.1
+# ONE_SHOT v10.2
 
 **Your personal Claude Code configuration.**
 
@@ -32,7 +32,7 @@ claude .
 
 ---
 
-## What Changed (v9 → v10.1)
+## What Changed (v9 → v10.2)
 
 ### v9: Framework with 50+ Skills
 - AGENTS.md routing table
@@ -42,7 +42,7 @@ claude .
 - "Build me X" triggered interview automatically
 
 ### v10: Personal Configuration (~93% token reduction)
-- Removed AGENTS.md
+- Removed AGENTS.md routing
 - 16 slash commands (invoke when needed)
 - 7 rules always loaded (~410 tokens)
 - You type `/interview` when you want structure
@@ -51,6 +51,12 @@ claude .
 - Rules split by project type (web, cli, service)
 - Auto-detection from files
 - ~300 tokens vs ~2000 in v9
+
+### v10.2: Work Discipline + Beads Tightening
+- Work discipline principles (plan first, commit per task, keep tasks small)
+- Beads operational rules (session start/end prompts, blocked/big bead handling)
+- beads_viewer (`bv`) as recommended TUI
+- "Wait for Native" strategy — use beads now, switch to Claude native when it ships
 
 ---
 
@@ -181,7 +187,7 @@ git pull origin master
 
 ---
 
-## v9 vs v10.1 Comparison
+## v9 vs v10.2 Comparison
 
 See [V9-TO-V10.1.md](V9-TO-V10.1.md) for detailed comparison.
 
@@ -195,4 +201,4 @@ See [V9-TO-V10.1.md](V9-TO-V10.1.md) for detailed comparison.
 
 ---
 
-**v10.1** | Progressive Disclosure | Slash Commands | Beads | "Wait for Native" Strategy
+**v10.2** | Progressive Disclosure | Slash Commands | Beads | "Wait for Native" Strategy

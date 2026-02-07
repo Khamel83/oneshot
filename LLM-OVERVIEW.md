@@ -1,8 +1,8 @@
 # LLM-OVERVIEW: ONE_SHOT
 
 > Complete context for any LLM to understand this project.
-> **Last Updated**: 2025-01-29
-> **ONE_SHOT Version**: 8.1
+> **Last Updated**: 2026-02-07
+> **ONE_SHOT Version**: 10.2
 > **Status**: Production / Active Development
 
 ---
@@ -38,10 +38,11 @@ A skill system for Claude Code that provides persistent task tracking, autonomou
 ### Current State
 
 - **Status**: Production / Active Development
-- **Version**: 8.1
-- **Total Skills**: 43 (21 Core, 22 Advanced)
-- **Last Milestone**: `/dispatch` multi-model CLI orchestration
-- **Next Milestone**: Enhanced skill discovery and testing
+- **Version**: 10.2
+- **Slash Commands**: 16
+- **Rules**: 7 (progressive disclosure)
+- **Last Milestone**: Work discipline + beads operational rules
+- **Next Milestone**: Wait for Claude native task tools
 
 ---
 
@@ -332,6 +333,6 @@ cd tests
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2025-01-29
+**Document Version**: 2.0
+**Last Updated**: 2026-02-07
 **Maintainer**: @Khamel83
