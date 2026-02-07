@@ -1,0 +1,77 @@
+# CLAUDE.md - OCI-Dev Cloud Deployment Target
+
+This machine is a **cloud deployment target** for the ONE_SHOT system.
+
+## Machine Identity
+
+- **Hostname:** oci-dev (instance-first)
+- **Tailscale IP:** 100.126.13.70
+- **Public IP:** 141.148.146.79
+- **Role:** Cloud runtime for lightweight services
+- **Owner:** khamel83
+
+## Current Deployments
+
+- **dada.khamel.com** (port 8000) - FastAPI app for family messaging
+
+## Deployment Pattern
+
+Services are deployed as:
+1. Python apps with virtualenv in ~/dev/<project>/
+2. Systemd services for auto-restart
+3. Exposed via homelab Traefik (dada.khamel.com → this machine via Tailscale)
+
+## How to Deploy Here
+
+From homelab or any Tailscale-connected machine:
+```bash
+# 1. Push code
+rsync -avz --exclude='.venv' --exclude='__pycache__' ./my-project/ ubuntu@100.126.13.70:~/dev/my-project/
+
+# 2. SSH and setup
+ssh ubuntu@100.126.13.70
+cd ~/dev/my-project
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 3. Create systemd service
+sudo tee /etc/systemd/system/my-project.service << 'SERVICE'
+[Unit]
+Description=My Project
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/dev/my-project
+ExecStart=/home/ubuntu/dev/my-project/venv/bin/python app.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+sudo systemctl daemon-reload
+sudo systemctl enable my-project
+sudo systemctl start my-project
+```
+
+## Constraints
+
+- **Memory:** 24GB RAM (plenty)
+- **Storage:** 77GB free
+- **Network:** Oracle Cloud free tier (10TB egress/month)
+- **No Docker:** Services run directly with systemd
+
+## Integration with Homelab
+
+- **DNS:** Add record in Cloudflare via API
+- **Routing:** Add Traefik config in ~/github/homelab/services/traefik/config/
+- **Secrets:** Use SOPS-encrypted secrets from secrets-vault
+
+## AGENTS.md
+
+This machine has AGENTS.md at ~/AGENTS.md (ONE_SHOT system).
+To update: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/README.md > ~/AGENTS.md`

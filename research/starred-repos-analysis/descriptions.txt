@@ -1,0 +1,9 @@
+mikekelly/claude-sneakpeek|Get a parallel build of Claude code that unlocks feature-flagged capabilities like swarm mode.
+BehiSecc/awesome-claude-skills|A curated list of Claude Skills.
+adithya-s-k/manim_skill|Agent skills for Manim to create 3Blue1Brown style animations.
+microsoft/agent-lightning|The absolute trainer to light up AI agents.
+steipete/summarize|Point at any URL/YouTube/Podcast or file. Get the gist. CLI and Chrome Extension.
+dgtlmoon/changedetection.io|Best and simplest tool for website change detection, web page monitoring, and website change alerts. Perfect for tracking content changes, price drops, restock alerts, and website defacement monitoring—all for free or enjoy our SaaS plan!
+openclaw/openclaw|Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞 
+github/copilot-sdk|Multi-platform SDK for integrating GitHub Copilot Agent into apps and services
+google/langextract|A Python library for extracting structured information from unstructured text using LLMs with precise source grounding and interactive visualization.
