@@ -1,8 +1,17 @@
-# ONE_SHOT v9
+# ONE_SHOT v10.1
 
-**Tell it an idea. Come back with the thing built.**
+**Your personal Claude Code configuration.**
 
-A skill system for Claude Code that provides persistent task tracking, autonomous execution, and multi-model coordination.
+---
+
+## What ONE_SHOT Is
+
+ONE_SHOT makes Claude Code work the way you want across all your projects:
+
+- **Progressive disclosure** - Rules load by project type (~300 tokens vs 2000)
+- **Slash commands** - Invoke when needed (/interview, /cp, /implement, /freesearch...)
+- **Persistent tracking** - Beads survives /clear, restarts, disconnections
+- **Wait for native** - Aligns with Claude's built-in features, doesn't duplicate them
 
 ---
 
@@ -18,136 +27,30 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 # 3. Open in Claude Code
 claude .
 
-# Then say: "Build me a [thing you want]"
-```
-
-That's it. Claude will interview you, plan it, build it.
-
----
-
-## How to Use ONE_SHOT
-
-### The Basic Workflow
-
-```
-You say what you want
-    ↓
-Claude interviews you (front-door skill)
-    ↓
-Claude creates a plan (create-plan skill)
-    ↓
-Claude builds it (implement-plan skill)
-    ↓
-Progress tracked in beads (survives everything)
-```
-
-### What to Say
-
-| You Say | What Happens |
-|---------|--------------|
-| "Build me X" | Claude interviews you, then builds it |
-| "Plan this" | Creates a structured implementation plan |
-| "Implement" | Executes the plan with task tracking |
-| "Debug this" | Systematic debugging with hypotheses |
-| "What's next?" | Shows your next unblocked task |
-| "Create handoff" | Saves context before `/clear` |
-| "Resume" | Restores context after `/clear` |
-
-### You Don't Need to Remember Skills
-
-Claude automatically picks the right skill based on what you say. There are 50+ skills, but you never need to memorize their names.
-
----
-
-## Example Session
-
-```
-You: "Build me a CLI tool for task management"
-
-Claude: [Asks questions via front-door skill]
-      - What language? (Python, Go, Rust?)
-      - What features? (add, list, complete, delete?)
-      - Where should data be stored? (SQLite, files, API?)
-
-      [Creates plan via create-plan skill]
-
-      [Implements via implement-plan skill]
-      - Writes code
-      - Runs tests
-      - Commits to git
-      - Tracks progress in beads
-```
-
-Your tasks survive `/clear`, restarts, disconnections.
-
----
-
-## Task Tracking (Beads)
-
-Beads = Persistent memory. Never lose track of what you're doing.
-
-```bash
-bd ready      # "What's next?" → Shows unblocked tasks
-bd list       # All tasks with status
-bd show 42    # Details of task #42
-bd sync       # Save to git (do this often!)
-```
-
-Tasks are tracked in `.beads/tasks.json` and synced to git.
-
-### Context Survival
-
-Claude's context window gets cleared. Your work shouldn't.
-
-**Before `/clear`:**
-```bash
-You: "Create handoff"
-Claude: Saves context to `.handoff.md`
-```
-
-**After `/clear`:**
-```bash
-You: "Resume"
-Claude: Restores from handoff + beads
+# Then say: "Build me [thing you want]"
 ```
 
 ---
 
-## Advanced Features
+## What Changed (v9 → v10.1)
 
-### Continuous Planning (v8+)
+### v9: Framework with 50+ Skills
+- AGENTS.md routing table
+- 52 skills auto-loaded
+- Hooks injecting context
+- ~5,800 tokens always-on
+- "Build me X" triggered interview automatically
 
-For complex projects, use the 3-file pattern:
+### v10: Personal Configuration (~93% token reduction)
+- Removed AGENTS.md
+- 16 slash commands (invoke when needed)
+- 7 rules always loaded (~410 tokens)
+- You type `/interview` when you want structure
 
-```bash
-You: "Create a continuous plan for [complex project]"
-```
-
-Creates:
-- `task_plan.md` - The plan with skill sequences
-- `findings.md` - Research and discoveries
-- `progress.md` - Session log
-
-These files survive `/clear` and enable multi-model coordination.
-
-### Skill Discovery (v9+)
-
-Not sure which skills exist?
-
-```bash
-You: "What skills do I have for testing?"
-You: "Search skillsmp for database skills"
-```
-
-### Multi-Model Dispatch
-
-Save Claude tokens by routing to specialized AI CLIs:
-
-```bash
-/dispatch "Research WebSocket patterns"    # → Gemini (free)
-/dispatch "Write a rate limiter function"  # → Codex (code)
-/dispatch "Design a microservices architecture"  # → Claude (plan)
-```
+### v10.1: Progressive Disclosure (+85% token savings)
+- Rules split by project type (web, cli, service)
+- Auto-detection from files
+- ~300 tokens vs ~2000 in v9
 
 ---
 
@@ -155,40 +58,88 @@ Save Claude tokens by routing to specialized AI CLIs:
 
 | Command | What It Does |
 |---------|--------------|
-| `/full-interview` | Ask all 13+ questions (thorough) |
-| `/quick-interview` | Ask only 4 questions (fast) |
-| `/smart-interview` | Auto-detect depth (default) |
-| `/freesearch` | Research via Gemini (0 Claude tokens) |
-| `/compact` | Summarize to free tokens |
-| `/run-plan` | Execute skill sequences deterministically (v9) |
+| `/interview` | Structured interview (triage → questions → spec) |
+| `/cp` | Continuous planner (3-file: task_plan.md, findings.md, progress.md) |
+| `/implement` | Execute plan with beads tracking |
+| `/freesearch` | Research via Exa API (zero Claude tokens) |
+| `/research` | Background research via Gemini CLI |
+| `/think` | Multi-perspective analysis |
+| `/diagnose` | Hypothesis-based debugging |
+| `/codereview` | OWASP + quality review |
+| `/deploy` | Deploy to oci-dev |
+| `/remote` | Execute on homelab/macmini |
+| `/audit` | Strategic communication filter |
+| `/beads` | Persistent task tracking |
+| `/handoff` | Save context before /clear |
+| `/restore` | Resume from handoff |
+| `/secrets` | SOPS/Age secret management |
+| `/batch` | Parallel multi-file operations |
 
 ---
 
-## What You Get
+## How It Works
 
-| Feature | Description |
-|---------|-------------|
-| **Smart Interview** | Claude asks the right questions upfront |
-| **Structured Plans** | Clear phases, decisions, dependencies |
-| **Persistent Tracking** | Tasks survive `/clear`, restarts, disconnections |
-| **Multi-Model** | Routes to best AI (Claude, Gemini, Codex) |
-| **Autonomous Mode** | Headless execution that survives disconnects |
-| **50+ Skills** | Specialized tools for every development task |
-| **SkillsMP Access** | 26,000+ external skills (v9) |
+### Progressive Disclosure
+
+Rules load based on what you're working on:
+
+| Project Type | Trigger | Rules Loaded |
+|--------------|---------|--------------|
+| Web app | `package.json` + `convex/` | Core + Web rules |
+| CLI | `setup.py` or `pyproject.toml` | Core + CLI rules |
+| Service | `*.service` | Core + Service rules |
+| Generic | Nothing detected | Core rules only |
+
+### Session Workflow
+
+```
+You say what you want
+    ↓
+Claude reads relevant rules (~300 tokens)
+    ↓
+You invoke commands when needed (/interview, /cp, etc.)
+    ↓
+Progress tracked in beads (survives everything)
+```
 
 ---
 
 ## Project Structure
 
-After installation, your project has:
+After installation:
 
 ```
 your-project/
-├── AGENTS.md           # Skill router (LLM instructions)
+├── AGENTS.md           # Skill router (curl from oneshot, read-only)
 ├── CLAUDE.md           # Your project-specific instructions
-├── .beads/             # Persistent task tracking
-└── .claude/skills/     # 50+ skills (symlinked from ~/.claude/skills/oneshot)
+└── .beads/             # Persistent task tracking
 ```
+
+Global config (installed once):
+
+```
+~/.claude/
+├── CLAUDE.md           # Core identity
+├── rules/              # Progressive disclosure rules
+│   ├── core.md         # Always loaded
+│   ├── web.md          # Web apps (Convex + Next.js)
+│   ├── cli.md          # CLIs (Python + Click)
+│   └── service.md      # Services (Python + systemd)
+└── commands/           # Slash commands (16 total)
+```
+
+---
+
+## Task Tracking (Beads)
+
+```bash
+bd ready      # "What's next?" → Shows unblocked tasks
+bd list       # All tasks with status
+bd show 42    # Details of task #42
+bd sync       # Save to git
+```
+
+Tasks survive `/clear`, restarts, disconnections.
 
 ---
 
@@ -198,9 +149,23 @@ your-project/
 # Required: Beads (task tracking)
 npm install -g @beads/bd
 
-# Optional: Gemini CLI (for free research)
+# Optional: Gemini CLI (for background research)
 npm install -g @google/gemini-cli
 gemini auth login
+```
+
+---
+
+## Updating ONE_SHOT
+
+```bash
+# Update your project
+cd your-project
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash -s -- --upgrade
+
+# Update the oneshot repo itself
+cd ~/github/oneshot
+git pull origin master
 ```
 
 ---
@@ -209,111 +174,25 @@ gemini auth login
 
 | Problem | Solution |
 |---------|----------|
-| Skill not triggering | Say `(ONE_SHOT)` to re-anchor |
-| Lost context after `/clear` | Say "resume" |
-| "What's next?" shows nothing | `bd list` to see all tasks |
-| `/freesearch` fails | Run `gemini auth login` first |
+| Command not working | Check it's in `~/.claude/commands/` |
+| Rules not loading | Check `~/.claude/rules/` exists |
+| Lost context after `/clear` | Say "resume" or `/restore` |
 | Beads not found | `npm install -g @beads/bd` |
 
 ---
 
-## What's Different?
+## v9 vs v10.1 Comparison
 
-| Traditional Claude | ONE_SHOT |
-|-------------------|----------|
-| Say "build X" → gets halfway, forgets | Say "build X" → interviews, plans, executes, tracks |
-| Context lost on `/clear` | Handoffs + beads survive anything |
-| No task tracking | Beads tracks everything, forever |
-| One AI, one context | Routes to best AI per task |
-| Restart from scratch | Resume exactly where you left off |
-
----
-
-## Updating ONE_SHOT
-
-### To update your project with latest skills and AGENTS.md:
-
-```bash
-cd your-project
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash -s -- --upgrade
-```
-
-### To update the oneshot repo itself:
-
-```bash
-cd ~/github/oneshot
-git pull origin master
-```
-
----
-
-## For LLMs: Documentation Maintenance
-
-### When to Update This README
-
-Update when:
-- New skills are added to core router
-- New user-facing features are added
-- Version changes (v8 → v9, etc.)
-- Workflow changes significantly
-- New slash commands are added
-
-### How to Update
-
-1. **Read current README** to understand existing content
-2. **Make changes** that are:
-   - Clear for users (simple language, examples)
-   - Accurate for LLMs (technical details correct)
-   - Minimal (don't add, remove what's not needed)
-3. **Test**: Can a new user follow this and succeed?
-4. **Commit**: Use conventional commit format
-
-### Section Guidelines
-
-| Section | Audience | Purpose |
-|---------|----------|---------|
-| Quick Start | User | Get started in 3 steps |
-| How to Use | User | Clear workflow examples |
-| What to Say | User | Reference for common commands |
-| For LLMs | LLM | Documentation maintenance rules |
-| Troubleshooting | Both | Common problems and solutions |
-
-### Documentation Principles
-
-1. **Users first** - Write for humans, optimize for clarity
-2. **Examples work** - Every example should be tested
-3. **Remove friction** - Delete anything that doesn't help users succeed
-4. **LLM-friendly** - Keep structure clear so LLMs can parse and update
-5. **Single source** - This README is the primary user doc, keep it that way
-
-### Related Files
-
-| File | Purpose | Who Reads It |
-|------|---------|--------------|
-| `README.md` | User guide + docs maintenance | Users + LLMs |
-| `AGENTS.md` | Skill router + LLM orchestration | LLMs only |
-| `CLAUDE.md` | Project-specific instructions | LLMs only |
-| `INDEX.md` | Complete skill reference | Users + LLMs |
-
-### Version Update Checklist
-
-When bumping version (e.g., v8 → v9):
-- [ ] Update version in header
-- [ ] Add new features to "What You Get" table
-- [ ] Update "What's Different" if relevant
-- [ ] Add new slash commands
-- [ ] Update troubleshooting if new issues
-- [ ] Check all examples still work
-- [ ] Run user guide through a test scenario
+See [V9-TO-V10.1.md](V9-TO-V10.1.md) for detailed comparison.
 
 ---
 
 ## Links
 
 - **GitHub**: https://github.com/Khamel83/oneshot
-- **Skills Reference**: [.claude/skills/INDEX.md](.claude/skills/INDEX.md)
 - **Beads**: https://github.com/steveyegge/beads
+- **Progressive Disclosure**: [.claude/rules/README.md](.claude/rules/README.md)
 
 ---
 
-**v9** | 50+ Skills | Beads | Continuous Planning | SkillsMP Integration | Deterministic Execution
+**v10.1** | Progressive Disclosure | Slash Commands | Beads | "Wait for Native" Strategy
