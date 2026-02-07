@@ -81,23 +81,27 @@ fallback: "beads"    # Use /beads when native unavailable
 
 ---
 
-## Beads Context
+## Beads: Source of Truth for Tasks
 
-```python
-import json
-bd = json.loads(BEADS_JSON)
+Beads (`bd` CLI) is the source of truth for all task tracking. Use it, not free-form text or code comments.
 
-# Session close protocol
-# ["status","add","sync","commit","sync","push"]
+### Operational Rules
+- **Session start**: Run `bd ls` or `bd todo`, pick the highest-priority unblocked bead. Summarize it before coding.
+- **New subtasks/bugs**: Create a bead for it. Don't leave TODOs in code comments.
+- **Blocked beads**: Never work on them. If something is blocked, add a bead describing what's missing.
+- **Big beads**: If a bead is too large or vague, propose splitting it into smaller, well-scoped beads.
+- **Status updates**: Always update the current bead's status and notes when you stop working on it (include links to key files/commits).
 
-# Ready tasks
-bd.ready  # [{"id":"1","title":"..."}, ...]
-```
-
-**Session close checklist:**
+### Session Close Protocol
 1. `git status` - check changes
 2. `git add <files>` - stage changes
 3. `bd sync` - commit beads
 4. `git commit -m "..."` - commit code
 5. `bd sync` - commit new beads changes
 6. `git push` - push to remote
+
+### Session Start Prompt
+> List the top 5 ready, unblocked beads, briefly summarize them, and recommend the best next one to work on.
+
+### Session End Prompt
+> Update the current bead with what you did, what's left, and any follow-up beads needed.
