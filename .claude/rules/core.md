@@ -46,19 +46,11 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/AGENTS.md > A
 
 ### Task Management Strategy
 ```yaml
-preferred: "native"  # Use Claude's TaskCreate when available
-fallback: "beads"    # Use /beads when native unavailable
+primary: "beads"     # Beads is the source of truth today
+future: "native"     # Switch to Claude's TaskCreate/TaskUpdate when they ship
 ```
 
-### Native Task Tools (When Available)
-| Tool | Purpose |
-|------|---------|
-| `TaskStatus` | List tasks, labels, time estimates |
-| `TaskCreate` | Create with title, description, assignee, labels, priority |
-| `TaskUpdate` | Update assignee, labels, priority, time estimate |
-| `TaskDelete` | Delete task by ID |
-| `Task(subagent_type)` | Spawn bash, explore, plan agents |
-| `TeammateTool` | spawnTeam, discoverTeams, requestJoin |
+Native task tools (TaskCreate, TaskStatus, etc.) do not exist yet. **Use Beads for all task tracking until further notice.**
 
 ---
 
