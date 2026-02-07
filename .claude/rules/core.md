@@ -13,6 +13,15 @@ These rules load for every project.
 
 ---
 
+## Work Discipline
+
+- **Plan first**: Always start with a plan before coding. Think, then do.
+- **Commit per task**: Don't batch commits to end-of-session. Commit each completed task immediately.
+- **Keep tasks small**: Break work so each subtask completes well within context. If it's too big, split it.
+- **Vanilla over complex**: Simple direct work beats elaborate multi-agent orchestration for small tasks.
+
+---
+
 ## Documentation-First Coding
 
 **CRITICAL RULE:** Before writing code that uses external APIs, libraries, or configuration syntax, you MUST check the current documentation.
@@ -46,19 +55,11 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/AGENTS.md > A
 
 ### Task Management Strategy
 ```yaml
-preferred: "native"  # Use Claude's TaskCreate when available
-fallback: "beads"    # Use /beads when native unavailable
+primary: "beads"     # Beads is the source of truth today
+future: "native"     # Switch to Claude's TaskCreate/TaskUpdate when they ship
 ```
 
-### Native Task Tools (When Available)
-| Tool | Purpose |
-|------|---------|
-| `TaskStatus` | List tasks, labels, time estimates |
-| `TaskCreate` | Create with title, description, assignee, labels, priority |
-| `TaskUpdate` | Update assignee, labels, priority, time estimate |
-| `TaskDelete` | Delete task by ID |
-| `Task(subagent_type)` | Spawn bash, explore, plan agents |
-| `TeammateTool` | spawnTeam, discoverTeams, requestJoin |
+Native task tools (TaskCreate, TaskStatus, etc.) do not exist yet. **Use Beads for all task tracking until further notice.**
 
 ---
 
@@ -81,23 +82,32 @@ fallback: "beads"    # Use /beads when native unavailable
 
 ---
 
-## Beads Context
+## Beads: Source of Truth for Tasks
 
-```python
-import json
-bd = json.loads(BEADS_JSON)
+Beads (`bd` CLI) is the source of truth for all task tracking. Use it, not free-form text or code comments.
 
-# Session close protocol
-# ["status","add","sync","commit","sync","push"]
+### Operational Rules
+- **Session start**: Run `bd ls` or `bd todo`, pick the highest-priority unblocked bead. Summarize it before coding.
+- **New subtasks/bugs**: Create a bead for it. Don't leave TODOs in code comments.
+- **Blocked beads**: Never work on them. If something is blocked, add a bead describing what's missing.
+- **Big beads**: If a bead is too large or vague, propose splitting it into smaller, well-scoped beads.
+- **Status updates**: Always update the current bead's status and notes when you stop working on it (include links to key files/commits).
 
-# Ready tasks
-bd.ready  # [{"id":"1","title":"..."}, ...]
-```
-
-**Session close checklist:**
+### Session Close Protocol
 1. `git status` - check changes
 2. `git add <files>` - stage changes
 3. `bd sync` - commit beads
 4. `git commit -m "..."` - commit code
 5. `bd sync` - commit new beads changes
 6. `git push` - push to remote
+
+### Session Start Prompt
+> List the top 5 ready, unblocked beads, briefly summarize them, and recommend the best next one to work on.
+
+### Session End Prompt
+> Update the current bead with what you did, what's left, and any follow-up beads needed.
+
+### Beads UI
+- **beads_viewer** (`bv`): TUI for browsing/managing beads with tree navigation
+- Install: `pip install beads-viewer` → run `bv`
+- Use `bv` for visual overview; `bd` for CLI operations
