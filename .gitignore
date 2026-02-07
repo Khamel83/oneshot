@@ -22,3 +22,4 @@ dispatch/
 # Users must provide their own copies
 .claude/skills/the-audit/SOURCE_DOCS/
 .env.*
+*.age
