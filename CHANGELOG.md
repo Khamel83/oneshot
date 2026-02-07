@@ -4,6 +4,66 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [10.1.0] - 2026-02-06
+
+### Added
+- **Progressive disclosure** - Rules split by project type (web, cli, service)
+- **Auto-detection** - Rules load based on project files (package.json, setup.py, *.service)
+- **"Wait for native" strategy** - Documentation for Claude's native TaskCreate/Update/Delete tools
+- **Modular rules** - `.claude/rules/` with core.md, web.md, cli.md, service.md, khamel-mode.md
+- **V9-TO-V10.1.md** - Comprehensive migration guide
+
+### Changed
+- CLAUDE.md reduced from 374 lines to ~62 lines
+- Token usage: ~300 always-on (down from ~2000 in v10)
+- README rewritten for v10.1 clarity
+
+### Token Savings Progression
+- v9: ~5,800 tokens always-on
+- v10: ~425 tokens always-on (93% reduction from v9)
+- v10.1: ~300 tokens always-on (95% total reduction from v9)
+
+### Removed
+- No removals - this is a refinement of v10
+
+---
+
+## [10.0.0] - 2025-XX-XX
+
+### Added
+- **16 slash commands** - On-demand invocation (/interview, /cp, /implement, /freesearch, /research, /think, /diagnose, /codereview, /deploy, /remote, /audit, /beads, /handoff, /restore, /secrets, /batch)
+- **7 rules files** - Always-loaded context (~410 tokens total)
+- **"Personal configuration" philosophy** - Not a framework, not distributable
+
+### Changed
+- Simplified from framework to configuration
+- Commands invoke on-demand vs auto-loading 52 skills
+
+### Removed
+- AGENTS.md routing table (no longer needed)
+- 52 auto-loaded skills
+- Hooks for context injection
+- Auto-trigger on "build me"
+
+### Token Savings
+- 93% reduction from v9 (~5,800 → ~425 tokens)
+
+---
+
+## [9.0.0] - 2025-XX-XX
+
+### Added
+- **Framework with 52 skills** - Auto-loaded skill system
+- **AGENTS.md routing table** - Pattern matching to skills
+- **Auto-interview** - "Build me X" triggered structured interview
+- **Skill marketplace integration** - SkillsMP access
+- **Continuous planning** - 3-file pattern (task_plan.md, findings.md, progress.md)
+
+### Token Cost
+- ~5,800 tokens always-on (CLAUDE.md + AGENTS.md + hooks + skills)
+
+---
+
 ## [8.2] - 2026-01-31
 
 ### Added
