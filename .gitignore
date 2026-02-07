@@ -22,4 +22,7 @@ dispatch/
 # Users must provide their own copies
 .claude/skills/the-audit/SOURCE_DOCS/
 .env.*
+
+# Encrypted sessions (but keep index.md for searchability)
 *.age
+!docs/sessions/index.md
