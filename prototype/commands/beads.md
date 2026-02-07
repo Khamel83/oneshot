@@ -2,6 +2,14 @@
 
 Git-backed task tracking with dependencies. Survives /clear, session restarts, and terminal disconnects.
 
+> **NOTE: Long-Term Transition Plan**
+>
+> Claude Code is developing native task tools (TaskCreate, TaskUpdate, TaskDelete). When these become widely available in stable releases, `/beads` will be deprecated in favor of native tools.
+>
+> **This is not imminent.** Beads will be supported for at least one major version after native tools are stable. Migration will be explicit via `beads migrate-to-native` command.
+>
+> For now, beads remains the recommended task tracking solution.
+
 ## Why Beads (not TODO.md)
 
 | Aspect | TODO.md | Beads |

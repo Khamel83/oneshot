@@ -109,6 +109,59 @@ Then:
 
 ---
 
+## ONE_SHOT v11: "Wait for Native" Strategy
+
+**Core Philosophy**: ONE_SHOT focuses on developer productivity, not building orchestration. We wait for Claude's native features to mature rather than building custom frameworks.
+
+### What This Means
+
+- ✅ **DO**: Use native Claude tools when available (TaskCreate, TaskUpdate, TeammateTool)
+- ✅ **DO**: Document how to use native features with ONE_SHOT rules
+- ❌ **DON'T**: Build custom orchestration that duplicates native features
+- ❌ **DON'T**: Over-invest in external task systems (beads is a bridge, not destination)
+
+### Validation (2026-02-06)
+
+Testing `claude-sneakpeek` confirmed Anthropic is building native multi-agent orchestration:
+- `TaskCreate/Update/Delete` - Built-in task management
+- `TeammateTool.spawnTeam/discoverTeams` - Team operations
+- `Task(subagent_type)` - Spawn specialized agents (bash, explore, plan...)
+
+**This validates v10's simplification.** We removed custom orchestration at the right time.
+
+### Task Management Strategy
+
+```yaml
+preferred: "native"  # Use Claude's TaskCreate when available
+fallback: "beads"    # Use /beads when native unavailable
+timeline: "Deprecate beads when native tools ship stable"
+```
+
+When native tools become widely available, ONE_SHOT will:
+1. Detect native tool availability
+2. Inform users of migration option
+3. Provide `beads migrate-to-native` command
+4. Support beads for at least one major version post-transition
+
+### Native Task Tools (When Available)
+
+When Claude Code has native task tools (swarm mode/feature flags), use these:
+
+| Tool | Usage | Description |
+|------|-------|-------------|
+| `TaskStatus` | Auto-listed | Shows your tasks, labels, time estimates |
+| `TaskCreate` | Use for new tasks | Create with title, description, assignee, labels, priority |
+| `TaskUpdate` | Use for changes | Update assignee, labels, priority, time estimate |
+| `TaskDelete` | Use for cleanup | Delete task by ID |
+| `Task(subagent_type)` | For spawning agents | Spawn bash, general-purpose, explore, plan agents |
+| `TeammateTool` | For team operations | spawnTeam, discoverTeams, requestJoin |
+
+**How to detect native tools**: Ask "List your available tools" and check for TaskCreate.
+
+**When native unavailable**: Use `/beads` command for git-backed task tracking.
+
+---
+
 ## ONE_SHOT Skills System v5.2
 
 **Skills are installed at**: `~/.claude/skills/oneshot/` (symlinked from oneshot/.claude/skills/)
