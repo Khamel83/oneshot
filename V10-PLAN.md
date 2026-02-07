@@ -220,6 +220,62 @@ Both preserve the token conservation pattern you value.
 - [ ] Verify .beads/ data still accessible via /beads
 - [ ] Verify project-specific CLAUDE.md content preserved
 
+## Auto-Handoff System (Context Protection)
+
+Claude Code's statusline receives context window usage as JSON after every response.
+We use this to auto-trigger handoffs before context is lost to auto-compact.
+
+### How it works
+
+```
+statusline.sh (fires after every response)
+  → reads context_window.used_percentage from JSON
+  → writes percentage to /tmp/claude-oneshot/context-pct
+  → displays "ctx: 73%" in status bar
+
+auto-handoff.sh (Stop hook, fires after every response)
+  → reads cached percentage from /tmp/claude-oneshot/context-pct
+  → if >= 80%, outputs warning: "Run /handoff now"
+  → sets marker so it only fires once per session
+
+auto-handoff.md (rule, always loaded)
+  → tells Claude: when you see the handoff warning, just do it
+  → don't ask permission, save the handoff, tell user it's done
+
+session-cleanup.sh (SessionStart hook)
+  → clears stale markers from previous sessions
+```
+
+### Files
+
+| File | Type | Purpose |
+|------|------|---------|
+| `hooks/statusline.sh` | Statusline | Monitor + cache context % |
+| `hooks/auto-handoff.sh` | Stop hook | Trigger warning at 80% |
+| `hooks/session-cleanup.sh` | SessionStart hook | Clear stale markers |
+| `hooks/settings-snippet.json` | Config | Hook registrations for settings.json |
+| `rules/auto-handoff.md` | Rule | Tells Claude to act on the warning |
+
+### Threshold choice: 80%
+
+- Auto-compact triggers at ~75-95% (hardcoded, varies)
+- 80% gives enough room to write a handoff (~2-5% context) before compact fires
+- The Stop hook fires once and sets a marker — no repeated nagging
+- SessionStart clears the marker so each session gets one trigger
+
+### Rules (updated total: 7)
+
+| Rule | Size |
+|------|------|
+| `infra-routing.md` | ~250 bytes |
+| `stack-defaults.md` | ~300 bytes |
+| `anti-patterns.md` | ~300 bytes |
+| `docs-first.md` | ~200 bytes |
+| `secrets.md` | ~200 bytes |
+| `lessons.md` | ~200 bytes |
+| `auto-handoff.md` | ~200 bytes |
+| **Total** | **~1.65KB (~410 tokens)** |
+
 ## Rollback Plan
 
 If v10 doesn't work after a week:
