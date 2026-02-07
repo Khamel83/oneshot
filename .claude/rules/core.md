@@ -105,3 +105,8 @@ Beads (`bd` CLI) is the source of truth for all task tracking. Use it, not free-
 
 ### Session End Prompt
 > Update the current bead with what you did, what's left, and any follow-up beads needed.
+
+### Beads UI
+- **beads_viewer** (`bv`): TUI for browsing/managing beads with tree navigation
+- Install: `pip install beads-viewer` → run `bv`
+- Use `bv` for visual overview; `bd` for CLI operations
