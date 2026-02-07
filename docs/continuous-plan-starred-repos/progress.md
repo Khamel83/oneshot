@@ -1,6 +1,6 @@
 # Progress - Starred Repos Continuous Plan
 
-## Status: Phase 1 Complete ✅
+## Status: Phase 1 & 2 Complete ✅
 
 **Date**: 2026-02-06
 
@@ -22,15 +22,15 @@
 - ✅ Documented native TaskCreate/Update/Delete usage
 - ✅ Added deprecation notice to /beads command (long-term framing)
 
+### Phase 2: Progressive Disclosure ✅
+- ✅ Split CLAUDE.md into modular rules by project type
+- ✅ Created auto-detection rules (web, cli, service)
+- ✅ **Token savings: ~85%** (2000 → ~300 tokens)
+- ✅ Committed: f66019e
+
 ---
 
 ## Pending Tasks
-
-### Phase 2: Progressive Disclosure (ON HOLD ⏸️)
-- ⏸️ Token cost-benefit analysis required
-- ⏸️ Load rules contextually by project type
-- ⏸️ Test token savings
-- ⏸️ Implement if savings > 10%
 
 ### Phase 3: Task Tools Transition (WAITING)
 - ⏳ Wait for native tools to ship in stable Claude Code
@@ -53,15 +53,7 @@
 | oneshot-d1l | Evaluate openclaw patterns | open ✅ |
 | oneshot-bsz | Compare CC-MIRROR task tools vs beads | open ✅ |
 | oneshot-0sx | Get Gemini CLI CTO validation | open ✅ |
-
----
-
-## Next Steps
-
-1. **Commit Phase 1 changes**
-2. **Create cost-benefit analysis** for Phase 2 decision
-3. **Monitor Claude Code releases** for native tool announcements
-4. **Revisit roadmap** when native tools ship
+| oneshot-3zb | Implement progressive disclosure | open ✅ |
 
 ---
 
@@ -71,3 +63,13 @@
 2. **Beads as Bridge** - Stable fallback, not temporary hack
 3. **Explicit Migration** - No auto-switch, user chooses
 4. **Long Support Window** - Beads supported 1+ version post-native
+5. **Progressive Disclosure** - Load rules by project type for 85% token savings
+
+---
+
+## Token Savings Summary
+
+| Phase | Before | After | Savings |
+|-------|--------|-------|---------|
+| v10 (full CLAUDE.md) | ~2000 tokens | - | - |
+| v11 (progressive) | - | ~300 tokens | **~85%** |
