@@ -87,7 +87,7 @@ Native task tools (TaskCreate, TaskStatus, etc.) do not exist yet. **Use Beads f
 Beads (`bd` CLI) is the source of truth for all task tracking. Use it, not free-form text or code comments.
 
 ### Operational Rules
-- **Session start**: Run `bd ls` or `bd todo`, pick the highest-priority unblocked bead. Summarize it before coding.
+- **Session start**: Run `bd ready` to check for ready tasks, pick the highest-priority unblocked bead. Summarize it before coding.
 - **New subtasks/bugs**: Create a bead for it. Don't leave TODOs in code comments.
 - **Blocked beads**: Never work on them. If something is blocked, add a bead describing what's missing.
 - **Big beads**: If a bead is too large or vague, propose splitting it into smaller, well-scoped beads.
