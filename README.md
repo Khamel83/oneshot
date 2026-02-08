@@ -67,6 +67,7 @@ claude .
 | `/interview` | Structured interview (triage → questions → spec) |
 | `/cp` | Continuous planner (3-file: task_plan.md, findings.md, progress.md) |
 | `/implement` | Execute plan with beads tracking |
+| `/convexify` | Add Convex backend to any project (Python or Next.js) |
 | `/freesearch` | Research via Exa API (zero Claude tokens) |
 | `/research` | Background research via Gemini CLI |
 | `/think` | Multi-perspective analysis |
@@ -79,6 +80,7 @@ claude .
 | `/handoff` | Save context before /clear |
 | `/restore` | Resume from handoff |
 | `/secrets` | SOPS/Age secret management |
+| `/sessions` | View/search encrypted session logs |
 | `/batch` | Parallel multi-file operations |
 
 ---
