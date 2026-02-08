@@ -41,6 +41,7 @@ KhameL: ~/.claude/rules/khamel-mode.md
 - **Task tracking** → `/beads` command
 - **Deployment** → oci-dev (100.126.13.70) via Tailscale
 - **Stack defaults** → See `khamel-mode.md`
+- **External docs** → Check `~/github/docs-cache/` before WebSearch (see `~/.claude/rules/docs-cache-pattern.md`)
 
 ---
 
