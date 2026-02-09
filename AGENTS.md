@@ -100,6 +100,12 @@ skill_router:
     note: "Background Gemini CLI + Perplexity/Context7/Tavily APIs, saves Claude tokens"
     slash: "/deep-research"
 
+  # Skill Discovery (v9)
+  - pattern: "skill discovery|find skill|what skills|skill match|discover skills"
+    skill: skill-discovery
+    note: "Automatic skill matching using keyword relevance + SkillsMP integration"
+    slash: "/skill-discovery"
+
   # Search Fallback (v8.1)
   - pattern: "web search failed|search not working|429|rate limit|search fallback|use search api"
     skill: search-fallback
@@ -143,6 +149,7 @@ All skills can be invoked via `/skill-name`. Core slash commands:
 | `/smart-interview` | Reset to auto-detect depth |
 | `/continuous-planner` | Create living 3-file plan (survives /clear) |
 | `/run-plan` | Execute skill sequence from task_plan.md deterministically |
+| `/skill-discovery` | Automatic skill matching for goals |
 | `/deep-research` | Background research via Gemini CLI or APIs |
 | `/freesearch` | TRULY FREE research via Gemini CLI (0 tokens) |
 | `/dispatch` | Route tasks to local AI CLIs (codex/gemini/qwen/zai) |
