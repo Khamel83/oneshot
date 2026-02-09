@@ -4,6 +4,30 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [10.2.0] - 2026-02-08
+
+### Added
+- **Work Discipline** - Core rules for planning first, committing per task, keeping tasks small
+- **Beads Operational Rules** - Session start/end prompts, blocked bead handling, bead splitting guidance
+- **beads_viewer (`bv`)** - Recommended TUI for visual bead management
+- **Documentation Maintenance** - AGENTS.md section for LLMs on when/how to update docs
+- **Code Quality** - All hooks reviewed and fixed (no bare except, proper error handling, macOS compatibility)
+
+### Changed
+- AGENTS.md footer updated to v10.2 with work discipline features
+- core.md expanded with session start/end prompts
+- Documentation maintenance patterns codified
+
+### Fixed
+- docs-check.sh: Fixed unsafe glob patterns
+- context-v8.py: Fixed bare except, proper exception handling
+- beads-v8.py: Fixed bare except, proper exception handling
+- state.sh: Fixed macOS sed compatibility
+- detect-latest-glm.sh: Fixed macOS sed compatibility
+- claude-shell-setup.sh: Fixed sed injection risk
+
+---
+
 ## [10.1.0] - 2026-02-06
 
 ### Added
