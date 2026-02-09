@@ -49,6 +49,11 @@ skill_router:
   - pattern: "implement|execute|build it|run the plan"
     skill: implement-plan
 
+  - pattern: "run plan|execute plan|deterministic|skill sequence"
+    skill: run-plan
+    note: "Execute skill sequence from task_plan.md deterministically - reads plan, executes each skill step-by-step"
+    slash: "/run-plan"
+
   # Task Tracking (persistent)
   - pattern: "beads|ready tasks|what's next|next task|blockers|dependencies"
     skill: beads
@@ -137,6 +142,7 @@ All skills can be invoked via `/skill-name`. Core slash commands:
 | `/quick-interview` | Quick mode (Q1, Q2, Q6, Q12 only) |
 | `/smart-interview` | Reset to auto-detect depth |
 | `/continuous-planner` | Create living 3-file plan (survives /clear) |
+| `/run-plan` | Execute skill sequence from task_plan.md deterministically |
 | `/deep-research` | Background research via Gemini CLI or APIs |
 | `/freesearch` | TRULY FREE research via Gemini CLI (0 tokens) |
 | `/dispatch` | Route tasks to local AI CLIs (codex/gemini/qwen/zai) |
