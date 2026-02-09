@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+# batch-cache-docs - Cache multiple docs at once using common library mappings
+# Usage: batch-cache-docs <category> <name1> <name2> ...
+
+set -euo pipefail
+
+CACHE_BASE="${DOCS_CACHE:-$HOME/github/docs-cache/docs/cache}"
+
+# Color output
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+log_info() { echo -e "${BLUE}[cache]${NC} $1"; }
+log_success() { echo -e "${GREEN}[cache]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[cache]${NC} $1"; }
+log_error() { echo -e "${RED}[cache]${NC} $1" >&2; }
+
+# Known doc URLs (expand as needed)
+declare -A DOC_URLS=(
+    # Python
+    [click]="https://click.palletsprojects.com/"
+    [fastapi]="https://fastapi.tiangolo.com/"
+    [requests]="https://requests.readthedocs.io/"
+    [pytest]="https://docs.pytest.org/"
+    [rich]="https://rich.readthedocs.io/"
+    [pydantic]="https://docs.pydantic.dev/"
+    [aiohttp]="https://docs.aiohttp.org/"
+    [httpx]="https://www.python-httpx.org/"
+    [sqlalchemy]="https://docs.sqlalchemy.org/"
+    [pytest]="https://docs.pytest.org/"
+    [black]="https://black.readthedocs.io/"
+    [ruff]="https://docs.astral.sh/ruff/"
+    [poetry]="https://python-poetry.org/docs"
+    [uv]="https://docs.astral.sh/uv/"
+    [typer]="https://typer.tiangolo.com/"
+    [pandas]="https://pandas.pydata.org/docs/"
+    [numpy]="https://numpy.org/doc/"
+
+    # JavaScript/TypeScript
+    [nextjs]="https://nextjs.org/docs"
+    [react]="https://react.dev/"
+    [vue]="https://vuejs.org/guide/"
+    [typescript]="https://www.typescriptlang.org/docs/"
+    [tailwind]="https://tailwindcss.com/docs"
+    [vite]="https://vitejs.dev/guide/"
+    [webpack]="https://webpack.js.org/guide/"
+
+    # Services/Tools
+    [redis]="https://redis.io/docs/"
+    [postgres]="https://www.postgresql.org/docs/"
+    [docker]="https://docs.docker.com/"
+    [kubernetes]="https://kubernetes.io/docs/"
+    [tailscale]="https://tailscale.com/kb/"
+    [cloudflare]="https://developers.cloudflare.com/"
+    [vercel]="https://vercel.com/docs"
+    [convex]="https://docs.convex.dev/"
+    [supabase]="https://supabase.com/docs"
+    [n8n]="https://docs.n8n.io/"
+    [traefik]="https://doc.traefik.io/traefik/"
+    [home-assistant]="https://www.home-assistant.io/docs/"
+
+    # Go
+    [cobra]="https://github.com/spf13/cobra/blob/main/site/content/user_guide.md"
+    [gin]="https://gin-gonic.com/docs/"
+    [gorm]="https://gorm.io/docs/"
+
+    # Rust
+    [tokio]="https://tokio.rs/docs"
+    [serde]="https://serde.rs/"
+    [axum]="https://docs.rs/axum/"
+)
+
+show_help() {
+    cat <<'EOF'
+batch-cache-docs - Cache docs for common libraries/services
+
+Usage:
+  batch-cache-docs <name>...          Cache specific docs by name
+  batch-cache-docs --list             Show all available docs
+  batch-cache-docs --python           Cache common Python libs
+  batch-cache-docs --js               Cache common JS/TS libs
+  batch-cache-docs --tools            Cache common dev tools
+
+Examples:
+  batch-cache-docs click fastapi redis
+  batch-cache-docs --python
+  batch-cache-docs --list
+
+Docs are cached to: ~/github/docs-cache/docs/cache/
+EOF
+}
+
+list_available() {
+    log_info "Available docs:"
+    echo ""
+    for name in $(printf '%s\n' "${!DOC_URLS[@]}" | sort); do
+        printf "  ${BLUE}%-20s${NC} %s\n" "$name" "${DOC_URLS[$name]}"
+    done
+}
+
+# Parse args
+if [[ $# -eq 0 ]]; then
+    show_help
+    exit 0
+fi
+
+case "${1:-}" in
+    --list|-l)
+        list_available
+        exit 0
+        ;;
+    --python)
+        NAMES="click fastapi pydantic aiohttp httpx pytest black ruff poetry uv typer pandas"
+        ;;
+    --js|--javascript)
+        NAMES="nextjs react typescript tailwind vite"
+        ;;
+    --tools)
+        NAMES="redis docker kubernetes tailscale vercel convex"
+        ;;
+    --help|-h)
+        show_help
+        exit 0
+        ;;
+    *)
+        NAMES="$*"
+        ;;
+esac
+
+# Cache each doc
+for name in $NAMES; do
+    url="${DOC_URLS[$name]:-}"
+
+    if [[ -z "$url" ]]; then
+        log_warn "No URL known for '$name', skipping"
+        log_info "Add to DOC_URLS in $0"
+        continue
+    fi
+
+    # Determine category
+    if [[ -f pyproject.toml || -f requirements.txt || -f setup.py ]] 2>/dev/null; then
+        category="python"
+    elif [[ -f package.json ]] 2>/dev/null; then
+        category="javascript"
+    else
+        category="tools"
+    fi
+
+    target_dir="$CACHE_BASE/$category/$name"
+
+    # Check if already cached
+    if [[ -d "$target_dir" ]]; then
+        log_warn "$name already cached at $target_dir"
+        log_info "Use: /doc $name $url (to re-cache)"
+        continue
+    fi
+
+    log_info "Caching $name..."
+    mkdir -p "$target_dir"
+
+    # Use Claude's webReader MCP to fetch
+    log_info "  Fetching: $url"
+    log_info "  Run in Claude: /doc $name $url"
+done
+
+log_success "Batch cache complete"
+log_info "Next: Use /doc skill or webReader MCP to fetch content"
