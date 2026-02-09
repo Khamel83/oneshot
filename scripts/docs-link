@@ -1,0 +1,353 @@
+#!/usr/bin/env bash
+# docs-link - Manage documentation symlinks from central cache to local projects
+# Usage: docs-link <command> [args...]
+
+set -euo pipefail
+
+# Configuration
+CACHE_BASE="${DOCS_CACHE:-$HOME/github/docs-cache/docs/cache}"
+CACHE_INDEX="$CACHE_BASE/.index.md"
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
+EXTERNAL_DIR="$PROJECT_ROOT/docs/external"
+MANIFEST_FILE="$PROJECT_ROOT/.docs-links.json"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log_info() { echo -e "${BLUE}[docs-link]${NC} $1"; }
+log_success() { echo -e "${GREEN}[docs-link]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[docs-link]${NC} $1"; }
+log_error() { echo -e "${RED}[docs-link]${NC} $1" >&2; }
+
+# Ensure cache exists
+ensure_cache() {
+    if [[ ! -d "$CACHE_BASE" ]]; then
+        log_error "Cache not found at $CACHE_BASE"
+        log_info "Set DOCS_CACHE env var or ensure ~/github/docs-cache exists"
+        exit 1
+    fi
+}
+
+# Ensure external dir exists
+ensure_external_dir() {
+    mkdir -p "$EXTERNAL_DIR"
+}
+
+# Load manifest
+load_manifest() {
+    if [[ -f "$MANIFEST_FILE" ]]; then
+        cat "$MANIFEST_FILE"
+    else
+        echo '{"cache_path":"'"$CACHE_BASE"'","links":{},"updated":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}'
+    fi
+}
+
+# Save manifest
+save_manifest() {
+    local manifest="$1"
+    echo "$manifest" | jq '.' > "$MANIFEST_FILE"
+}
+
+# Get docs from cache index
+get_available_docs() {
+    if [[ ! -f "$CACHE_INDEX" ]]; then
+        log_error "Cache index not found at $CACHE_INDEX"
+        exit 1
+    fi
+    # Parse markdown table to get name and category
+    grep -E '^\|' "$CACHE_INDEX" | tail -n +3 | grep -v '^|--' | while IFS='|' read -r _ name category _; do
+        name=$(echo "$name" | xargs)
+        category=$(echo "$category" | xargs)
+        if [[ -n "$name" && "$name" != "Name" ]]; then
+            echo "$category/$name"
+        fi
+    done
+}
+
+# Resolve doc path
+resolve_doc_path() {
+    local name="$1"
+    local available
+    available=$(get_available_docs)
+
+    # Check for exact match
+    local match
+    match=$(echo "$available" | grep "/$name$" || true)
+    if [[ -n "$match" ]]; then
+        echo "$CACHE_BASE/$match"
+        return 0
+    fi
+
+    # Check for partial match (just name)
+    match=$(echo "$available" | grep -E "/[^/]*${name}[^/]*$" || true)
+    local count
+    count=$(echo "$match" | wc -l)
+    if [[ $count -eq 1 ]]; then
+        echo "$CACHE_BASE/$match"
+        return 0
+    elif [[ $count -gt 1 ]]; then
+        log_error "Multiple matches for '$name':"
+        echo "$match" | sed 's|^|  |'
+        return 1
+    fi
+
+    log_error "No docs found for '$name'"
+    log_info "Run 'docs-link available' to see cached docs"
+    return 1
+}
+
+# Command: available
+cmd_available() {
+    ensure_cache
+    log_info "Available docs in cache:"
+    echo ""
+    local available
+    available=$(get_available_docs)
+    if [[ -z "$available" ]]; then
+        log_warn "No docs found in cache"
+        return
+    fi
+    echo "$available" | while IFS=/ read -r category name; do
+        local status=""
+        if [[ -L "$EXTERNAL_DIR/$name" ]]; then
+            status="${GREEN}[linked]${NC}"
+        fi
+        printf "  ${BLUE}%-20s${NC} %-30s %s\n" "$category" "$name" "$status"
+    done
+}
+
+# Command: list
+cmd_list() {
+    if [[ ! -f "$MANIFEST_FILE" ]]; then
+        log_warn "No docs linked in this project"
+        return
+    fi
+
+    local manifest
+    manifest=$(load_manifest)
+    local links
+    links=$(echo "$manifest" | jq -r '.links | to_entries[] | "\(.key)=\(.value)"')
+
+    if [[ -z "$links" ]]; then
+        log_warn "No docs linked in this project"
+        return
+    fi
+
+    log_info "Linked docs in $PROJECT_ROOT:"
+    echo ""
+    echo "$links" | while IFS= read -r entry; do
+        local name="${entry%%=*}"
+        local path="${entry#*=}"
+        local link_path="$EXTERNAL_DIR/$name"
+        local status="${GREEN}OK${NC}"
+        if [[ ! -L "$link_path" ]]; then
+            status="${RED}BROKEN${NC}"
+        fi
+        printf "  ${BLUE}%-20s${NC} -> %-40s [%s]\n" "$name" "$path" "$status"
+    done
+}
+
+# Command: add
+cmd_add() {
+    if [[ $# -eq 0 ]]; then
+        log_error "Usage: docs-link add <name>..."
+        exit 1
+    fi
+
+    ensure_cache
+    ensure_external_dir
+
+    local manifest
+    manifest=$(load_manifest)
+
+    for name in "$@"; do
+        local target
+        if ! target=$(resolve_doc_path "$name"); then
+            continue
+        fi
+
+        local link_path="$EXTERNAL_DIR/$name"
+
+        # Check if already linked
+        if [[ -e "$link_path" ]]; then
+            if [[ -L "$link_path" ]]; then
+                log_warn "'$name' is already linked"
+            else
+                log_error "'$name' already exists and is not a symlink"
+            fi
+            continue
+        fi
+
+        # Create symlink
+        ln -s "$target" "$link_path"
+
+        # Update manifest
+        local relative="${target#$CACHE_BASE/}"
+        manifest=$(echo "$manifest" | jq -r --arg name "$name" --arg path "$relative" '.links[$name] = $path')
+
+        log_success "Linked $name -> $relative"
+    done
+
+    # Save manifest with updated timestamp
+    manifest=$(echo "$manifest" | jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.updated = $ts')
+    save_manifest "$manifest"
+
+    # Update project CLAUDE.md if it exists
+    update_claude_md
+}
+
+# Command: remove
+cmd_remove() {
+    if [[ $# -eq 0 ]]; then
+        log_error "Usage: docs-link remove <name>"
+        exit 1
+    fi
+
+    local manifest
+    manifest=$(load_manifest)
+
+    for name in "$@"; do
+        local link_path="$EXTERNAL_DIR/$name"
+
+        if [[ ! -L "$link_path" ]]; then
+            log_warn "'$name' is not linked"
+            continue
+        fi
+
+        rm "$link_path"
+        manifest=$(echo "$manifest" | jq -r --arg name "$name" 'del(.links[$name])')
+        log_success "Removed link for '$name'"
+    done
+
+    manifest=$(echo "$manifest" | jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.updated = $ts')
+    save_manifest "$manifest"
+}
+
+# Command: sync
+cmd_sync() {
+    ensure_cache
+    ensure_external_dir
+
+    local manifest
+    manifest=$(load_manifest)
+
+    local links
+    links=$(echo "$manifest" | jq -r '.links | to_entries[] | "\(.key)=\(.value)"')
+
+    if [[ -z "$links" ]]; then
+        log_warn "No links to sync"
+        return
+    fi
+
+    for entry in $links; do
+        local name="${entry%%=*}"
+        local path="${entry#*=}"
+        local link_path="$EXTERNAL_DIR/$name"
+        local target="$CACHE_BASE/$path"
+
+        if [[ -L "$link_path" ]]; then
+            rm "$link_path"
+        fi
+
+        ln -s "$target" "$link_path"
+        log_info "Synced $name"
+    done
+
+    log_success "Synced all links"
+}
+
+# Update CLAUDE.md with external docs reference
+update_claude_md() {
+    local claude_md="$PROJECT_ROOT/CLAUDE.md"
+
+    if [[ ! -f "$claude_md" ]]; then
+        return
+    fi
+
+    # Check if section already exists
+    if grep -q "## External Documentation" "$claude_md"; then
+        return
+    fi
+
+    # Add section at end
+    cat >> "$claude_md" <<'EOF'
+
+## External Documentation
+
+This project has links to cached external documentation:
+
+```bash
+# View linked docs
+ls docs/external/
+
+# See available cached docs
+docs-link available
+```
+
+Cached docs are managed via the central cache at ~/github/docs-cache/
+EOF
+
+    log_info "Updated CLAUDE.md with external docs section"
+}
+
+# Show help
+cmd_help() {
+    cat <<'EOF'
+docs-link - Manage documentation symlinks from central cache
+
+Usage:
+  docs-link <command> [args...]
+
+Commands:
+  add <name>...       Add symlinks to current project
+  list                Show what's linked in this project
+  remove <name>       Remove a symlink
+  available           Show all cached docs available to link
+  sync                Update all symlinks (if cache moved)
+
+Environment:
+  DOCS_CACHE          Path to docs cache (default: ~/github/docs-cache/docs/cache)
+
+Examples:
+  docs-link add polymarket convex
+  docs-link list
+  docs-link remove polymarket
+  docs-link available
+
+Cache location: ~/github/docs-cache/docs/cache/
+EOF
+}
+
+# Main
+case "${1:-}" in
+    add)
+        shift
+        cmd_add "$@"
+        ;;
+    list|ls)
+        cmd_list
+        ;;
+    remove|rm)
+        shift
+        cmd_remove "$@"
+        ;;
+    available|avail)
+        cmd_available
+        ;;
+    sync)
+        cmd_sync
+        ;;
+    help|--help|-h|"")
+        cmd_help
+        ;;
+    *)
+        log_error "Unknown command: $1"
+        echo ""
+        cmd_help
+        exit 1
+        ;;
+esac

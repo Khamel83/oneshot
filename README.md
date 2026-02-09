@@ -85,6 +85,27 @@ claude .
 
 ---
 
+## Documentation Cache (docs-link)
+
+Link cached external docs to any project:
+
+```bash
+cd your-project
+docs-link add polymarket convex tailscale  # Link docs
+docs-link list                              # Show linked docs
+docs-link available                         # Show all cached docs
+```
+
+Creates symlinks in `docs/external/` pointing to central cache at `~/github/docs-cache/`.
+
+**Benefits:**
+- Instant access to cached docs (no WebSearch needed)
+- Saves Claude token quota
+- Works offline
+- Version-controlled documentation
+
+---
+
 ## How It Works
 
 ### Progressive Disclosure
@@ -156,6 +177,9 @@ Tasks survive `/clear`, restarts, disconnections.
 ```bash
 # Required: Beads (task tracking)
 npm install -g @beads/bd
+
+# Required: docs-link (documentation cache manager)
+# Installed via install.sh to ~/.local/bin/docs-link
 
 # Optional: Gemini CLI (for background research)
 npm install -g @google/gemini-cli

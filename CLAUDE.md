@@ -41,7 +41,8 @@ KhameL: ~/.claude/rules/khamel-mode.md
 - **Task tracking** → `/beads` command
 - **Deployment** → oci-dev (100.126.13.70) via Tailscale
 - **Stack defaults** → See `khamel-mode.md`
-- **External docs** → `~/.claude/rules/docs-cache-pattern.md`
+- **External docs** → `docs-link add <name>` (links cached docs to project)
+- **Docs cache** → `~/.claude/rules/docs-cache-pattern.md`
 
 ---
 
