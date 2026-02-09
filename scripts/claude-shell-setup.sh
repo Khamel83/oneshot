@@ -57,13 +57,15 @@ if [[ "$1" == "--install" ]]; then
 
     # Remove old block if exists (handles variants like "(oci-dev)" suffix)
     if grep -q "##### Claude Code + ZAI shortcuts" "$SHELLRC" 2>/dev/null; then
-        sed -i "/##### Claude Code + ZAI shortcuts/,/##### end Claude Code + ZAI shortcuts #####/d" "$SHELLRC"
+        sed -i.bak "/##### Claude Code + ZAI shortcuts/,/##### end Claude Code + ZAI shortcuts #####/d" "$SHELLRC"
+        rm -f "${SHELLRC}.bak"
         echo "Removed old Claude/ZAI block from $SHELLRC"
     fi
 
     # Remove old heartbeat block if exists (for migration)
     if grep -q "##### ONE-SHOT Heartbeat #####" "$SHELLRC" 2>/dev/null; then
-        sed -i "/##### ONE-SHOT Heartbeat #####/,/##### end ONE-SHOT Heartbeat #####/d" "$SHELLRC"
+        sed -i.bak "/##### ONE-SHOT Heartbeat #####/,/##### end ONE-SHOT Heartbeat #####/d" "$SHELLRC"
+        rm -f "${SHELLRC}.bak"
         echo "Removed old Heartbeat block from $SHELLRC"
     fi
 
@@ -121,14 +123,19 @@ oneshot-dismiss() {
 ##### end ONE-SHOT Heartbeat #####
 SHELLRC_BLOCK
 
-    # Replace placeholders with actual values
-    sed -i "s|__ZAI_API_KEY__|$ZAI_API_KEY|g" "$SHELLRC"
-    sed -i "s|__GLM_MODEL__|$GLM_MODEL|g" "$SHELLRC"
+    # Replace placeholders with actual values (escaped for safety)
+    # Escape special characters in API key for sed
+    local escaped_key=$(printf '%s\n' "$ZAI_API_KEY" | sed 's/[[\.*^$()+?{|]/\\&/g')
+    local escaped_model=$(printf '%s\n' "$GLM_MODEL" | sed 's/[[\.*^$()+?{|]/\\&/g')
+    sed -i.bak "s|__ZAI_API_KEY__|${escaped_key}|g" "$SHELLRC"
+    sed -i.bak "s|__GLM_MODEL__|${escaped_model}|g" "$SHELLRC"
+    rm -f "${SHELLRC}.bak"
 
     # Add shell-specific hook
     if [[ "$SHELL_TYPE" == "zsh" ]]; then
         # Remove old hook if exists
-        sed -i '/add-zsh-hook _oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
+        sed -i.bak '/add-zsh-hook _oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
+        rm -f "${SHELLRC}.bak"
         # Add zsh hook
         cat >> "$SHELLRC" << 'ZSH_HOOK'
 
@@ -138,7 +145,8 @@ add-zsh-hook chpwd _oneshot_heartbeat
 ZSH_HOOK
     else
         # Remove old hook if exists
-        sed -i '/PROMPT_COMMAND.*_oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
+        sed -i.bak '/PROMPT_COMMAND.*_oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
+        rm -f "${SHELLRC}.bak"
         # Add bash hook (unquoted heredoc so \$ becomes $ in the file)
         cat >> "$SHELLRC" << BASH_HOOK
 

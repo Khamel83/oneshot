@@ -31,8 +31,9 @@ state_update_claude_md() {
     return 0
   fi
 
-  # Remove old heartbeat comments
-  sed -i '/<!-- oneshot:/d' "$claude_md" 2>/dev/null || true
+  # Remove old heartbeat comments (portable: macOS compatible)
+  sed -i.bak '/<!-- oneshot:/d' "$claude_md" 2>/dev/null || true
+  rm -f "${claude_md}.bak"
 
   # Add new heartbeat metadata at end
   cat >> "$claude_md" << EOF

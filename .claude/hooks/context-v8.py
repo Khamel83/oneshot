@@ -72,7 +72,7 @@ def main():
                 "o": os.path.exists(os.path.join(pd, 'LLM-OVERVIEW.md')),
                 "a": os.path.exists(os.path.join(pd, 'AGENTS.md'))
             }
-    except:
+    except (subprocess.TimeoutExpired, json.JSONDecodeError, FileNotFoundError, PermissionError, OSError):
         pass
 
     ctx = {

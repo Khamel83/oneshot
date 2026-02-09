@@ -37,7 +37,8 @@ if versions:
 case "${1:-}" in
   --update-env|-u)
     LATEST=$(detect_latest) || exit 1
-    sed -i "s/^ZAI_MODEL_PIN=.*/ZAI_MODEL_PIN=$LATEST/" "$ENV_FILE"
+    sed -i.bak "s/^ZAI_MODEL_PIN=.*/ZAI_MODEL_PIN=$LATEST/" "$ENV_FILE"
+    rm -f "${ENV_FILE}.bak"
     echo "✓ Updated GLM model to: $LATEST"
     ;;
   *)

@@ -11,7 +11,7 @@ def main():
         r = subprocess.run(['bd', 'ready', '--json'], capture_output=True, text=True, timeout=5)
         if r.returncode == 0:
             ctx['ready'] = json.loads(r.stdout or '[]')[:3]
-    except:
+    except (subprocess.TimeoutExpired, json.JSONDecodeError, FileNotFoundError, PermissionError):
         ctx['ready'] = []
 
     print(json.dumps({"hookSpecificOutput": {"additionalContext": f"BEADS:{json.dumps(ctx, separators=(',', ':'))}"}}))

@@ -93,7 +93,7 @@ detect_deps() {
     fi
 
     # Docker - check for services
-    if [[ -f docker-compose.yml || -f docker-compose.yaml ]]; then
+    if [[ -f docker-compose.yml ]] || [[ -f docker-compose.yaml ]]; then
         deps="$deps docker"
     fi
 
