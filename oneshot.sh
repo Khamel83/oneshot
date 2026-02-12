@@ -382,7 +382,7 @@ if [ ! -f .sops.yaml ]; then
 # Uses Age encryption: https://github.com/FiloSottile/age
 creation_rules:
   - age: age1kwu32vl7x3tx7dqphzykcf5cahgm4ejztm865f22fkwe5j6hwalqh0rau8
-    path_regex: '.*\.env(\.encrypted)?$'
+    path_regex: '.*\.encrypted$'
 EOF
   echo -e "  ${GREEN}✓${NC} .sops.yaml (created)"
 else
