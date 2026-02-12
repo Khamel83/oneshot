@@ -1,9 +1,9 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for user guide, INDEX.md for skill reference -->
 
-# ONE_SHOT v10.2
+# ONE_SHOT v10.3
 
-> **v10.2 = WAIT FOR NATIVE** - Progressive disclosure rules, slash commands on-demand, beads for task tracking, ~93% token reduction from v9.
+> **v10.3 = NEW STACK** - Astro + Cloudflare Pages/Workers + Better Auth + Postgres on OCI replaces Convex+Next.js+Clerk+Vercel.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
@@ -131,6 +131,22 @@ skill_router:
   # Maintenance
   - pattern: "/update|update oneshot|upgrade oneshot|check version"
     skill: auto-updater
+
+  # Infrastructure & Deployment
+  - pattern: "set up cloudflare|configure deploy|add database|add postgres|make this deployable|set up the stack"
+    skill: stack-setup
+    note: "Full Cloudflare + Postgres stack setup (Astro → CF Pages → Workers → Hyperdrive → Postgres on OCI)"
+```
+
+### Stack Quick Reference
+
+```
+Frontend: Cloudflare Pages (Astro)
+API:      Cloudflare Workers
+Database: Postgres on OCI via Hyperdrive
+Tunnel:   pg.omarsnewgroove.com → 100.126.13.70:5432
+Docs:     .claude/infrastructure/STACK.md
+Skill:    .claude/skills/stack-setup/SKILL.md
 ```
 
 **All other skills**: Available on-demand via `/skill-name` or explicit request. See INDEX.md.

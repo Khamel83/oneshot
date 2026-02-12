@@ -1,4 +1,4 @@
-# ONE_SHOT v10.2
+# ONE_SHOT v10.3
 
 **Your personal Claude Code configuration.**
 
@@ -67,7 +67,7 @@ claude .
 | `/interview` | Structured interview (triage → questions → spec) |
 | `/cp` | Continuous planner (3-file: task_plan.md, findings.md, progress.md) |
 | `/implement` | Execute plan with beads tracking |
-| `/convexify` | Add Convex backend to any project (Python or Next.js) |
+| `/stack-setup` | Configure Astro + Cloudflare + Postgres stack |
 | `/freesearch` | Research via Exa API (zero Claude tokens) |
 | `/research` | Background research via Gemini CLI |
 | `/think` | Multi-perspective analysis |
@@ -91,7 +91,7 @@ Link cached external docs to any project:
 
 ```bash
 cd your-project
-docs-link add polymarket convex tailscale  # Link docs
+docs-link add polymarket astro cloudflare tailscale  # Link docs
 docs-link list                              # Show linked docs
 docs-link available                         # Show all cached docs
 ```
@@ -114,7 +114,7 @@ Rules load based on what you're working on:
 
 | Project Type | Trigger | Rules Loaded |
 |--------------|---------|--------------|
-| Web app | `package.json` + `convex/` | Core + Web rules |
+| Web app | `astro.config.*` or `wrangler.toml` | Core + Web rules |
 | CLI | `setup.py` or `pyproject.toml` | Core + CLI rules |
 | Service | `*.service` | Core + Service rules |
 | Generic | Nothing detected | Core rules only |
@@ -151,7 +151,7 @@ Global config (installed once):
 ├── CLAUDE.md           # Core identity
 ├── rules/              # Progressive disclosure rules
 │   ├── core.md         # Always loaded
-│   ├── web.md          # Web apps (Convex + Next.js)
+│   ├── web.md          # Web apps (Astro + Cloudflare + Better Auth + Postgres)
 │   ├── cli.md          # CLIs (Python + Click)
 │   └── service.md      # Services (Python + systemd)
 └── commands/           # Slash commands (16 total)
@@ -227,4 +227,4 @@ See [V9-TO-V10.1.md](V9-TO-V10.1.md) for detailed comparison.
 
 ---
 
-**v10.2** | Progressive Disclosure | Slash Commands | Beads | "Wait for Native" Strategy
+**v10.3** | New Stack (Astro + CF Pages/Workers + Better Auth + Postgres) | Progressive Disclosure | Slash Commands | Beads

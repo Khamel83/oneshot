@@ -32,7 +32,7 @@ def main():
 
     # Stacks
     stacks = {
-        "web": "Convex+Next.js+Clerk->Vercel",
+        "web": "Astro+CF-Pages/Workers+BetterAuth+Postgres",
         "cli": "Python+Click+SQLite",
         "svc": "Python+systemd->oci"
     }

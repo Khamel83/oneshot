@@ -12,7 +12,7 @@
 
 | Project Type | Trigger | Rules |
 |--------------|---------|-------|
-| Web app | `package.json` + `convex/` | `~/.claude/rules/web.md` |
+| Web app | `astro.config.*` or `wrangler.toml` | `~/.claude/rules/web.md` |
 | CLI | `setup.py` or `pyproject.toml` | `~/.claude/rules/cli.md` |
 | Service | `*.service` or long-running `*.py` | `~/.claude/rules/service.md` |
 | Generic | None detected | Core rules only |

@@ -4,6 +4,32 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [10.3.0] - 2026-02-12
+
+### Added
+- **New Standard Stack** - Complete migration from Convex+Next.js+Clerk+Vercel to Astro+Cloudflare Pages/Workers+Better Auth+Postgres on OCI
+- **Infrastructure Documentation** - `.claude/infrastructure/STACK.md` with complete stack reference (architecture, database ops, Cloudflare Tunnel, deployment, auth, backups)
+- **Stack Setup Skill** - `.claude/skills/stack-setup/SKILL.md` for automated project configuration with the new stack
+- **Stack Quick Reference** - Added to AGENTS.md for instant lookup
+
+### Changed
+- **khamel-mode.md** - Updated stack defaults (Astro + CF Pages/Workers + Better Auth + Postgres)
+- **web.md** - Complete rewrite for Astro + Cloudflare + Better Auth + Postgres stack
+- **Detection patterns** - Changed from `convex/` to `astro.config.*` or `wrangler.toml`
+- **Public access** - Changed from Tailscale Funnel + poytz to Cloudflare Tunnel + Cloudflare Pages
+- **Storage progression** - Updated from SQLite → Convex → OCI DB to SQLite → Postgres on OCI → OCI Autonomous DB
+- **Auth default** - Better Auth + Google OAuth (sessions in Postgres) replaces Clerk
+- **Anti-patterns** - Added Convex/Next.js/Clerk/Vercel as old stack to avoid
+
+### Removed
+- `/convexify` slash command (replaced by /stack-setup for new stack)
+
+### Fixed
+- All detection tables updated for new stack triggers
+- context-v8.py stack reference updated
+
+---
+
 ## [10.2.0] - 2026-02-08
 
 ### Added
