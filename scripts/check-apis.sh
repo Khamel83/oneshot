@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-# Set SOPS key location (must be run from oneshot directory or parent)
+# Set SOPS config location
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SOPS_CONFIG="${PROJECT_DIR}/.sops.yaml"
 
@@ -13,19 +13,22 @@ if [[ ! -f "$SOPS_CONFIG" ]]; then
     SOPS_CONFIG="$HOME/github/oneshot/.sops.yaml"
 fi
 
+# Set age recipient for decryption
+export SOPS_AGE_RECIPIENTS=age1kwu32vl7x3tx7dqphzykcf5cahgm4ejztm865f22fkwe5j6hwalqh0rau8
+
 ISSUES=0
 
-# Helper to decrypt key from JSON
-_decrypt_key() {
+# Decrypt and export a key from dotenv file
+_decrypt_dotenv_key() {
     local _file="$1"
     local _key="$2"
-    sops --config "$SOPS_CONFIG" -d "${PROJECT_DIR}/secrets/${_file}" 2>/dev/null | jq -r "${_key} // empty" 2>/dev/null || echo ""
+    sops --config "$SOPS_CONFIG" --decrypt --input-type dotenv --output-type dotenv "${PROJECT_DIR}/secrets/${_file}" 2>/dev/null | grep "^${_key}=" | cut -d'=' -f2
 }
 
 # Test ZAI API key
 check_zai_api() {
   local _zai_key
-  _zai_key=$(_decrypt_key "research_keys.json.encrypted" '.ZAI_API_KEY')
+  _zai_key=$(_decrypt_dotenv_key "research_keys.env.encrypted" "ZAI_API_KEY")
 
   if [[ -z "$_zai_key" ]]; then
     echo "⚠️  ZAI_API_KEY: not set"
@@ -45,7 +48,7 @@ check_zai_api() {
 # Test Tavily API
 check_tavily_api() {
   local _tavily_key
-  _tavily_key=$(_decrypt_key "research_keys.json.encrypted" '.TAVILY_API_KEY')
+  _tavily_key=$(_decrypt_dotenv_key "research_keys.env.encrypted" "TAVILY_API_KEY")
 
   if [[ -z "$_tavily_key" ]]; then
     echo "⊘ TAVILY_API_KEY: not set (optional)"
@@ -59,7 +62,7 @@ check_tavily_api() {
 # Test Exa API
 check_exa_api() {
   local _exa_key
-  _exa_key=$(_decrypt_key "research_keys.json.encrypted" '.EXA_API_KEY')
+  _exa_key=$(_decrypt_dotenv_key "research_keys.env.encrypted" "EXA_API_KEY")
 
   if [[ -z "$_exa_key" ]]; then
     echo "⊘ EXA_API_KEY: not set (optional)"
@@ -73,7 +76,7 @@ check_exa_api() {
 # Test Apify API
 check_apify_api() {
   local _apify_key
-  _apify_key=$(_decrypt_key "research_keys.json.encrypted" '.APIFY_API_KEY')
+  _apify_key=$(_decrypt_dotenv_key "research_keys.env.encrypted" "APIFY_TOKEN")
 
   if [[ -z "$_apify_key" ]]; then
     echo "⊘ APIFY_API_KEY: not set (optional)"
@@ -87,7 +90,7 @@ check_apify_api() {
 # Test Context7 API
 check_context7_api() {
   local _context7_key
-  _context7_key=$(_decrypt_key "research_keys.json.encrypted" '.CONTEXT7_API_KEY')
+  _context7_key=$(_decrypt_dotenv_key "research_keys.env.encrypted" "CONTEXT7_API_KEY")
 
   if [[ -z "$_context7_key" ]]; then
     echo "⊘ CONTEXT7_API_KEY: not set (optional)"
