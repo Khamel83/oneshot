@@ -22,7 +22,7 @@ These are foundational files, not skills:
 Frontend: Cloudflare Pages (Astro)
 API:      Cloudflare Workers
 Database: Postgres on OCI via Hyperdrive
-Tunnel:   pg.omarsnewgroove.com → 100.126.13.70:5432
+Tunnel:   pg.khamel.com → 100.126.13.70:5432
 Auth:     Better Auth + Google OAuth
 Deploy:   Cloudflare Pages (free)
 ```

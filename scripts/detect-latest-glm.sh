@@ -28,7 +28,7 @@ if versions:
 
   if [[ -z "$result" ]]; then
     # Fallback to known good version if API fails
-    echo "glm-4.7"
+    echo "glm-5"
   else
     echo "$result"
   fi

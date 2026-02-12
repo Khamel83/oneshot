@@ -144,7 +144,7 @@ skill_router:
 Frontend: Cloudflare Pages (Astro)
 API:      Cloudflare Workers
 Database: Postgres on OCI via Hyperdrive
-Tunnel:   pg.omarsnewgroove.com → 100.126.13.70:5432
+Tunnel:   pg.khamel.com → 100.126.13.70:5432
 Docs:     .claude/infrastructure/STACK.md
 Skill:    .claude/skills/stack-setup/SKILL.md
 ```

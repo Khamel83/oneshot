@@ -81,7 +81,7 @@ docker exec pg-server pg_dump -U omar database_name > backup.sql
 
 The tunnel connects Cloudflare's network to the Postgres instance on OCI without exposing it to the public internet.
 
-**Tunnel hostname:** `pg.omarsnewgroove.com` (or check `~/.cloudflared/config.yml` on OCI)
+**Tunnel hostname:** `pg.khamel.com` (or check `/etc/cloudflared/config.yml` on OCI)
 
 **Status check:**
 ```bash
@@ -108,7 +108,7 @@ docker exec pg-server createdb -U omar my_project
 ```bash
 # One-time per project
 npx wrangler hyperdrive create my-project-db \
-  --connection-string="postgresql://omar:PASSWORD@pg.omarsnewgroove.com:5432/my_project"
+  --connection-string="postgresql://omar:PASSWORD@pg.khamel.com:5432/my_project"
 ```
 
 Save the ID it returns.

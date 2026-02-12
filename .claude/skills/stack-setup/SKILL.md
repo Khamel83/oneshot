@@ -21,7 +21,7 @@ Activate this skill when the user says:
 ## Prerequisites
 
 Before running this skill, verify:
-1. Cloudflare Tunnel is running on OCI (`pg.omarsnewgroove.com` resolves)
+1. Cloudflare Tunnel is running on OCI (`pg.khamel.com` resolves)
 2. User has `wrangler` CLI authenticated (`npx wrangler whoami`)
 3. Postgres is running (`docker exec pg-server psql -U omar -c "SELECT 1"`)
 
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 ```bash
 npx wrangler hyperdrive create PROJECT_NAME-db \
-  --connection-string="postgresql://omar:PASSWORD@pg.omarsnewgroove.com:5432/PROJECT_NAME"
+  --connection-string="postgresql://omar:PASSWORD@pg.khamel.com:5432/PROJECT_NAME"
 ```
 
 Capture the returned ID for wrangler.toml.
@@ -214,7 +214,7 @@ Run: `npx tsx test-db.ts`
 ## Notes
 
 - Always use the Tailscale IP (100.126.13.70) for local dev
-- Always use the tunnel hostname (pg.omarsnewgroove.com) for Hyperdrive
+- Always use the tunnel hostname (pg.khamel.com) for Hyperdrive
 - Password is in `~/pg-server/.env` on OCI - never commit it
 - Test locally before deploying to catch connection issues early
 

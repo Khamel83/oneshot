@@ -21,7 +21,7 @@
 # ║  EDIT THESE VALUES BEFORE RUNNING --install                    ║
 # ╚════════════════════════════════════════════════════════════════╝
 ZAI_API_KEY="YOUR_ZAI_API_KEY_HERE"
-GLM_MODEL="glm-4.7"  # Update when z.ai releases new version
+GLM_MODEL="glm-5"  # Update when z.ai releases new version
 SHELL_TYPE="${SHELL_TYPE:-bash}"  # bash or zsh - auto-detected by --install
 # ══════════════════════════════════════════════════════════════════
 
