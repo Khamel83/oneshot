@@ -197,6 +197,26 @@ gemini auth login
 
 ---
 
+## Secrets (SOPS/Age)
+
+ONE_SHOT uses SOPS + Age for encrypted secrets. The age key is at `~/.age/key.txt` and SOPS config is at `.sops.yaml`.
+
+**On new machines:**
+```bash
+# Copy age key from existing machine
+scp user@known-machine:~/.age/key.txt ~/.age/key.txt
+
+# Then verify decryption works
+sops -d secrets/research_keys.env.encrypted
+```
+
+**Encrypted files:**
+- `secrets/research_keys.env.encrypted` - API keys (ZAI, Exa, Tavily, Apify, Context7)
+- `secrets/homelab.env.encrypted` - Homelab credentials
+- `secrets/*.env.encrypted` - Project-specific secrets
+
+---
+
 ## Updating ONE_SHOT
 
 ```bash
