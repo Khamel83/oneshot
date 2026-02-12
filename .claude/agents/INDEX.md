@@ -1,6 +1,6 @@
 # Agents Index
 
-ONE_SHOT v10.3 uses skills instead of agents. See `.claude/skills/INDEX.md` for available skills.
+ONE_SHOT v10.4 uses skills instead of agents. See `.claude/skills/INDEX.md` for available skills.
 
 ---
 

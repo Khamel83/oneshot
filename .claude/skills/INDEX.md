@@ -1,6 +1,6 @@
 # Skills Index
 
-ONE_SHOT v10.3 - Progressive disclosure rules, new stack (Astro + Cloudflare + Better Auth + Postgres), slash commands on-demand.
+ONE_SHOT v10.4 - Progressive disclosure rules, check scripts with safe update logic, slash commands on-demand.
 
 ---
 

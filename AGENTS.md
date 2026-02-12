@@ -1,9 +1,9 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for user guide, INDEX.md for skill reference -->
 
-# ONE_SHOT v10.3
+# ONE_SHOT v10.4
 
-> **v10.3 = NEW STACK** - Astro + Cloudflare Pages/Workers + Better Auth + Postgres on OCI replaces Convex+Next.js+Clerk+Vercel.
+> **v10.4 = Check Scripts + Heartbeat** - Automated maintenance scripts with safe update logic and rate limiting.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
@@ -373,5 +373,5 @@ When updating user-facing features:
 
 ---
 
-**Version**: 10.3 | **System Tokens**: ~400 (down from 5.8k) | **Slash Commands**: 16 | **Rules**: 7 | **Context**: Progressive disclosure | **New**: Astro + Cloudflare + Better Auth + Postgres stack, /stack-setup skill
+**Version**: 10.4 | **System Tokens**: ~400 (down from 5.8k) | **Slash Commands**: 16 | **Rules**: 7 | **Context**: Progressive disclosure | **New**: Check scripts, heartbeat installer with rate limiting
 # Local test modification

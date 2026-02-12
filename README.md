@@ -1,4 +1,4 @@
-# ONE_SHOT v10.3
+# ONE_SHOT v10.4
 
 **Your personal Claude Code configuration.**
 
@@ -32,40 +32,53 @@ claude .
 
 ---
 
-## What Changed (v9 → v10.3)
+## How to Use ONE_SHOT
 
-### v9: Framework with 50+ Skills
-- AGENTS.md routing table
-- 52 skills auto-loaded
-- Hooks injecting context
-- ~5,800 tokens always-on
-- "Build me X" triggered interview automatically
+### Daily Workflow
 
-### v10: Personal Configuration (~93% token reduction)
-- Removed AGENTS.md routing
-- 16 slash commands (invoke when needed)
-- 7 rules always loaded (~410 tokens)
-- You type `/interview` when you want structure
+1. **Start a session** → Claude reads your project's rules automatically
+2. **Say what you want** → "Build me a weather CLI", "Fix the login bug"
+3. **Track progress** → Tasks saved in `.beads/`, survives everything
+4. **Use slash commands** → When you need structure: `/interview`, `/cp`, `/diagnose`
 
-### v10.1: Progressive Disclosure (+85% token savings)
-- Rules split by project type (web, cli, service)
-- Auto-detection from files
-- ~300 tokens vs ~2000 in v9
+### Key Commands
 
-### v10.2: Work Discipline + Beads Tightening
-- Work discipline principles (plan first, commit per task, keep tasks small)
-- Beads operational rules (session start/end prompts, blocked/big bead handling)
-- beads_viewer (`bv`) as recommended TUI
-- "Wait for Native" strategy — use beads now, switch to Claude native when it ships
+| You Say | What Happens |
+|---------|--------------|
+| "Build me X" | Claude plans and builds |
+| `/interview` | Structured requirements gathering |
+| `/cp` | Continuous planner (3-file pattern) |
+| `/implement` | Execute plan with beads tracking |
+| `/diagnose` | Hypothesis-based debugging |
+| `/stack-setup` | Configure Astro + Cloudflare + Postgres |
+| `/deploy` | Deploy to oci-dev |
 
-### v10.3: New Stack (Astro + Cloudflare + Better Auth + Postgres)
-- **Major stack migration** from Convex+Next.js+Clerk+Vercel
-- **Zero-cost stack** - Cloudflare free tier + OCI free tier + self-hosted Postgres
-- **New infrastructure docs** - `.claude/infrastructure/STACK.md`
-- **Stack setup skill** - `/stack-setup` for automated project configuration
-- **Better Auth** - Replaces Clerk, sessions in your own Postgres
-- **Cloudflare Tunnel** - For production database access
-- **Detection updated** - `astro.config.*` or `wrangler.toml` for web apps
+### Check Scripts (Automated)
+
+ONE_SHOT includes heartbeat scripts that run periodically to keep your setup current:
+
+| Script | Purpose |
+|--------|---------|
+| `heartbeat.sh` | Periodic maintenance (run via systemd or cron) |
+| `check-oneshot.sh` | Verify ONE_SHOT is up to date |
+| `check-apis.sh` | Check API keys and services |
+
+Install heartbeat with 23-hour rate limiting:
+```bash
+~/.claude/scripts/heartbeat-install.sh
+```
+
+### Stack Defaults
+
+ONE_SHOT uses opinionated defaults (don't ask, just use):
+
+| Project Type | Stack |
+|--------------|-------|
+| Web apps | Astro + Cloudflare Pages/Workers + Better Auth + Postgres on OCI |
+| CLIs | Python + Click + SQLite |
+| Services | Python + systemd → oci-dev |
+| Heavy compute | Route to macmini |
+| Large storage | Route to homelab |
 
 ---
 
@@ -242,9 +255,9 @@ git pull origin master
 
 ---
 
-## v9 vs v10.3 Comparison
+## Version History
 
-See [V9-TO-V10.1.md](V9-TO-V10.1.md) for detailed comparison.
+See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
 
 ---
 
@@ -256,4 +269,4 @@ See [V9-TO-V10.1.md](V9-TO-V10.1.md) for detailed comparison.
 
 ---
 
-**v10.3** | New Stack (Astro + CF Pages/Workers + Better Auth + Postgres) | Progressive Disclosure | Slash Commands | Beads
+**v10.4** | Check scripts + Heartbeat installer | Progressive Disclosure | Slash Commands | Beads

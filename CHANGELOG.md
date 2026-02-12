@@ -4,6 +4,21 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [10.4.0] - 2026-02-12
+
+### Added
+- `check-oneshot.sh --fix` flag (pull only when explicitly requested)
+- `oneshot.sh` smart AGENTS.md updates (respects local changes, --force to override)
+- `check-apis.sh` PWD-based SOPS config detection (works from any directory)
+- `heartbeat.sh --safe` mode (skips check-oneshot to prevent cascade updates)
+- `heartbeat-install.sh` installer with 23-hour rate limiting
+- All check scripts now idempotent (safe to run multiple times)
+
+### Changed
+- check-oneshot.sh defaults to check-only mode (no automatic pulls)
+
+---
+
 ## [10.3.0] - 2026-02-12
 
 ### Added
