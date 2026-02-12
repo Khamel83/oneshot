@@ -1,3 +1,9 @@
+---
+name: stack-setup
+description: Configure a project to use Omar's standard Cloudflare + Postgres stack (Astro → CF Pages → Workers → Hyperdrive → Postgres on OCI)
+allowed-tools: Read, Write, Edit, Bash
+---
+
 # Stack Setup Skill
 
 Configure a project to use Omar's standard Cloudflare + Postgres stack.
@@ -211,3 +217,7 @@ Run: `npx tsx test-db.ts`
 - Always use the tunnel hostname (pg.omarsnewgroove.com) for Hyperdrive
 - Password is in `~/pg-server/.env` on OCI - never commit it
 - Test locally before deploying to catch connection issues early
+
+## Keywords
+
+stack, cloudflare, postgres, astro, deployment, database, setup, infrastructure, hyperdrive, workers
