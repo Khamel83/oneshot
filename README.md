@@ -32,7 +32,7 @@ claude .
 
 ---
 
-## What Changed (v9 → v10.2)
+## What Changed (v9 → v10.3)
 
 ### v9: Framework with 50+ Skills
 - AGENTS.md routing table
@@ -57,6 +57,15 @@ claude .
 - Beads operational rules (session start/end prompts, blocked/big bead handling)
 - beads_viewer (`bv`) as recommended TUI
 - "Wait for Native" strategy — use beads now, switch to Claude native when it ships
+
+### v10.3: New Stack (Astro + Cloudflare + Better Auth + Postgres)
+- **Major stack migration** from Convex+Next.js+Clerk+Vercel
+- **Zero-cost stack** - Cloudflare free tier + OCI free tier + self-hosted Postgres
+- **New infrastructure docs** - `.claude/infrastructure/STACK.md`
+- **Stack setup skill** - `/stack-setup` for automated project configuration
+- **Better Auth** - Replaces Clerk, sessions in your own Postgres
+- **Cloudflare Tunnel** - For production database access
+- **Detection updated** - `astro.config.*` or `wrangler.toml` for web apps
 
 ---
 
@@ -213,7 +222,7 @@ git pull origin master
 
 ---
 
-## v9 vs v10.2 Comparison
+## v9 vs v10.3 Comparison
 
 See [V9-TO-V10.1.md](V9-TO-V10.1.md) for detailed comparison.
 
