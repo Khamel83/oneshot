@@ -24,10 +24,15 @@ set -e
 
 # Parse arguments
 UPGRADE_MODE=false
+FORCE_MODE=false
 for arg in "$@"; do
   case $arg in
     --upgrade)
       UPGRADE_MODE=true
+      shift
+      ;;
+    --force)
+      FORCE_MODE=true
       shift
       ;;
     --help)
@@ -78,6 +83,58 @@ else
 fi
 echo ""
 
+# =============================================================================
+# Smart AGENTS.md update function
+# =============================================================================
+update_agents_md() {
+  local AGENTS_FILE="AGENTS.md"
+  local FORCE_UPDATE="${1:-false}"
+
+  # Fresh install - no file exists
+  if [[ ! -f "$AGENTS_FILE" ]]; then
+    curl -sL "$ONESHOT_BASE/AGENTS.md" > "$AGENTS_FILE" 2>/dev/null || \
+      curl -sL "$ONESHOT_BASE/README.md" > "$AGENTS_FILE"
+    echo -e "  ${GREEN}✓${NC} AGENTS.md (created)"
+    return 0
+  fi
+
+  # Check if we're in a git repo
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo -e "  ${YELLOW}○${NC} AGENTS.md (not in git repo, skipping update)"
+    return 0
+  fi
+
+  # Check for ANY local changes (staged or unstaged)
+  if git status --porcelain "$AGENTS_FILE" 2>/dev/null | grep -qE "^[AM]"; then
+    if [[ "$FORCE_UPDATE" == "true" ]]; then
+      echo -e "  ${YELLOW}⚠${NC} AGENTS.md (force overwrite with --force)"
+    else
+      echo -e "  ${YELLOW}○${NC} AGENTS.md (locally modified, use --force to update)"
+      return 0
+    fi
+  fi
+
+  # Try to compare with remote (handle network failure)
+  if ! git fetch origin >/dev/null 2>&1; then
+    echo -e "  ${YELLOW}○${NC} AGENTS.md (network error, cannot check for updates)"
+    return 0
+  fi
+
+  LOCAL_HASH=$(git rev-parse HEAD:"$AGENTS_FILE" 2>/dev/null || echo "none")
+  REMOTE_HASH=$(git rev-parse origin/master:"$AGENTS_FILE" 2>/dev/null || git rev-parse origin/main:"$AGENTS_FILE" 2>/dev/null || echo "none")
+
+  if [[ "$LOCAL_HASH" == "$REMOTE_HASH" ]]; then
+    echo -e "  ${GREEN}✓${NC} AGENTS.md (up to date)"
+    return 0
+  fi
+
+  # Remote is newer - update
+  curl -sL "$ONESHOT_BASE/AGENTS.md" > "$AGENTS_FILE" 2>/dev/null || \
+    curl -sL "$ONESHOT_BASE/README.md" > "$AGENTS_FILE"
+  echo -e "  ${GREEN}✓${NC} AGENTS.md (updated from remote)"
+  return 0
+}
+
 # Check for beads CLI (REQUIRED)
 if ! command -v bd &> /dev/null; then
   echo -e "${RED}Error: beads CLI not found (REQUIRED)${NC}"
@@ -99,11 +156,9 @@ fi
 echo ""
 
 # =============================================================================
-# 1. AGENTS.md - The orchestrator (always update, this is OneShot's file)
+# 1. AGENTS.md - The orchestrator (smart update, respects local changes)
 # =============================================================================
-curl -sL "$ONESHOT_BASE/AGENTS.md" > AGENTS.md 2>/dev/null || \
-  curl -sL "$ONESHOT_BASE/README.md" > AGENTS.md
-echo -e "  ${GREEN}✓${NC} AGENTS.md (orchestrator with skill routing)"
+update_agents_md "$FORCE_MODE"
 
 # =============================================================================
 # 2. CLAUDE.md - Supplement if exists, create if not

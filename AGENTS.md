@@ -374,3 +374,4 @@ When updating user-facing features:
 ---
 
 **Version**: 10.3 | **System Tokens**: ~400 (down from 5.8k) | **Slash Commands**: 16 | **Rules**: 7 | **Context**: Progressive disclosure | **New**: Astro + Cloudflare + Better Auth + Postgres stack, /stack-setup skill
+# Local test modification
