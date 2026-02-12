@@ -131,6 +131,22 @@ skill_router:
   # Maintenance
   - pattern: "/update|update oneshot|upgrade oneshot|check version"
     skill: auto-updater
+
+  # Infrastructure & Deployment
+  - pattern: "set up cloudflare|configure deploy|add database|add postgres|make this deployable|set up the stack"
+    skill: stack-setup
+    note: "Full Cloudflare + Postgres stack setup (Astro → CF Pages → Workers → Hyperdrive → Postgres on OCI)"
+```
+
+### Stack Quick Reference
+
+```
+Frontend: Cloudflare Pages (Astro)
+API:      Cloudflare Workers
+Database: Postgres on OCI via Hyperdrive
+Tunnel:   pg.omarsnewgroove.com → 100.126.13.70:5432
+Docs:     .claude/infrastructure/STACK.md
+Skill:    .claude/skills/stack-setup/SKILL.md
 ```
 
 **All other skills**: Available on-demand via `/skill-name` or explicit request. See INDEX.md.
