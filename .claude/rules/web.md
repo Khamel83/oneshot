@@ -1,41 +1,59 @@
-# Web App Rules (Convex + Next.js + Clerk)
+# Web App Rules (Astro + Cloudflare + Better Auth + Postgres)
 
 ## Default Stack
 
 When building web apps for this user:
 
 ```
-Convex (backend) + Next.js (frontend) + Clerk (auth) → Deploy to Vercel
+Astro (frontend) + Cloudflare Workers (API) + Better Auth (auth) + Postgres on OCI (data)
+Deploy to: Cloudflare Pages
 ```
 
 ## When to Use
 
 Detect by presence of:
-- `package.json` with `convex` dependency
-- `convex/` directory
-- `app/` or `pages/` directory
+- `astro.config.mjs` or `astro.config.ts`
+- `wrangler.toml`
+- `package.json` with `astro` dependency
 
-## Convex-Specific Rules
+## Astro-Specific Rules
 
-- **Backend is Convex** - Don't suggest Express, FastAPI, or custom backends
-- **File-based routing** - Use `convex/schema.ts` for data model
-- **Real-time by default** - Leverage Convex subscriptions
-- **Auth via Clerk** - Don't build custom auth
+- **Astro is the framework** - Don't suggest Next.js, Remix, SvelteKit
+- **Cloudflare adapter** - Use `@astrojs/cloudflare` for SSR
+- **Islands architecture** - Server-first, add interactivity with client directives
+- **Content Collections** - Use for structured content when applicable
 
-## Next.js-Specific Rules
+## Cloudflare Workers Rules
 
-- **App Router preferred** - Use `app/` directory over `pages/`
-- **Server Components** - Default to RSC, use Client Components sparingly
-- **API Routes via Convex** - Don't use Next.js API routes, use Convex functions
+- **API via Workers** - Don't suggest Express, FastAPI, or standalone API servers
+- **Hyperdrive** - Use for Postgres connection pooling in production
+- **wrangler.toml** - All deployment config lives here
+- **Local dev** - Connect directly to Postgres via Tailscale (no Hyperdrive needed)
+
+## Auth Rules
+
+- **Better Auth** - Default auth library, don't suggest Clerk, Auth0, or NextAuth
+- **Google OAuth** - Default provider via Better Auth
+- **Sessions in Postgres** - Auth data lives in your database, you own it
+- **Cloudflare Access** - Use for internal/admin tools only
+
+## Database Rules
+
+- **Postgres on OCI** - Default database for all web apps
+- **Direct Tailscale connection** - For local dev (100.126.13.70:5432)
+- **Hyperdrive** - For production (via Cloudflare Tunnel)
+- **`postgres` npm package** - Use this, not pg/knex/prisma/drizzle unless needed
 
 ## Deployment
 
-- **Vercel** - Default deploy target, no configuration needed
-- **Convex dashboard** - `npx convex dev` for local development
+- **Cloudflare Pages** - Default deploy target
+- **GitHub auto-deploy** - Connect repo in CF dashboard
+- **Manual**: `npm run build && npx wrangler pages deploy dist`
 
 ## Anti-Patterns
 
-- ❌ Don't suggest PostgreSQL, MongoDB, or other databases
-- ❌ Don't suggest custom authentication
-- ❌ Don't suggest API routes (use Convex functions)
-- ❌ Don't suggest server-side frameworks (Express, FastAPI)
+- ❌ Don't suggest Convex, Next.js, Clerk, or Vercel (old stack)
+- ❌ Don't suggest MongoDB, MySQL, or other databases
+- ❌ Don't suggest Lucia auth (deprecated)
+- ❌ Don't suggest standalone API servers (Express, FastAPI)
+- ❌ Don't suggest heavy ORMs (Prisma, Drizzle) unless explicitly needed

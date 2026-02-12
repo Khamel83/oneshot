@@ -254,6 +254,53 @@ ssh ubuntu@100.126.13.70 "cd ~/pg-server && ./backup.sh"
 
 ---
 
+## Authentication
+
+### Default: Better Auth + Google OAuth
+
+**Better Auth** is the default auth library. Sessions stored in your Postgres.
+
+**Install:**
+```bash
+npm install better-auth
+```
+
+**Setup `src/lib/auth.ts`:**
+```typescript
+import { betterAuth } from 'better-auth'
+import postgres from 'postgres'
+
+const sql = postgres(process.env.DATABASE_URL!)
+
+export const auth = betterAuth({
+  database: sql,
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+})
+```
+
+**Google OAuth setup:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create OAuth 2.0 Client ID
+3. Set redirect URI: `https://your-site.pages.dev/api/auth/callback/google`
+4. Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.env.local`
+
+**Environment variables needed:**
+```
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+```
+
+### Internal Tools: Cloudflare Access
+
+For admin dashboards and internal tools, use Cloudflare Access (already configured). No code needed — just toggle on in the Cloudflare dashboard.
+
+---
+
 ## Cost
 
 | Component | Cost |
@@ -264,4 +311,6 @@ ssh ubuntu@100.126.13.70 "cd ~/pg-server && ./backup.sh"
 | Cloudflare Tunnel | Free |
 | OCI Compute | Free tier (ARM, 24GB RAM) |
 | Postgres | Free (self-hosted) |
+| Better Auth | Free (open-source) |
+| Cloudflare Access | Free (50 users) |
 | **Total** | **$0** |

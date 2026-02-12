@@ -140,13 +140,39 @@ node_modules/
 dist/
 ```
 
-### 10. Install Dependencies
+### 10. Set Up Better Auth
 
-```bash
-npm install postgres
+Create `src/lib/auth.ts`:
+```typescript
+import { betterAuth } from 'better-auth'
+import postgres from 'postgres'
+
+const sql = postgres(process.env.DATABASE_URL!)
+
+export const auth = betterAuth({
+  database: sql,
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+})
 ```
 
-### 11. Test Connection
+Add to `.env.example`:
+```
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+### 11. Install Dependencies
+
+```bash
+npm install postgres better-auth
+```
+
+### 12. Test Connection
 
 Create a simple test:
 ```typescript
@@ -174,7 +200,8 @@ Run: `npx tsx test-db.ts`
 - [ ] src/lib/db.ts client
 - [ ] .env.example and .env.local
 - [ ] Updated .gitignore
-- [ ] postgres package installed
+- [ ] Better Auth configured with Google OAuth
+- [ ] postgres + better-auth packages installed
 - [ ] Verified database connection
 
 ## Notes

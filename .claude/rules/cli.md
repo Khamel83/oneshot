@@ -13,7 +13,7 @@ Python + Click + SQLite
 Detect by presence of:
 - `setup.py` or `pyproject.toml`
 - CLI entry points defined
-- No `convex/` or web framework files
+- No `astro.config.*` or `wrangler.toml` or web framework files
 
 ## Click-Specific Rules
 

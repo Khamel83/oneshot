@@ -5,7 +5,7 @@
 Rules are split into:
 - **core.md** - Always loaded (~150 lines)
 - **khamel-mode.md** - User-specific defaults (~50 lines)
-- **web.md** - Web app rules (Convex + Next.js)
+- **web.md** - Web app rules (Astro + Cloudflare + Better Auth + Postgres)
 - **cli.md** - CLI rules (Python + Click)
 - **service.md** - Service/API rules (Python + systemd)
 
@@ -24,7 +24,7 @@ Claude should auto-detect project type from files:
 
 | Detection | Project Type | Rules Loaded |
 |-----------|--------------|--------------|
-| `package.json` + `convex/` | Web app | core + khamel-mode + web |
+| `astro.config.*` or `wrangler.toml` | Web app | core + khamel-mode + web |
 | `setup.py` or `pyproject.toml` | CLI | core + khamel-mode + cli |
 | `*.service` systemd file | Service | core + khamel-mode + service |
 | No detection | Generic | core + khamel-mode |
@@ -44,7 +44,7 @@ In your project's `CLAUDE.md`:
 
 Auto-detect project type and load appropriate rules.
 
-If this is a **web app** (Convex + Next.js): Use web defaults
+If this is a **web app** (Astro + Cloudflare): Use web defaults
 If this is a **CLI** (Python + Click): Use CLI defaults
 If this is a **service** (Python + systemd): Use service defaults
 
