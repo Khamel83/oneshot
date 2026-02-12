@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # ONE-SHOT Heartbeat - Auto-updating health system
-# Usage: ./heartbeat.sh [--force] [--quiet] [--background]
+# Usage: ./heartbeat.sh [--force] [--quiet] [--background] [--safe]
 #
 # Auto-actions (once per day):
-#   1. ONE-SHOT: Auto git pull from origin
+#   1. ONE-SHOT: Check for updates (no pull unless --fix + --force)
 #   2. GLM Model: Auto-update models.env and shell config
 #   3. Secrets: Sync and verify decryptability
 #   4. Checks: CLIs, API keys, MCPs, connections
 #   5. Beads: Sync health data
+#
+# Options:
+#   --safe: Skip check-oneshot (prevent cascade)
 
 set -euo pipefail
 
@@ -26,12 +29,14 @@ fi
 QUIET=""
 FORCE=""
 BACKGROUND=""
+SAFE_MODE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --quiet|-q) QUIET="--quiet" ;;
     --force|-f) FORCE="--force" ;;
     --background|-b) BACKGROUND="--background" ;;
+    --safe|-s) SAFE_MODE="--safe" ;;
   esac
   shift
 done
@@ -68,8 +73,12 @@ check() {
   fi
 }
 
-# 1. Update ONE-SHOT repo first (pulls latest scripts/secrets)
-check "ONE-SHOT" "$SCRIPT_DIR/check-oneshot.sh"
+# 1. Check ONE-SHOT repo (skip in safe mode)
+if [[ "$SAFE_MODE" == "--safe" ]]; then
+  RESULTS+=("○ ONE-SHOT (safe mode, skipped)")
+else
+  check "ONE-SHOT" "$SCRIPT_DIR/check-oneshot.sh"
+fi
 
 # 2. Auto-update GLM model if newer version available
 check "GLM Model" "$SCRIPT_DIR/check-glm.sh"
