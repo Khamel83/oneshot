@@ -232,14 +232,26 @@ sops -d secrets/research_keys.env.encrypted
 
 ## Updating ONE_SHOT
 
-```bash
-# Update your project
-cd your-project
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash -s -- --upgrade
+**Works from ANY version - even if your install is broken:**
 
-# Update the oneshot repo itself
-cd ~/github/oneshot
-git pull origin master
+```
+run curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/oneshot-update.sh | bash -s -- force
+```
+
+Or just say to Claude:
+```
+curl the oneshot updater and run it with force
+```
+
+**If you have the command installed:**
+```bash
+oneshot-update force    # Update + sync to current project
+oneshot-update status   # Check current version
+```
+
+**From Claude Code:**
+```
+/update
 ```
 
 ---
