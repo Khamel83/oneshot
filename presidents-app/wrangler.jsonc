@@ -1,0 +1,12 @@
+{
+  "name": "presidents",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-02-04",
+  "compatibility_flags": ["nodejs_compat"],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "6a5f56df186a4ec4953a4fa77e0681f6"
+    }
+  ]
+}
