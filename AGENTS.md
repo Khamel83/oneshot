@@ -1,9 +1,9 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for user guide, INDEX.md for skill reference -->
 
-# ONE_SHOT v10.5
+# ONE_SHOT v11
 
-> **v10.5 = Skills Cleanup + Better Docs** - Removed unused skills (convexify, deploy), added context clearing workflow, comprehensive SKILLS.md documentation.
+> **v11 = Native Tasks + Swarms** - Migrated from Beads to Claude's native Tasks (TaskCreate/Update/List). Added /swarm command for agent team orchestration. Beads deprecated as fallback.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 

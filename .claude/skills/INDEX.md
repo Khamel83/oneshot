@@ -1,6 +1,14 @@
 # Skills Index
 
-ONE_SHOT v10.5 - Skills cleanup, context clearing workflow, comprehensive documentation. See docs/SKILLS.md for full reference.
+ONE_SHOT v11 - Native Tasks + Swarms. Migrated from Beads to native Tasks, added /swarm for agent teams. See docs/SKILLS.md for full reference.
+
+---
+
+## v11 Highlights
+
+- **Native Tasks**: TaskCreate, TaskGet, TaskUpdate, TaskList (Beads deprecated)
+- **/swarm**: Agent team orchestration (experimental)
+- **External models**: NOT supported in swarms (Claude only)
 
 ---
 

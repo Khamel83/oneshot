@@ -49,17 +49,40 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/AGENTS.md > A
 
 ---
 
-## ONE_SHOT v11: "Wait for Native" Strategy
+## ONE_SHOT v11: Native Tasks + Swarms
 
-**Core Philosophy**: Focus on developer productivity, wait for Claude's native features.
+**Core Philosophy**: Use Claude's native features first, external tools as fallback.
 
 ### Task Management Strategy
 ```yaml
-primary: "beads"     # Beads is the source of truth today
-future: "native"     # Switch to Claude's TaskCreate/TaskUpdate when they ship
+primary: "native"     # Claude's TaskCreate/TaskUpdate/TaskList
+fallback: "beads"     # Legacy bd CLI for edge cases
 ```
 
-Native task tools (TaskCreate, TaskStatus, etc.) do not exist yet. **Use Beads for all task tracking until further notice.**
+**Native Tasks** (TaskCreate, TaskGet, TaskUpdate, TaskList) shipped in Claude Code 2.1 (Jan 2026).
+- Persistent in `~/.claude/tasks/`
+- Survive `/clear` and context compression
+- Use these for all task tracking
+
+### Session Start Protocol
+1. `TaskList` - Check for pending/in_progress tasks
+2. Pick highest-priority unblocked task
+3. `TaskUpdate` to set status="in_progress"
+
+### Session End Protocol
+1. `git status` - check changes
+2. `git add <files>` - stage changes
+3. `git commit -m "..."` - commit code
+4. `TaskUpdate` - mark task completed or update notes
+5. `git push` - push to remote
+
+### Swarm Mode (Experimental)
+Enable with: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+
+Use `/swarm` for multi-agent orchestration:
+- TeamCreate - Create agent team
+- SendMessage - Peer-to-peer messaging
+- Task assignment to teammates
 
 ---
 
@@ -82,32 +105,19 @@ Native task tools (TaskCreate, TaskStatus, etc.) do not exist yet. **Use Beads f
 
 ---
 
-## Beads: Source of Truth for Tasks
+## Beads: Legacy Fallback
 
-Beads (`bd` CLI) is the source of truth for all task tracking. Use it, not free-form text or code comments.
+**DEPRECATED in v11**: Beads (`bd` CLI) is now a fallback. Use native Tasks instead.
 
-### Operational Rules
-- **Session start**: Run `bd ready` to check for ready tasks, pick the highest-priority unblocked bead. Summarize it before coding.
-- **New subtasks/bugs**: Create a bead for it. Don't leave TODOs in code comments.
-- **Blocked beads**: Never work on them. If something is blocked, add a bead describing what's missing.
-- **Big beads**: If a bead is too large or vague, propose splitting it into smaller, well-scoped beads.
-- **Status updates**: Always update the current bead's status and notes when you stop working on it (include links to key files/commits).
+Use Beads only when:
+- Working on legacy projects that already use beads
+- Native tasks are unavailable for some reason
 
-### Session Close Protocol
-1. `git status` - check changes
-2. `git add <files>` - stage changes
-3. `bd sync` - commit beads
-4. `git commit -m "..."` - commit code
-5. `bd sync` - commit new beads changes
-6. `git push` - push to remote
+### Beads Commands (Legacy)
+- `bd ready` - List ready tasks
+- `bd create "task"` - Create task
+- `bd sync` - Commit bead changes
+- `bv` - TUI viewer
 
-### Session Start Prompt
-> List the top 5 ready, unblocked beads, briefly summarize them, and recommend the best next one to work on.
-
-### Session End Prompt
-> Update the current bead with what you did, what's left, and any follow-up beads needed.
-
-### Beads UI
-- **beads_viewer** (`bv`): TUI for browsing/managing beads with tree navigation
-- Install: `pip install beads-viewer` → run `bv`
-- Use `bv` for visual overview; `bd` for CLI operations
+### Migration
+Existing Beads users: See `/beads` deprecation notice for migration guide.

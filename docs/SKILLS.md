@@ -1,6 +1,8 @@
 # ONE_SHOT Slash Commands Reference
 
-A practical guide to all 21 slash commands - what they do and when to use them.
+A practical guide to all 22 slash commands - what they do and when to use them.
+
+**v11**: Native Tasks are now the primary task system. Use TaskCreate, TaskGet, TaskUpdate, TaskList.
 
 ---
 
@@ -16,7 +18,7 @@ Creates a living plan stored in three files (`task_plan.md`, `findings.md`, `pro
 Executes a continuous plan deterministically by reading the skill sequence from `task_plan.md` and running each skill step-by-step. Updates the plan files as it progresses. Use after `/cp` creates a plan. **Clear context first** with `/handoff` → `/clear` → `/restore` so the plan is fresh in context.
 
 ### `/implement`
-Executes an approved plan with Beads task tracking. Breaks the plan into task groups, tracks progress via `bd` commands, commits after each task, and manages context thresholds. Use when you have a plan ready to execute. **Clear context first** for best results.
+Executes an approved plan with native task tracking. Breaks the plan into task groups, tracks progress via TaskCreate/TaskUpdate, commits after each task, and manages context thresholds. Use when you have a plan ready to execute. **Clear context first** for best results.
 
 ---
 
@@ -35,8 +37,11 @@ Views and searches encrypted session logs. All Claude Code sessions are auto-sav
 
 ## Task Tracking
 
-### `/beads`
-Interface to the Beads task tracking system (`bd` CLI). Creates, updates, lists, and manages persistent tasks that survive across sessions. Use to track work in progress, see what's ready to work on next, and maintain task dependencies.
+### `/beads` ⚠️ DEPRECATED
+Interface to the Beads task tracking system (`bd` CLI). **Deprecated in v11** - use native Tasks (TaskCreate, TaskGet, TaskUpdate, TaskList) instead. Beads is kept as a fallback for legacy projects only.
+
+### `/swarm`
+Orchestrates multiple Claude Code instances working as a team. One session acts as lead, coordinating work across teammates with shared task lists and peer-to-peer messaging. Use for parallel exploration: research & review, competing hypotheses, cross-layer coordination (frontend/backend/tests). Requires experimental flag: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.
 
 ---
 
@@ -112,7 +117,7 @@ Updates the ONE_SHOT framework itself and runs a health check. Syncs from the Gi
 | Continue after `/clear` | `/restore` |
 | Save my place before clearing | `/handoff` |
 | Find old conversations | `/sessions` |
-| Track tasks across sessions | `/beads` |
+| Track tasks | Native Tasks: `TaskCreate`, `TaskList`, `TaskUpdate` |
 | Debug something broken | `/diagnose` |
 | Review code for security | `/codereview` |
 | Edit 20+ files at once | `/batch` |
@@ -123,3 +128,4 @@ Updates the ONE_SHOT framework itself and runs a health check. Syncs from the Gi
 | Think through a complex decision | `/think` (or "think hard", "ultrathink", etc.) |
 | Set up a new web project | `/stack-setup` |
 | Update ONE_SHOT | `/update` |
+| Run parallel agents | `/swarm` |

@@ -4,6 +4,35 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [11.0.0] - 2026-02-13
+
+### Breaking Changes
+- **Beads deprecated** - Native Tasks (TaskCreate/TaskGet/TaskUpdate/TaskList) are now primary. `/beads` shows deprecation notice. Beads CLI still works as fallback.
+
+### Added
+- **Native Tasks** - Claude's built-in task tools are now the primary task tracking system
+- **/swarm command** - Agent team orchestration for parallel work (experimental, requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)
+- **Swarm patterns documentation** - Research & review, competing hypotheses, cross-layer coordination
+- **docs/SWARMS.md** - Comprehensive swarm usage guide (to be created)
+
+### Changed
+- **core.md** - Updated task management from "wait for native" to "use native"
+- **/implement** - Now uses native Tasks instead of Beads
+- **/restore** - Checks native Tasks first, then Beads fallback
+- **SKILLS.md** - Added /swarm, marked /beads as deprecated, updated task tracking section
+
+### Documentation
+- Updated README.md to v11 with native tasks and swarm support
+- Updated AGENTS.md to v11
+- Updated .claude/skills/INDEX.md to v11
+
+### Research Findings
+- External models NOT supported in swarms (Claude models only)
+- Swarm best for: research/review, competing hypotheses, cross-layer coordination
+- Swarm NOT for: sequential tasks, same-file edits, routine tasks
+
+---
+
 ## [10.5.0] - 2026-02-13
 
 ### Added

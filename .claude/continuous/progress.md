@@ -22,23 +22,48 @@
 - **Files**: `.claude/continuous/findings.md` - added v11 research
 - **Result**: Swarm patterns and open questions documented
 
+#### 11:15 - Researched External Models
+- **What**: Researched external model support in swarms
+- **Finding**: NOT supported - Agent teams only use Claude models
+- **Source**: Official Claude Code docs (code.claude.com/docs/en/agent-teams)
+
+#### 11:20 - Updated core.md for v11
+- **What**: Updated native task section, deprecated Beads section
+- **Files**: `~/.claude/rules/core.md` - removed outdated statement, added native workflow
+- **Result**: Native Tasks now primary, Beads fallback
+
+#### 11:30 - Created /swarm Command
+- **What**: Created comprehensive swarm orchestration command
+- **Files**: `~/.claude/commands/swarm.md` - NEW
+- **Result**: Full swarm patterns, controls, limitations documented
+
+#### 11:40 - Deprecated /beads
+- **What**: Added deprecation notice to beads command
+- **Files**: `~/.claude/commands/beads.md` - added deprecation header
+- **Result**: Users warned to migrate to native tasks
+
+#### 11:50 - Updated All Documentation
+- **What**: Updated SKILLS.md, README.md, AGENTS.md, CHANGELOG.md for v11
+- **Created**: `docs/SWARMS.md` - comprehensive swarm guide
+- **Result**: v11 documentation complete
+
 ### Key Decisions
 1. **Native Tasks = Primary** - Beads becomes fallback
 2. **Full `/swarm` command** - Not just basic support
 3. **Deprecate, don't delete** - Keep /beads working with deprecation notice
-4. **Research first** - Understand swarm patterns before implementing
+4. **External models NOT supported** - Claude only for swarms
 
-### Next Steps (Priority Order)
-1. [ ] Research external model support in swarms
-2. [ ] Update core.md to remove outdated statement
-3. [ ] Create /swarm command
-4. [ ] Deprecate /beads with migration guide
-5. [ ] Update all documentation for v11
+### Completed Tasks (Native Task Tracking)
+- [x] Research external model support in swarms
+- [x] Update core.md for v11 native tasks
+- [x] Create /swarm command
+- [x] Deprecate /beads command
+- [x] Update documentation for v11
 
 ### Checkpoint
-**Context Level**: 40%
-**Beads Sync**: N/A (migrating to native)
-**Plan Status**: v11 IN PROGRESS - Phase 1
+**Context Level**: 60%
+**Native Tasks**: 5/5 completed
+**Plan Status**: v11 Phase 1-5 COMPLETE, Phase 6 (Testing) pending
 
 ---
 

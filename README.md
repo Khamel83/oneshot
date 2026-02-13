@@ -1,4 +1,4 @@
-# ONE_SHOT v10.5
+# ONE_SHOT v11
 
 **Your personal Claude Code configuration.**
 
@@ -10,8 +10,8 @@ ONE_SHOT makes Claude Code work the way you want across all your projects:
 
 - **Progressive disclosure** - Rules load by project type (~300 tokens vs 2000)
 - **Slash commands** - Invoke when needed (/interview, /cp, /implement, /freesearch...)
-- **Persistent tracking** - Beads survives /clear, restarts, disconnections
-- **Wait for native** - Aligns with Claude's built-in features, doesn't duplicate them
+- **Native Tasks** - Uses Claude's built-in TaskCreate/TaskUpdate/TaskList (Beads deprecated)
+- **Swarm support** - Agent teams for parallel work with /swarm command
 
 ---
 
@@ -38,8 +38,8 @@ claude .
 
 1. **Start a session** → Claude reads your project's rules automatically
 2. **Say what you want** → "Build me a weather CLI", "Fix the login bug"
-3. **Track progress** → Tasks saved in `.beads/`, survives everything
-4. **Use slash commands** → When you need structure: `/interview`, `/cp`, `/diagnose`
+3. **Track progress** → Native Tasks (TaskCreate/TaskList) persist across sessions
+4. **Use slash commands** → When you need structure: `/interview`, `/cp`, `/diagnose`, `/swarm`
 
 ### Key Commands
 
@@ -48,6 +48,7 @@ claude .
 | "Build me X" | Claude plans and builds |
 | `/interview` | Structured requirements gathering |
 | `/cp` | Continuous planner (3-file pattern) |
+| `/swarm` | Parallel agent teams (experimental) |
 | `/implement` | Execute plan with beads tracking |
 | `/diagnose` | Hypothesis-based debugging |
 | `/stack-setup` | Configure Astro + Cloudflare + Postgres |

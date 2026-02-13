@@ -37,9 +37,33 @@ Researched Claude Code 2.1 native features for v11 migration.
 | Peer messaging | No | Yes (SendMessage) |
 | Dependencies | pip install | Built-in |
 
-**Open Questions:**
-- External model support in swarms? (needs testing)
-- Swarm patterns and best practices? (needs documentation)
+**External Model Support:**
+- **NOT supported** - Agent teams only use Claude models
+- Can specify which Claude model: "Use Sonnet for each teammate"
+- No mention of GPT, Gemini, or other external models in docs
+
+**Swarm Patterns (Best Practices):**
+1. **Research & Review** - Multiple teammates investigate different aspects simultaneously
+2. **Competing Hypotheses** - Teammates test different theories, challenge each other
+3. **Cross-Layer Coordination** - Frontend, backend, tests each owned by different teammate
+4. **New Modules** - Each teammate owns a separate piece
+
+**Display Modes:**
+- `in-process` - All in main terminal, Shift+Up/Down to select teammate
+- `split-panes` - Each teammate in own pane (requires tmux or iTerm2)
+
+**Key Workflows:**
+- Plan approval mode: Teammate plans first, lead approves before implementation
+- Delegate mode: Lead only coordinates (Shift+Tab), doesn't implement
+- Direct messaging: Select teammate, type to message
+- Task claiming: Lead assigns OR teammates self-claim unblocked tasks
+
+**Limitations:**
+- No session resumption with in-process teammates
+- Task status can lag (manual fix sometimes needed)
+- One team per session
+- No nested teams
+- Lead is fixed (can't transfer leadership)
 
 ---
 

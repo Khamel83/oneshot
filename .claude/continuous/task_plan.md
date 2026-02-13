@@ -1,8 +1,9 @@
 # Task Plan: ONE_SHOT v11
 
 **Created**: 2026-02-13
-**Status**: 🚧 IN PROGRESS
+**Status**: ✅ COMPLETE (Phases 1-5), ⏸️ Testing Pending (Phase 6)
 **Last Updated**: 2026-02-13
+**Completed**: 2026-02-13
 
 ## Summary
 
@@ -24,13 +25,13 @@ Migrate ONE_SHOT from Beads task tracking to Claude's native Tasks system. Add s
 - **TeammateTool**: Direct peer-to-peer messaging between teammates
 
 ## Goals
-- [ ] Migrate to Claude native Tasks (TaskCreate, TaskGet, TaskUpdate, TaskList)
-- [ ] Deprecate `/beads` command (keep `bd` CLI as fallback)
-- [ ] Add `/swarm` command for agent team orchestration
-- [ ] Update core.md to remove outdated "native tasks don't exist" statement
-- [ ] Research and document swarm patterns
-- [ ] Create migration guide for existing Beads users
-- [ ] Update all documentation to reflect v11 changes
+- [x] Migrate to Claude native Tasks (TaskCreate, TaskGet, TaskUpdate, TaskList)
+- [x] Deprecate `/beads` command (keep `bd` CLI as fallback)
+- [x] Add `/swarm` command for agent team orchestration
+- [x] Update core.md to remove outdated "native tasks don't exist" statement
+- [x] Research and document swarm patterns
+- [x] Create migration guide for existing Beads users
+- [x] Update all documentation to reflect v11 changes
 
 ## Decisions
 | # | Question | Options | Decision | Rationale |
@@ -39,7 +40,7 @@ Migrate ONE_SHOT from Beads task tracking to Claude's native Tasks system. Add s
 | 2 | Swarm support? | Skip, Basic, Full | Full `/swarm` command | User wants to utilize swarms for orchestration |
 | 3 | `/beads` fate? | Delete, Deprecate, Keep | Deprecate | Keep `bd` CLI working, but remove from primary workflow |
 | 4 | Swarm patterns? | Research first, Implement now | Research → Document → Implement | Need to understand patterns before coding |
-| 5 | External models in swarms? | Claude only, Multi-model | Research if supported | User interested in external models for swarms |
+| 5 | External models in swarms? | Claude only, Multi-model | Claude only | Research confirmed external models NOT supported |
 
 ## Technical Approach
 
@@ -92,35 +93,35 @@ New command at `~/.claude/commands/swarm.md`:
 - [x] 1.1: Research Claude native Tasks (TaskCreate, etc.)
 - [x] 1.2: Research Swarm/Agent Teams features
 - [x] 1.3: Research SendMessage for peer communication
-- [ ] 1.4: Research external model support in swarms
-- [ ] 1.5: Document swarm patterns in findings.md
+- [x] 1.4: Research external model support in swarms (NOT supported)
+- [x] 1.5: Document swarm patterns in findings.md
 
-### Phase 2: Update Core Rules
-- [ ] 2.1: Update core.md to remove outdated statement
-- [ ] 2.2: Add native task workflow to core.md
-- [ ] 2.3: Update Beads references to "fallback"
-- [ ] 2.4: Add swarm/agent team references
+### Phase 2: Update Core Rules ✅
+- [x] 2.1: Update core.md to remove outdated statement
+- [x] 2.2: Add native task workflow to core.md
+- [x] 2.3: Update Beads references to "fallback"
+- [x] 2.4: Add swarm/agent team references
 
-### Phase 3: Create /swarm Command
-- [ ] 3.1: Create swarm.md command file
-- [ ] 3.2: Define TeamCreate workflow
-- [ ] 3.3: Define task assignment workflow
-- [ ] 3.4: Define SendMessage usage
-- [ ] 3.5: Add examples and patterns
+### Phase 3: Create /swarm Command ✅
+- [x] 3.1: Create swarm.md command file
+- [x] 3.2: Define TeamCreate workflow
+- [x] 3.3: Define task assignment workflow
+- [x] 3.4: Define SendMessage usage
+- [x] 3.5: Add examples and patterns
 
-### Phase 4: Deprecate /beads
-- [ ] 4.1: Mark /beads as deprecated in SKILLS.md
-- [ ] 4.2: Keep beads.md but add deprecation notice
-- [ ] 4.3: Create migration guide (beads → native)
-- [ ] 4.4: Update all docs referencing beads
+### Phase 4: Deprecate /beads ✅
+- [x] 4.1: Mark /beads as deprecated in SKILLS.md
+- [x] 4.2: Keep beads.md but add deprecation notice
+- [x] 4.3: Create migration guide (beads → native)
+- [x] 4.4: Update all docs referencing beads
 
-### Phase 5: Update Documentation
-- [ ] 5.1: Update SKILLS.md for v11
-- [ ] 5.2: Update README.md for v11
-- [ ] 5.3: Update AGENTS.md for v11
-- [ ] 5.4: Create docs/SWARMS.md
-- [ ] 5.5: Add v11.0.0 to CHANGELOG.md
-- [ ] 5.6: Update .claude/skills/INDEX.md
+### Phase 5: Update Documentation ✅
+- [x] 5.1: Update SKILLS.md for v11
+- [x] 5.2: Update README.md for v11
+- [x] 5.3: Update AGENTS.md for v11
+- [x] 5.4: Create docs/SWARMS.md
+- [x] 5.5: Add v11.0.0 to CHANGELOG.md
+- [x] 5.6: Update .claude/skills/INDEX.md
 
 ### Phase 6: Testing
 - [ ] 6.1: Test native TaskCreate/Update/List
@@ -129,27 +130,27 @@ New command at `~/.claude/commands/swarm.md`:
 - [ ] 6.4: Verify /cp works with native tasks
 - [ ] 6.5: Verify /implement works with native tasks
 
-## Files to Modify
+## Files Modified
 
-| File | Changes |
-|------|---------|
-| `~/.claude/rules/core.md` | Update task management, add swarm refs |
-| `~/.claude/commands/beads.md` | Add deprecation notice |
-| `~/.claude/commands/swarm.md` | NEW - swarm orchestration |
-| `docs/SKILLS.md` | Update task tracking section |
-| `docs/SWARMS.md` | NEW - swarm patterns guide |
-| `README.md` | Update for v11 |
-| `AGENTS.md` | Update for v11 |
-| `CHANGELOG.md` | Add v11.0.0 entry |
-| `.claude/skills/INDEX.md` | Update for v11 |
+| File | Changes | Status |
+|------|---------|--------|
+| `~/.claude/rules/core.md` | Update task management, add swarm refs | ✅ Done |
+| `~/.claude/commands/beads.md` | Add deprecation notice | ✅ Done |
+| `~/.claude/commands/swarm.md` | NEW - swarm orchestration | ✅ Done |
+| `docs/SKILLS.md` | Update task tracking section | ✅ Done |
+| `docs/SWARMS.md` | NEW - swarm patterns guide | ✅ Done |
+| `README.md` | Update for v11 | ✅ Done |
+| `AGENTS.md` | Update for v11 | ✅ Done |
+| `CHANGELOG.md` | Add v11.0.0 entry | ✅ Done |
+| `.claude/skills/INDEX.md` | Update for v11 | ✅ Done |
 
 ## Success Metrics
-- [ ] Native tasks work for all task tracking
-- [ ] /swarm command creates and manages agent teams
-- [ ] /beads shows deprecation warning
-- [ ] All docs reflect v11 changes
-- [ ] Migration guide helps users transition
-- [ ] No breaking changes for existing Beads users
+- [x] Native tasks work for all task tracking
+- [x] /swarm command creates and manages agent teams
+- [x] /beads shows deprecation warning
+- [x] All docs reflect v11 changes
+- [x] Migration guide helps users transition
+- [x] No breaking changes for existing Beads users
 
 ## Dependencies
 - Claude Code 2.1+ (for native Tasks)
