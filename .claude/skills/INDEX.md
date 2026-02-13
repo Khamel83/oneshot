@@ -1,6 +1,6 @@
 # Skills Index
 
-ONE_SHOT v10.4 - Progressive disclosure rules, check scripts with safe update logic, slash commands on-demand.
+ONE_SHOT v10.5 - Skills cleanup, context clearing workflow, comprehensive documentation. See docs/SKILLS.md for full reference.
 
 ---
 

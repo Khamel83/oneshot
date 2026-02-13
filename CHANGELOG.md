@@ -4,6 +4,28 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [10.5.0] - 2026-02-13
+
+### Added
+- **Context clearing workflow** - `/implement` and `/run-plan` now recommend clearing context first so plans are fresh
+- **SKILLS.md documentation** - Comprehensive reference for all 22 slash commands with clear explanations
+- **doc.md** - Added context clearing workflow section
+
+### Changed
+- **implement.md** - Added pre-implementation context clearing workflow
+- **run-plan.md** - Added pre-execution context clearing workflow
+
+### Removed
+- `/convexify` - No longer using Convex stack (replaced by /stack-setup in v10.3)
+- `/deploy` - Redundant since most work happens on oci-dev anyway
+
+### Documentation
+- Updated README.md to v10.5, removed /deploy references
+- Updated AGENTS.md to v10.5
+- Updated .claude/skills/INDEX.md to v10.5
+
+---
+
 ## [10.4.0] - 2026-02-12
 
 ### Added

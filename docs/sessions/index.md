@@ -2,6 +2,8 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260212_221958_is_there_any_way_to_fix_our_upgrade___update_polic.md.age](20260212_221958_is_there_any_way_to_fix_our_upgrade___update_polic.md.age) | 2026-02-12 22:19:58 | is there any way to fix our upgrade / update polic... | add, age, api, auth, bug, build, clerk, convex, fix, go, install, migration, postgres, remove, session, setup, test, update |
+| File | Date | Title | Topics |
 | [20260212_181620__command-name__model__command-name_.md.age](20260212_181620__command-name__model__command-name_.md.age) | 2026-02-12 18:16:20 | <command-name>/model</command-name> | add, age, api, auth, aws, bug, build, config, database, deploy, docker, encrypt, fix, frontend, go, implement, install, postgres, rust, session, setup, sops, test, update |
 | File | Date | Title | Topics |
 | [20260212_151353__command-name__model__command-name_.md.age](20260212_151353__command-name__model__command-name_.md.age) | 2026-02-12 15:13:53 | <command-name>/model</command-name> | add, age, api, auth, bug, config, database, docker, encrypt, fix, go, implement, install, postgres, rust, session, setup, sops, test, update |

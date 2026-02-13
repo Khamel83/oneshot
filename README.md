@@ -1,4 +1,4 @@
-# ONE_SHOT v10.4
+# ONE_SHOT v10.5
 
 **Your personal Claude Code configuration.**
 
@@ -51,7 +51,6 @@ claude .
 | `/implement` | Execute plan with beads tracking |
 | `/diagnose` | Hypothesis-based debugging |
 | `/stack-setup` | Configure Astro + Cloudflare + Postgres |
-| `/deploy` | Deploy to oci-dev |
 
 ### Check Scripts (Automated)
 
@@ -88,14 +87,16 @@ ONE_SHOT uses opinionated defaults (don't ask, just use):
 |---------|--------------|
 | `/interview` | Structured interview (triage → questions → spec) |
 | `/cp` | Continuous planner (3-file: task_plan.md, findings.md, progress.md) |
+| `/run-plan` | Execute plan deterministically from task_plan.md |
 | `/implement` | Execute plan with beads tracking |
 | `/stack-setup` | Configure Astro + Cloudflare + Postgres stack |
 | `/freesearch` | Research via Exa API (zero Claude tokens) |
 | `/research` | Background research via Gemini CLI |
+| `/doc` | Cache external docs locally |
+| `/skill-discovery` | Find skills matching your goal |
 | `/think` | Multi-perspective analysis |
 | `/diagnose` | Hypothesis-based debugging |
 | `/codereview` | OWASP + quality review |
-| `/deploy` | Deploy to oci-dev |
 | `/remote` | Execute on homelab/macmini |
 | `/audit` | Strategic communication filter |
 | `/beads` | Persistent task tracking |
@@ -104,6 +105,7 @@ ONE_SHOT uses opinionated defaults (don't ask, just use):
 | `/secrets` | SOPS/Age secret management |
 | `/sessions` | View/search encrypted session logs |
 | `/batch` | Parallel multi-file operations |
+| `/update` | Update ONE_SHOT from GitHub |
 
 ---
 
@@ -176,7 +178,7 @@ Global config (installed once):
 │   ├── web.md          # Web apps (Astro + Cloudflare + Better Auth + Postgres)
 │   ├── cli.md          # CLIs (Python + Click)
 │   └── service.md      # Services (Python + systemd)
-└── commands/           # Slash commands (16 total)
+└── commands/           # Slash commands (21 total)
 ```
 
 ---
@@ -281,4 +283,4 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
 
 ---
 
-**v10.4** | Check scripts + Heartbeat installer | Progressive Disclosure | Slash Commands | Beads
+**v10.5** | Skills cleanup + Better docs | Progressive Disclosure | Slash Commands | Beads

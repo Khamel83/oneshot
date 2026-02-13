@@ -1,8 +1,74 @@
-# Progress Log: ONE_SHOT v10.4
+# Progress Log: ONE_SHOT v11
 
-**Session Start**: 2026-02-12
-**Current Phase**: Planning
-**Last Checkpoint**: Session #1
+**Session Start**: 2026-02-13
+**Current Phase**: Phase 1 - Research
+**Last Checkpoint**: Session #3 - v11 Plan Created
+
+---
+
+## Session #3 - 2026-02-13 (Continued)
+
+### Actions Taken
+
+#### 11:00 - v11 Plan Created
+- **What**: Created comprehensive v11 task plan via /cp
+- **Why**: User wants to migrate from Beads to native tasks, add swarm support
+- **Files**: `.claude/continuous/task_plan.md` - new v11 plan
+- **Result**: 6 phases defined, 24 tasks to complete
+
+#### 11:05 - Updated Findings
+- **What**: Documented native tasks and swarm research in findings.md
+- **Why**: Preserve research for future reference
+- **Files**: `.claude/continuous/findings.md` - added v11 research
+- **Result**: Swarm patterns and open questions documented
+
+### Key Decisions
+1. **Native Tasks = Primary** - Beads becomes fallback
+2. **Full `/swarm` command** - Not just basic support
+3. **Deprecate, don't delete** - Keep /beads working with deprecation notice
+4. **Research first** - Understand swarm patterns before implementing
+
+### Next Steps (Priority Order)
+1. [ ] Research external model support in swarms
+2. [ ] Update core.md to remove outdated statement
+3. [ ] Create /swarm command
+4. [ ] Deprecate /beads with migration guide
+5. [ ] Update all documentation for v11
+
+### Checkpoint
+**Context Level**: 40%
+**Beads Sync**: N/A (migrating to native)
+**Plan Status**: v11 IN PROGRESS - Phase 1
+
+---
+
+## Session #2 - 2026-02-13
+
+### Actions Taken
+
+#### 10:30 - Synced v10.4 Plan
+- **What**: Applied new /cp sync workflow - marked all completed items
+- **Why**: Plan was complete but checkboxes weren't marked
+- **Files**: `.claude/continuous/task_plan.md` - all goals and phases now marked [x]
+- **Result**: v10.4 plan now accurately reflects completion
+
+#### 10:35 - Updated /cp Command
+- **What**: Added "Session Start Sync" workflow to /cp command
+- **Why**: Prevent future plans from getting out of sync
+- **Files**: `~/.claude/commands/cp.md` - added sync process, auto-detection rules
+- **Result**: Every /cp session now syncs plan before showing state
+
+#### 10:40 - v10.5 Work Complete
+- **What**: Skills cleanup and documentation refresh
+- **Removed**: /convexify, /deploy
+- **Updated**: /implement, /run-plan with context clearing workflow
+- **Created**: docs/SKILLS.md with comprehensive command reference
+- **Result**: v10.5 released
+
+### Checkpoint
+**Context Level**: 60%
+**Beads Sync**: Pending
+**Plan Status**: v10.4 COMPLETE, v10.5 COMPLETE (ad-hoc)
 
 ---
 
@@ -27,6 +93,7 @@
 **Beads Sync**: Pending
 
 ---
+
 ## Session #1 - 2026-02-02
 
 ### Actions Taken
@@ -144,4 +211,8 @@ Continue with Phase 1.1: Create skills_inventory.json with names + descriptions 
 ---
 ## Phase Completion History
 
-*None yet - Phase 1 in progress*
+| Version | Date | Summary |
+|---------|------|---------|
+| v10.4 | 2026-02-13 | Fixed oneshot.sh update logic, cascade failures |
+| v10.5 | 2026-02-13 | Skills cleanup, /cp sync workflow |
+| v11 | IN PROGRESS | Native tasks, swarm support |

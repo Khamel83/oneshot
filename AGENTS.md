@@ -1,9 +1,9 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for user guide, INDEX.md for skill reference -->
 
-# ONE_SHOT v10.4
+# ONE_SHOT v10.5
 
-> **v10.4 = Check Scripts + Heartbeat** - Automated maintenance scripts with safe update logic and rate limiting.
+> **v10.5 = Skills Cleanup + Better Docs** - Removed unused skills (convexify, deploy), added context clearing workflow, comprehensive SKILLS.md documentation.
 
 > **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
 
@@ -373,5 +373,4 @@ When updating user-facing features:
 
 ---
 
-**Version**: 10.4 | **System Tokens**: ~400 (down from 5.8k) | **Slash Commands**: 16 | **Rules**: 7 | **Context**: Progressive disclosure | **New**: Check scripts, heartbeat installer with rate limiting
-# Local test modification
+**Version**: 10.5 | **System Tokens**: ~400 (down from 5.8k) | **Slash Commands**: 21 | **Rules**: 7 | **Context**: Progressive disclosure | **New**: Skills cleanup, context clearing workflow, SKILLS.md reference
