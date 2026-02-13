@@ -15,7 +15,11 @@ echo "Installing ONE_SHOT $VERSION..."
 mkdir -p "$BIN_DIR"
 
 # Remove old broken symlinks (v7 and earlier)
-rm -f "$BIN_DIR/oneshot" "$BIN_DIR/oneshot-build" "$BIN_DIR/oneshot-resilient" "$BIN_DIR/oneshot-update"
+rm -f "$BIN_DIR/oneshot" "$BIN_DIR/oneshot-build" "$BIN_DIR/oneshot-resilient" 2>/dev/null || true
+
+# Create oneshot-update symlink
+ln -sf "$ONESHOT_DIR/scripts/oneshot-update.sh" "$BIN_DIR/oneshot-update"
+echo "  oneshot-update    - Update ONE_SHOT from GitHub"
 
 # Install docs-link for documentation cache management (if it exists)
 if [ -f "$ONESHOT_DIR/scripts/docs-link" ]; then
