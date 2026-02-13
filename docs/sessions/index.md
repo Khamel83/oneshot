@@ -2,36 +2,22 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260213_111600_waht_does___docs__do__does_that_force_a_freesearch.md.age](20260213_111600_waht_does___docs__do__does_that_force_a_freesearch.md.age) | 2026-02-13 11:16:00 | waht does "/docs" do? does that force a freesearch... | add, age, convex, deploy, feature, fix, go, implement, migration, oci, refactor, remove, session, test, update |
 | [20260212_221958_is_there_any_way_to_fix_our_upgrade___update_polic.md.age](20260212_221958_is_there_any_way_to_fix_our_upgrade___update_polic.md.age) | 2026-02-12 22:19:58 | is there any way to fix our upgrade / update polic... | add, age, api, auth, bug, build, clerk, convex, fix, go, install, migration, postgres, remove, session, setup, test, update |
-| File | Date | Title | Topics |
 | [20260212_181620__command-name__model__command-name_.md.age](20260212_181620__command-name__model__command-name_.md.age) | 2026-02-12 18:16:20 | <command-name>/model</command-name> | add, age, api, auth, aws, bug, build, config, database, deploy, docker, encrypt, fix, frontend, go, implement, install, postgres, rust, session, setup, sops, test, update |
-| File | Date | Title | Topics |
 | [20260212_151353__command-name__model__command-name_.md.age](20260212_151353__command-name__model__command-name_.md.age) | 2026-02-12 15:13:53 | <command-name>/model</command-name> | add, age, api, auth, bug, config, database, docker, encrypt, fix, go, implement, install, postgres, rust, session, setup, sops, test, update |
-| File | Date | Title | Topics |
 | [20260212_122736__command-name__clear__command-name_.md.age](20260212_122736__command-name__clear__command-name_.md.age) | 2026-02-12 12:27:36 | <command-name>/clear</command-name> | age, implement |
-| File | Date | Title | Topics |
 | [20260212_120659__command-name__clear__command-name_.md.age](20260212_120659__command-name__clear__command-name_.md.age) | 2026-02-12 12:06:59 | <command-name>/clear</command-name> | age, api, fix, implement, install, setup, sops, test, update |
-| File | Date | Title | Topics |
 | [20260212_115021_https___github_com_Khamel83_oneshot_pull_4_can_you.md.age](20260212_115021_https___github_com_Khamel83_oneshot_pull_4_can_you.md.age) | 2026-02-12 11:50:21 | https://github.com/Khamel83/oneshot/pull/4 can you... | add, age, api, ci/cd, config, encrypt, fix, go, setup, sops, test, update |
-| File | Date | Title | Topics |
 | [20260208_231547__command-name__clear__command-name_.md.age](20260208_231547__command-name__clear__command-name_.md.age) | 2026-02-08 23:15:47 | <command-name>/clear</command-name> | age, remove |
-| File | Date | Title | Topics |
 | [20260208_223105_Done__All_code_review_fixes_committed_and_pushed_.md.age](20260208_223105_Done__All_code_review_fixes_committed_and_pushed_.md.age) | 2026-02-08 22:31:05 | Done. All code review fixes committed and pushed: | api, fix, setup, test |
-| File | Date | Title | Topics |
-| [20260208_215054_can_we_make_sure_that_docs-cache_is_run_almost_lik.md.age](20260208_215054_can_we_make_sure_that_docs-cache_is_run_almost_lik.md.age) | 2026-02-08 21:50:54 | can we make sure that docs-cache is run almost lik... | age, go, update |
-| File | Date | Title | Topics |
+| [20260208_215054_can_we_make_sure_that_docs_cache_is_run_almost_lik.md.age](20260208_215054_can_we_make_sure_that_docs-cache_is_run_almost_lik.md.age) | 2026-02-08 21:50:54 | can we make sure that docs-cache is run almost lik... | age, go, update |
 | [20260207_220346_can_you_compare_the_docs__doc_against_all_of_our_o.md.age](20260207_220346_can_you_compare_the_docs__doc_against_all_of_our_o.md.age) | 2026-02-07 22:03:46 | can you compare the docs /doc against all of our o... |  |
-| File | Date | Title | Topics |
 | [20260207_214130_Implement_the_following_plan_.md.age](20260207_214130_Implement_the_following_plan_.md.age) | 2026-02-07 21:41:30 | Implement the following plan: | add, age, api, auth, convex, docker, go, implement, nextjs, oci, python, test, update |
-| File | Date | Title | Topics |
 | [20260207_211449_is_tehre_some_way_to_create_a_skill_rule_that_in_o.md.age](20260207_211449_is_tehre_some_way_to_create_a_skill_rule_that_in_o.md.age) | 2026-02-07 21:14:49 | is tehre some way to create a skill/rule that in o... | api |
-| File | Date | Title | Topics |
 | [20260207_180617_Bash_gemini__Research_Convex_database__getconvex_c.md.age](20260207_180617_Bash_gemini__Research_Convex_database__getconvex_c.md.age) | 2026-02-07 18:06:17 | Bash(gemini "Research Convex database (getconvex.c... | age, api, build, config, convex, database, feature, go, install, javascript, python, session, sqlite, typescript, update |
-| File | Date | Title | Topics |
 | [20260207_175445_Write_CONVEX_ISSUES_md_.md.age](20260207_175445_Write_CONVEX_ISSUES_md_.md.age) | 2026-02-07 17:54:45 | Write(CONVEX_ISSUES.md) | backend, convex, encrypt, remove, update |
-| File | Date | Title | Topics |
 | [20260207_161727_lets_make_this_change_to_our_alias_scripts_.md.age](20260207_161727_lets_make_this_change_to_our_alias_scripts_.md.age) | 2026-02-07 16:17:27 | lets make this change to our alias scripts | add, age, api, auth, install, session |
-| File | Date | Title | Topics |
 | [20260207_154525_Done__Here_s_what_happens_now_.md.age](20260207_154525_Done__Here_s_what_happens_now_.md.age) | 2026-02-07 15:45:25 | Done. Here's what happens now: | age, api, auth, bug, convex, decrypt, deploy, docker, encrypt, fix, go, implement, python, remove, rust, session, sops, test, update |
 | [20260207_153547__Request_interrupted_by_user_for_tool_use_.md.age](20260207_153547__Request_interrupted_by_user_for_tool_use_.md.age) | 2026-02-07 15:35:47 | [Request interrupted by user for tool use] | add, age, api, config, decrypt, encrypt, fix, go, implement, logger, python, session, sops, test, update |
 | [20260207_153315__Request_interrupted_by_user_for_tool_use_.md.age](20260207_153315__Request_interrupted_by_user_for_tool_use_.md.age) | 2026-02-07 15:33:15 | [Request interrupted by user for tool use] | add, age, api, config, decrypt, encrypt, fix, go, implement, logger, python, session, sops, test, update |
