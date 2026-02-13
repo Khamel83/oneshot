@@ -61,3 +61,21 @@ KhameL: ~/.claude/rules/khamel-mode.md
   oneshot:last-check: 2026-02-06
   oneshot:machine: instance-first
 -->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-02-12
+  oneshot:machine: instance-first
+-->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-02-12
+  oneshot:machine: instance-first
+-->
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-02-12
+  oneshot:machine: instance-first
+-->

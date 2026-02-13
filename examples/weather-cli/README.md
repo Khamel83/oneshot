@@ -22,14 +22,17 @@ The agent:
 ## Usage
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Install in development mode
+pip install -e .
 
 # Get weather for a city
-python -m weather_cli "San Francisco"
+weather-cli "San Francisco"
 
 # Get weather with units
-python -m weather_cli "London" --units metric
+weather-cli "London" --units imperial
+
+# Or using Python module
+python -m weather_cli "Tokyo"
 ```
 
 ## Project Structure
@@ -37,7 +40,8 @@ python -m weather_cli "London" --units metric
 ```
 weather-cli/
 ├── README.md              # This file
-├── requirements.txt       # Dependencies
+├── pyproject.toml         # Modern Python packaging
+├── requirements.txt       # Dependencies (for pip install -r)
 ├── src/
 │   └── weather_cli/
 │       ├── __init__.py
@@ -71,7 +75,7 @@ weather-cli/
    - Task 1: Project structure + requirements.txt
    - Task 2: Weather API client
    - Task 3: Display formatting
-   - Task 4: CLI argument parsing
+   - Task 4: CLI with Click (argument parsing)
    - Task 5: Main entry point
    - Task 6: Error handling
 

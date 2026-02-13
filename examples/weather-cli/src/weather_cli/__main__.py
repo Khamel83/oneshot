@@ -1,53 +1,42 @@
 """CLI entry point for weather_cli."""
 
-import argparse
 import sys
 
-from rich.console import Console
+import click
 
 from .api import WeatherAPI
-from .display import display_weather, display_error
+from .display import display_error, display_weather
 
 
-def main() -> int:
-    """Main entry point for the weather CLI.
+@click.command()
+@click.argument("city")
+@click.option(
+    "--units",
+    type=click.Choice(["metric", "imperial"], case_sensitive=False),
+    default="metric",
+    show_default=True,
+    help="Temperature units",
+)
+def main(city: str, units: str) -> None:
+    """Fetch and display weather data for any CITY.
 
-    Returns:
-        Exit code (0 for success, 1 for error)
+    Example: weather-cli "San Francisco" --units imperial
     """
-    parser = argparse.ArgumentParser(
-        prog="weather_cli",
-        description="Fetch and display weather data for any city.",
-    )
-    parser.add_argument(
-        "city",
-        help="City name to get weather for (e.g., 'San Francisco')",
-    )
-    parser.add_argument(
-        "--units",
-        choices=["metric", "imperial"],
-        default="metric",
-        help="Temperature units: metric (Celsius) or imperial (Fahrenheit)",
-    )
-
-    args = parser.parse_args()
-    console = Console()
-
     try:
-        api = WeatherAPI(units=args.units)
-        data = api.get_weather_for_city(args.city)
+        api = WeatherAPI(units=units)
+        data = api.get_weather_for_city(city)
 
         if data is None:
-            display_error(f"City not found: {args.city}", console)
-            return 1
+            display_error(f"City not found: {city}")
+            sys.exit(1)
 
-        display_weather(data, console)
-        return 0
+        display_weather(data)
+        sys.exit(0)
 
     except Exception as e:
-        display_error(str(e), console)
-        return 1
+        display_error(str(e))
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
