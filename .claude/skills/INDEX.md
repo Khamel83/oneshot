@@ -1,6 +1,8 @@
 # Skills Index
 
-ONE_SHOT v11 - Native Tasks + Swarms. Migrated from Beads to native Tasks, added /swarm for agent teams. See docs/SKILLS.md for full reference.
+ONE_SHOT v11 - Native Tasks + Swarms. Migrated from Beads to native Tasks, added /swarm for agent teams.
+
+**For command reference, see [docs/SKILLS.md](../../docs/SKILLS.md).**
 
 ---
 
@@ -12,14 +14,27 @@ ONE_SHOT v11 - Native Tasks + Swarms. Migrated from Beads to native Tasks, added
 
 ---
 
-## Core Infrastructure
+## Where Commands Live
 
-These are foundational files, not skills:
+**Slash commands are loaded from `~/.claude/commands/`, NOT `~/.claude/skills/`.**
+
+```
+~/.claude/commands/stack-setup.md  →  /stack-setup (loaded by Claude)
+~/.claude/skills/                  →  Reference docs only (NOT loaded)
+```
+
+To add a new command:
+1. Create `~/.claude/commands/<name>.md` with frontmatter (name, description)
+2. It auto-appears in the skills list on next session
+
+---
+
+## Core Infrastructure
 
 | File | Purpose |
 |-------|---------|
-| `.claude/infrastructure/STACK.md` | Complete stack reference (Astro → CF Pages → Workers → Hyperdrive → Postgres) |
-| `.claude/skills/stack-setup/SKILL.md` | Configure new projects with standard stack |
+| `.claude/infrastructure/STACK.md` | Complete stack reference |
+| `~/.claude/commands/stack-setup.md` | `/stack-setup` command |
 | `AGENTS.md` | Skill router (curl from oneshot, read-only) |
 
 ---
