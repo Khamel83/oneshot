@@ -284,4 +284,4 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
 
 ---
 
-**v10.5** | Skills cleanup + Better docs | Progressive Disclosure | Slash Commands | Beads
+**v11** | Native Tasks + Swarms | Progressive Disclosure | Slash Commands | Native Tasks
