@@ -15,6 +15,19 @@ Comprehensive update that handles everything "setup" related:
 /update --quick      # Skip heartbeat checks (git pull only)
 ```
 
+## Works From ANY Version
+
+If you're on an old version without `/update`, run this from any terminal:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/update.sh | bash
+```
+
+Or if you have the repo:
+```bash
+~/github/oneshot/scripts/update.sh
+```
+
 ## Execution
 
 ```bash
