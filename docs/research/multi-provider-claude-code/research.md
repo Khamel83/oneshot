@@ -435,3 +435,63 @@ Multi-provider Claude Code is **highly viable** with mature tooling available:
 4. **For maximum quality:** Stick with native Claude Opus 4.5 / Sonnet 4.5
 
 The critical gotcha is the `--jinja` flag when using routers - without it, tool calling may fail silently.
+
+---
+
+## Final Working Solution (Feb 2026)
+
+After testing cc-mirror, we went back to a simpler approach using shell functions.
+
+### What Didn't Work
+- **cc-mirror**: Installed old Claude Code version (2.1.1), had bugs with mode switching, npm deprecation warnings
+- **Aliases**: Couldn't properly unset environment variables
+- **ANTHROPIC_API_KEY**: Many providers need `ANTHROPIC_AUTH_TOKEN` instead
+
+### What Worked
+Shell functions in `~/.bashrc` with:
+1. **Separate config directories** (`~/.claude-zai`, `~/.claude-ds`, etc.) to avoid auth conflicts
+2. **ANTHROPIC_AUTH_TOKEN** (not API_KEY) for most providers
+3. **--jinja flag** for OpenRouter providers (critical for tool calling)
+4. **--model flag** to specify the model
+
+### Working Functions
+
+```bash
+# zai - GLM-5 via Z.ai (direct API)
+zai() {
+    CLAUDE_CONFIG_DIR="$HOME/.claude-zai" \
+    ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+    ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
+    claude --dangerously-skip-permissions --model glm-5 "$@"
+}
+
+# ds - DeepSeek (direct API)
+ds() {
+    CLAUDE_CONFIG_DIR="$HOME/.claude-ds" \
+    ANTHROPIC_BASE_URL="https://api.deepseek.com" \
+    ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY" \
+    claude --dangerously-skip-permissions --model deepseek-chat "$@"
+}
+
+# kimi - Kimi K2.5 via OpenRouter (needs --jinja)
+kimi() {
+    CLAUDE_CONFIG_DIR="$HOME/.claude-kimi" \
+    ANTHROPIC_BASE_URL="https://openrouter.ai/api" \
+    ANTHROPIC_AUTH_TOKEN="$OPENROUTER_API_KEY" \
+    claude --dangerously-skip-permissions --jinja --model moonshotai/kimi-k2.5 "$@"
+}
+
+# mini - MiniMax M2.5 via OpenRouter (needs --jinja)
+mini() {
+    CLAUDE_CONFIG_DIR="$HOME/.claude-mini" \
+    ANTHROPIC_BASE_URL="https://openrouter.ai/api" \
+    ANTHROPIC_AUTH_TOKEN="$OPENROUTER_API_KEY" \
+    claude --dangerously-skip-permissions --jinja --model minimax/minimax-m2.5 "$@"
+}
+```
+
+### Key Learnings
+1. **Auth conflicts**: Use separate `CLAUDE_CONFIG_DIR` for each provider
+2. **Token vs Key**: Use `ANTHROPIC_AUTH_TOKEN` for Z.ai, OpenRouter, DeepSeek
+3. **Tool calling via routers**: The `--jinja` flag is ESSENTIAL for OpenRouter
+4. **Keep it simple**: cc-mirror added complexity without clear benefits for this use case
