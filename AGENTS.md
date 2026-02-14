@@ -3,7 +3,7 @@
 
 # ONE_SHOT v12
 
-> **v12 = Intelligent Delegation** - Added delegation assessment protocol, audit logging, fallback chains, and resilience rules. Based on Google DeepMind's "Intelligent AI Delegation" framework (arXiv:2602.11865). Delegation is a protocol, not a prompt.
+> **v12.1 = Intelligent Delegation (slimmed)** - Assessment, verification, fallback chains. Audit logging via SubagentStop hook (deterministic). Dropped rules now native to Claude Code (depth limits, parallelism, scoping). Based on DeepMind's "Intelligent AI Delegation" (arXiv:2602.11865).
 
 > **Context is the scarce resource.** Delegate intelligently, verify results, write state to disk.
 
@@ -225,50 +225,33 @@ auto_delegation:
 
 ---
 
-## INTELLIGENT DELEGATION (v12)
+## INTELLIGENT DELEGATION (v12.1)
 
-**CRITICAL**: Before delegating, assess. After delegating, verify. On failure, escalate.
-
+Before delegating, assess. After delegating, verify. On failure, escalate.
 Full rules: `.claude/rules/delegation.md`
 
 ```yaml
 delegation_protocol:
-  # 1. ASSESS before delegating (5 dimensions)
-  assess:
-    - complexity:    low | medium | high
-    - criticality:   low | medium | high
-    - uncertainty:   low | medium | high
-    - cost:          low | medium | high
-    - reversibility: trivial | easy | hard
-
-  # 2. ROUTE based on assessment
+  # 1. ASSESS (3 dimensions — Claude Code handles depth/parallelism/scoping natively)
+  assess: [complexity, criticality, uncertainty]
   route:
     - "low complexity + low criticality → handle inline"
     - "high criticality + high uncertainty → ask human first"
-    - "high criticality + hard reversibility → git checkpoint first"
+    - "high criticality → git checkpoint first"
 
-  # 3. VERIFY after completion
+  # 2. VERIFY (Claude does NOT auto-verify subagent results)
   verify:
     code_search: "spot-check claims against files"
     code_changes: "review diff, confirm intent"
     commands: "check exit code"
     research: "confirm sources exist"
 
-  # 4. ESCALATE on failure (3 attempts max)
-  fallback:
-    - attempt_1: "original delegation"
-    - attempt_2: "main agent handles inline"
-    - attempt_3: "ask human"
+  # 3. ESCALATE on failure (3 attempts max, change strategy each time)
+  fallback: [original delegation, main agent inline, ask human]
 
-  # 5. LOG everything
+  # 4. LOG (deterministic via SubagentStop hook, not prompt-dependent)
   log: ".claude/delegation-log.jsonl"
   command: "/delegation-log"
-
-  # 6. GUARD against cascading failures
-  limits:
-    max_depth: 2
-    max_parallel: 4
-    circuit_breaker: "3 consecutive failures → cooldown 5min"
 ```
 
 ---
@@ -428,4 +411,4 @@ When updating user-facing features:
 
 ---
 
-**Version**: 12.0 | **System Tokens**: ~500 | **Slash Commands**: 22 | **Rules**: 8 | **Context**: Progressive disclosure | **New**: Intelligent delegation (assessment, audit, fallback, resilience) based on DeepMind framework
+**Version**: 12.1 | **System Tokens**: ~450 | **Slash Commands**: 22 | **Rules**: 8 | **Context**: Progressive disclosure | **New**: Slimmed delegation (assessment, verification, fallback) + deterministic audit logging via SubagentStop hook

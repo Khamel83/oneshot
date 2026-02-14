@@ -1,41 +1,55 @@
-# Validation Report: ONE_SHOT v12 Intelligent Delegation Plan
+# Validation Report: ONE_SHOT v12 → v12.1
 
 **Validator**: Opus-class agent (independent review)
-**Date**: 2026-02-13
-**Verdict**: PASS with required fixes (applied below)
+**Date**: 2026-02-13 (original), 2026-02-14 (v12.1 revision)
+**Verdict**: PASS — slimmed to remove Claude Code native overlap
 
 ---
 
-## Scorecard
+## v12 → v12.1 Changes
 
-| # | Criterion | Verdict | Key Issue |
-|---|-----------|---------|-----------|
-| 1 | Modules address claimed gaps | **PASS** | Module 2 verification was superficial; Module 3 mid-exec intervention not implementable |
-| 2 | No missed gaps | **FAIL → FIXED** | Added reversibility, verification protocols; acknowledged decomposition/monoculture |
-| 3 | Implementation order correct | **PASS** | Dependencies satisfied |
-| 4 | No over-engineering | **FAIL → FIXED** | Collapsed Module 4 into Module 2; simplified fallback chain |
-| 5 | No under-specification | **FAIL → FIXED** | Specified assessment mechanism, log invocation, scope as prompt-level |
-| 6 | Achievable without breaking changes | **PASS** | AGENTS.md modification is valid (this is the canonical repo) |
+### Dropped (now native to Claude Code)
+
+| v12 Rule | Claude Code Native Feature |
+|----------|---------------------------|
+| Max delegation depth: 2 | Subagents cannot spawn subagents (built-in) |
+| Max parallel delegations: 4 | Managed internally by Claude Code |
+| Per-agent-type timeouts | `max_turns` param on Task tool |
+| Scope enforcement guidelines | Tool-access scoping per subagent type |
+| Circuit breaker (3 failures) | Moved to SubagentStop hook (deterministic) |
+| Cost dimension (5th) | Redundant — model routing via `model` param |
+| Reversibility dimension (5th) | Folded into criticality assessment |
+
+### Kept (genuine value-add)
+
+| Rule | Why |
+|------|-----|
+| 3-dimension assessment (complexity, criticality, uncertainty) | Claude doesn't natively assess before delegating |
+| Verification protocol (4 methods) | Claude trusts subagent results without checking |
+| Fallback chain (3 attempts) | No built-in escalation path |
+| When NOT to delegate | Prevents over-delegation of trivial tasks |
+
+### Changed (prompt → hook)
+
+| Before | After |
+|--------|-------|
+| Prompt instruction: "log to JSONL after delegation" | SubagentStop hook: deterministic logging, fires every time |
 
 ---
 
-## Fixes Applied
+## Token Impact
 
-1. **Added reversibility** as 5th assessment dimension in Module 1
-2. **Defined concrete verification strategies** in Module 2 (test execution, output sampling, diff review)
-3. **Removed mid-execution intervention** from Module 3 (not supported by Claude Code)
-4. **Collapsed Module 4 into Module 2** - stats are a view on the JSONL log, not separate
-5. **Specified assessment is agent reasoning**, not runtime evaluation
-6. **Renamed scope_enforcement to scope_guidelines** - prompt-level, not sandboxed
-7. **Simplified fallback chain** to 3 steps: original → inline → human
-8. **Acknowledged AGENTS.md v12 bump** affects downstream consumers
+| Version | delegation.md tokens | AGENTS.md delegation section |
+|---------|---------------------|------------------------------|
+| v12 | ~400 | ~200 |
+| v12.1 | ~150 | ~100 |
+| Saved | ~350 tokens/session | |
 
 ---
 
-## Remaining Limitations (Accepted)
+## Sources Used for Decision
 
-- **Mid-execution monitoring**: Not possible with current Claude Code subagent system. Post-completion only.
-- **Scope enforcement**: Depends on model instruction-following, not technical sandboxing.
-- **Trust calibration**: Deferred to v13 when historical data exists to calibrate against.
-- **Market coordination**: Not applicable to single-user ONE_SHOT.
-- **Monoculture risk**: Partially mitigated by model diversity in fallback chain, but fundamentally limited by Claude Code's agent system.
+- [Claude Code Subagents Docs](https://code.claude.com/docs/en/sub-agents)
+- [Claude Code Hooks Guide](https://code.claude.com/docs/en/hooks-guide)
+- [Claude Code Agent Teams](https://code.claude.com/docs/en/agent-teams)
+- SubagentStop hook event type (v1.0.41+)
