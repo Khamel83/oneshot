@@ -18,6 +18,7 @@
 | Generic | None detected | Core rules only |
 
 **User-specific defaults**: `~/.claude/rules/khamel-mode.md`
+**Delegation protocol**: `~/.claude/rules/delegation.md` (always loaded)
 
 ---
 
@@ -27,6 +28,7 @@ ONE_SHOT is the framework itself. Read core rules + all project type rules for f
 
 ```
 Core: ~/.claude/rules/core.md
+Delegation: ~/.claude/rules/delegation.md
 Web: ~/.claude/rules/web.md
 CLI: ~/.claude/rules/cli.md
 Service: ~/.claude/rules/service.md
