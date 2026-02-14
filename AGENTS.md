@@ -1,11 +1,11 @@
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 <!-- Humans: See README.md for user guide, INDEX.md for skill reference -->
 
-# ONE_SHOT v11
+# ONE_SHOT v12
 
-> **v11 = Native Tasks + Swarms** - Migrated from Beads to Claude's native Tasks (TaskCreate/Update/List). Added /swarm command for agent team orchestration. Beads deprecated as fallback.
+> **v12.1 = Intelligent Delegation (slimmed)** - Assessment, verification, fallback chains. Audit logging via SubagentStop hook (deterministic). Dropped rules now native to Claude Code (depth limits, parallelism, scoping). Based on DeepMind's "Intelligent AI Delegation" (arXiv:2602.11865).
 
-> **Context is the scarce resource.** Delegate aggressively, parallelize always, write state to disk.
+> **Context is the scarce resource.** Delegate intelligently, verify results, write state to disk.
 
 ---
 
@@ -128,6 +128,12 @@ skill_router:
   - pattern: "browse skills|skillsmp|find skills|skill marketplace"
     skill: skillsmp-browser
 
+  # Delegation (v12)
+  - pattern: "delegation log|show delegations|delegation stats|/delegation-log"
+    skill: delegation-log
+    note: "View and query delegation audit log"
+    slash: "/delegation-log"
+
   # Maintenance
   - pattern: "/update|update oneshot|upgrade oneshot|check version"
     skill: auto-updater
@@ -170,6 +176,7 @@ All skills can be invoked via `/skill-name`. Core slash commands:
 | `/freesearch` | TRULY FREE research via Gemini CLI (0 tokens) |
 | `/dispatch` | Route tasks to local AI CLIs (codex/gemini/qwen/zai) |
 | `/search-fallback` | Fallback search APIs when WebSearch fails |
+| `/delegation-log` | View/query delegation audit log |
 | `/update` | Update ONE_SHOT from GitHub |
 | `/beads` or `/bd` | Task tracking commands |
 | `/oops` | Save lessons learned |
@@ -215,6 +222,37 @@ auto_delegation:
 ```
 
 **Key change from v7.3:** Bias toward delegation. Don't wait for user to say "background".
+
+---
+
+## INTELLIGENT DELEGATION (v12.1)
+
+Before delegating, assess. After delegating, verify. On failure, escalate.
+Full rules: `.claude/rules/delegation.md`
+
+```yaml
+delegation_protocol:
+  # 1. ASSESS (3 dimensions — Claude Code handles depth/parallelism/scoping natively)
+  assess: [complexity, criticality, uncertainty]
+  route:
+    - "low complexity + low criticality → handle inline"
+    - "high criticality + high uncertainty → ask human first"
+    - "high criticality → git checkpoint first"
+
+  # 2. VERIFY (Claude does NOT auto-verify subagent results)
+  verify:
+    code_search: "spot-check claims against files"
+    code_changes: "review diff, confirm intent"
+    commands: "check exit code"
+    research: "confirm sources exist"
+
+  # 3. ESCALATE on failure (3 attempts max, change strategy each time)
+  fallback: [original delegation, main agent inline, ask human]
+
+  # 4. LOG (deterministic via SubagentStop hook, not prompt-dependent)
+  log: ".claude/delegation-log.jsonl"
+  command: "/delegation-log"
+```
 
 ---
 
@@ -373,4 +411,4 @@ When updating user-facing features:
 
 ---
 
-**Version**: 10.5 | **System Tokens**: ~400 (down from 5.8k) | **Slash Commands**: 21 | **Rules**: 7 | **Context**: Progressive disclosure | **New**: Skills cleanup, context clearing workflow, SKILLS.md reference
+**Version**: 12.1 | **System Tokens**: ~450 | **Slash Commands**: 22 | **Rules**: 8 | **Context**: Progressive disclosure | **New**: Slimmed delegation (assessment, verification, fallback) + deterministic audit logging via SubagentStop hook

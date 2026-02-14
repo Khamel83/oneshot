@@ -13,6 +13,18 @@ These rules load for every project.
 
 ---
 
+## Intelligent Delegation (v12.1)
+
+Before delegating, assess (complexity, criticality, uncertainty). After delegation, verify the result.
+Full protocol: `~/.claude/rules/delegation.md`
+
+- **Assess**: Is this worth delegating? Low complexity → handle inline.
+- **Verify**: Spot-check search results, review diffs, check exit codes.
+- **Escalate**: original → inline → human (3 attempts max, change strategy each time).
+- **Log**: Automatic via SubagentStop hook → `.claude/delegation-log.jsonl`
+
+---
+
 ## Work Discipline
 
 - **Plan first**: Always start with a plan before coding. Think, then do.

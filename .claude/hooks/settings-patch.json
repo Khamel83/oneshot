@@ -1,0 +1,14 @@
+{
+  "_comment": "Add this SubagentStop block to ~/.claude/settings.json under 'hooks'",
+  "SubagentStop": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.claude/delegation-log-hook.sh"
+        }
+      ]
+    }
+  ]
+}
