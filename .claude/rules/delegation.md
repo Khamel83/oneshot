@@ -1,6 +1,8 @@
-# Delegation Rules (v12.1)
+# Delegation Rules (v12.2)
 
-Informed by: "Intelligent AI Delegation" (Tomasev et al., Google DeepMind, 2026)
+Informed by:
+- "Intelligent AI Delegation" (Tomasev et al., Google DeepMind, 2026)
+- Agent Lightning (Microsoft, 2025) — spans, trajectories, credit assignment
 
 Claude Code already enforces: subagent depth limits, tool-access scoping, model routing, max_turns.
 These rules cover what Claude Code does NOT do natively: assessment, verification, fallback, and restraint.
@@ -64,7 +66,31 @@ Never retry with the same approach. Change strategy between attempts.
 
 ---
 
+## Credit Assignment (Agent Lightning-inspired)
+
+After a multi-span session, evaluate which delegations contributed most:
+
+| Signal | Credit | Blame |
+|--------|--------|-------|
+| Delegation output reused by later steps | +credit (enabling work) | |
+| Last delegation before a failure | | +blame (bottleneck) |
+| Delegation with reward=0.0 | | +blame (wasted compute) |
+| Delegation that unblocked a stuck task | +credit (critical path) | |
+| Low-cost delegation (haiku, <5 calls) that succeeded | +credit (efficient) | |
+
+**How to use**: When reviewing `/delegation-trajectory`, identify the bottleneck span (lowest reward on the critical path). Next time a similar task arises, adjust: use a stronger model, provide more context, or handle inline.
+
+**Reward heuristic** (logged automatically by hook):
+- `1.0` — success, no error signals
+- `0.5` — partial, error keywords but still produced output
+- `0.0` — failure, fatal/crash/aborted/no results
+
+Over time, `/delegation-stats` aggregates rewards by agent type and task pattern, revealing which agents excel at what.
+
+---
+
 ## Audit Log
 
-Delegation events are logged automatically via SubagentStop hook to `.claude/delegation-log.jsonl`.
-Query with `/delegation-log` or `jq` directly.
+Delegation spans are logged automatically via SubagentStop hook to `.claude/delegation-log.jsonl`.
+Each entry includes span_id, session_id, tool_sequence, and reward for trajectory assembly.
+Query with `/delegation-log`, `/delegation-trajectory`, or `jq` directly.

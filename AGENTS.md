@@ -3,9 +3,9 @@
 
 # ONE_SHOT v12
 
-> **v12.1 = Intelligent Delegation (slimmed)** - Assessment, verification, fallback chains. Audit logging via SubagentStop hook (deterministic). Dropped rules now native to Claude Code (depth limits, parallelism, scoping). Based on DeepMind's "Intelligent AI Delegation" (arXiv:2602.11865).
+> **v12.2 = Agent Lightning Integration** - Enriched delegation spans (span_id, session_id, tool_sequence, reward), trajectory assembly, credit assignment heuristics, reward-weighted performance stats. Builds on v12.1 (DeepMind delegation) with concepts from Microsoft Agent Lightning.
 
-> **Context is the scarce resource.** Delegate intelligently, verify results, write state to disk.
+> **Context is the scarce resource.** Delegate intelligently, trace execution, learn from results.
 
 ---
 
@@ -128,11 +128,21 @@ skill_router:
   - pattern: "browse skills|skillsmp|find skills|skill marketplace"
     skill: skillsmp-browser
 
-  # Delegation (v12)
-  - pattern: "delegation log|show delegations|delegation stats|/delegation-log"
+  # Delegation (v12.2)
+  - pattern: "delegation log|show delegations|/delegation-log"
     skill: delegation-log
     note: "View and query delegation audit log"
     slash: "/delegation-log"
+
+  - pattern: "delegation trajectory|session trace|execution path|/delegation-trajectory"
+    skill: delegation-trajectory
+    note: "View session-level execution trajectories (Agent Lightning spans)"
+    slash: "/delegation-trajectory"
+
+  - pattern: "delegation stats|delegation performance|agent performance|/delegation-stats"
+    skill: delegation-stats
+    note: "Reward-weighted performance stats and routing recommendations"
+    slash: "/delegation-stats"
 
   # Maintenance
   - pattern: "/update|update oneshot|upgrade oneshot|check version"
@@ -177,6 +187,8 @@ All skills can be invoked via `/skill-name`. Core slash commands:
 | `/dispatch` | Route tasks to local AI CLIs (codex/gemini/qwen/zai) |
 | `/search-fallback` | Fallback search APIs when WebSearch fails |
 | `/delegation-log` | View/query delegation audit log |
+| `/delegation-trajectory` | View session execution trajectories |
+| `/delegation-stats` | Reward-weighted delegation performance stats |
 | `/update` | Update ONE_SHOT from GitHub |
 | `/beads` or `/bd` | Task tracking commands |
 | `/oops` | Save lessons learned |
@@ -225,9 +237,9 @@ auto_delegation:
 
 ---
 
-## INTELLIGENT DELEGATION (v12.1)
+## INTELLIGENT DELEGATION (v12.2)
 
-Before delegating, assess. After delegating, verify. On failure, escalate.
+Before delegating, assess. After delegating, verify. On failure, escalate. Always trace.
 Full rules: `.claude/rules/delegation.md`
 
 ```yaml
@@ -249,9 +261,14 @@ delegation_protocol:
   # 3. ESCALATE on failure (3 attempts max, change strategy each time)
   fallback: [original delegation, main agent inline, ask human]
 
-  # 4. LOG (deterministic via SubagentStop hook, not prompt-dependent)
-  log: ".claude/delegation-log.jsonl"
-  command: "/delegation-log"
+  # 4. TRACE (Agent Lightning-inspired spans + trajectories)
+  spans: ".claude/delegation-log.jsonl"  # span_id, session_id, tool_sequence, reward
+  trajectories: "/delegation-trajectory"  # chains spans by session
+  credit: "output reuse = credit, last-before-failure = blame"
+
+  # 5. LEARN (reward-weighted performance stats → routing recommendations)
+  stats: "/delegation-stats"
+  loop: "stats → identify bottlenecks → adjust routing → repeat"
 ```
 
 ---
@@ -411,4 +428,4 @@ When updating user-facing features:
 
 ---
 
-**Version**: 12.1 | **System Tokens**: ~450 | **Slash Commands**: 22 | **Rules**: 8 | **Context**: Progressive disclosure | **New**: Slimmed delegation (assessment, verification, fallback) + deterministic audit logging via SubagentStop hook
+**Version**: 12.2 | **System Tokens**: ~480 | **Slash Commands**: 24 | **Rules**: 8 | **Context**: Progressive disclosure | **New**: Agent Lightning integration (enriched spans, trajectories, credit assignment, reward-weighted stats)
