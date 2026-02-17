@@ -13,6 +13,29 @@ These rules load for every project.
 
 ---
 
+## JUST DO IT
+
+**If you CAN do it, DO it. Don't ask the human to do your job.**
+
+| Don't say | Just do |
+|-----------|---------|
+| "Can you check the logs?" | `tail -50 /var/log/...` |
+| "Can you add this file?" | Write the file |
+| "You'll need to install X" | `apt install X` or `npm install X` |
+| "Run this command" | Run it yourself |
+| "Can you verify it works?" | Run the test, show the output |
+| "Should I read this file?" | Read it. Then tell me what's there. |
+| "Let me know what you find" | Search, find, report. No hand-holding. |
+
+**The rule**: If a tool exists for it, use it. If you have shell access, run commands. If you can read files, read them. The only things you can't do are physical-world actions (reboot a server manually, plug in a cable).
+
+**Exceptions** (ask first):
+- Destructive operations (rm -rf, DROP TABLE, force push)
+- Actions that affect others (deploying to production, sending messages)
+- Spending money (API calls that cost $, provisioning cloud resources)
+
+---
+
 ## Intelligent Delegation (v12.1)
 
 Before delegating, assess (complexity, criticality, uncertainty). After delegation, verify the result.
