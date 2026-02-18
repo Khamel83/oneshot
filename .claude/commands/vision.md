@@ -1,6 +1,6 @@
-# /vision — Analyze Images with AI Vision
+# /vision — Visual Inspection of Websites and Images
 
-Invoke the MCP image analysis tool. Use this when you need to extract information from images, screenshots, mockups, or diagrams.
+Smart visual analysis that handles both websites and images.
 
 ## Usage
 
@@ -8,56 +8,73 @@ Invoke the MCP image analysis tool. Use this when you need to extract informatio
 /vision <url> [prompt]
 ```
 
-- `<url>` — Remote URL to the image (PNG, JPG, JPEG)
+- `<url>` — Website URL OR direct image URL
 - `[prompt]` — Optional: what to look for (default: comprehensive analysis)
+
+## Behavior
+
+| URL Type | What Happens |
+|----------|--------------|
+| Website (`https://example.com`) | Playwright navigates → screenshots → analyzes |
+| Image (`https://.../*.png|jpg|jpeg`) | Direct analysis with mcp__4_5v_mcp__analyze_image |
 
 ## Examples
 
 ```
-/vision https://example.com/mockup.png
-/vision https://example.com/screenshot.jpg "Extract the hex color codes used"
-/vision https://example.com/diagram.png "Describe the architecture shown"
+/vision https://example.com
+→ Navigates to site, takes screenshot, analyzes layout and design
+
+/vision https://example.com "What colors are used?"
+→ Screenshots site, analyzes color palette
+
+/vision https://mockup.png "replicate"
+→ Direct image analysis for UI replication
+
+/vision https://diagram.png "Describe the architecture"
+→ Direct image analysis
 ```
 
 ## For UI Replication
 
-When replicating a UI from an image:
-
 ```
-/vision https://example.com/design.png "replicate"
+/vision https://mysite.com "replicate"
 ```
 
-This triggers the special replication prompt: "Describe in detail the layout structure, color style, main components, and interactive elements of the website in this image to facilitate subsequent code generation by the model."
+Uses the replication prompt: "Describe in detail the layout structure, color style, main components, and interactive elements to facilitate code generation."
+
+## Execution Steps
+
+When invoked:
+
+1. **Detect URL type:**
+   - Ends in `.png`, `.jpg`, `.jpeg` (case insensitive) → image
+   - Otherwise → website
+
+2. **For images:**
+   - Call `mcp__4_5v_mcp__analyze_image` directly
+   - If prompt is "replicate", use specialized replication prompt
+   - Otherwise use provided prompt or default comprehensive analysis
+
+3. **For websites:**
+   - Call `mcp__playwright__browser_navigate` with the URL
+   - Call `mcp__playwright__browser_screenshot` to capture
+   - Call `mcp__4_5v_mcp__analyze_image` on the screenshot
+   - If prompt is "replicate", use specialized replication prompt
+
+## Tools Used
+
+- `mcp__playwright__browser_navigate` — Navigate to websites
+- `mcp__playwright__browser_screenshot` — Capture screenshots
+- `mcp__4_5v_mcp__analyze_image` — AI vision analysis
+
+## Requirements
+
+- Playwright MCP server must be configured
+- The `mcp__4_5v_mcp__analyze_image` MCP must be available
 
 ## Local Images
 
-For local image files, use the Read tool directly instead:
-
+For local image files, use Read tool directly:
 ```
 Read: screenshots/mockup.png
 ```
-
-The Read tool also supports image viewing for local paths.
-
-## When to Use
-
-- Analyzing hosted screenshots or mockups
-- Extracting colors, fonts, spacing from designs
-- Understanding diagrams or architecture images
-- UI/UX replication tasks
-- Reading text from images (OCR-ish)
-
-## Tool Invoked
-
-This command invokes: `mcp__4_5v_mcp__analyze_image`
-
-## Execution
-
-When this command is invoked:
-
-1. Parse the URL and optional prompt from arguments
-2. If prompt is "replicate", use the specialized replication prompt
-3. Call `mcp__4_5v_mcp__analyze_image` with:
-   - `imageSource`: the provided URL
-   - `prompt`: the provided prompt (or default comprehensive analysis)
-4. Return the analysis results
