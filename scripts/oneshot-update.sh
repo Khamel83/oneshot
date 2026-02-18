@@ -83,11 +83,23 @@ do_update() {
     if git pull --rebase origin master 2>>"$LOG_FILE"; then
         log "Update successful"
 
-        # Update the symlink if needed
+        # Update the skills symlink if needed
         if [ ! -L "$SKILLS_SYMLINK" ]; then
             ln -sf "$ONESHOT_DIR/.claude/skills" "$SKILLS_SYMLINK"
             log "Updated symlink: $SKILLS_SYMLINK"
         fi
+
+        # Create symlinks for all commands
+        COMMANDS_DIR="$HOME/.claude/commands"
+        mkdir -p "$COMMANDS_DIR"
+        for cmd in "$ONESHOT_DIR/.claude/commands"/*.md; do
+            [ -f "$cmd" ] || continue
+            cmd_name=$(basename "$cmd")
+            # Remove existing file (regular or symlink) and create fresh symlink
+            rm -f "$COMMANDS_DIR/$cmd_name"
+            ln -sf "$cmd" "$COMMANDS_DIR/$cmd_name"
+        done
+        log "Updated command symlinks in $COMMANDS_DIR"
 
         echo "UPDATED"
         return 0
