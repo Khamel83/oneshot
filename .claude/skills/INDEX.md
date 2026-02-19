@@ -1,16 +1,17 @@
 # Skills Index
 
-ONE_SHOT v11 - Native Tasks + Swarms. Migrated from Beads to native Tasks, added /swarm for agent teams.
+ONE_SHOT v12.2 - Intelligent Delegation + Agent Lightning Integration. Native Tasks preferred, Beads deprecated.
 
 **For command reference, see [docs/SKILLS.md](../../docs/SKILLS.md).**
 
 ---
 
-## v11 Highlights
+## v12.2 Highlights
 
 - **Native Tasks**: TaskCreate, TaskGet, TaskUpdate, TaskList (Beads deprecated)
-- **/swarm**: Agent team orchestration (experimental)
-- **External models**: NOT supported in swarms (Claude only)
+- **Intelligent Delegation**: Assess before delegating, verify after, trace with spans
+- **Agent Lightning**: Enriched spans (span_id, session_id, tool_sequence, reward), trajectories, credit assignment
+- **Delegation Commands**: `/delegation-log`, `/delegation-trajectory`, `/delegation-stats`
 
 ---
 

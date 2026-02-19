@@ -2,6 +2,10 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260217_213139_what_ever_happened_to_our_visual_inspection_mCP_op.md.age](20260217_213139_what_ever_happened_to_our_visual_inspection_mCP_op.md.age) | 2026-02-17 21:31:39 | what ever happened to our visual inspection mCP op... | update |
+| File | Date | Title | Topics |
+| [20260217_143612_we_need_to_add_in_some_code_around_how_oneshot_and.md.age](20260217_143612_we_need_to_add_in_some_code_around_how_oneshot_and.md.age) | 2026-02-17 14:36:12 | we need to add in some code around how oneshot and... | add |
+| File | Date | Title | Topics |
 | [20260213_111600_waht_does___docs__do__does_that_force_a_freesearch.md.age](20260213_111600_waht_does___docs__do__does_that_force_a_freesearch.md.age) | 2026-02-13 11:16:00 | waht does "/docs" do? does that force a freesearch... | add, age, convex, deploy, feature, fix, go, implement, migration, oci, refactor, remove, session, test, update |
 | [20260212_221958_is_there_any_way_to_fix_our_upgrade___update_polic.md.age](20260212_221958_is_there_any_way_to_fix_our_upgrade___update_polic.md.age) | 2026-02-12 22:19:58 | is there any way to fix our upgrade / update polic... | add, age, api, auth, bug, build, clerk, convex, fix, go, install, migration, postgres, remove, session, setup, test, update |
 | [20260212_181620__command-name__model__command-name_.md.age](20260212_181620__command-name__model__command-name_.md.age) | 2026-02-12 18:16:20 | <command-name>/model</command-name> | add, age, api, auth, aws, bug, build, config, database, deploy, docker, encrypt, fix, frontend, go, implement, install, postgres, rust, session, setup, sops, test, update |

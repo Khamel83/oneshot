@@ -250,4 +250,5 @@ Continue with Phase 1.1: Create skills_inventory.json with names + descriptions 
 |---------|------|---------|
 | v10.4 | 2026-02-13 | Fixed oneshot.sh update logic, cascade failures |
 | v10.5 | 2026-02-13 | Skills cleanup, /cp sync workflow |
-| v11 | IN PROGRESS | Native tasks, swarm support |
+| v11.0 | 2026-02-13 | Native tasks, swarm support |
+| v12.2 | 2026-02-19 | Agent Lightning integration, intelligent delegation, /delegation-* commands |

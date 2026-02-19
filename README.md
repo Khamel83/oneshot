@@ -1,4 +1,4 @@
-# ONE_SHOT v11
+# ONE_SHOT v12
 
 **Your personal Claude Code configuration.**
 
@@ -10,8 +10,8 @@ ONE_SHOT makes Claude Code work the way you want across all your projects:
 
 - **Progressive disclosure** - Rules load by project type (~300 tokens vs 2000)
 - **Slash commands** - Invoke when needed (/interview, /cp, /implement, /freesearch...)
-- **Native Tasks** - Uses Claude's built-in TaskCreate/TaskUpdate/TaskList (Beads deprecated)
-- **Swarm support** - Agent teams for parallel work with /swarm command
+- **Native Tasks** - Uses Claude's built-in TaskCreate/TaskUpdate/TaskList for persistent tracking
+- **Intelligent delegation** - Agent Lightning integration with enriched spans, trajectories, and credit assignment
 
 ---
 
@@ -39,7 +39,7 @@ claude .
 1. **Start a session** → Claude reads your project's rules automatically
 2. **Say what you want** → "Build me a weather CLI", "Fix the login bug"
 3. **Track progress** → Native Tasks (TaskCreate/TaskList) persist across sessions
-4. **Use slash commands** → When you need structure: `/interview`, `/cp`, `/diagnose`, `/swarm`
+4. **Use slash commands** → When you need structure: `/interview`, `/cp`, `/diagnose`
 
 ### Key Commands
 
@@ -48,8 +48,7 @@ claude .
 | "Build me X" | Claude plans and builds |
 | `/interview` | Structured requirements gathering |
 | `/cp` | Continuous planner (3-file pattern) |
-| `/swarm` | Parallel agent teams (experimental) |
-| `/implement` | Execute plan with beads tracking |
+| `/implement` | Execute plan with native task tracking |
 | `/diagnose` | Hypothesis-based debugging |
 | `/stack-setup` | Configure Astro + Cloudflare + Postgres |
 
@@ -89,7 +88,7 @@ ONE_SHOT uses opinionated defaults (don't ask, just use):
 | `/interview` | Structured interview (triage → questions → spec) |
 | `/cp` | Continuous planner (3-file: task_plan.md, findings.md, progress.md) |
 | `/run-plan` | Execute plan deterministically from task_plan.md |
-| `/implement` | Execute plan with beads tracking |
+| `/implement` | Execute plan with native task tracking |
 | `/stack-setup` | Configure Astro + Cloudflare + Postgres stack |
 | `/freesearch` | Research via Exa API (zero Claude tokens) |
 | `/research` | Background research via Gemini CLI |
@@ -100,12 +99,14 @@ ONE_SHOT uses opinionated defaults (don't ask, just use):
 | `/codereview` | OWASP + quality review |
 | `/remote` | Execute on homelab/macmini |
 | `/audit` | Strategic communication filter |
-| `/beads` | Persistent task tracking |
 | `/handoff` | Save context before /clear |
 | `/restore` | Resume from handoff |
 | `/secrets` | SOPS/Age secret management |
 | `/sessions` | View/search encrypted session logs |
 | `/batch` | Parallel multi-file operations |
+| `/delegation-log` | View delegation audit trail |
+| `/delegation-trajectory` | View session execution paths |
+| `/delegation-stats` | Reward-weighted performance stats |
 | `/update` | Update ONE_SHOT from GitHub |
 
 ---
@@ -153,7 +154,7 @@ Claude reads relevant rules (~300 tokens)
     ↓
 You invoke commands when needed (/interview, /cp, etc.)
     ↓
-Progress tracked in beads (survives everything)
+Progress tracked via native Tasks (survives everything)
 ```
 
 ---
@@ -165,8 +166,7 @@ After installation:
 ```
 your-project/
 ├── AGENTS.md           # Skill router (curl from oneshot, read-only)
-├── CLAUDE.md           # Your project-specific instructions
-└── .beads/             # Persistent task tracking
+└── CLAUDE.md           # Your project-specific instructions
 ```
 
 Global config (installed once):
@@ -179,36 +179,42 @@ Global config (installed once):
 │   ├── web.md          # Web apps (Astro + Cloudflare + Better Auth + Postgres)
 │   ├── cli.md          # CLIs (Python + Click)
 │   └── service.md      # Services (Python + systemd)
-└── commands/           # Slash commands (21 total)
+├── commands/           # Slash commands
+└── tasks/              # Native task storage (persistent)
 ```
 
 ---
 
-## Task Tracking (Beads)
+## Task Tracking (Native Tasks)
+
+ONE_SHOT uses Claude's native task tools for persistent tracking:
 
 ```bash
-bd ready      # "What's next?" → Shows unblocked tasks
-bd list       # All tasks with status
-bd show 42    # Details of task #42
-bd sync       # Save to git
+# Claude manages tasks via built-in tools:
+TaskList         # Show all tasks
+TaskCreate       # Create new task
+TaskUpdate       # Update task status
+TaskGet          # Get task details
 ```
 
-Tasks survive `/clear`, restarts, disconnections.
+Tasks persist across `/clear`, sessions, and restarts. No external CLI required.
+
+**Legacy**: `/beads` command still works for Beads CLI users, but native tasks are preferred.
 
 ---
 
 ## Prerequisites
 
 ```bash
-# Required: Beads (task tracking)
-npm install -g @beads/bd
-
 # Required: docs-link (documentation cache manager)
 # Installed via install.sh to ~/.local/bin/docs-link
 
 # Optional: Gemini CLI (for background research)
 npm install -g @google/gemini-cli
 gemini auth login
+
+# Optional: Beads CLI (legacy task tracking)
+npm install -g @beads/bd
 ```
 
 ---
@@ -266,7 +272,7 @@ oneshot-update status   # Check current version
 | Command not working | Check it's in `~/.claude/commands/` |
 | Rules not loading | Check `~/.claude/rules/` exists |
 | Lost context after `/clear` | Say "resume" or `/restore` |
-| Beads not found | `npm install -g @beads/bd` |
+| Tasks not persisting | Check `~/.claude/tasks/` exists |
 
 ---
 
@@ -279,9 +285,8 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
 ## Links
 
 - **GitHub**: https://github.com/Khamel83/oneshot
-- **Beads**: https://github.com/steveyegge/beads
 - **Progressive Disclosure**: [.claude/rules/README.md](.claude/rules/README.md)
 
 ---
 
-**v11** | Native Tasks + Swarms | Progressive Disclosure | Slash Commands | Native Tasks
+**v12.2** | Agent Lightning Integration | Intelligent Delegation | Progressive Disclosure | Slash Commands

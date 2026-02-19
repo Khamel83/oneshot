@@ -4,6 +4,29 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [12.2.0] - 2026-02-19
+
+### Added
+- **Agent Lightning Integration** - Enriched delegation spans with span_id, session_id, tool_sequence, and reward
+- **Delegation audit log** - `.claude/delegation-log.jsonl` with automatic logging via SubagentStop hook
+- **/delegation-log** - View and query delegation audit trail
+- **/delegation-trajectory** - View session-level execution trajectories (Agent Lightning spans)
+- **/delegation-stats** - Reward-weighted performance stats and routing recommendations
+- **Credit assignment heuristics** - Identify which delegations contributed most (+credit) vs bottlenecks (+blame)
+
+### Changed
+- **Delegation rules v12.2** - Based on DeepMind "Intelligent AI Delegation" paper + Microsoft Agent Lightning
+- **Assess-Verify-Escalate-Trace loop** - Formalized delegation protocol with 3-attempt fallback chain
+- **core.md** - Updated from v12.1 to v12.2 Intelligent Delegation section
+- **AGENTS.md** - Added delegation commands to skill router and slash commands table
+- **delegation.md** - Enhanced with Agent Lightning concepts (spans, trajectories, credit assignment)
+
+### Research Sources
+- "Intelligent AI Delegation" (Tomasev et al., Google DeepMind, 2026)
+- Agent Lightning (Microsoft, 2025) — spans, trajectories, reward-based credit assignment
+
+---
+
 ## [11.0.0] - 2026-02-13
 
 ### Breaking Changes

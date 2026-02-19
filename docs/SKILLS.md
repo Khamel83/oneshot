@@ -1,8 +1,8 @@
 # ONE_SHOT Slash Commands Reference
 
-A practical guide to all 22 slash commands - what they do and when to use them.
+A practical guide to all 25 slash commands - what they do and when to use them.
 
-**v11**: Native Tasks are now the primary task system. Use TaskCreate, TaskGet, TaskUpdate, TaskList.
+**v12.2**: Native Tasks primary, intelligent delegation with Agent Lightning spans, trajectories, and credit assignment.
 
 ---
 
@@ -42,6 +42,15 @@ Interface to the Beads task tracking system (`bd` CLI). **Deprecated in v11** - 
 
 ### `/swarm`
 Orchestrates multiple Claude Code instances working as a team. One session acts as lead, coordinating work across teammates with shared task lists and peer-to-peer messaging. Use for parallel exploration: research & review, competing hypotheses, cross-layer coordination (frontend/backend/tests). Requires experimental flag: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.
+
+### `/delegation-log`
+Views the delegation audit trail - all spans logged automatically when subagents complete. Each entry includes span_id, session_id, tool_sequence, and reward. Use to see what work was delegated and how it performed.
+
+### `/delegation-trajectory`
+Views session-level execution trajectories - chains of delegation spans grouped by session. Shows the full path from request to completion, with reward signals for each step. Use to understand how complex tasks were decomposed.
+
+### `/delegation-stats`
+Aggregates delegation performance stats with reward-weighted metrics. Shows which agent types perform best on which task patterns, identifies bottlenecks, and provides routing recommendations. Use to optimize delegation strategy over time.
 
 ---
 
@@ -129,3 +138,6 @@ Updates the ONE_SHOT framework itself and runs a health check. Syncs from the Gi
 | Set up a new web project | `/stack-setup` |
 | Update ONE_SHOT | `/update` |
 | Run parallel agents | `/swarm` |
+| View delegation audit trail | `/delegation-log` |
+| See execution paths | `/delegation-trajectory` |
+| Check delegation performance | `/delegation-stats` |

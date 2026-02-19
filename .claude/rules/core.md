@@ -36,7 +36,7 @@ These rules load for every project.
 
 ---
 
-## Intelligent Delegation (v12.1)
+## Intelligent Delegation (v12.2)
 
 Before delegating, assess (complexity, criticality, uncertainty). After delegation, verify the result.
 Full protocol: `~/.claude/rules/delegation.md`
@@ -84,7 +84,7 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/AGENTS.md > A
 
 ---
 
-## ONE_SHOT v11: Native Tasks + Swarms
+## ONE_SHOT v12: Native Tasks + Intelligent Delegation
 
 **Core Philosophy**: Use Claude's native features first, external tools as fallback.
 
