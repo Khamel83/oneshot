@@ -12,6 +12,7 @@ ONE_SHOT makes Claude Code work the way you want across all your projects:
 - **Slash commands** - Invoke when needed (/interview, /cp, /implement, /freesearch...)
 - **Native Tasks** - Uses Claude's built-in TaskCreate/TaskUpdate/TaskList for persistent tracking
 - **Intelligent delegation** - Agent Lightning integration with enriched spans, trajectories, and credit assignment
+- **Swarm mode** - Multi-agent teams for parallel work (experimental, `/swarm`)
 
 ---
 
@@ -107,6 +108,8 @@ ONE_SHOT uses opinionated defaults (don't ask, just use):
 | `/delegation-log` | View delegation audit trail |
 | `/delegation-trajectory` | View session execution paths |
 | `/delegation-stats` | Reward-weighted performance stats |
+| `/swarm` | Multi-agent team orchestration (experimental) |
+| `/beads` | Legacy task tracking (deprecated, use native tasks) |
 | `/update` | Update ONE_SHOT from GitHub |
 
 ---
