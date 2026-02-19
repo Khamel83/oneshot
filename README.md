@@ -2,75 +2,141 @@
 
 **Your personal Claude Code configuration.**
 
----
+One install gives you: progressive disclosure rules, slash commands, native task tracking, intelligent delegation, and swarm mode.
 
-## What ONE_SHOT Is
-
-ONE_SHOT makes Claude Code work the way you want across all your projects:
-
-- **Progressive disclosure** - Rules load by project type (~300 tokens vs 2000)
-- **Slash commands** - Invoke when needed (/interview, /cp, /implement, /freesearch...)
-- **Native Tasks** - Uses Claude's built-in TaskCreate/TaskUpdate/TaskList for persistent tracking
-- **Intelligent delegation** - Agent Lightning integration with enriched spans, trajectories, and credit assignment
-- **Swarm mode** - Multi-agent teams for parallel work (experimental, `/swarm`)
+**[Quick Start](#quick-start)** | **[All Commands](#slash-commands)** | **[What's New](#whats-new)** | **[Full Docs](docs/SKILLS.md)**
 
 ---
 
-## Quick Start (3 Steps)
+## Quick Start
 
 ```bash
-# 1. In your project directory
+# 1. In your project
 cd your-project
 
-# 2. Install ONE_SHOT
+# 2. Install
 curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 
-# 3. Open in Claude Code
+# 3. Start Claude Code
 claude .
-
-# Then say: "Build me [thing you want]"
 ```
+
+Then just describe what you're working on. ONE_SHOT loads the right rules automatically.
 
 ---
 
-## How to Use ONE_SHOT
+## How It Works
 
-### Daily Workflow
+**Progressive disclosure** - Rules load based on your project type:
 
-1. **Start a session** → Claude reads your project's rules automatically
-2. **Say what you want** → "Build me a weather CLI", "Fix the login bug"
-3. **Track progress** → Native Tasks (TaskCreate/TaskList) persist across sessions
-4. **Use slash commands** → When you need structure: `/interview`, `/cp`, `/diagnose`
+| Your Project | Detects | Loads |
+|--------------|---------|-------|
+| Web app | `astro.config.*` or `wrangler.toml` | Core + Web rules |
+| CLI | `setup.py` or `pyproject.toml` | Core + CLI rules |
+| Service | `*.service` | Core + Service rules |
+| Anything else | — | Core rules only |
 
-### Key Commands
+~300 tokens always loaded (down from ~2000 in older versions).
 
-| You Say | What Happens |
-|---------|--------------|
-| "Build me X" | Claude plans and builds |
-| `/interview` | Structured requirements gathering |
-| `/cp` | Continuous planner (3-file pattern) |
-| `/implement` | Execute plan with native task tracking |
-| `/diagnose` | Hypothesis-based debugging |
-| `/stack-setup` | Configure Astro + Cloudflare + Postgres |
+---
 
-### Check Scripts (Automated)
+## Slash Commands
 
-ONE_SHOT includes heartbeat scripts that run periodically to keep your setup current:
+Click any command for full documentation.
 
-| Script | Purpose |
-|--------|---------|
-| `heartbeat.sh` | Periodic maintenance (run via systemd or cron) |
-| `check-oneshot.sh` | Verify ONE_SHOT is up to date |
-| `check-apis.sh` | Check API keys and services |
+### Planning & Execution
 
-Install heartbeat with 23-hour rate limiting:
-```bash
-~/.claude/scripts/heartbeat-install.sh
-```
+| Command | Description |
+|---------|-------------|
+| [`/interview`](docs/SKILLS.md#interview) | Structured requirements gathering before coding |
+| [`/cp`](docs/SKILLS.md#cp-continuous-planner) | Living 3-file plan that survives `/clear` |
+| [`/run-plan`](docs/SKILLS.md#run-plan) | Execute plan from `task_plan.md` step-by-step |
+| [`/implement`](docs/SKILLS.md#implement) | Execute plan with native task tracking |
 
-### Stack Defaults
+### Context & Recovery
 
-ONE_SHOT uses opinionated defaults (don't ask, just use):
+| Command | Description |
+|---------|-------------|
+| [`/handoff`](docs/SKILLS.md#handoff) | Save checkpoint before `/clear` |
+| [`/restore`](docs/SKILLS.md#restore) | Resume from handoff |
+| [`/sessions`](docs/SKILLS.md#sessions) | Browse encrypted session history |
+
+### Task Tracking
+
+| Command | Description |
+|---------|-------------|
+| Native Tasks | Built-in: `TaskCreate`, `TaskList`, `TaskUpdate`, `TaskGet` |
+| [`/beads`](docs/SKILLS.md#beads-️-deprecated) | Legacy CLI-based tracking (deprecated) |
+
+### Debugging & Quality
+
+| Command | Description |
+|---------|-------------|
+| [`/diagnose`](docs/SKILLS.md#diagnose) | Hypothesis-based debugging |
+| [`/codereview`](docs/SKILLS.md#codereview) | OWASP + quality review |
+
+### Research & Docs
+
+| Command | Description |
+|---------|-------------|
+| [`/research`](docs/SKILLS.md#research) | Background research via Gemini CLI |
+| [`/freesearch`](docs/SKILLS.md#freesearch) | Zero-token web search via Exa API |
+| [`/doc`](docs/SKILLS.md#doc) | Cache external docs locally |
+| [`/skill-discovery`](docs/SKILLS.md#skill-discovery) | Find skills matching your goal |
+
+### Multi-File & Remote
+
+| Command | Description |
+|---------|-------------|
+| [`/batch`](docs/SKILLS.md#batch) | Parallel operations across 10+ files |
+| [`/remote`](docs/SKILLS.md#remote) | Execute on homelab/macmini via SSH |
+
+### Delegation (v12.2)
+
+| Command | Description |
+|---------|-------------|
+| [`/delegation-log`](docs/SKILLS.md#delegation-log) | View delegation audit trail |
+| [`/delegation-trajectory`](docs/SKILLS.md#delegation-trajectory) | See session execution paths |
+| [`/delegation-stats`](docs/SKILLS.md#delegation-stats) | Reward-weighted performance stats |
+
+### Parallel Work
+
+| Command | Description |
+|---------|-------------|
+| [`/swarm`](docs/SKILLS.md#swarm) | Multi-agent teams (experimental) |
+
+### Utilities
+
+| Command | Description |
+|---------|-------------|
+| [`/think`](docs/SKILLS.md#think) | Multi-perspective analysis |
+| [`/audit`](docs/SKILLS.md#audit) | Strategic communication filter |
+| [`/secrets`](docs/SKILLS.md#secrets) | SOPS/Age secret management |
+| [`/stack-setup`](docs/SKILLS.md#stack-setup) | Configure Astro + Cloudflare + Postgres |
+| [`/update`](docs/SKILLS.md#update) | Update ONE_SHOT from GitHub |
+| [`/vision`](.claude/commands/vision.md) | Visual inspection via MCP |
+
+---
+
+## What's New
+
+### v12.2 (2026-02-19)
+- **Agent Lightning integration** - Delegation spans with `span_id`, `session_id`, `tool_sequence`, `reward`
+- **New commands**: `/delegation-log`, `/delegation-trajectory`, `/delegation-stats`
+- **Credit assignment** - See which delegations helped vs. bottlenecked
+
+### v11.0 (2026-02-13)
+- **Native Tasks** - Built-in `TaskCreate`/`TaskList`/`TaskUpdate` (Beads deprecated)
+- **/swarm** - Multi-agent team orchestration
+
+### v10.3 (2026-02-12)
+- **New stack** - Astro + Cloudflare + Better Auth + Postgres (replaced Convex+Next.js)
+
+[Full changelog →](CHANGELOG.md)
+
+---
+
+## Stack Defaults
 
 | Project Type | Stack |
 |--------------|-------|
@@ -82,188 +148,27 @@ ONE_SHOT uses opinionated defaults (don't ask, just use):
 
 ---
 
-## Slash Commands
+## Key Files
 
-| Command | What It Does |
-|---------|--------------|
-| `/interview` | Structured interview (triage → questions → spec) |
-| `/cp` | Continuous planner (3-file: task_plan.md, findings.md, progress.md) |
-| `/run-plan` | Execute plan deterministically from task_plan.md |
-| `/implement` | Execute plan with native task tracking |
-| `/stack-setup` | Configure Astro + Cloudflare + Postgres stack |
-| `/freesearch` | Research via Exa API (zero Claude tokens) |
-| `/research` | Background research via Gemini CLI |
-| `/doc` | Cache external docs locally |
-| `/skill-discovery` | Find skills matching your goal |
-| `/think` | Multi-perspective analysis |
-| `/diagnose` | Hypothesis-based debugging |
-| `/codereview` | OWASP + quality review |
-| `/remote` | Execute on homelab/macmini |
-| `/audit` | Strategic communication filter |
-| `/handoff` | Save context before /clear |
-| `/restore` | Resume from handoff |
-| `/secrets` | SOPS/Age secret management |
-| `/sessions` | View/search encrypted session logs |
-| `/batch` | Parallel multi-file operations |
-| `/delegation-log` | View delegation audit trail |
-| `/delegation-trajectory` | View session execution paths |
-| `/delegation-stats` | Reward-weighted performance stats |
-| `/swarm` | Multi-agent team orchestration (experimental) |
-| `/beads` | Legacy task tracking (deprecated, use native tasks) |
-| `/update` | Update ONE_SHOT from GitHub |
+| File | Purpose |
+|------|---------|
+| [AGENTS.md](AGENTS.md) | Skill routing (LLM-only, curl from repo) |
+| [CLAUDE.md](CLAUDE.md) | Your project-specific instructions |
+| [docs/SKILLS.md](docs/SKILLS.md) | Full command reference |
+| [.claude/rules/](.claude/rules/) | Progressive disclosure rules |
+| [.claude/commands/](.claude/commands/) | Slash command definitions |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
 
 ---
 
-## Documentation Cache (docs-link)
-
-Link cached external docs to any project:
+## Updating
 
 ```bash
-cd your-project
-docs-link add polymarket astro cloudflare tailscale  # Link docs
-docs-link list                              # Show linked docs
-docs-link available                         # Show all cached docs
-```
-
-Creates symlinks in `docs/external/` pointing to central cache at `~/github/docs-cache/`.
-
-**Benefits:**
-- Instant access to cached docs (no WebSearch needed)
-- Saves Claude token quota
-- Works offline
-- Version-controlled documentation
-
----
-
-## How It Works
-
-### Progressive Disclosure
-
-Rules load based on what you're working on:
-
-| Project Type | Trigger | Rules Loaded |
-|--------------|---------|--------------|
-| Web app | `astro.config.*` or `wrangler.toml` | Core + Web rules |
-| CLI | `setup.py` or `pyproject.toml` | Core + CLI rules |
-| Service | `*.service` | Core + Service rules |
-| Generic | Nothing detected | Core rules only |
-
-### Session Workflow
-
-```
-You say what you want
-    ↓
-Claude reads relevant rules (~300 tokens)
-    ↓
-You invoke commands when needed (/interview, /cp, etc.)
-    ↓
-Progress tracked via native Tasks (survives everything)
-```
-
----
-
-## Project Structure
-
-After installation:
-
-```
-your-project/
-├── AGENTS.md           # Skill router (curl from oneshot, read-only)
-└── CLAUDE.md           # Your project-specific instructions
-```
-
-Global config (installed once):
-
-```
-~/.claude/
-├── CLAUDE.md           # Core identity
-├── rules/              # Progressive disclosure rules
-│   ├── core.md         # Always loaded
-│   ├── web.md          # Web apps (Astro + Cloudflare + Better Auth + Postgres)
-│   ├── cli.md          # CLIs (Python + Click)
-│   └── service.md      # Services (Python + systemd)
-├── commands/           # Slash commands
-└── tasks/              # Native task storage (persistent)
-```
-
----
-
-## Task Tracking (Native Tasks)
-
-ONE_SHOT uses Claude's native task tools for persistent tracking:
-
-```bash
-# Claude manages tasks via built-in tools:
-TaskList         # Show all tasks
-TaskCreate       # Create new task
-TaskUpdate       # Update task status
-TaskGet          # Get task details
-```
-
-Tasks persist across `/clear`, sessions, and restarts. No external CLI required.
-
-**Legacy**: `/beads` command still works for Beads CLI users, but native tasks are preferred.
-
----
-
-## Prerequisites
-
-```bash
-# Required: docs-link (documentation cache manager)
-# Installed via install.sh to ~/.local/bin/docs-link
-
-# Optional: Gemini CLI (for background research)
-npm install -g @google/gemini-cli
-gemini auth login
-
-# Optional: Beads CLI (legacy task tracking)
-npm install -g @beads/bd
-```
-
----
-
-## Secrets (SOPS/Age)
-
-ONE_SHOT uses SOPS + Age for encrypted secrets. The age key is at `~/.age/key.txt` and SOPS config is at `.sops.yaml`.
-
-**On new machines:**
-```bash
-# Copy age key from existing machine
-scp user@known-machine:~/.age/key.txt ~/.age/key.txt
-
-# Then verify decryption works
-sops -d secrets/research_keys.env.encrypted
-```
-
-**Encrypted files:**
-- `secrets/research_keys.env.encrypted` - API keys (ZAI, Exa, Tavily, Apify, Context7)
-- `secrets/homelab.env.encrypted` - Homelab credentials
-- `secrets/*.env.encrypted` - Project-specific secrets
-
----
-
-## Updating ONE_SHOT
-
-**Works from ANY version - even if your install is broken:**
-
-```
-run curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/oneshot-update.sh | bash -s -- force
-```
-
-Or just say to Claude:
-```
-curl the oneshot updater and run it with force
-```
-
-**If you have the command installed:**
-```bash
-oneshot-update force    # Update + sync to current project
-oneshot-update status   # Check current version
-```
-
-**From Claude Code:**
-```
+# From any project
 /update
+
+# Or force reinstall
+curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/oneshot-update.sh | bash -s -- force
 ```
 
 ---
@@ -272,24 +177,11 @@ oneshot-update status   # Check current version
 
 | Problem | Solution |
 |---------|----------|
-| Command not working | Check it's in `~/.claude/commands/` |
+| Command not working | Check `~/.claude/commands/` |
 | Rules not loading | Check `~/.claude/rules/` exists |
-| Lost context after `/clear` | Say "resume" or `/restore` |
+| Lost context | `/restore` or say "resume" |
 | Tasks not persisting | Check `~/.claude/tasks/` exists |
 
 ---
 
-## Version History
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
-
----
-
-## Links
-
-- **GitHub**: https://github.com/Khamel83/oneshot
-- **Progressive Disclosure**: [.claude/rules/README.md](.claude/rules/README.md)
-
----
-
-**v12.2** | Agent Lightning Integration | Intelligent Delegation | Progressive Disclosure | Slash Commands
+**v12.2** | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
