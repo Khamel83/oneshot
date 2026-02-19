@@ -148,6 +148,32 @@ Click any command for full documentation.
 
 ---
 
+## Project Structure
+
+After installation:
+
+```
+your-project/
+├── AGENTS.md           # Skill router (curl from oneshot, read-only)
+└── CLAUDE.md           # Your project-specific instructions
+```
+
+Global config (installed once):
+
+```
+~/.claude/
+├── CLAUDE.md           # Core identity
+├── rules/              # Progressive disclosure rules
+│   ├── core.md         # Always loaded
+│   ├── web.md          # Web apps
+│   ├── cli.md          # CLIs
+│   └── service.md      # Services
+├── commands/           # Slash commands
+└── tasks/              # Native task storage (persistent)
+```
+
+---
+
 ## Key Files
 
 | File | Purpose |
@@ -158,6 +184,68 @@ Click any command for full documentation.
 | [.claude/rules/](.claude/rules/) | Progressive disclosure rules |
 | [.claude/commands/](.claude/commands/) | Slash command definitions |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |
+
+---
+
+## Prerequisites
+
+```bash
+# Optional: Gemini CLI (for /research)
+npm install -g @google/gemini-cli && gemini auth login
+
+# Optional: Beads CLI (legacy task tracking)
+npm install -g @beads/bd
+```
+
+---
+
+## Secrets (SOPS/Age)
+
+ONE_SHOT uses SOPS + Age for encrypted secrets. Age key at `~/.age/key.txt`.
+
+**On new machines:**
+```bash
+# Copy age key from existing machine
+scp user@known-machine:~/.age/key.txt ~/.age/key.txt
+
+# Verify decryption works
+sops -d secrets/research_keys.env.encrypted
+```
+
+Encrypted files in `secrets/`:
+- `research_keys.env.encrypted` - API keys (ZAI, Exa, Tavily, etc.)
+- `homelab.env.encrypted` - Homelab credentials
+- `*.env.encrypted` - Project-specific secrets
+
+---
+
+## Documentation Cache
+
+Link cached external docs to any project:
+
+```bash
+docs-link add polymarket astro cloudflare  # Link docs
+docs-link list                              # Show linked
+docs-link available                         # Show all cached
+```
+
+Creates symlinks in `docs/external/` → `~/github/docs-cache/`.
+
+---
+
+## Heartbeat Scripts
+
+Automatic maintenance (run via systemd or cron):
+
+| Script | Purpose |
+|--------|---------|
+| `heartbeat.sh` | Periodic maintenance |
+| `check-oneshot.sh` | Verify ONE_SHOT is up to date |
+| `check-apis.sh` | Check API keys and services |
+
+```bash
+~/.claude/scripts/heartbeat-install.sh
+```
 
 ---
 
@@ -181,6 +269,7 @@ curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/ones
 | Rules not loading | Check `~/.claude/rules/` exists |
 | Lost context | `/restore` or say "resume" |
 | Tasks not persisting | Check `~/.claude/tasks/` exists |
+| Beads not found | `npm install -g @beads/bd` |
 
 ---
 
