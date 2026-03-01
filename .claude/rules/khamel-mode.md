@@ -55,6 +55,23 @@ Cloudflare Access → internal/admin tools (already configured)
 - aws/gcp/azure → Default is OCI free tier or homelab
 - Lucia auth → Deprecated, use Better Auth
 
+## Decision Defaults (Don't Ask, Just Pick)
+
+When ambiguous, apply these defaults without asking for clarification:
+
+| Ambiguity | Default Choice |
+|-----------|----------------|
+| Multiple valid implementations | **Simplest one** |
+| Naming things | Follow existing pattern in file |
+| Error handling style | Match surrounding code |
+| Test framework | Use existing tests as guide |
+| Library choice | One already in project |
+| Refactor opportunity | **Skip unless blocking** |
+| API design | Match existing endpoints |
+| File organization | Follow project structure |
+
+**Key rule**: When truly ambiguous, make a reasonable choice and note the decision.
+
 ## When You Notice Drift
 
 If Claude notices we're NOT using beads, Tailscale, ONE_SHOT patterns, or standard stack:

@@ -12,6 +12,7 @@ ONE_SHOT v12.2 - Intelligent Delegation + Agent Lightning Integration. Native Ta
 - **Intelligent Delegation**: Assess before delegating, verify after, trace with spans
 - **Agent Lightning**: Enriched spans (span_id, session_id, tool_sequence, reward), trajectories, credit assignment
 - **Delegation Commands**: `/delegation-log`, `/delegation-trajectory`, `/delegation-stats`
+- **Continuous Mode**: `/continuous` for autonomous execution
 
 ---
 
