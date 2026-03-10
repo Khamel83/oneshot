@@ -1,13 +1,13 @@
 # ONE_SHOT v13 — Operator Framework
 
-**9 slash commands.** Two operators. Seven utilities.
+**9 skills.** Two operators. Seven utilities.
 
 ---
 
 ## Operators
 
-| Command | Purpose |
-|---------|---------|
+| Skill | Purpose |
+|-------|---------|
 | `/short` | Quick iterations on existing projects |
 | `/full` | New projects, refactors, complex work |
 
@@ -32,10 +32,10 @@ Full operator for complex tasks:
 
 ---
 
-## Utility Commands
+## Utility Skills
 
-| Command | Purpose |
-|---------|---------|
+| Skill | Purpose |
+|-------|---------|
 | `/handoff` | Save context before /clear |
 | `/restore` | Resume from handoff |
 | `/research` | Background research mode |
@@ -60,13 +60,46 @@ Operator-based (v13):
 
 ---
 
-## Where Commands Live
+## Where Skills Live
 
 ```
-~/.claude/commands/     → User-level commands (9 files)
+~/.claude/skills/<name>/SKILL.md  → Personal skills (available in all projects)
 ```
 
-Commands are NOT in this skills directory. This INDEX.md is reference only.
+### Required Format
+
+Each SKILL.md MUST have this frontmatter:
+
+```yaml
+---
+name: skill-name
+description: What it does and WHEN to use it. Include trigger keywords.
+---
+```
+
+**Critical**: The `name:` field is REQUIRED. Without it, the skill won't be discovered.
+
+### Example
+
+```
+~/.claude/skills/
+├── short/
+│   └── SKILL.md
+├── full/
+│   └── SKILL.md
+├── handoff/
+│   └── SKILL.md
+└── ...
+```
+
+### Why Commands Didn't Work
+
+Claude Code v2.1+ uses the **skills** system, not `~/.claude/commands/`.
+
+- Skills are **model-invoked** — Claude decides when to use them based on description
+- Commands were **user-invoked** — required explicit `/command` typing
+
+The `~/.claude/commands/` directory is deprecated. Use `~/.claude/skills/` instead.
 
 ---
 
