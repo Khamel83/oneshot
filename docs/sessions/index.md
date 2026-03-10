@@ -2,6 +2,10 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260309_174618_dont_see_eithe_ro_fthe_short_or_full_slach_command.md.age](20260309_174618_dont_see_eithe_ro_fthe_short_or_full_slach_command.md.age) | 2026-03-09 17:46:18 | dont see eithe ro fthe short or full slach command... |  |
+| File | Date | Title | Topics |
+| [20260309_174216_Implement_the_following_plan_.md.age](20260309_174216_Implement_the_following_plan_.md.age) | 2026-03-09 17:42:16 | Implement the following plan: | add, age, config, encrypt, go, implement, install, migration, remove, session, setup, sops, test, update |
+| File | Date | Title | Topics |
 | [20260309_173002_Implement_the_following_plan_.md.age](20260309_173002_Implement_the_following_plan_.md.age) | 2026-03-09 17:30:02 | Implement the following plan: | age, implement, refactor, remove, session, setup, sops, update |
 | File | Date | Title | Topics |
 | [20260309_151434_Implement_the_following_plan_.md.age](20260309_151434_Implement_the_following_plan_.md.age) | 2026-03-09 15:14:34 | Implement the following plan: | age, implement, refactor, remove, session, setup, sops, update |
