@@ -1,61 +1,75 @@
-# Skills Index
+# ONE_SHOT v13 — Operator Framework
 
-ONE_SHOT v12.2 - Intelligent Delegation + Agent Lightning Integration. Native Tasks preferred, Beads deprecated.
-
-**For command reference, see [docs/SKILLS.md](../../docs/SKILLS.md).**
+**9 slash commands.** Two operators. Seven utilities.
 
 ---
 
-## v12.2 Highlights
+## Operators
 
-- **Native Tasks**: TaskCreate, TaskGet, TaskUpdate, TaskList (Beads deprecated)
-- **Intelligent Delegation**: Assess before delegating, verify after, trace with spans
-- **Agent Lightning**: Enriched spans (span_id, session_id, tool_sequence, reward), trajectories, credit assignment
-- **Delegation Commands**: `/delegation-log`, `/delegation-trajectory`, `/delegation-stats`
-- **Continuous Mode**: `/continuous` for autonomous execution
+| Command | Purpose |
+|---------|---------|
+| `/short` | Quick iterations on existing projects |
+| `/full` | New projects, refactors, complex work |
+
+### /short — Quick Iteration
+
+Fast operator for existing work:
+- Loads recent context (git log, tasks, decisions)
+- Asks: "What are you working on?"
+- Discovers relevant skills on demand
+- Executes in burn-down mode
+- Shows delegation summary on completion
+
+### /full — Structured Work
+
+Full operator for complex tasks:
+- Creates IMPLEMENTATION_CONTEXT.md
+- Structured intake and discovery
+- Phase-based planning with milestones
+- Skill discovery via SkillsMP
+- Execution with context checkpoints
+- Completion summary
+
+---
+
+## Utility Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/handoff` | Save context before /clear |
+| `/restore` | Resume from handoff |
+| `/research` | Background research mode |
+| `/doc` | Cache external documentation |
+| `/freesearch` | Zero-token web search (Exa) |
+| `/vision` | Image/website visual analysis |
+| `/secrets` | SOPS/Age secrets management |
+
+---
+
+## Architecture
+
+```
+Menu-based (old):
+25+ slash commands → user picks one → executes
+
+Operator-based (v13):
+/short or /full → discover skills → execute → summary
+```
+
+**Why?** Reduced complexity, fewer commands to maintain, skill discovery happens when needed.
 
 ---
 
 ## Where Commands Live
 
-**Slash commands are loaded from `~/.claude/commands/`, NOT `~/.claude/skills/`.**
-
 ```
-~/.claude/commands/stack-setup.md  →  /stack-setup (loaded by Claude)
-~/.claude/skills/                  →  Reference docs only (NOT loaded)
+~/.claude/commands/     → User-level commands (9 files)
 ```
 
-To add a new command:
-1. Create `~/.claude/commands/<name>.md` with frontmatter (name, description)
-2. It auto-appears in the skills list on next session
+Commands are NOT in this skills directory. This INDEX.md is reference only.
 
 ---
 
-## Core Infrastructure
+## Full Spec
 
-| File | Purpose |
-|-------|---------|
-| `.claude/infrastructure/STACK.md` | Complete stack reference |
-| `~/.claude/commands/stack-setup.md` | `/stack-setup` command |
-| `AGENTS.md` | Skill router (curl from oneshot, read-only) |
-
----
-
-## Stack Quick Reference
-
-```
-Frontend: Cloudflare Pages (Astro)
-API:      Cloudflare Workers
-Database: Postgres on OCI via Hyperdrive
-Tunnel:   pg.khamel.com → 100.126.13.70:5432
-Auth:     Better Auth + Google OAuth
-Deploy:   Cloudflare Pages (free)
-```
-
----
-
-## See AGENTS.md
-
-All skill routing and slash commands are defined in `AGENTS.md`. Use `/skill-name` to invoke.
-
-For full skill catalog, see archive/v9/skills/INDEX.md (v9 had 50+ skills; v10 uses on-demand slash commands instead).
+See `AGENTS.md` for complete operator protocol, decision defaults, and auto-approval rules.

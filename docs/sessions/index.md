@@ -2,6 +2,26 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260309_173002_Implement_the_following_plan_.md.age](20260309_173002_Implement_the_following_plan_.md.age) | 2026-03-09 17:30:02 | Implement the following plan: | age, implement, refactor, remove, session, setup, sops, update |
+| File | Date | Title | Topics |
+| [20260309_151434_Implement_the_following_plan_.md.age](20260309_151434_Implement_the_following_plan_.md.age) | 2026-03-09 15:14:34 | Implement the following plan: | age, implement, refactor, remove, session, setup, sops, update |
+| File | Date | Title | Topics |
+| [20260309_145531__context__________________________________________.md.age](20260309_145531__context__________________________________________.md.age) | 2026-03-09 14:55:31 | /context                                          ... | add, age, api, auth, backend, bug, build, config, database, deploy, docker, feature, fix, frontend, go, implement, oci, refactor, remove, rust, session, setup, test, update |
+| File | Date | Title | Topics |
+| [20260309_114617__context__________________________________________.md.age](20260309_114617__context__________________________________________.md.age) | 2026-03-09 11:46:17 | /context                                          ... | age, api, bug, database, docker, feature, go, implement, oci, refactor, session, setup, test, update |
+| File | Date | Title | Topics |
+| [20260309_110015_Untitled_Session.md.age](20260309_110015_Untitled_Session.md.age) | 2026-03-09 11:00:15 | Untitled Session |  |
+| File | Date | Title | Topics |
+| [20260309_105217__command-name__exit__command-name_.md.age](20260309_105217__command-name__exit__command-name_.md.age) | 2026-03-09 10:52:17 | <command-name>/exit</command-name> | age, go |
+| File | Date | Title | Topics |
+| [20260306_125512__context__________________________________________.md.age](20260306_125512__context__________________________________________.md.age) | 2026-03-06 12:55:12 | /context                                          ... | age, api, bug, database, docker, feature, go, implement, oci, refactor, session, setup, test, update |
+| File | Date | Title | Topics |
+| [20260301_143612_Implement_the_following_plan_.md.age](20260301_143612_Implement_the_following_plan_.md.age) | 2026-03-01 14:36:12 | Implement the following plan: | add, age, auth, feature, fix, go, implement, python, refactor, test, update |
+| File | Date | Title | Topics |
+| [20260301_142810_They_re_usually_not_getting__one_continuous_reason.md.age](20260301_142810_They_re_usually_not_getting__one_continuous_reason.md.age) | 2026-03-01 14:28:10 | They’re usually not getting “one continuous reason... | age, api, build, feature, fix, go, migration, refactor, remove, test, update |
+| File | Date | Title | Topics |
+| [20260221_221804_Head_of_Claude_Code__What_happens_after_coding_is_.md.age](20260221_221804_Head_of_Claude_Code__What_happens_after_coding_is_.md.age) | 2026-02-21 22:18:04 | Head of Claude Code: What happens after coding is ... | add, age, auth, bug, build, database, feature, fix, go, implement, javascript, postgres, refactor, rust, session, setup, typescript, update |
+| File | Date | Title | Topics |
 | [20260217_213139_what_ever_happened_to_our_visual_inspection_mCP_op.md.age](20260217_213139_what_ever_happened_to_our_visual_inspection_mCP_op.md.age) | 2026-02-17 21:31:39 | what ever happened to our visual inspection mCP op... | update |
 | File | Date | Title | Topics |
 | [20260217_143612_we_need_to_add_in_some_code_around_how_oneshot_and.md.age](20260217_143612_we_need_to_add_in_some_code_around_how_oneshot_and.md.age) | 2026-02-17 14:36:12 | we need to add in some code around how oneshot and... | add |

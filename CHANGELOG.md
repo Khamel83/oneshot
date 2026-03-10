@@ -4,6 +4,38 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [13.0.0] - 2026-03-09
+
+### Breaking Changes
+- **Operator framework** - Replaced 25+ menu commands with 2 operators (`/short`, `/full`) that discover skills on demand
+- **Removed commands**: /interview, /cp, /run-plan, /implement, /sessions, /diagnose, /codereview, /batch, /remote, /delegation-*, /swarm, /think, /audit, /stack-setup, /update, /beads, /skill-discovery, /continuous
+- **Skills archived** - v9 skills compressed to `archive/v9-skills.tar.gz`
+
+### Added
+- **`/short` operator** - Quick iteration: load context, ask, execute in burn-down mode
+- **`/full` operator** - Structured work: intake, plan, execute with checkpoints
+- **9 commands total** - 2 operators + 7 utilities (down from 25+)
+- **On-demand skill discovery** - Operators discover skills via SkillsMP when needed
+- **Decision defaults** - Agents make reasonable choices autonomously
+
+### Changed
+- **AGENTS.md** - Now operator spec instead of skill router
+- **docs/SKILLS.md** - Command reference for 9 commands
+- **README.md** - Updated for v13 operator framework
+- **docs/LLM-OVERVIEW.md** - Updated to reflect v13 architecture
+
+### Removed
+- Menu-based command system (replaced by operators)
+- Skills directory (archived to v9-skills.tar.gz)
+- Multiple planning commands (consolidated into operators)
+- Delegation audit commands (simplified into operator behavior)
+
+### Architecture
+- **Before**: 25+ menu commands, pre-defined skill catalog
+- **After**: 2 operators + 7 utilities, skill discovery on demand
+
+---
+
 ## [12.2.0] - 2026-02-19
 
 ### Added

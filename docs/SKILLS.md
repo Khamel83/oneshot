@@ -1,143 +1,173 @@
 # ONE_SHOT Slash Commands Reference
 
-A practical guide to all 25 slash commands - what they do and when to use them.
-
-**v12.2**: Native Tasks primary, intelligent delegation with Agent Lightning spans, trajectories, and credit assignment.
+**v13 — Operator Framework.** 9 commands total.
 
 ---
 
-## Planning & Execution
+## Operators
 
-### `/interview`
-Triages your request by asking clarifying questions before coding. Classifies intent (new project, fix bug, continue work, modify existing, understand, quick task) and adjusts interview depth accordingly. Use this before starting any non-trivial work to avoid rework from unclear requirements. Outputs a spec file.
+### `/short` — Quick Iteration
 
-### `/cp` (Continuous Planner)
-Creates a living plan stored in three files (`task_plan.md`, `findings.md`, `progress.md`) that survives `/clear`, context compression, and even switching between different AI models. Use for multi-session projects where you need persistent state. Each file has a specific purpose: plan holds decisions, findings holds research, progress holds the session log.
+Fast operator for existing projects. Loads context, asks what you're working on, executes in burn-down mode.
 
-### `/run-plan`
-Executes a continuous plan deterministically by reading the skill sequence from `task_plan.md` and running each skill step-by-step. Updates the plan files as it progresses. Use after `/cp` creates a plan. **Clear context first** with `/handoff` → `/clear` → `/restore` so the plan is fresh in context.
+```
+/short
+/short <scope>
+```
 
-### `/implement`
-Executes an approved plan with native task tracking. Breaks the plan into task groups, tracks progress via TaskCreate/TaskUpdate, commits after each task, and manages context thresholds. Use when you have a plan ready to execute. **Clear context first** for best results.
+**Behavior:**
+- Loads recent git commits and pending tasks
+- Asks: "What are you working on?"
+- Discovers relevant skills on demand
+- Completes tasks fully before starting next
+- Shows delegation summary on completion
+
+**With scope:** Limits work to matching files
+
+```
+/short src/auth/*.ts    # Only work on auth files
+```
+
+### `/full` — Structured Work
+
+Full operator for new projects, refactors, and complex implementations.
+
+```
+/full
+/full <project-description>
+```
+
+**Behavior:**
+- Creates IMPLEMENTATION_CONTEXT.md for persistent state
+- Structured intake phase (goals, scope, architecture)
+- Phase-based planning with milestones
+- Skill discovery via SkillsMP
+- Execution with context checkpoints
+- Completion summary with verification
+
+**Use when:** Starting a new project, major refactoring, complex features
 
 ---
 
 ## Context Management
 
 ### `/handoff`
-Saves a checkpoint of your current context before clearing. Captures what was done, what's in progress, key decisions, blockers, and next steps. Use before `/clear` or when context is getting full. Creates a file you can restore from.
+
+Saves context before `/clear`. Captures what was done, what's in progress, decisions, blockers, next steps.
+
+```
+/handoff
+```
 
 ### `/restore`
-Resumes work from a handoff checkpoint. Checks Beads first for in-progress tasks (fast path), then falls back to reading the handoff file for full context restoration. Use after `/clear` to pick up exactly where you left off.
 
-### `/sessions`
-Views and searches encrypted session logs. All Claude Code sessions are auto-saved as encrypted markdown files. Use to find past conversations, decisions, or code from previous sessions. Different from `/restore` - this is for browsing history, not resuming work.
+Resumes from handoff checkpoint. Checks native Tasks first, then reads handoff file.
 
----
-
-## Task Tracking
-
-### `/beads` ⚠️ DEPRECATED
-Interface to the Beads task tracking system (`bd` CLI). **Deprecated in v11** - use native Tasks (TaskCreate, TaskGet, TaskUpdate, TaskList) instead. Beads is kept as a fallback for legacy projects only.
-
-### `/swarm`
-Orchestrates multiple Claude Code instances working as a team. One session acts as lead, coordinating work across teammates with shared task lists and peer-to-peer messaging. Use for parallel exploration: research & review, competing hypotheses, cross-layer coordination (frontend/backend/tests). Requires experimental flag: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.
-
-### `/delegation-log`
-Views the delegation audit trail - all spans logged automatically when subagents complete. Each entry includes span_id, session_id, tool_sequence, and reward. Use to see what work was delegated and how it performed.
-
-### `/delegation-trajectory`
-Views session-level execution trajectories - chains of delegation spans grouped by session. Shows the full path from request to completion, with reward signals for each step. Use to understand how complex tasks were decomposed.
-
-### `/delegation-stats`
-Aggregates delegation performance stats with reward-weighted metrics. Shows which agent types perform best on which task patterns, identifies bottlenecks, and provides routing recommendations. Use to optimize delegation strategy over time.
-
----
-
-## Debugging & Quality
-
-### `/diagnose`
-Systematically debugs issues using hypothesis-based diagnosis. Starts with symptoms, isolates the problem layer (network → process → config → dependencies → data → code), checks past lessons, forms hypotheses, tests them, and applies minimal fixes. Use when something is broken or not working as expected.
-
-### `/codereview`
-Performs structured code reviews for quality and security. Checks OWASP Top 10, code quality patterns, accessibility (for frontend), and provides actionable feedback with severity levels. Use before merging, for security review, or when asking "is this safe?"
-
----
-
-## Multi-File & Remote Operations
-
-### `/batch`
-Applies the same operation across many files using parallel background agents. Groups files into batches of 5, spawns an agent per batch, aggregates results, and handles failures with rollback. Use for pattern-based refactoring across 10+ files (renaming, adding imports, updating patterns). 10x faster than sequential.
-
-### `/remote`
-Executes commands on remote machines via SSH. Supports three workflows: sync-and-run (push code, execute on remote), data transfer (move files between machines for processing), and long-running jobs (tmux sessions). Routes to homelab for Docker/storage, macmini for GPU/transcription, oci-dev for APIs. Use when compute needs differ from current machine.
+```
+/restore
+```
 
 ---
 
 ## Research & Documentation
 
 ### `/research`
-Runs background research using Gemini CLI or search APIs. Investigates topics without blocking your main conversation. Use for gathering context on unfamiliar libraries, patterns, or domains.
+
+Background research using search APIs. Investigates topics without blocking conversation.
+
+```
+/research <topic>
+```
 
 ### `/freesearch`
-Zero-token web research via Exa API. Searches the web without consuming your context budget. Use before WebSearch to save tokens. Follows the docs-cache search order: local cache → freesearch → training data → WebSearch.
+
+Zero-token web search via Exa API. Searches without consuming context budget.
+
+```
+/freesearch <query>
+```
 
 ### `/doc`
-Caches external documentation locally from a URL. Fetches via webReader MCP, saves to `~/github/docs-cache/`, and updates the index. Use to cache framework/library docs for offline reference. Run `/doc --list` to see what's cached.
 
-### `/skill-discovery`
-Automatically matches your goal to relevant skills. Searches local skills and suggests which ones to use. Use when you're not sure which skill applies to your task.
+Caches external documentation locally. Fetches from URL, saves to `~/github/docs-cache/`.
+
+```
+/doc <url>
+/doc --list    # Show cached docs
+```
 
 ---
 
-## Communication & Secrets
+## Utilities
 
-### `/audit`
-Strategic communication filter that transforms raw emotional input into strategic output. Applies principles from negotiation experts (Chris Voss, Jim Camp) to strip emotional charge while preserving your position. Use before sending high-stakes communications to employers, clients, partners, or in any negotiation/conflict situation. Originally for divorce, but applicable to any difficult conversation.
+### `/vision`
+
+Visual analysis of websites and images. Handles screenshots and direct image URLs.
+
+```
+/vision https://example.com
+/vision https://image.png "replicate"
+```
 
 ### `/secrets`
-Manages SOPS/Age encrypted secrets. Decrypts from `~/github/oneshot/secrets/` without exposing plaintext in chat. Use to access API keys, credentials, or any sensitive configuration.
+
+SOPS/Age secrets management. Decrypts from `~/github/oneshot/secrets/`.
+
+```
+/secrets <name>
+```
 
 ---
 
-## Thinking & Analysis
-
-### `/think`
-Multi-perspective analysis using expert personas. Applies different cognitive depths: "think" (quick check), "think hard" (trade-offs), "ultrathink" (exhaustive alternatives), "super think" (system-wide), "mega think" (paradigm questioning). Use for complex decisions where you want to see multiple angles.
-
----
-
-## Stack & Updates
-
-### `/stack-setup`
-Configures a project with the standard Cloudflare + Postgres stack. Sets up Astro frontend, Cloudflare Workers for API, Better Auth, and Postgres on OCI via Hyperdrive. Use when starting a new web project that should follow the default stack.
-
-### `/update`
-Updates the ONE_SHOT framework itself and runs a health check. Syncs from the GitHub repo. Use to get the latest skills, rules, and fixes.
-
----
-
-## Quick Reference by Intent
+## Quick Reference
 
 | I want to... | Use |
 |--------------|-----|
-| Plan a new feature | `/interview` → `/cp` |
-| Execute a plan | `/handoff` → `/clear` → `/restore` → `/implement` or `/run-plan` |
-| Continue after `/clear` | `/restore` |
-| Save my place before clearing | `/handoff` |
-| Find old conversations | `/sessions` |
-| Track tasks | Native Tasks: `TaskCreate`, `TaskList`, `TaskUpdate` |
-| Debug something broken | `/diagnose` |
-| Review code for security | `/codereview` |
-| Edit 20+ files at once | `/batch` |
-| Run on macmini/homelab | `/remote` |
+| Quick iteration on existing work | `/short` |
+| Start a new project | `/full` |
+| Save context before clearing | `/handoff` |
+| Resume after `/clear` | `/restore` |
 | Research a topic | `/research` or `/freesearch` |
 | Cache library docs | `/doc` |
-| Filter a message before sending | `/audit` |
-| Think through a complex decision | `/think` (or "think hard", "ultrathink", etc.) |
-| Set up a new web project | `/stack-setup` |
-| Update ONE_SHOT | `/update` |
-| Run parallel agents | `/swarm` |
-| View delegation audit trail | `/delegation-log` |
-| See execution paths | `/delegation-trajectory` |
-| Check delegation performance | `/delegation-stats` |
+| Analyze a website or image | `/vision` |
+| Access secrets | `/secrets` |
+
+---
+
+## Architecture
+
+**Before (v12):** 25+ menu commands
+**After (v13):** 2 operators + 7 utilities
+
+Operators discover skills on demand instead of maintaining a large command catalog.
+
+---
+
+## Decision Defaults
+
+Operators apply these defaults without asking:
+
+| Ambiguity | Default |
+|-----------|---------|
+| Multiple implementations | Simplest |
+| Naming | Follow existing pattern |
+| Refactor opportunity | Skip unless blocking |
+| Stack | Follow CLAUDE.md defaults |
+| Error handling | Match surrounding code |
+
+---
+
+## Auto-Approved Actions
+
+- Reading any file
+- Writing to scope-matched files
+- Running tests and linters
+- Creating context files (DECISIONS.md, BLOCKERS.md, etc.)
+- Git commit (not push)
+
+## Requires Confirmation
+
+- Destructive operations (rm -rf, DROP TABLE)
+- Git push to shared branches
+- External API calls that cost money
+- Deploying to production

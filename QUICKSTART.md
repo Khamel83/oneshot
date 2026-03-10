@@ -27,27 +27,18 @@ curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/ones
 | `oneshot-update status` | Show version and last check |
 | `oneshot-update sync` | Sync to current project (no git pull) |
 
-## From Claude
-
-Inside a Claude Code session:
-```
-/update
-```
-
-This runs `oneshot-update force` + health checks.
-
 ## What Gets Updated
 
 - `AGENTS.md` - Synced to your current project
 - `~/.local/bin/oneshot-update` - Symlink to update script
-- `~/.claude/skills/oneshot` - Symlink to skills
+- `~/.claude/commands/` - Slash commands (9 total)
+- `~/.claude/rules/` - Progressive disclosure rules
 
 ## What Doesn't Change
 
 - `CLAUDE.md` - Project-specific, never touched
-- `.claude/rules/` - Project-specific
-- `.beads/` - Your task data
-- `.claude/continuous/` - Project state
+- `.claude/rules/` (project-level) - Project-specific
+- `~/.claude/tasks/` - Native task storage
 
 ## Rate Limiting
 
@@ -59,4 +50,3 @@ Auto-check is rate limited to once per day. Use `force` to bypass.
 |------|---------|
 | `scripts/install.sh` | Main installer |
 | `scripts/oneshot-update.sh` | Updater (auto/check/force/sync/status) |
-| `.claude/commands/update.md` | `/update` slash command |
