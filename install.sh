@@ -27,17 +27,16 @@ if [ -f "$ONESHOT_DIR/scripts/docs-link" ]; then
     echo "  docs-link         - Documentation cache manager"
 fi
 
-# Create skills symlink (for skill files if needed)
-mkdir -p "${HOME}/.claude/skills"
-ln -sf "$ONESHOT_DIR/.claude/skills" "${HOME}/.claude/skills/oneshot" 2>/dev/null || true
-
-# Sync commands to global ~/.claude/commands/
-if [ -d "$ONESHOT_DIR/.claude/commands" ]; then
-    mkdir -p "${HOME}/.claude/commands"
-    for cmd in "$ONESHOT_DIR/.claude/commands"/*.md; do
-        [ -f "$cmd" ] && ln -sf "$cmd" "${HOME}/.claude/commands/" 2>/dev/null || true
-    done
+# Sync skills (COPY not symlink - works across machines)
+if [ -d "$ONESHOT_DIR/.claude/skills" ]; then
+    mkdir -p "${HOME}/.claude/skills"
+    echo "Syncing skills..."
+    cp -r "$ONESHOT_DIR/.claude/skills/"* "${HOME}/.claude/skills/" 2>/dev/null || true
+    echo "  Skills synced to ~/.claude/skills/"
 fi
+
+# Note: commands/ is deprecated in favor of skills/
+# Skills are model-invoked, commands were user-invoked
 
 echo ""
 echo "ONE_SHOT $VERSION installed."
