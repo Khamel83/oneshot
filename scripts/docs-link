@@ -58,14 +58,13 @@ get_available_docs() {
         log_error "Cache index not found at $CACHE_INDEX"
         exit 1
     fi
-    # Parse markdown table to get name and category
-    grep -E '^\|' "$CACHE_INDEX" | tail -n +3 | grep -v '^|--' | while IFS='|' read -r _ name category _; do
-        name=$(echo "$name" | xargs)
-        category=$(echo "$category" | xargs)
-        if [[ -n "$name" && "$name" != "Name" ]]; then
-            echo "$category/$name"
-        fi
-    done
+    # Parse markdown table to get name and category (4 columns: Name, Category, Related, URL, Cached)
+    grep -E '^\|' "$CACHE_INDEX" | tail -n +3 | grep -v '^|--' | awk -F'|' '{
+        name = $2; category = $3;
+        gsub(/^[ \t]+|[ \t]+$/, "", name);
+        gsub(/^[ \t]+|[ \t]+$/, "", category);
+        if (name != "" && name != "Name") print category "/" name;
+    }'
 }
 
 # Resolve doc path
@@ -294,6 +293,165 @@ EOF
     log_info "Updated CLAUDE.md with external docs section"
 }
 
+# Update README with annotations footer
+update_readme_annotations() {
+    local doc_path="$1"
+    local readme="$doc_path/README.md"
+
+    if [[ ! -f "$readme" ]]; then
+        return
+    fi
+
+    # Check if annotations section already exists
+    if grep -q "## Annotations" "$readme"; then
+        return
+    fi
+
+    # Count annotations
+    local annotations_dir="$doc_path/annotations"
+    local count=0
+    local links=""
+    if [[ -d "$annotations_dir" ]]; then
+        count=$(ls -1 "$annotations_dir"/*.md 2>/dev/null | wc -l)
+        if [[ $count -gt 0 ]]; then
+            links=$(
+                for f in "$annotations_dir"/*.md; do
+                    if [[ -f "$f" ]]; then
+                        local basename=$(basename "$f" .md)
+                        local title=$(head -n 10 "$f" | grep -E "^#+ " | head -1 | sed 's/^#+ //;s/^#//;s/^ *//')
+                        [[ -z "$title" ]] && title="$basename"
+                        echo "- [$title](annotations/$basename.md)"
+                    fi
+                done
+            )
+        fi
+    fi
+
+    # Add footer
+    cat >> "$readme" <<EOF
+
+---
+
+## Annotations
+
+> Recent agent notes from working with this service
+
+$links
+
+**[View all annotations →](annotations/)**
+EOF
+
+    log_info "Updated README with annotations footer"
+}
+
+# Command: annotate
+cmd_annotate() {
+    local name="$1"
+    local note="${2:-}"
+
+    if [[ -z "$name" ]]; then
+        log_error "Usage: docs-link annotate <name> [note]"
+        exit 1
+    fi
+
+    ensure_cache
+
+    local doc_path
+    if ! doc_path=$(resolve_doc_path "$name"); then
+        exit 1
+    fi
+
+    local annotations_dir="$doc_path/annotations"
+    mkdir -p "$annotations_dir"
+
+    local date=$(date +%Y-%m-%d)
+    local filename
+
+    if [[ -n "$note" ]]; then
+        # Generate slug from note
+        local slug=$(echo "$note" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]+/-/g' | sed 's/^-//;s/-$//' | cut -c1-30)
+        filename="$annotations_dir/$date-${slug}.md"
+    else
+        filename="$annotations_dir/$date.md"
+    fi
+
+    # Create frontmatter template
+    local frontmatter="---
+agent: claude-opus-4-6
+related: []
+---
+
+# $(echo "$note" | head -c 60 | sed 's/$/\.../' if [[ ${#note} -gt 60 ]])
+
+$note
+"
+
+    if [[ -n "$note" ]]; then
+        echo "$frontmatter" > "$filename"
+        log_success "Annotation saved to $filename"
+    else
+        # Open editor
+        ${EDITOR:-vi} "$filename"
+        log_success "Annotation saved to $filename"
+    fi
+
+    # Update README footer
+    update_readme_annotations "$doc_path"
+}
+
+# Command: related
+cmd_related() {
+    local name="$1"
+
+    if [[ -z "$name" ]]; then
+        log_error "Usage: docs-link related <name>"
+        exit 1
+    fi
+
+    ensure_cache
+
+    # Get doc path and category
+    local doc_path
+    if ! doc_path=$(resolve_doc_path "$name"); then
+        exit 1
+    fi
+
+    local category=$(basename "$(dirname "$doc_path")")
+
+    # Parse index for related docs (format: | Name | Category | Related | URL | Cached |)
+    local related_line
+    related_line=$(grep "| $name |" "$CACHE_INDEX" || true)
+
+    if [[ -z "$related_line" ]]; then
+        log_warn "No entry found for '$name' in index"
+        return
+    fi
+
+    # Extract related column (4th field: $1=empty, $2=Name, $3=Category, $4=Related)
+    local related=$(echo "$related_line" | awk -F'|' '{gsub(/^[ \t]+|[ \t]+$/, "", $4); print $4}')
+
+    if [[ -z "$related" || "$related" == "-" ]]; then
+        log_info "No related docs defined for '$name'"
+        return
+    fi
+
+    log_info "Related docs for $name:"
+    echo ""
+    IFS=',' read -ra ADDR <<< "$related"
+    for r in "${ADDR[@]}"; do
+        r=$(echo "$r" | xargs)
+        printf "  ${BLUE}%-20s${NC} " "$r"
+        # Try to find and show path
+        if [[ -d "$CACHE_BASE/$category/$r" ]]; then
+            echo "-> $CACHE_BASE/$category/$r"
+        elif [[ -d "$CACHE_BASE/tools/$r" ]]; then
+            echo "-> $CACHE_BASE/tools/$r"
+        else
+            echo "(not cached)"
+        fi
+    done
+}
+
 # Show help
 cmd_help() {
     cat <<'EOF'
@@ -308,6 +466,8 @@ Commands:
   remove <name>       Remove a symlink
   available           Show all cached docs available to link
   sync                Update all symlinks (if cache moved)
+  annotate <name> [note]  Add annotation to cached doc
+  related <name>      Show related docs for a cached entry
 
 Environment:
   DOCS_CACHE          Path to docs cache (default: ~/github/docs-cache/docs/cache)
@@ -317,6 +477,8 @@ Examples:
   docs-link list
   docs-link remove polymarket
   docs-link available
+  docs-link annotate openai "Streaming delta may be null"
+  docs-link related openai
 
 Cache location: ~/github/docs-cache/docs/cache/
 EOF
@@ -340,6 +502,14 @@ case "${1:-}" in
         ;;
     sync)
         cmd_sync
+        ;;
+    annotate)
+        shift
+        cmd_annotate "$@"
+        ;;
+    related)
+        shift
+        cmd_related "$@"
         ;;
     help|--help|-h|"")
         cmd_help
