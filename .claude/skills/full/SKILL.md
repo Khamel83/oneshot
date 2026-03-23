@@ -41,12 +41,18 @@ When invoked:
 
 ### Phase 2: Planning
 
-1. **Phase-Based Plan**
+1. **Docs Check**
+   - Identify all external libraries, APIs, and tools the project will use
+   - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
+   - For anything missing → run `/doc <name> <url>` before coding begins
+   - Use cached docs as source of truth — do NOT rely on training data for syntax
+
+2. **Phase-Based Plan**
    - Break into milestones
    - Define acceptance criteria
    - Identify dependencies
 
-2. **Skill Discovery**
+3. **Skill Discovery**
    - Check `1shot/skills/` for already-pulled project skills
    - For each high-level task type, ask: *"Is this specialized enough that a better community skill exists?"*
    - Specialized domains (security, blockchain, ML, infra tools, specific APIs, parsers): **search SkillsMP**
@@ -56,7 +62,7 @@ When invoked:
    - General tasks (write tests, refactor, add endpoint): skip search, proceed with core skills
    - If a skill is pulled, note it: "Using `1shot/skills/{name}` for [task type]"
 
-3. **Create Task Queue**
+4. **Create Task Queue**
    - Use native TaskCreate for each milestone
    - Set dependencies with addBlockedBy
 

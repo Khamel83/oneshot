@@ -48,8 +48,13 @@ When invoked:
 ### Phase 1: Plan
 
 1. **Explore codebase** (Explore subagent) — identify impacted files
-2. **Write `1shot/ROADMAP.md`** — phases and success criteria from PROJECT.md
-3. **Skill Discovery** — for each major task type in the roadmap:
+2. **Docs Check**
+   - Identify all external libraries, APIs, and tools needed
+   - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
+   - For anything missing → run `/doc <name> <url>` before assigning build tasks
+   - Use cached docs as source of truth — do NOT rely on training data for syntax
+3. **Write `1shot/ROADMAP.md`** — phases and success criteria from PROJECT.md
+4. **Skill Discovery** — for each major task type in the roadmap:
    - Check `1shot/skills/` for already-pulled skills
    - Ask: *"Is this specialized enough that a community skill would do this better?"*
    - Specialized (security, blockchain, ML, specific APIs, infra tools): search SkillsMP
@@ -57,12 +62,12 @@ When invoked:
      ./scripts/skillsmp-search.sh "<task type>" --install
      ```
    - General (write tests, refactor, add endpoint): skip, use core skills
-4. **Create native tasks** — one TaskCreate per deliverable (not steps):
+5. **Create native tasks** — one TaskCreate per deliverable (not steps):
    - subject: deliverable title
    - description: acceptance criteria from PROJECT.md, files to touch, skill to use if pulled
    - Set addBlockedBy for dependencies
-5. **Update STATE.md**: phase = "plan → build"
-6. **Show task list** before proceeding
+6. **Update STATE.md**: phase = "plan → build"
+7. **Show task list** before proceeding
 
 ### Phase 2: Build Loop
 

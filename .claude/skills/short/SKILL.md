@@ -29,7 +29,13 @@ When invoked:
    "What are you working on?"
    ```
 
-3. **Skill Discovery** (if the task is specialized)
+3. **Docs Check** (if the task uses any external library, API, or tool)
+   - Check local cache: `cat ~/github/docs-cache/docs/cache/.index.md`
+   - If the tool is missing → run `/doc <name> <url>` to cache it first
+   - Use cached docs as source of truth — do NOT rely on training data for syntax
+   - If no external tools involved: skip this step
+
+4. **Skill Discovery** (if the task is specialized)
    - Check `1shot/skills/` — already pulled skills for this project
    - If the task involves a specific domain, tool, or API not covered by core skills:
      ```bash
