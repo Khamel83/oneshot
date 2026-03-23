@@ -39,12 +39,15 @@ KhameL: ~/.claude/rules/khamel-mode.md
 
 ## Quick Reference
 
-- **New project?** → `~/.claude/skills/oneshot/core/build/project.md` skill
-- **Task tracking** → `/beads` command
+- **New project?** → `/full` operator
+- **Quick iteration?** → `/short` operator
+- **Multi-model task?** → `/conduct` operator
+- **Task tracking** → Native TaskCreate/TaskList tools (`~/.claude/tasks/`)
 - **Deployment** → oci-dev (100.126.13.70) via Tailscale
 - **Stack defaults** → See `khamel-mode.md`
 - **External docs** → `docs-link add <name>` (links cached docs to project)
 - **Docs cache** → `~/.claude/rules/docs-cache-pattern.md`
+- **Skills** → `~/.claude/skills/` (10 total: /short, /full, /conduct + 7 utilities)
 
 ---
 
@@ -60,42 +63,6 @@ KhameL: ~/.claude/rules/khamel-mode.md
 
 <!--
   ONE-SHOT Heartbeat Metadata
-  oneshot:last-check: 2026-02-06
-  oneshot:machine: instance-first
--->
-
-<!--
-  ONE-SHOT Heartbeat Metadata
-  oneshot:last-check: 2026-02-12
-  oneshot:machine: instance-first
--->
-
-<!--
-  ONE-SHOT Heartbeat Metadata
-  oneshot:last-check: 2026-02-12
-  oneshot:machine: instance-first
--->
-
-<!--
-  ONE-SHOT Heartbeat Metadata
-  oneshot:last-check: 2026-02-12
-  oneshot:machine: instance-first
--->
-
-<!--
-  ONE-SHOT Heartbeat Metadata
-  oneshot:last-check: 2026-02-23
-  oneshot:machine: instance-first
--->
-
-<!--
-  ONE-SHOT Heartbeat Metadata
-  oneshot:last-check: 2026-03-06
-  oneshot:machine: instance-first
--->
-
-<!--
-  ONE-SHOT Heartbeat Metadata
-  oneshot:last-check: 2026-03-09
-  oneshot:machine: instance-first
+  oneshot:last-check: 2026-03-22
+  oneshot:machine: oci-dev
 -->

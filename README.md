@@ -1,8 +1,8 @@
 # ONE_SHOT v13
 
-**Operator framework for Claude Code.** Two operators, seven utilities. Discover skills on demand.
+**Operator framework for Claude Code.** Three operators, seven utilities. Discover skills on demand.
 
-**[Quick Start](#quick-start)** | **[Commands](#slash-commands)** | **[Full Docs](docs/SKILLS.md)**
+**[Quick Start](#quick-start)** | **[Skills](#skills)** | **[Full Docs](docs/SKILLS.md)**
 
 ---
 
@@ -19,7 +19,7 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 claude .
 ```
 
-Then use `/short` for quick iteration or `/full` for structured work.
+Then use `/short` for quick iteration, `/full` for structured work, or `/conduct` to orchestrate across models.
 
 ---
 
@@ -38,34 +38,37 @@ Then use `/short` for quick iteration or `/full` for structured work.
 
 ---
 
-## Slash Commands
+## Skills
 
-### Operators (2)
+Skills live in `~/.claude/skills/` and are invoked as slash commands. Claude also discovers and applies them automatically based on context.
 
-| Command | Description |
-|---------|-------------|
+### Operators (3)
+
+| Skill | Description |
+|-------|-------------|
 | [`/short`](docs/SKILLS.md#short) | Quick iteration - load context, ask, execute |
 | [`/full`](docs/SKILLS.md#full) | Structured work - new projects, refactors |
+| [`/conduct`](docs/SKILLS.md#conduct) | Multi-model PMO orchestrator - routes across Claude + Codex + Gemini, loops until done |
 
 ### Context (2)
 
-| Command | Description |
-|---------|-------------|
+| Skill | Description |
+|-------|-------------|
 | [`/handoff`](docs/SKILLS.md#handoff) | Save checkpoint before `/clear` |
 | [`/restore`](docs/SKILLS.md#restore) | Resume from handoff |
 
 ### Research & Docs (3)
 
-| Command | Description |
-|---------|-------------|
+| Skill | Description |
+|-------|-------------|
 | [`/research`](docs/SKILLS.md#research) | Background research via Gemini CLI |
 | [`/freesearch`](docs/SKILLS.md#freesearch) | Zero-token web search (Exa API) |
 | [`/doc`](docs/SKILLS.md#doc) | Cache external docs locally |
 
 ### Utilities (2)
 
-| Command | Description |
-|---------|-------------|
+| Skill | Description |
+|-------|-------------|
 | [`/vision`](docs/SKILLS.md#vision) | Image/website analysis |
 | [`/secrets`](docs/SKILLS.md#secrets) | SOPS/Age secret management |
 
@@ -103,7 +106,7 @@ Global config (installed once):
 │   ├── web.md          # Web apps
 │   ├── cli.md          # CLIs
 │   └── service.md      # Services
-├── commands/           # Slash commands (9 total)
+├── skills/             # Skills (10 total)
 └── tasks/              # Native task storage
 ```
 
@@ -191,11 +194,11 @@ curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh |
 
 | Problem | Solution |
 |---------|----------|
-| Command not working | Check `~/.claude/commands/` |
+| Skill not working | Check `~/.claude/skills/` |
 | Rules not loading | Check `~/.claude/rules/` exists |
 | Lost context | `/restore` or say "resume" |
 | Tasks not persisting | Check `~/.claude/tasks/` exists |
 
 ---
 
-**v13** | 9 commands | Operators discover skills on demand | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
+**v13** | 10 skills | Operators discover skills on demand | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)

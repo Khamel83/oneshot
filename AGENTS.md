@@ -2,7 +2,7 @@
 
 # ONE_SHOT v13 — Operator Framework
 
-> **Context is the scarce resource.** Two operators, seven utilities. Discover skills on demand.
+> **Context is the scarce resource.** Three operators, seven utilities. Discover skills on demand.
 
 ---
 
@@ -38,6 +38,21 @@
 6. Verify and show completion summary
 
 **For:** New projects, refactors, complex features.
+
+### `/conduct` — Multi-Model PMO Orchestrator
+
+```
+/conduct [idea or goal]
+```
+
+**Behavior:**
+1. Detect available providers (codex, gemini)
+2. Ask clarifying questions — BLOCKING, nothing runs until answered
+3. Create structured plan with task breakdown
+4. Route work across Claude + Codex + Gemini based on task type
+5. Loop until goal is fully met (not just started)
+
+**For:** Non-trivial tasks where you want autonomous execution across models until done.
 
 ---
 
@@ -118,4 +133,4 @@ On failure: escalate (original → inline → human)
 
 ## VERSION
 
-v13 | 9 commands | Operators discover skills on demand
+v13 | 10 skills | Operators discover skills on demand

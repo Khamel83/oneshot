@@ -1,6 +1,6 @@
-# ONE_SHOT Slash Commands Reference
+# ONE_SHOT Skills Reference
 
-**v13 — Operator Framework.** 9 commands total.
+**v13 — Operator Framework.** 10 skills total: 3 operators + 7 utilities.
 
 ---
 
@@ -46,6 +46,24 @@ Full operator for new projects, refactors, and complex implementations.
 - Completion summary with verification
 
 **Use when:** Starting a new project, major refactoring, complex features
+
+### `/conduct` — Multi-Model PMO Orchestrator
+
+Routes work across Claude, Codex, and Gemini. Asks clarifying questions first. Loops until the goal is fully met.
+
+```
+/conduct
+/conduct <idea or goal>
+```
+
+**Behavior:**
+- Detects available providers (codex, gemini) on startup
+- Asks clarifying questions — **blocking**, nothing executes until answered
+- Creates structured plan with task breakdown
+- Routes each task to the best model based on type
+- Loops until goal is actually complete, not just started
+
+**Use when:** Non-trivial tasks where you want autonomous multi-model execution until done. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, run it.
 
 ---
 
@@ -125,6 +143,7 @@ SOPS/Age secrets management. Decrypts from `~/github/oneshot/secrets/`.
 |--------------|-----|
 | Quick iteration on existing work | `/short` |
 | Start a new project | `/full` |
+| Run a big task across multiple models | `/conduct` |
 | Save context before clearing | `/handoff` |
 | Resume after `/clear` | `/restore` |
 | Research a topic | `/research` or `/freesearch` |
@@ -137,7 +156,7 @@ SOPS/Age secrets management. Decrypts from `~/github/oneshot/secrets/`.
 ## Architecture
 
 **Before (v12):** 25+ menu commands
-**After (v13):** 2 operators + 7 utilities
+**After (v13):** 3 operators + 7 utilities
 
 Operators discover skills on demand instead of maintaining a large command catalog.
 
