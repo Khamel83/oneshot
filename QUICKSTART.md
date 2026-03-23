@@ -3,50 +3,61 @@
 ## Install (First Time)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 ```
 
-## Update (Any Version)
+Or if you have the repo cloned:
+```bash
+bash install.sh
+```
+
+## Update
 
 ```bash
-oneshot-update force
+oneshot-update        # Check and auto-update if newer version found
+oneshot-update force  # Force update now
+oneshot-update status # Show version and last check
 ```
 
-Or if you don't have the command:
-```bash
-curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/oneshot-update.sh | bash -s -- force
+## Skills (10 total)
+
+| Skill | What it does |
+|-------|--------------|
+| `/short` | Quick iteration on existing work |
+| `/full` | New project or major refactor |
+| `/conduct` | Multi-model orchestration until done |
+| `/handoff` | Save context before `/clear` |
+| `/restore` | Resume from handoff |
+| `/research` | Background research via Gemini or search |
+| `/freesearch` | Zero-token web search (Exa API) |
+| `/doc` | Cache external docs locally |
+| `/vision` | Analyze images or websites |
+| `/secrets` | Manage SOPS/Age encrypted secrets |
+
+## Typical Session
+
+```
+claude .          # Open Claude Code
+/short            # Load context, ask what's next, burn down tasks
+/handoff          # Save context before ending
 ```
 
-## All Commands
+## What Gets Installed
 
-| Command | What it does |
-|---------|--------------|
-| `oneshot-update` | Check for updates (auto-update if found) |
-| `oneshot-update force` | Force update + sync to current project |
-| `oneshot-update check` | Just check, don't update |
-| `oneshot-update status` | Show version and last check |
-| `oneshot-update sync` | Sync to current project (no git pull) |
-
-## What Gets Updated
-
-- `AGENTS.md` - Synced to your current project
-- `~/.local/bin/oneshot-update` - Symlink to update script
-- `~/.claude/commands/` - Slash commands (9 total)
-- `~/.claude/rules/` - Progressive disclosure rules
+| Location | Contents |
+|----------|----------|
+| `~/.claude/skills/` | 10 skills (global, all projects) |
+| `~/.local/bin/oneshot-update` | Update command |
+| `~/.local/bin/docs-link` | Docs cache manager |
+| `AGENTS.md` (project) | Operator spec (read-only) |
+| `CLAUDE.md` (project) | Project instructions (created if missing) |
 
 ## What Doesn't Change
 
-- `CLAUDE.md` - Project-specific, never touched
-- `.claude/rules/` (project-level) - Project-specific
-- `~/.claude/tasks/` - Native task storage
+- Existing `CLAUDE.md` — never touched
+- Your custom skills in `~/.claude/skills/`
+- `~/.claude/tasks/` — native task storage
 
 ## Rate Limiting
 
 Auto-check is rate limited to once per day. Use `force` to bypass.
-
-## Files
-
-| File | Purpose |
-|------|---------|
-| `scripts/install.sh` | Main installer |
-| `scripts/oneshot-update.sh` | Updater (auto/check/force/sync/status) |

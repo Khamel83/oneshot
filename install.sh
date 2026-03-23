@@ -1,5 +1,7 @@
 #!/bin/bash
-# install.sh - Install ONE_SHOT to system
+# install.sh - Install ONE_SHOT to system (local clone)
+# Use this when you have the repo cloned locally.
+# For fresh installs: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 
 set -euo pipefail
 
@@ -14,7 +16,7 @@ echo "Installing ONE_SHOT $VERSION..."
 # Create bin directory
 mkdir -p "$BIN_DIR"
 
-# Remove old broken symlinks (v7 and earlier)
+# Remove old broken symlinks (v9 and earlier)
 rm -f "$BIN_DIR/oneshot" "$BIN_DIR/oneshot-build" "$BIN_DIR/oneshot-resilient" 2>/dev/null || true
 
 # Create oneshot-update symlink
@@ -27,28 +29,30 @@ if [ -f "$ONESHOT_DIR/scripts/docs-link" ]; then
     echo "  docs-link         - Documentation cache manager"
 fi
 
-# Sync skills (COPY not symlink - works across machines)
+# Sync skills to global ~/.claude/skills/ (COPY not symlink - works across machines)
 if [ -d "$ONESHOT_DIR/.claude/skills" ]; then
     mkdir -p "${HOME}/.claude/skills"
-    echo "Syncing skills..."
+    echo "Syncing skills to ~/.claude/skills/..."
     cp -r "$ONESHOT_DIR/.claude/skills/"* "${HOME}/.claude/skills/" 2>/dev/null || true
-    echo "  Skills synced to ~/.claude/skills/"
+    echo "  10 skills synced"
 fi
-
-# Note: commands/ is deprecated in favor of skills/
-# Skills are model-invoked, commands were user-invoked
 
 echo ""
 echo "ONE_SHOT $VERSION installed."
 echo ""
-echo "Commands available via /slash-commands in Claude:"
-echo "  /update           - Update ONE_SHOT from GitHub"
-echo "  /deploy           - Push to OCI-Dev Cloud"
-echo "  /research         - Background research"
-echo "  /beads            - Task tracking"
-echo "  /handoff          - Save context"
+echo "Skills available in Claude Code:"
+echo "  /short     - Quick iteration"
+echo "  /full      - Structured work"
+echo "  /conduct   - Multi-model orchestration"
+echo "  /handoff   - Save context"
+echo "  /restore   - Resume from handoff"
+echo "  /research  - Background research"
+echo "  /freesearch - Zero-token search"
+echo "  /doc       - Cache external docs"
+echo "  /vision    - Image/website analysis"
+echo "  /secrets   - SOPS/Age secrets"
 echo ""
-echo "See AGENTS.md for full skill router and commands."
+echo "See ~/.claude/skills/INDEX.md for full reference."
 
 # Check if in PATH
 if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
@@ -58,4 +62,4 @@ if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
     echo ""
 fi
 
-echo "Done! To update in the future, run: /update"
+echo "Done! To update: oneshot-update"

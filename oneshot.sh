@@ -1,26 +1,20 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v9
+# ONE_SHOT Bootstrap Script v13
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # Options:
-#   --upgrade    Update all skills/agents to latest version (overwrites existing)
+#   --upgrade    Update all skills to latest version (overwrites existing)
 #   --help       Show this help
 #
-# NON-DESTRUCTIVE: This script only adds to your project, never overwrites existing files.
-# - Existing CLAUDE.md? We prepend a reference to AGENTS.md
-# - Existing TODO.md, LLM-OVERVIEW.md? We skip them
-# - Existing skills? We add new ones, never remove yours (unless --upgrade)
-#
-# REQUIRES: beads CLI for persistent task tracking
-# Install: npm install -g @beads/bd
-#   - or:  brew install steveyegge/beads/bd
-#   - or:  go install github.com/steveyegge/beads/cmd/bd@latest
+# NON-DESTRUCTIVE: Only adds to your project, never overwrites existing files.
+# - Existing CLAUDE.md? Left untouched (prints reminder to reference AGENTS.md)
+# - Existing .gitignore? Appends ONE_SHOT block only if not present
 #
 # Optional: ~/.age/key.txt for secrets encryption
 # Get Age: sudo apt install age || brew install age
 # Generate key: age-keygen -o ~/.age/key.txt
 
-set -e
+set -euo pipefail
 
 # Parse arguments
 UPGRADE_MODE=false
@@ -36,27 +30,29 @@ for arg in "$@"; do
       shift
       ;;
     --help)
-      echo "ONE_SHOT Bootstrap Script v9"
+      echo "ONE_SHOT Bootstrap Script v13"
       echo ""
       echo "Usage:"
       echo "  curl -sL .../oneshot.sh | bash                   # Install"
       echo "  curl -sL .../oneshot.sh | bash -s -- --upgrade   # Update skills"
       echo ""
       echo "Prerequisites:"
-      echo "  beads CLI   npm install -g @beads/bd (REQUIRED)"
-      echo "  age         sudo apt install age (optional, for secrets)"
+      echo "  age    sudo apt install age (optional, for secrets)"
       echo ""
       echo "Options:"
-      echo "  --upgrade    Update all skills and agents to latest version"
+      echo "  --upgrade    Update all skills to latest version"
       echo "  --help       Show this help"
       echo ""
-      echo "What gets installed:"
-      echo "  Always:      AGENTS.md, CLAUDE.md block, .beads/"
-      echo "  Skills:      27 skills in .claude/skills/"
-      echo "  Agents:      4 sub-agents in .claude/agents/"
+      echo "What gets installed globally (~/.claude/):"
+      echo "  Skills:      10 skills in ~/.claude/skills/"
+      echo "  install.sh:  symlink to oneshot-update at ~/.local/bin/"
+      echo ""
+      echo "What gets added to your project:"
+      echo "  AGENTS.md    Operator spec (read-only, curl from oneshot)"
+      echo "  CLAUDE.md    Project instructions (created if missing)"
       echo ""
       echo "Never touched:"
-      echo "  TODO.md, LLM-OVERVIEW.md, your custom skills"
+      echo "  Existing CLAUDE.md, your custom skills"
       exit 0
       ;;
   esac
@@ -64,163 +60,67 @@ done
 
 ONESHOT_BASE="https://raw.githubusercontent.com/Khamel83/oneshot/master"
 SKILLS_BASE="$ONESHOT_BASE/.claude/skills"
-AGENTS_BASE="$ONESHOT_BASE/.claude/agents"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m'
-
 RED='\033[0;31m'
+NC='\033[0m'
 
 echo ""
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "${BLUE}ONE_SHOT Upgrade v9${NC}"
+  echo -e "${BLUE}ONE_SHOT Upgrade v13${NC}"
   echo "====================="
 else
-  echo -e "${BLUE}ONE_SHOT Bootstrap v9${NC}"
+  echo -e "${BLUE}ONE_SHOT Bootstrap v13${NC}"
   echo "========================"
 fi
 echo ""
-
-# =============================================================================
-# Smart AGENTS.md update function
-# =============================================================================
-update_agents_md() {
-  local AGENTS_FILE="AGENTS.md"
-  local FORCE_UPDATE="${1:-false}"
-
-  # Fresh install - no file exists
-  if [[ ! -f "$AGENTS_FILE" ]]; then
-    curl -sL "$ONESHOT_BASE/AGENTS.md" > "$AGENTS_FILE" 2>/dev/null || \
-      curl -sL "$ONESHOT_BASE/README.md" > "$AGENTS_FILE"
-    echo -e "  ${GREEN}✓${NC} AGENTS.md (created)"
-    return 0
-  fi
-
-  # Check if we're in a git repo
-  if ! git rev-parse --git-dir >/dev/null 2>&1; then
-    echo -e "  ${YELLOW}○${NC} AGENTS.md (not in git repo, skipping update)"
-    return 0
-  fi
-
-  # Check for ANY local changes (staged or unstaged)
-  if git status --porcelain "$AGENTS_FILE" 2>/dev/null | grep -qE "^[AM]"; then
-    if [[ "$FORCE_UPDATE" == "true" ]]; then
-      echo -e "  ${YELLOW}⚠${NC} AGENTS.md (force overwrite with --force)"
-    else
-      echo -e "  ${YELLOW}○${NC} AGENTS.md (locally modified, use --force to update)"
-      return 0
-    fi
-  fi
-
-  # Try to compare with remote (handle network failure)
-  if ! git fetch origin >/dev/null 2>&1; then
-    echo -e "  ${YELLOW}○${NC} AGENTS.md (network error, cannot check for updates)"
-    return 0
-  fi
-
-  LOCAL_HASH=$(git rev-parse HEAD:"$AGENTS_FILE" 2>/dev/null || echo "none")
-  REMOTE_HASH=$(git rev-parse origin/master:"$AGENTS_FILE" 2>/dev/null || git rev-parse origin/main:"$AGENTS_FILE" 2>/dev/null || echo "none")
-
-  if [[ "$LOCAL_HASH" == "$REMOTE_HASH" ]]; then
-    echo -e "  ${GREEN}✓${NC} AGENTS.md (up to date)"
-    return 0
-  fi
-
-  # Remote is newer - update
-  curl -sL "$ONESHOT_BASE/AGENTS.md" > "$AGENTS_FILE" 2>/dev/null || \
-    curl -sL "$ONESHOT_BASE/README.md" > "$AGENTS_FILE"
-  echo -e "  ${GREEN}✓${NC} AGENTS.md (updated from remote)"
-  return 0
-}
-
-# Check for beads CLI (REQUIRED)
-if ! command -v bd &> /dev/null; then
-  echo -e "${RED}Error: beads CLI not found (REQUIRED)${NC}"
-  echo ""
-  echo "Install beads first:"
-  echo "  npm install -g @beads/bd"
-  echo "  # or: brew install steveyegge/beads/bd"
-  echo "  # or: go install github.com/steveyegge/beads/cmd/bd@latest"
-  echo ""
-  echo "Then re-run this script."
-  exit 1
-fi
-echo -e "  ${GREEN}✓${NC} beads CLI detected"
 
 # Check for Age key (optional)
 if [ ! -f ~/.age/key.txt ]; then
   echo -e "  ${YELLOW}○${NC} Age key (optional for secrets): mkdir -p ~/.age && age-keygen -o ~/.age/key.txt"
 fi
-echo ""
 
 # =============================================================================
-# 1. AGENTS.md - The orchestrator (smart update, respects local changes)
+# 1. AGENTS.md - The operator spec (smart update, respects local changes)
 # =============================================================================
+update_agents_md() {
+  local AGENTS_FILE="AGENTS.md"
+  local FORCE_UPDATE="${1:-false}"
+
+  if [[ ! -f "$AGENTS_FILE" ]]; then
+    curl -sL "$ONESHOT_BASE/AGENTS.md" > "$AGENTS_FILE"
+    echo -e "  ${GREEN}✓${NC} AGENTS.md (created)"
+    return 0
+  fi
+
+  # In a git repo: check for local modifications
+  if git rev-parse --git-dir >/dev/null 2>&1; then
+    if git status --porcelain "$AGENTS_FILE" 2>/dev/null | grep -qE "^[AM]"; then
+      if [[ "$FORCE_UPDATE" == "true" ]]; then
+        echo -e "  ${YELLOW}⚠${NC} AGENTS.md (force overwrite with --force)"
+      else
+        echo -e "  ${YELLOW}○${NC} AGENTS.md (locally modified, use --force to update)"
+        return 0
+      fi
+    fi
+  fi
+
+  curl -sL "$ONESHOT_BASE/AGENTS.md" > "$AGENTS_FILE"
+  echo -e "  ${GREEN}✓${NC} AGENTS.md (updated)"
+}
+
 update_agents_md "$FORCE_MODE"
 
 # =============================================================================
-# 2. CLAUDE.md - Supplement if exists, create if not
+# 2. CLAUDE.md - Create minimal version if missing, never overwrite
 # =============================================================================
-CLAUDE_ONESHOT_BLOCK="<!-- ONE_SHOT v6.0 -->
-# IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
-#
-# Skills (synchronous, shared context):
-#   \"build me...\"     → front-door
-#   \"plan...\"         → create-plan
-#   \"implement...\"    → implement-plan
-#   \"debug/fix...\"    → debugger
-#   \"deploy...\"       → push-to-cloud
-#   \"ultrathink...\"   → thinking-modes
-#   \"beads/ready...\"  → beads (persistent tasks)
-#
-# Agents (isolated context, background):
-#   \"security audit...\" → security-auditor
-#   \"explore/find all...\" → deep-research
-#   \"background/parallel...\" → background-worker
-#   \"coordinate agents...\" → multi-agent-coordinator
-#
-# Always update TODO.md as you work.
-<!-- /ONE_SHOT -->"
-
-if [ -f CLAUDE.md ]; then
-  if ! grep -q "<!-- ONE_SHOT" CLAUDE.md; then
-    # Prepend OneShot block to existing CLAUDE.md
-    echo "$CLAUDE_ONESHOT_BLOCK" | cat - CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md (supplemented - added skill routing reference)"
-  else
-    # Update existing OneShot block
-    sed -i.bak '/<!-- ONE_SHOT/,/<!-- \/ONE_SHOT -->/d' CLAUDE.md 2>/dev/null || true
-    echo "$CLAUDE_ONESHOT_BLOCK" | cat - CLAUDE.md > CLAUDE.md.tmp && mv CLAUDE.md.tmp CLAUDE.md
-    rm -f CLAUDE.md.bak 2>/dev/null || true
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md (updated to v6.0)"
-  fi
-else
-  # Create new CLAUDE.md with skill and agent routing emphasis
+if [ ! -f CLAUDE.md ]; then
   cat > CLAUDE.md << 'EOF'
-<!-- ONE_SHOT v6.0 -->
-# IMPORTANT: Read AGENTS.md - it contains skill and agent routing rules.
-#
-# Skills (synchronous, shared context):
-#   "build me..."     → front-door
-#   "plan..."         → create-plan
-#   "implement..."    → implement-plan
-#   "debug/fix..."    → debugger
-#   "deploy..."       → push-to-cloud
-#   "ultrathink..."   → thinking-modes
-#   "beads/ready..."  → beads (persistent tasks)
-#
-# Agents (isolated context, background):
-#   "security audit..." → security-auditor
-#   "explore/find all..." → deep-research
-#   "background/parallel..." → background-worker
-#   "coordinate agents..." → multi-agent-coordinator
-#
-# Always update TODO.md as you work.
-<!-- /ONE_SHOT -->
-
 # Project Instructions
+
+> Read AGENTS.md for operator behaviors and skill routing.
 
 ## Overview
 [Brief description of what this project does]
@@ -228,208 +128,91 @@ else
 ## Key Commands
 ```bash
 # Setup
-[setup commands]
-
 # Run
-[run commands]
-
 # Test
-[test commands]
 ```
 
 ## Architecture
-[Key architectural decisions and patterns]
+[Key architectural decisions]
 
 ## Conventions
-[Project-specific conventions and standards]
-
-## Skill & Agent Usage
-When working on this project:
-- Planning: `create-plan` → `implement-plan`
-- Debugging: `debugger` → `test-runner`
-- Deploying: `push-to-cloud` → `ci-cd-setup`
-- Context: `create-handoff` before `/clear`
-- Security: `security-auditor` (isolated)
-- Research: `deep-research` (isolated)
+[Project-specific conventions]
 EOF
-  echo -e "  ${GREEN}✓${NC} CLAUDE.md (created with skill/agent routing)"
-fi
-
-# =============================================================================
-# 3. TODO.md - Create if not exists (never overwrite)
-# =============================================================================
-if [ ! -f TODO.md ]; then
-  cat > TODO.md << 'EOF'
-# TODO
-
-Project task tracking following [todo.md](https://github.com/todomd/todo.md) spec.
-
-### Backlog
-- [ ] [First task to do]
-
-### In Progress
-
-### Done ✓
-
----
-*Updated by OneShot skills. Say `(ONE_SHOT)` to re-anchor.*
-EOF
-  echo -e "  ${GREEN}✓${NC} TODO.md (created)"
+  echo -e "  ${GREEN}✓${NC} CLAUDE.md (created)"
 else
-  echo -e "  ${GREEN}✓${NC} TODO.md (exists, skipped)"
+  if ! grep -q "AGENTS.md" CLAUDE.md; then
+    echo -e "  ${YELLOW}→${NC} CLAUDE.md (exists — add a reference to AGENTS.md if needed)"
+  else
+    echo -e "  ${GREEN}✓${NC} CLAUDE.md (exists, skipped)"
+  fi
 fi
 
 # =============================================================================
-# 4. LLM-OVERVIEW.md - Create if not exists (never overwrite)
-# =============================================================================
-if [ ! -f LLM-OVERVIEW.md ]; then
-  cat > LLM-OVERVIEW.md << 'EOF'
-# LLM Overview
-
-> Context for any LLM working on this project. No secrets.
-
-## What This Project Does
-[One paragraph description]
-
-## Tech Stack
-- Language: [e.g., TypeScript, Python]
-- Framework: [e.g., Next.js, FastAPI]
-- Database: [e.g., SQLite, PostgreSQL, none]
-- Deployment: [e.g., Vercel, Docker, homelab]
-
-## Project Structure
-```
-[key directories and their purpose]
-```
-
-## Key Files
-| File | Purpose |
-|------|---------|
-| `CLAUDE.md` | Project instructions |
-| `AGENTS.md` | Skill routing |
-| `TODO.md` | Task tracking |
-
-## How to Run
-```bash
-[commands to run the project]
-```
-
-## Current State
-- **Status**: [Planning / In Development / Production]
-- **Last Updated**: [date]
-
-## Important Context
-[Anything an LLM should know before working on this project]
-EOF
-  echo -e "  ${GREEN}✓${NC} LLM-OVERVIEW.md (created)"
-else
-  echo -e "  ${GREEN}✓${NC} LLM-OVERVIEW.md (exists, skipped)"
-fi
-
-# =============================================================================
-# 5. Skills - Consolidated 27 skills (additive only)
+# 3. Global skills — installed to ~/.claude/skills/ (not project-local)
 # =============================================================================
 SKILLS=(
-  # Core (3)
-  front-door failure-recovery thinking-modes
-  # Planning (3)
-  create-plan implement-plan api-designer
-  # Context (3) - includes beads for persistent task tracking
-  create-handoff resume-handoff beads
-  # Development (6)
-  debugger test-runner code-reviewer refactorer performance-optimizer visual-iteration
-  # Operations (6)
-  git-workflow push-to-cloud remote-exec ci-cd-setup docker-composer observability-setup
-  # Data & Docs (4)
-  database-migrator documentation-generator secrets-vault-manager secrets-sync
-  # Communication (1)
-  the-audit
-  # Agent Bridge (1)
-  delegate-to-agent
+  short
+  full
+  conduct
+  handoff
+  restore
+  research
+  freesearch
+  doc
+  vision
+  secrets
 )
 
-mkdir -p .claude/skills
+mkdir -p "${HOME}/.claude/skills"
 SKILLS_ADDED=0
 SKILLS_UPDATED=0
 SKILLS_SKIPPED=0
 
 for skill in "${SKILLS[@]}"; do
-  if [ ! -f ".claude/skills/$skill/SKILL.md" ]; then
-    # New skill - always download
-    mkdir -p ".claude/skills/$skill"
-    if curl -sL "$SKILLS_BASE/$skill/SKILL.md" -o ".claude/skills/$skill/SKILL.md" 2>/dev/null; then
-      ((SKILLS_ADDED++)) || true
+  SKILL_FILE="${HOME}/.claude/skills/$skill/SKILL.md"
+  if [ ! -f "$SKILL_FILE" ]; then
+    mkdir -p "${HOME}/.claude/skills/$skill"
+    if curl -sL "$SKILLS_BASE/$skill/SKILL.md" -o "$SKILL_FILE" 2>/dev/null; then
+      SKILLS_ADDED=$((SKILLS_ADDED + 1))
     fi
   elif [ "$UPGRADE_MODE" = true ]; then
-    # Existing skill + upgrade mode - overwrite
-    if curl -sL "$SKILLS_BASE/$skill/SKILL.md" -o ".claude/skills/$skill/SKILL.md" 2>/dev/null; then
-      ((SKILLS_UPDATED++)) || true
+    if curl -sL "$SKILLS_BASE/$skill/SKILL.md" -o "$SKILL_FILE" 2>/dev/null; then
+      SKILLS_UPDATED=$((SKILLS_UPDATED + 1))
     fi
   else
-    ((SKILLS_SKIPPED++)) || true
+    SKILLS_SKIPPED=$((SKILLS_SKIPPED + 1))
   fi
 done
 
-if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 27 total)"
-else
-  echo -e "  ${GREEN}✓${NC} .claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 27 total)"
-fi
-
-# =============================================================================
-# 6. Agents - Native sub-agents for isolated context work (4 agents)
-# =============================================================================
-AGENTS=(
-  security-auditor
-  deep-research
-  background-worker
-  multi-agent-coordinator
-)
-
-mkdir -p .claude/agents
-AGENTS_ADDED=0
-AGENTS_UPDATED=0
-AGENTS_SKIPPED=0
-
-for agent in "${AGENTS[@]}"; do
-  if [ ! -f ".claude/agents/$agent.md" ]; then
-    # New agent - always download
-    if curl -sL "$AGENTS_BASE/$agent.md" -o ".claude/agents/$agent.md" 2>/dev/null; then
-      ((AGENTS_ADDED++)) || true
-    fi
-  elif [ "$UPGRADE_MODE" = true ]; then
-    # Existing agent + upgrade mode - overwrite
-    if curl -sL "$AGENTS_BASE/$agent.md" -o ".claude/agents/$agent.md" 2>/dev/null; then
-      ((AGENTS_UPDATED++)) || true
-    fi
-  else
-    ((AGENTS_SKIPPED++)) || true
-  fi
-done
-
-# Download INDEX.md and TEMPLATE.md for agents
-curl -sL "$AGENTS_BASE/INDEX.md" -o ".claude/agents/INDEX.md" 2>/dev/null || true
-curl -sL "$AGENTS_BASE/TEMPLATE.md" -o ".claude/agents/TEMPLATE.md" 2>/dev/null || true
+# Also sync INDEX.md and SKILLS_REFERENCE.md
+curl -sL "$SKILLS_BASE/../skills/INDEX.md" -o "${HOME}/.claude/skills/INDEX.md" 2>/dev/null || true
+curl -sL "$SKILLS_BASE/../skills/SKILLS_REFERENCE.md" -o "${HOME}/.claude/skills/SKILLS_REFERENCE.md" 2>/dev/null || true
 
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "  ${GREEN}✓${NC} .claude/agents/ (${AGENTS_ADDED} added, ${AGENTS_UPDATED} updated, 4 total)"
+  echo -e "  ${GREEN}✓${NC} ~/.claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 10 total)"
 else
-  echo -e "  ${GREEN}✓${NC} .claude/agents/ (${AGENTS_ADDED} added, ${AGENTS_SKIPPED} existing, 4 total)"
+  echo -e "  ${GREEN}✓${NC} ~/.claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 10 total)"
 fi
 
 # =============================================================================
-# 6.5 Beads - Initialize persistent task tracking (REQUIRED - already checked)
+# 4. Install oneshot-update to PATH
 # =============================================================================
-if [ ! -d ".beads" ]; then
-  echo -e "  ${BLUE}→${NC} Initializing beads..."
-  bd init --stealth 2>/dev/null || true
-  echo -e "  ${GREEN}✓${NC} .beads/ initialized (git-backed persistent tasks)"
+BIN_DIR="${HOME}/.local/bin"
+mkdir -p "$BIN_DIR"
+ONESHOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || echo "$HOME/github/oneshot")"
+
+if [ -f "$ONESHOT_DIR/scripts/oneshot-update.sh" ]; then
+  ln -sf "$ONESHOT_DIR/scripts/oneshot-update.sh" "$BIN_DIR/oneshot-update"
+  echo -e "  ${GREEN}✓${NC} oneshot-update (linked to $BIN_DIR)"
 else
-  echo -e "  ${GREEN}✓${NC} .beads/ (already initialized)"
+  # Running via curl - download the update script
+  curl -sL "$ONESHOT_BASE/scripts/oneshot-update.sh" -o "$BIN_DIR/oneshot-update" 2>/dev/null
+  chmod +x "$BIN_DIR/oneshot-update"
+  echo -e "  ${GREEN}✓${NC} oneshot-update (installed to $BIN_DIR)"
 fi
 
 # =============================================================================
-# 7. .sops.yaml - Create if not exists (never overwrite)
+# 5. .sops.yaml - Create if not exists (never overwrite)
 # =============================================================================
 if [ ! -f .sops.yaml ]; then
   cat > .sops.yaml << 'EOF'
@@ -445,26 +228,7 @@ else
 fi
 
 # =============================================================================
-# 8. .env.example - Create if not exists (never overwrite)
-# =============================================================================
-if [ ! -f .env.example ]; then
-  cat > .env.example << 'EOF'
-# Project secrets - copy to .env and fill in
-# Encrypt: sops -e .env > .env.encrypted && rm .env
-# Decrypt: sops -d .env.encrypted > .env
-
-# Pull from central vault:
-# sops -d ~/github/oneshot/secrets/secrets.env.encrypted | grep KEY_NAME >> .env
-
-# Project-specific secrets:
-EOF
-  echo -e "  ${GREEN}✓${NC} .env.example (created)"
-else
-  echo -e "  ${GREEN}✓${NC} .env.example (exists, skipped)"
-fi
-
-# =============================================================================
-# 9. .gitignore - Append if block not present (never remove existing rules)
+# 6. .gitignore - Append if block not present (never remove existing rules)
 # =============================================================================
 GITIGNORE_BLOCK="
 # ONE_SHOT
@@ -473,11 +237,7 @@ GITIGNORE_BLOCK="
 *.key
 .age/
 !.env.example
-!*.encrypted
-# Beads local cache (JSONL is tracked)
-.beads/beads.db
-.beads/bd.sock
-.beads/export_hashes.db"
+!*.encrypted"
 
 if [ -f .gitignore ]; then
   if ! grep -q "# ONE_SHOT" .gitignore; then
@@ -492,59 +252,34 @@ else
 fi
 
 # =============================================================================
-# 10. oneshot-build script (for autonomous mode)
-# =============================================================================
-mkdir -p scripts
-if [ ! -f "scripts/oneshot-build" ] || [ "$UPGRADE_MODE" = true ]; then
-  curl -sL "$ONESHOT_BASE/scripts/oneshot-build" -o "scripts/oneshot-build" 2>/dev/null
-  chmod +x "scripts/oneshot-build"
-  echo -e "  ${GREEN}✓${NC} scripts/oneshot-build (autonomous builder)"
-else
-  echo -e "  ${GREEN}✓${NC} scripts/oneshot-build (exists)"
-fi
-
-# =============================================================================
 # Done
 # =============================================================================
 echo ""
-echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║                    ONE_SHOT v9 Ready!                       ║${NC}"
-echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════╝${NC}"
+echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║                   ONE_SHOT v13 Ready!                      ║${NC}"
+echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
-echo -e "${BLUE}🚀 TRY THIS FIRST:${NC}"
+echo -e "${BLUE}Start a session:${NC}"
+echo "  claude ."
 echo ""
-echo "  Interactive mode (Claude Code):"
-echo "    Open project in Claude Code, then say:"
-echo "    → \"build me a REST API for managing todos\""
-echo "    → \"plan a feature that adds user authentication\""
+echo -e "${BLUE}Then use:${NC}"
+echo "  /short    Quick iteration on existing work"
+echo "  /full     New project or major refactor"
+echo "  /conduct  Multi-model orchestration until done"
 echo ""
-echo "  Autonomous mode (headless):"
-echo "    oneshot-build \"A Python CLI that fetches weather data\""
-echo "    # Monitor: tail -f .agent/STATUS.md"
+echo -e "${BLUE}Context management:${NC}"
+echo "  /handoff  Save context before /clear"
+echo "  /restore  Resume from handoff"
 echo ""
-echo -e "${BLUE}📖 Quick Reference:${NC}"
+echo -e "${BLUE}Research & docs:${NC}"
+echo "  /research   Deep research via Gemini or search"
+echo "  /freesearch Zero-token search via Exa"
+echo "  /doc        Cache external docs locally"
 echo ""
-echo "  Core Skills (say these phrases):"
-echo "    \"build me...\"      → Interview + spec + plan"
-echo "    \"plan this...\"     → Create structured plan"
-echo "    \"implement...\"     → Execute with task tracking"
-echo "    \"debug/fix...\"     → Systematic debugging"
-echo "    \"review code...\"   → Quality & security check"
+echo "Full docs: README.md and ~/.claude/skills/INDEX.md"
 echo ""
-echo "  Context Management:"
-echo "    bd ready           → See next tasks"
-echo "    bd list            → All tasks"
-echo "    \"create handoff\"   → Save before /clear"
-echo "    \"resume\"           → Continue after /clear"
-echo ""
-echo -e "${BLUE}📁 Files Created:${NC}"
-echo "    AGENTS.md          Skill routing"
-echo "    CLAUDE.md          Project instructions"
-echo "    .beads/            Persistent task state"
-echo ""
-echo "Full docs: See README.md and .claude/skills/INDEX.md"
-echo ""
-echo -e "${YELLOW}Verify it worked:${NC}"
-echo "    bd list          # Should show 'No open issues'"
-echo "    ls .beads/       # Should exist"
-echo ""
+if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+  echo -e "${YELLOW}Add to your shell profile to use oneshot-update:${NC}"
+  echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
+  echo ""
+fi
