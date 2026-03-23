@@ -157,6 +157,17 @@ if [ "$QUICK_MODE" = false ]; then
         log_skip "No validate-skills.sh found"
     fi
 
+    section "Validation: ONE_SHOT Docs Sync"
+    if [ -f "scripts/validate-docs.sh" ]; then
+        if bash scripts/validate-docs.sh 2>&1; then
+            log_ok "Docs are in sync with reality"
+        else
+            log_error "Doc sync check failed — docs don't match actual state"
+        fi
+    else
+        log_skip "No validate-docs.sh found"
+    fi
+
     section "Validation: ONE_SHOT Agents"
     if [ -f "scripts/validate-agents.py" ]; then
         if python scripts/validate-agents.py 2>&1; then

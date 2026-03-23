@@ -1,6 +1,6 @@
 # ONE_SHOT v13 — Operator Framework
 
-**9 skills.** Two operators. Seven utilities.
+**10 skills.** Three operators. Seven utilities.
 
 ---
 
@@ -26,7 +26,7 @@ Full operator for complex tasks:
 - Creates IMPLEMENTATION_CONTEXT.md
 - Structured intake and discovery
 - Phase-based planning with milestones
-- Skill discovery via SkillsMP
+- Skill discovery via this index
 - Execution with context checkpoints
 - Completion summary
 

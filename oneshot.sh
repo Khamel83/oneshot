@@ -228,7 +228,98 @@ else
 fi
 
 # =============================================================================
-# 6. .gitignore - Append if block not present (never remove existing rules)
+# 6. scripts/ — Project-level tooling
+# =============================================================================
+mkdir -p scripts
+
+_install_script() {
+  local name="$1"
+  local file="scripts/$name"
+  if [ ! -f "$file" ] || [ "$UPGRADE_MODE" = true ]; then
+    if curl -sL "$ONESHOT_BASE/scripts/$name" -o "$file" 2>/dev/null; then
+      chmod +x "$file"
+      echo -e "  ${GREEN}✓${NC} $file ($([ "$UPGRADE_MODE" = true ] && echo updated || echo created))"
+    else
+      echo -e "  ${YELLOW}○${NC} $file (download failed)"
+    fi
+  else
+    echo -e "  ${GREEN}✓${NC} $file (exists, skipped)"
+  fi
+}
+
+_install_script oneshot-check.sh
+_install_script skillsmp-search.sh
+_install_script secrets-helper.sh
+
+# =============================================================================
+# 7. 1shot/ - Project working directory (visible in repo, not dot-prefixed)
+# =============================================================================
+mkdir -p 1shot/skills
+
+# LLM-OVERVIEW.md — created if missing, never overwritten
+if [ ! -f "1shot/LLM-OVERVIEW.md" ]; then
+  PROJECT_NAME=$(basename "$(pwd)")
+  TODAY=$(date +%Y-%m-%d)
+  curl -sL "$ONESHOT_BASE/templates/LLM-OVERVIEW.md" 2>/dev/null \
+    | sed "s/\[PROJECT NAME\]/$PROJECT_NAME/" \
+    | sed "s/\[date\]/$TODAY/g" \
+    > "1shot/LLM-OVERVIEW.md" || cat > "1shot/LLM-OVERVIEW.md" << EOF
+# LLM-OVERVIEW: $PROJECT_NAME
+
+> Complete context for any LLM to understand this project.
+> **Last Updated**: $TODAY
+> **Status**: Active Development
+
+---
+
+## 1. WHAT IS THIS?
+[Describe what this project does]
+
+## 2. ARCHITECTURE
+[Key components and stack]
+
+## 3. KEY FILES
+| File | Purpose |
+|------|---------|
+| \`AGENTS.md\` | ONE_SHOT operator spec |
+| \`CLAUDE.md\` | Project-specific Claude instructions |
+| \`1shot/PROJECT.md\` | Current goals and acceptance criteria |
+
+## 4. HOW TO RUN
+\`\`\`bash
+# [add commands here]
+\`\`\`
+
+## 5. CURRENT STATE
+[What's working, what's in progress]
+EOF
+  echo -e "  ${GREEN}✓${NC} 1shot/LLM-OVERVIEW.md (created)"
+else
+  echo -e "  ${GREEN}✓${NC} 1shot/LLM-OVERVIEW.md (exists, skipped)"
+fi
+
+# .gitkeep so skills/ is tracked even when empty
+if [ ! -f "1shot/skills/.gitkeep" ] && [ -z "$(ls -A 1shot/skills 2>/dev/null)" ]; then
+  touch 1shot/skills/.gitkeep
+fi
+
+echo -e "  ${GREEN}✓${NC} 1shot/skills/ (ready for SkillsMP pulls)"
+
+# Install skillsmp-search.sh for use in this project
+mkdir -p scripts
+if [ ! -f "scripts/skillsmp-search.sh" ] || [ "$UPGRADE_MODE" = true ]; then
+  if curl -sL "$ONESHOT_BASE/scripts/skillsmp-search.sh" -o scripts/skillsmp-search.sh 2>/dev/null; then
+    chmod +x scripts/skillsmp-search.sh
+    echo -e "  ${GREEN}✓${NC} scripts/skillsmp-search.sh ($([ "$UPGRADE_MODE" = true ] && echo updated || echo created))"
+  else
+    echo -e "  ${YELLOW}○${NC} scripts/skillsmp-search.sh (download failed)"
+  fi
+else
+  echo -e "  ${GREEN}✓${NC} scripts/skillsmp-search.sh (exists, skipped)"
+fi
+
+# =============================================================================
+# 8. .gitignore - Append if block not present (never remove existing rules)
 # =============================================================================
 GITIGNORE_BLOCK="
 # ONE_SHOT

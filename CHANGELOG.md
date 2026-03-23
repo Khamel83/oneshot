@@ -4,6 +4,20 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [13.1.0] - 2026-03-22
+
+### Added
+- **`/conduct` operator** - Multi-model PMO orchestrator. Asks clarifying questions first, creates a structured plan, routes work across Claude + Codex + Gemini, loops until goal is fully met.
+- **10 skills total** - Now 3 operators + 7 utilities (up from 9 skills / 2 operators)
+
+### Changed
+- **AGENTS.md** - Updated to include `/conduct` operator spec
+- **docs/SKILLS.md** - Updated to reflect 3 operators
+- **docs/LLM-OVERVIEW.md** - Updated skill counts, paths, and removed SkillsMP references
+- **Skill path** - `~/.claude/commands/` → `~/.claude/skills/` (corrected in all docs)
+
+---
+
 ## [13.0.0] - 2026-03-09
 
 ### Breaking Changes

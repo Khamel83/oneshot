@@ -1,7 +1,7 @@
 # LLM-OVERVIEW: ONE_SHOT
 
 > Complete context for any LLM to understand this project.
-> **Last Updated**: 2026-03-09
+> **Last Updated**: 2026-03-22
 > **ONE_SHOT Version**: 13
 > **Status**: Production / Active Development
 
@@ -26,17 +26,17 @@ An operator framework for Claude Code that provides on-demand skill discovery, i
 
 | Capability | How |
 |------------|-----|
-| **On-demand skill discovery** | Operators discover skills via SkillsMP when needed |
+| **On-demand skill discovery** | Operators discover skills from `~/.claude/skills/` index |
 | **Context management** | Handoffs + restore survive `/clear` |
 | **Intelligent delegation** | Assess-comply-verify-escalate pattern |
 | **Decision defaults** | Agents make reasonable choices autonomously |
-| **Token optimization** | 9 commands vs 25+ in earlier versions |
+| **Token optimization** | 10 skills vs 25+ in earlier versions |
 
 ### Current State
 
 - **Status**: Production / Active Development
 - **Version**: 13
-- **Commands**: 9 total (2 operators + 7 utilities)
+- **Commands**: 10 total (3 operators + 7 utilities)
 - **Rules**: Progressive disclosure (~300 tokens)
 - **Architecture**: Operator framework with on-demand skill discovery
 
@@ -53,37 +53,39 @@ An operator framework for Claude Code that provides on-demand skill discovery, i
 | **Task Tracking** | Native Tasks (TaskCreate/TaskGet/TaskUpdate/TaskList) |
 | **External CLIs** | gemini (for /research) |
 | **Persistence** | Git + handoff files |
-| **Skill Discovery** | SkillsMP (on-demand) |
+| **Skill Discovery** | On-demand (operators read skill index) |
 
 ### Key Components
 
 | Component | Purpose | Location |
 |-----------|---------|----------|
-| **AGENTS.md** | Operator spec - `/short` and `/full` behaviors | Project root |
+| **AGENTS.md** | Operator spec - `/short`, `/full`, `/conduct` behaviors | Project root |
 | **CLAUDE.md** | Global project instructions (editable per project) | Project root |
-| **`/short`** | Quick iteration operator | Command |
-| **`/full`** | Structured work operator | Command |
-| **`/handoff`** | Context checkpoint before `/clear` | Command |
-| **`/restore`** | Resume from handoff | Command |
-| **`/research`** | Background research via Gemini | Command |
-| **`/freesearch`** | Zero-token web search via Exa API | Command |
-| **`/doc`** | Cache external docs locally | Command |
-| **`/vision`** | Image/website analysis | Command |
-| **`/secrets`** | SOPS/Age secret management | Command |
+| **`/short`** | Quick iteration operator | Skill |
+| **`/full`** | Structured work operator | Skill |
+| **`/conduct`** | Multi-model PMO orchestrator | Skill |
+| **`/handoff`** | Context checkpoint before `/clear` | Skill |
+| **`/restore`** | Resume from handoff | Skill |
+| **`/research`** | Background research via Gemini | Skill |
+| **`/freesearch`** | Zero-token web search via Exa API | Skill |
+| **`/doc`** | Cache external docs locally | Skill |
+| **`/vision`** | Image/website analysis | Skill |
+| **`/secrets`** | SOPS/Age secret management | Skill |
 
-### Command Structure
+### Skill Structure
 
 ```
-~/.claude/commands/
-├── short.md           # Quick iteration operator
-├── full.md            # Structured work operator
-├── handoff.md         # Context checkpoint
-├── restore.md         # Resume from handoff
-├── research.md        # Background research
-├── freesearch.md      # Zero-token web search
-├── doc.md             # Doc caching
-├── vision.md          # Image/website analysis
-└── secrets.md         # Secrets management
+~/.claude/skills/
+├── short/             # Quick iteration operator
+├── full/              # Structured work operator
+├── conduct/           # Multi-model PMO orchestrator
+├── handoff/           # Context checkpoint
+├── restore/           # Resume from handoff
+├── research/          # Background research
+├── freesearch/        # Zero-token web search
+├── doc/               # Doc caching
+├── vision/            # Image/website analysis
+└── secrets/           # Secrets management
 ```
 
 ### Installation Flow
@@ -95,8 +97,8 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 # This creates:
 # 1. AGENTS.md (operator spec)
 # 2. CLAUDE.md (project instructions)
-# 3. Symlinks to ~/.claude/commands/ (9 commands)
-# 4. Symlinks to ~/.claude/rules/ (progressive disclosure)
+# 3. Skills in ~/.claude/skills/ (10 skills)
+# 4. Rules in ~/.claude/rules/ (progressive disclosure)
 ```
 
 ---
@@ -121,8 +123,8 @@ curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | 
 ### What Works
 
 **Core System**
-- 2 operators (short, full) with skill discovery
-- 7 utility commands
+- 3 operators (short, full, conduct) with skill discovery
+- 7 utility skills
 - Progressive disclosure rules (~300 tokens)
 - Native task tracking (built into Claude Code)
 
@@ -177,7 +179,7 @@ claude .
 
 ### Adding a New Command
 
-1. Create command: `.claude/commands/new-command.md`
+1. Create skill directory: `.claude/skills/new-command/SKILL.md`
 2. Update docs/SKILLS.md
 3. Update README.md
 4. Update AGENTS.md if it changes operator behavior
@@ -202,15 +204,15 @@ claude .
 1. **Context is scarce** - Fewer commands, on-demand discovery
 2. **Decide autonomously** - Decision defaults prevent constant questions
 3. **State to disk** - Handoffs survive `/clear`
-4. **Operators, not menus** - 2 operators > 25+ menu commands
+4. **Operators, not menus** - 3 operators > 25+ menu commands
 5. **User time > agent compute** - Make reasonable choices, don't ask
 
 ### Design Trade-offs
 
 | Decision | Rationale |
 |----------|-----------|
-| 9 commands vs 25+ | Less decision fatigue, skill discovery on demand |
-| Operators | Two entry points cover all use cases |
+| 10 skills vs 25+ | Less decision fatigue, skill discovery on demand |
+| Operators | Three entry points cover all use cases |
 | Native tasks | Built into Claude Code, no external dependency |
 | Progressive disclosure | ~300 tokens always-on vs ~2000 |
 
@@ -246,9 +248,9 @@ claude .
 
 | Term | Definition |
 |------|------------|
-| **Operator** | Entry point command that orchestrates work (`/short`, `/full`) |
+| **Operator** | Entry point skill that orchestrates work (`/short`, `/full`, `/conduct`) |
 | **Handoff** | Context snapshot for resuming after `/clear` |
-| **Skill discovery** | Finding relevant skills on demand via SkillsMP |
+| **Skill discovery** | Finding relevant skills on demand from `~/.claude/skills/` index |
 | **Native Tasks** | Claude Code's built-in task tracking |
 | **Progressive disclosure** | Loading rules based on project type |
 | **Decision defaults** | Pre-set choices for ambiguous situations |
@@ -261,7 +263,6 @@ claude .
 |---------|--------------|
 | [Claude Code](https://claude.com/claude-code) | Target platform |
 | [Penny](https://github.com/Khamel83/penny) | Voice-to-action system |
-| [SkillsMP](https://skillsmp.com) | Skill discovery marketplace |
 
 ---
 

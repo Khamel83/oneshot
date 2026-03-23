@@ -41,7 +41,7 @@ Full operator for new projects, refactors, and complex implementations.
 - Creates IMPLEMENTATION_CONTEXT.md for persistent state
 - Structured intake phase (goals, scope, architecture)
 - Phase-based planning with milestones
-- Skill discovery via SkillsMP
+- Skill discovery via `~/.claude/skills/` index
 - Execution with context checkpoints
 - Completion summary with verification
 

@@ -17,7 +17,7 @@
 **Behavior:**
 1. Load context: git log -5, TaskList, DECISIONS.md, BLOCKERS.md
 2. Ask: "What are you working on?"
-3. Discover skills on demand (SkillsMP)
+3. Discover skills on demand (~/.claude/skills/ index)
 4. Execute in burn-down mode
 5. Show delegation summary on completion
 
@@ -33,7 +33,7 @@
 1. Create/load IMPLEMENTATION_CONTEXT.md
 2. Structured intake: goals, scope, architecture, constraints
 3. Phase-based planning with milestones
-4. Skill discovery via SkillsMP
+4. Skill discovery via ~/.claude/skills/ index
 5. Execute with context checkpoints (50% → suggest handoff, 70% → auto-handoff)
 6. Verify and show completion summary
 
