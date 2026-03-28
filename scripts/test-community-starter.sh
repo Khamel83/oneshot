@@ -42,6 +42,10 @@ REQUIRED_FILES=(
     "SETUP.md"
     "ARCHITECTURE.md"
     ".env.example"
+    "public/css/theme.css"
+    "public/config.js"
+    "public/favicon.svg"
+    "public/js/default-avatar.svg"
     "migrations/00_sites_table.sql"
     "migrations/01_schema_template.sql"
     "migrations/02_rls_template.sql"
@@ -140,6 +144,19 @@ echo ""
 echo "--- 10. Frontend multi-tenant ---"
 check "auth.js has getSite" grep -q "getSite" "$TEMPLATE/public/js/auth.js"
 check "auth.js has api()" grep -q "function api" "$TEMPLATE/public/js/auth.js"
+echo ""
+
+# 11. Design system
+echo "--- 11. Design system ---"
+check "theme.css has grain texture" grep -q "fractalNoise" "$TEMPLATE/public/css/theme.css"
+check "theme.css has glassmorphism" grep -q "backdrop-filter" "$TEMPLATE/public/css/theme.css"
+check "theme.css has Poppins" grep -q "Poppins" "$TEMPLATE/public/css/theme.css"
+check "config.js loads theme" grep -q "loadConfig" "$TEMPLATE/public/config.js"
+check "config.js has presets" grep -q "THEME_PRESETS" "$TEMPLATE/public/config.js"
+check "HTML pages load theme.css" grep -rq 'theme.css' "$TEMPLATE/public/"*.html
+check "HTML pages load config.js" grep -rq 'config.js' "$TEMPLATE/public/"*.html
+check "favicon.svg exists" test -f "$TEMPLATE/public/favicon.svg"
+check "default-avatar.svg exists" test -f "$TEMPLATE/public/js/default-avatar.svg"
 echo ""
 
 # Summary

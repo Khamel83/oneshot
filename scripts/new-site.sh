@@ -2,10 +2,15 @@
 # new-site.sh — Create a new private site in the multi-tenant platform
 #
 # Usage:
-#   ./scripts/new-site.sh <slug> "<name>" --admin-email <email>
+#   ./scripts/new-site.sh <slug> "<name>" --admin-email <email> [--theme <preset>]
 #
 # Example:
 #   ./scripts/new-site.sh kids-class "Mrs. Smith's 2nd Grade" --admin-email me@khamel.com
+#   ./scripts/new-site.sh poker "Friday Poker" --admin-email me@khamel.com --theme sunset
+#   ./scripts/new-site.sh poker "Friday Poker" --admin-email me@khamel.com --accent "#ea580c,#dc2626,#fdba74" --logo "poker"
+#
+# Theme presets: slate (default), forest, sunset, mono
+# Or use --accent "color1,color2,color3" for custom gradient
 #
 # Required env vars:
 #   SUPABASE_URL           — e.g. https://abcdef.supabase.co
@@ -13,22 +18,60 @@
 
 set -uo pipefail
 
+# --- Theme presets ---
+THEMES=(
+    "slate|#4f6df5|#7c5cbf|#89b4d4"
+    "forest|#16a34a|#15803d|#86efac"
+    "sunset|#ea580c|#dc2626|#fdba74"
+    "mono|#6b7280|#374151|#d1d5db"
+)
+
 # --- Args ---
 SLUG="$1"
 NAME="$2"
 ADMIN_EMAIL=""
+THEME="slate"
+ACCENT_CUSTOM=""
+LOGO_TEXT=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --admin-email) ADMIN_EMAIL="$2"; shift 2 ;;
         --admin-password) ADMIN_PASSWORD="$2"; shift 2 ;;
+        --theme) THEME="$2"; shift 2 ;;
+        --accent) ACCENT_CUSTOM="$2"; shift 2 ;;
+        --logo) LOGO_TEXT="$2"; shift 2 ;;
         *) shift ;;
     esac
 done
 
+# --- Resolve theme colors ---
+resolve_theme() {
+    local theme="$1"
+    for entry in "${THEMES[@]}"; do
+        IFS='|' read -r name c1 c2 c3 <<< "$entry"
+        if [ "$name" = "$theme" ]; then
+            echo "$c1|$c2|$c3"
+            return
+        fi
+    done
+    echo "Unknown theme '$theme'. Choose: slate, forest, sunset, mono"
+    exit 1
+}
+
+if [ -n "$ACCENT_CUSTOM" ]; then
+    IFS=',' read -r ACCENT_1 ACCENT_2 ACCENT_3 <<< "$ACCENT_CUSTOM"
+else
+    IFS='|' read -r ACCENT_1 ACCENT_2 ACCENT_3 <<< "$(resolve_theme "$THEME")"
+fi
+
+if [ -z "$LOGO_TEXT" ]; then
+    LOGO_TEXT="$NAME"
+fi
+
 # --- Validate ---
 if [ -z "$SLUG" ]; then
-    echo "Usage: new-site.sh <slug> \"<name>\" --admin-email <email> [--admin-password <pw>]"
+    echo "Usage: new-site.sh <slug> \"<name>\" --admin-email <email> [--theme <preset>] [--accent \"c1,c2,c3\"] [--logo <text>]"
     exit 1
 fi
 
@@ -64,6 +107,8 @@ SITE_URL="${SITE_URL:-https://khamel.com}"
 echo "=== Creating site: $SLUG ==="
 echo "    Name: $NAME"
 echo "    Admin: $ADMIN_EMAIL"
+echo "    Theme: $THEME"
+echo "    Colors: $ACCENT_1, $ACCENT_2, $ACCENT_3"
 echo ""
 
 # --- Check if site already exists ---
@@ -159,12 +204,24 @@ fi
 
 # --- Register site in public.sites table ---
 echo "Registering site..."
+SITE_CONFIG=$(python3 -c "
+import json
+print(json.dumps({
+    'theme': '$THEME',
+    'accent_1': '$ACCENT_1',
+    'accent_2': '$ACCENT_2',
+    'accent_3': '$ACCENT_3',
+    'logo_text': '$LOGO_TEXT',
+    'font_display': 'Poppins',
+    'font_body': 'Inter',
+}))
+")
 REGISTER=$(curl -s -w "\n%{http_code}" "$SUPABASE_URL/rest/v1/sites" \
     -H "apikey: $SERVICE_KEY" \
     -H "Authorization: Bearer $SERVICE_KEY" \
     -H "Content-Type: application/json" \
     -H "Prefer: return=minimal" \
-    -d "{\"slug\": \"$SLUG\", \"name\": $(echo "$NAME" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')}")
+    -d "{\"slug\": \"$SLUG\", \"name\": $(echo "$NAME" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))'), \"config\": $SITE_CONFIG}")
 REGISTER_CODE=$(echo "$REGISTER" | tail -1)
 
 if [ "$REGISTER_CODE" = "201" ]; then

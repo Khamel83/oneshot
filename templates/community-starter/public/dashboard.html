@@ -3,98 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — Your App</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Dashboard — Your Site</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/theme.css">
+
     <style>
-        :root {
-            --color-primary: #4f46e5;
-            --color-bg: #f9fafb;
-            --color-text: #111827;
-            --color-muted: #6b7280;
-            --color-card: #ffffff;
+        .main { padding-top: 80px; }
+
+        .welcome-card {
+            margin-bottom: 2rem;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--color-bg); color: var(--color-text); }
-        nav {
-            background: var(--color-card);
-            border-bottom: 1px solid #e5e7eb;
-            padding: 0 1.5rem;
-            display: flex;
-            align-items: center;
-            height: 56px;
-            gap: 1rem;
+
+        .welcome-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
         }
-        nav .title { font-weight: 600; flex: 1; }
-        nav a { color: var(--color-muted); text-decoration: none; font-size: 0.875rem; }
-        nav a:hover { color: var(--color-text); }
-        nav button {
-            background: none;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 0.375rem 0.75rem;
-            cursor: pointer;
+
+        .welcome-card p {
+            color: var(--text-muted);
             font-size: 0.875rem;
         }
-        main { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
-        h2 { font-size: 1.25rem; margin-bottom: 1rem; }
-        .card {
-            background: var(--color-card);
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            margin-bottom: 1.5rem;
-        }
-        .members-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1rem;
-        }
-        .member-card {
-            background: var(--color-card);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-        }
-        .member-card img {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 0.5rem;
-            background: #e5e7eb;
-        }
-        .member-card .name { font-weight: 500; font-size: 0.875rem; }
-        .admin-badge {
-            display: none;
-            background: var(--color-primary);
-            color: white;
-            font-size: 0.7rem;
-            padding: 0.125rem 0.5rem;
-            border-radius: 999px;
-            margin-left: 0.5rem;
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-white);
         }
     </style>
 </head>
 <body>
-    <nav>
-        <span class="title">Your App</span>
-        <a href="/dashboard">Dashboard</a>
-        <a id="adminLink" href="/admin" style="display:none">Admin</a>
-        <button id="signOutBtn">Sign out</button>
-    </nav>
-    <main>
-        <div class="card">
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a href="/" class="site-logo">your site</a>
+            <nav class="site-nav">
+                <a href="/dashboard" class="nav-link" id="navDashboard">Dashboard</a>
+            </nav>
+            <div class="site-auth">
+                <a href="/admin" class="btn btn-sm btn-outline" id="adminLink" style="display:none">Admin</a>
+                <button class="btn btn-sm btn-outline" id="signOutBtn">Sign out</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main">
+        <div class="card welcome-card">
             <h2 id="greeting">Welcome back!</h2>
-            <p id="memberInfo" style="color: var(--color-muted); font-size: 0.875rem;"></p>
+            <p id="memberEmail"></p>
         </div>
 
-        <h2>Members</h2>
+        <h3 class="section-title">Members</h3>
         <div id="membersGrid" class="members-grid">
-            <p style="color: var(--color-muted);">Loading…</p>
+            <p class="text-muted">Loading...</p>
         </div>
-    </main>
+    </div>
 
     <script type="module">
+        import { loadConfig, getSiteName } from '/config.js';
         import { getSite, requireAuth, getMember, isAdmin, signOut, authFetch, handleUnauthorized, api, page } from '/js/auth.js';
 
         if (!requireAuth()) throw new Error('not authenticated');
@@ -102,21 +72,26 @@
         const site = getSite();
         const member = getMember();
 
+        await loadConfig();
+        const name = getSiteName();
+        if (name) document.title = `${name} — Dashboard`;
+
         // Update nav links for multi-tenant
-        document.querySelector('nav a[href="/dashboard"]').href = page('dashboard');
+        document.querySelector('.site-logo').textContent = name ? name.toLowerCase() : 'your site';
+        document.getElementById('navDashboard').href = page('dashboard');
+        document.querySelector('.site-logo').href = site ? `/${site}` : '/';
+
         if (isAdmin()) {
             const adminLink = document.getElementById('adminLink');
             adminLink.style.display = '';
             adminLink.href = page('admin');
         }
 
-        // Personalize greeting
         document.getElementById('greeting').textContent = `Welcome back, ${member.name || 'friend'}!`;
-        document.getElementById('memberInfo').textContent = member.email || '';
+        document.getElementById('memberEmail').textContent = member.email || '';
 
         document.getElementById('signOutBtn').addEventListener('click', signOut);
 
-        // Load members list
         async function loadMembers() {
             try {
                 const res = await authFetch(api('members'));
@@ -124,19 +99,19 @@
                 const data = await res.json();
                 renderMembers(data.members || []);
             } catch (err) {
-                document.getElementById('membersGrid').innerHTML = '<p style="color:#dc2626">Failed to load members.</p>';
+                document.getElementById('membersGrid').innerHTML = '<p style="color:var(--error)">Failed to load members.</p>';
             }
         }
 
         function renderMembers(members) {
             const grid = document.getElementById('membersGrid');
             if (!members.length) {
-                grid.innerHTML = '<p style="color: var(--color-muted)">No members yet.</p>';
+                grid.innerHTML = '<p class="text-muted">No members yet.</p>';
                 return;
             }
             grid.innerHTML = members.map(m => `
                 <div class="member-card">
-                    <img src="${m.avatar_url || '/js/default-avatar.svg'}" alt="${m.name}" onerror="this.src='/js/default-avatar.svg'">
+                    <img src="${m.avatar_url || '/js/default-avatar.svg'}" alt="${escapeHtml(m.name)}" onerror="this.src='/js/default-avatar.svg'">
                     <div class="name">${escapeHtml(m.name)}</div>
                 </div>
             `).join('');

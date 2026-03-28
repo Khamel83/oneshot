@@ -20,6 +20,8 @@ class handler(BaseHTTPRequestHandler):
         params = parse_qs(urlparse(self.path).query)
         action = params.get('action', [''])[0]
 
+        if action == 'config':
+            return self._handle_site_config()
         if action == 'sites':
             return self._handle_list_sites()
 
@@ -41,6 +43,28 @@ class handler(BaseHTTPRequestHandler):
             return self._handle_check_email_connectivity()
 
         self._send_error(400, 'Unknown action')
+
+    def _handle_site_config(self):
+        """Return theme config for the current site (from public.sites.config)."""
+        from api._supabase import get_site
+        site = get_site()
+        if not site:
+            self._send_error(400, 'No site context')
+            return
+        try:
+            result = _raw_db().table('sites').select('slug,name,config').eq('slug', site).single().execute()
+            if not result.data:
+                self._send_error(404, 'Site not found')
+                return
+            site_data = result.data
+            self._send_success({
+                'slug': site_data['slug'],
+                'name': site_data.get('name', site_data['slug']),
+                'config': site_data.get('config', {}),
+            })
+        except Exception as e:
+            print(f'Site config failed: {e}')
+            self._send_error(500, 'Failed to load site config')
 
     def _handle_health_check(self):
         status = {}

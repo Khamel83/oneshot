@@ -3,133 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — Your App</title>
-    <style>
-        :root {
-            --color-primary: #4f46e5;
-            --color-primary-dark: #4338ca;
-            --color-bg: #f9fafb;
-            --color-text: #111827;
-            --color-muted: #6b7280;
-            --color-error: #dc2626;
-            --color-card: #ffffff;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--color-bg);
-            color: var(--color-text);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .card {
-            background: var(--color-card);
-            border-radius: 12px;
-            padding: 2rem;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
-        label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
-        input {
-            width: 100%;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 0.625rem 0.75rem;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-        input:focus { outline: 2px solid var(--color-primary); border-color: transparent; }
-        button {
-            width: 100%;
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.75rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        button:hover { background: var(--color-primary-dark); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .error {
-            color: var(--color-error);
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
-        .links { text-align: center; margin-top: 1rem; font-size: 0.875rem; color: var(--color-muted); }
-        .links a { color: var(--color-primary); text-decoration: none; }
-    </style>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Sign In — Your Site</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/theme.css">
 </head>
 <body>
-    <div class="card">
-        <h1>Sign In</h1>
-        <p id="error" class="error"></p>
-        <form id="loginForm">
-            <label for="email">Email</label>
-            <input id="email" type="email" required autocomplete="email" placeholder="you@example.com">
-            <label for="password">Password</label>
-            <input id="password" type="password" required autocomplete="current-password" placeholder="--------">
-            <button type="submit" id="submitBtn">Sign In</button>
-        </form>
-        <div class="links">
-            <a id="resetLink">Forgot password?</a>
+    <div class="auth-page">
+        <div class="auth-container">
+            <a href="/" class="back-link" id="backLink">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back
+            </a>
+
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1 class="site-logo" id="logoText">your site</h1>
+                    <p id="formSubtitle">Log in to your account</p>
+                </div>
+
+                <div id="errorMsg" class="msg-error"></div>
+
+                <form id="authForm">
+                    <div class="form-group" id="nameGroup" style="display:none">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" placeholder="Your name" autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="width:100%;padding:1rem;font-size:1rem;">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="auth-footer" id="authFooter">
+                    <p><a href="#" id="toggleLink">Need to create an account?</a></p>
+                    <p><a href="/reset-password">Forgot your password?</a></p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        import { getSite, saveSession, isLoggedIn, api, page } from '/js/auth.js';
+        import { loadConfig, getSiteName } from '/config.js';
+        import { getSite, isLoggedIn, saveSession, api, page } from '/js/auth.js';
 
         const site = getSite();
 
         // Already logged in → go to dashboard
-        if (isLoggedIn()) window.location.href = page('dashboard');
+        if (isLoggedIn()) {
+            window.location.href = page('dashboard');
+            throw new Error('redirecting');
+        }
 
-        // Update page-relative links
-        if (site) document.getElementById('resetLink').href = page('reset-password');
+        await loadConfig();
+        const name = getSiteName();
+        if (name) {
+            document.getElementById('logoText').textContent = name.toLowerCase();
+            document.title = `${name} — Sign In`;
+        }
+        if (site) document.getElementById('backLink').href = `/${site}`;
 
-        const form = document.getElementById('loginForm');
-        const errorEl = document.getElementById('error');
+        // Signup mode via URL param
+        const params = new URLSearchParams(window.location.search);
+        let isSignup = params.get('mode') === 'signup';
+
+        function toggleMode() {
+            isSignup = !isSignup;
+            const nameGroup = document.getElementById('nameGroup');
+            const subtitle = document.getElementById('formSubtitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const toggleLink = document.getElementById('toggleLink');
+
+            if (isSignup) {
+                nameGroup.style.display = '';
+                subtitle.textContent = 'Create your account';
+                submitBtn.textContent = 'Create Account';
+                toggleLink.textContent = 'Already have an account? Sign in';
+            } else {
+                nameGroup.style.display = 'none';
+                subtitle.textContent = 'Log in to your account';
+                submitBtn.textContent = 'Sign In';
+                toggleLink.textContent = 'Need to create an account?';
+            }
+        }
+
+        document.getElementById('toggleLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleMode();
+        });
+
+        // Auto-switch to signup if ?mode=signup
+        if (isSignup) toggleMode();
+
+        const form = document.getElementById('authForm');
+        const errorEl = document.getElementById('errorMsg');
         const submitBtn = document.getElementById('submitBtn');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            errorEl.style.display = 'none';
+            errorEl.className = 'msg-error';
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Signing in...';
+            submitBtn.textContent = isSignup ? 'Creating account...' : 'Signing in...';
 
-            const email = document.getElementById('email').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
+            const nameVal = document.getElementById('name').value.trim();
+
+            if (isSignup && !nameVal) {
+                showError('Name is required');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+                return;
+            }
+
+            const action = isSignup ? 'signup' : 'login';
+            const body = { action, email, password };
+            if (isSignup) body.name = nameVal;
 
             try {
                 const res = await fetch(api('auth'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'login', email, password }),
+                    body: JSON.stringify(body),
                 });
                 const data = await res.json();
+
                 if (data.success) {
-                    saveSession(data.token, data.member);
+                    if (data.token) {
+                        saveSession(data.token, data.member || {});
+                    }
                     window.location.href = page('dashboard');
                 } else {
-                    showError(data.error || 'Login failed');
+                    showError(data.error || (isSignup ? 'Signup failed' : 'Invalid email or password'));
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = isSignup ? 'Create Account' : 'Sign In';
                 }
             } catch (err) {
-                showError('Network error. Please try again.');
-            } finally {
+                showError('Connection error. Please try again.');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Sign In';
+                submitBtn.textContent = isSignup ? 'Create Account' : 'Sign In';
             }
         });
 
         function showError(msg) {
             errorEl.textContent = msg;
-            errorEl.style.display = 'block';
+            errorEl.className = 'msg-error show';
         }
     </script>
 </body>

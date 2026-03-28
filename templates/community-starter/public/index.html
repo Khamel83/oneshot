@@ -3,46 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your App</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Your Site</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/theme.css">
+
     <style>
-        :root {
-            --color-primary: #4f46e5;
-            --color-bg: #f9fafb;
-            --color-text: #111827;
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--color-bg); color: var(--color-text); }
-        .hero { text-align: center; padding: 5rem 2rem; }
-        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
-        p { color: #6b7280; font-size: 1.125rem; margin-bottom: 2rem; }
-        .cta { display: inline-flex; gap: 1rem; }
-        a.btn {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            text-decoration: none;
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
-        a.btn-primary { background: var(--color-primary); color: white; }
-        a.btn-secondary { background: white; color: var(--color-text); border: 1px solid #d1d5db; }
+        @media (min-width: 600px) {
+            .hero h1 { font-size: 4rem; }
+        }
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+        }
+        @media (max-width: 400px) {
+            .hero-cta { flex-direction: column; }
+        }
+        .features {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+        .feature-card h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+        .feature-card p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>Your Community</h1>
-        <p>A private space for your group. Sign in to get started.</p>
-        <div class="cta" id="ctaButtons">
-            <a href="/login" class="btn btn-primary">Sign In</a>
-            <a href="/signup" class="btn btn-secondary">Join</a>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a href="/" class="site-logo">your site</a>
+            <nav class="site-nav" id="siteNav"></nav>
+            <div class="site-auth" id="siteAuth"></div>
         </div>
-    </div>
+    </header>
+
+    <section class="hero" id="heroSection">
+        <h1 id="heroTitle">Your Community</h1>
+        <p id="heroSubtitle">A private space for your group. Sign in to get started.</p>
+        <div class="hero-cta" id="heroCta">
+            <a href="/login" class="btn btn-primary">Sign In</a>
+            <a href="/login?mode=signup" class="btn btn-outline">Join</a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="card feature-card">
+            <div class="feature-icon">&#128274;</div>
+            <h3>Private</h3>
+            <p>Only members can see what's inside. Invite-only access.</p>
+        </div>
+        <div class="card feature-card">
+            <div class="feature-icon">&#128101;</div>
+            <h3>Members</h3>
+            <p>See who's in the group. Profiles, contacts, all in one place.</p>
+        </div>
+        <div class="card feature-card">
+            <div class="feature-icon">&#128231;</div>
+            <h3>Updates</h3>
+            <p>Stay in the loop with group emails and announcements.</p>
+        </div>
+    </section>
 
     <script type="module">
-        import { isLoggedIn } from '/js/auth.js';
-        // Already logged in — swap buttons to go to dashboard
+        import { loadConfig, getSiteName } from '/config.js';
+        import { getSite, isLoggedIn, page } from '/js/auth.js';
+
+        const site = getSite();
+
+        await loadConfig();
+        const name = getSiteName();
+
+        // Update hero content with site name
+        if (name) {
+            document.getElementById('heroTitle').textContent = name;
+            document.getElementById('heroSubtitle').textContent = `Welcome to ${name}. Sign in to get started.`;
+        }
+
+        // Update nav/auth based on auth state
+        if (site) {
+            document.getElementById('siteNav').innerHTML = `
+                <a href="${page('dashboard')}" class="nav-link">Dashboard</a>
+            `;
+        }
+
         if (isLoggedIn()) {
-            document.getElementById('ctaButtons').innerHTML =
-                '<a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>';
+            document.getElementById('heroCta').innerHTML =
+                `<a href="${page('dashboard')}" class="btn btn-primary">Go to Dashboard</a>`;
+            if (site) {
+                document.getElementById('siteAuth').innerHTML = `
+                    <a href="${page('dashboard')}" class="btn btn-sm btn-outline">Dashboard</a>
+                `;
+            }
+        } else if (site) {
+            document.getElementById('siteAuth').innerHTML = `
+                <a href="${page('login')}" class="btn btn-sm btn-outline">Sign In</a>
+                <a href="${page('login')}?mode=signup" class="btn btn-sm btn-primary">Join</a>
+            `;
         }
     </script>
 </body>
