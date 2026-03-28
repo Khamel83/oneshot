@@ -30,3 +30,4 @@ dispatch/
 # cc-mirror keys
 secrets/cc-mirror-keys.env
 node_modules/
+.claude/delegation-log.jsonl
