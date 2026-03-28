@@ -1,6 +1,6 @@
 # ONE_SHOT v13 — Operator Framework
 
-**10 skills.** Three operators. Seven utilities.
+**11 skills.** Three operators. Eight utilities.
 
 ---
 
@@ -43,6 +43,7 @@ Full operator for complex tasks:
 | `/freesearch` | Zero-token web search (Exa) |
 | `/vision` | Image/website visual analysis |
 | `/secrets` | SOPS/Age secrets management |
+| `/review-log` | Review session logs with haiku |
 
 ---
 

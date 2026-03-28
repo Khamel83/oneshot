@@ -8,7 +8,6 @@ These rules load for every project.
 
 - Don't edit databases directly when there's a UI
 - Don't write scripts when a CLI exists
-- Don't debug for an hour when `docker pull` might fix it
 - If there's a 30-second solution, do that before the 30-minute solution
 
 ---
@@ -25,9 +24,8 @@ These rules load for every project.
 | "Run this command" | Run it yourself |
 | "Can you verify it works?" | Run the test, show the output |
 | "Should I read this file?" | Read it. Then tell me what's there. |
-| "Let me know what you find" | Search, find, report. No hand-holding. |
 
-**The rule**: If a tool exists for it, use it. If you have shell access, run commands. If you can read files, read them. The only things you can't do are physical-world actions (reboot a server manually, plug in a cable).
+**The rule**: If a tool exists for it, use it. The only things you can't do are physical-world actions.
 
 **Exceptions** (ask first):
 - Destructive operations (rm -rf, DROP TABLE, force push)
@@ -41,8 +39,8 @@ These rules load for every project.
 Before delegating, assess (complexity, criticality, uncertainty). After delegation, verify the result.
 Full protocol: `~/.claude/rules/delegation.md`
 
-- **Assess**: Is this worth delegating? Low complexity → handle inline.
-- **Verify**: Spot-check search results, review diffs, check exit codes.
+- **Assess**: Low complexity → handle inline.
+- **Verify**: Spot-check results, review diffs, check exit codes.
 - **Escalate**: original → inline → human (3 attempts max, change strategy each time).
 - **Log**: Automatic via SubagentStop hook → `.claude/delegation-log.jsonl`
 
@@ -51,108 +49,44 @@ Full protocol: `~/.claude/rules/delegation.md`
 ## Work Discipline
 
 - **Plan first**: Always start with a plan before coding. Think, then do.
-- **Commit per task**: Don't batch commits to end-of-session. Commit each completed task immediately.
-- **Keep tasks small**: Break work so each subtask completes well within context. If it's too big, split it.
-- **Vanilla over complex**: Simple direct work beats elaborate multi-agent orchestration for small tasks.
+- **Commit per task**: Commit each completed task immediately, don't batch.
+- **Keep tasks small**: Break work so each subtask completes well within context.
+- **Vanilla over complex**: Simple direct work beats elaborate orchestration for small tasks.
 
 ---
 
 ## Documentation-First Coding
 
-**CRITICAL RULE:** Before writing code that uses external APIs, libraries, or configuration syntax, you MUST check the current documentation.
+Before writing code that uses external APIs or libraries, check current docs first.
 
-### Process
 1. Check local cached docs: `~/homelab/docs/services/<service-name>/`
 2. If insufficient, use WebFetch/WebSearch for current docs
-3. Verify version compatibility
-4. Write code using current syntax, not training data
+3. Write code using current syntax, not training data
 
 ---
 
-## AGENTS.md Rule (CRITICAL)
+## AGENTS.md Rule
 
-**AGENTS.md is READ-ONLY in all projects.**
-
-```bash
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/AGENTS.md > AGENTS.md
-```
-
-| File | Purpose | Editable? |
-|------|---------|-----------|
-| `AGENTS.md` | ONE_SHOT spec (universal) | **NO** - curl from oneshot |
-| `CLAUDE.md` | Project-specific Claude instructions | YES |
+**AGENTS.md is READ-ONLY.** Refresh with: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/AGENTS.md > AGENTS.md`
 
 ---
 
-## ONE_SHOT v12: Native Tasks + Intelligent Delegation
+## Task Management
 
-**Core Philosophy**: Use Claude's native features first, external tools as fallback.
+**Native Tasks** (TodoWrite/TodoRead) — primary. Persistent in session, use for all tracking.
 
-### Task Management Strategy
-```yaml
-primary: "native"     # Claude's TaskCreate/TaskUpdate/TaskList
-fallback: "beads"     # Legacy bd CLI for edge cases
-```
+| Session Start | Session End |
+|--------------|-------------|
+| Check pending tasks | git status + commit |
+| Set in_progress | TaskUpdate → completed |
+| | git push |
 
-**Native Tasks** (TaskCreate, TaskGet, TaskUpdate, TaskList) shipped in Claude Code 2.1 (Jan 2026).
-- Persistent in `~/.claude/tasks/`
-- Survive `/clear` and context compression
-- Use these for all task tracking
-
-### Session Start Protocol
-1. `TaskList` - Check for pending/in_progress tasks
-2. Pick highest-priority unblocked task
-3. `TaskUpdate` to set status="in_progress"
-
-### Session End Protocol
-1. `git status` - check changes
-2. `git add <files>` - stage changes
-3. `git commit -m "..."` - commit code
-4. `TaskUpdate` - mark task completed or update notes
-5. `git push` - push to remote
-
-### Swarm Mode (Experimental)
-Enable with: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
-
-Use `/swarm` for multi-agent orchestration:
-- TeamCreate - Create agent team
-- SendMessage - Peer-to-peer messaging
-- Task assignment to teammates
+**Beads (`bd` CLI) is deprecated** — use native Tasks.
 
 ---
 
-## ONE_SHOT Skills System
+## Session Logging
 
-**Skills installed at**: `~/.claude/skills/oneshot/`
-
-1. **AGENTS.md** - Skeleton key for orchestration
-2. **Skills** (21 total) - Loaded on-demand (~100 tokens each)
-3. **Secrets** - SOPS/Age encrypted in oneshot/secrets/
-
-### Skill Discovery
-| Intent | Skill |
-|--------|-------|
-| "new project", "build me" | `oneshot-core` |
-| "resume", "checkpoint" | `resume-handoff` |
-| "deploy", "push to cloud" | `push-to-cloud` |
-| "refactor", "clean up" | `refactorer` |
-| "bug", "broken" | `debugger` |
-
----
-
-## Beads: Legacy Fallback
-
-**DEPRECATED in v11**: Beads (`bd` CLI) is now a fallback. Use native Tasks instead.
-
-Use Beads only when:
-- Working on legacy projects that already use beads
-- Native tasks are unavailable for some reason
-
-### Beads Commands (Legacy)
-- `bd ready` - List ready tasks
-- `bd create "task"` - Create task
-- `bd sync` - Commit bead changes
-- `bv` - TUI viewer
-
-### Migration
-Existing Beads users: See `/beads` deprecation notice for migration guide.
+All tool calls are logged to `~/.claude/logs/YYYY-MM-DD.jsonl` via PostToolUse hook.
+Session summaries written to `~/.claude/logs/sessions.jsonl` at session end.
+Use `/review-log` to analyze logs with haiku.
