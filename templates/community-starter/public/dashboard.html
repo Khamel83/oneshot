@@ -95,15 +95,19 @@
     </main>
 
     <script type="module">
-        import { requireAuth, getMember, isAdmin, signOut, authFetch, handleUnauthorized } from '/js/auth.js';
+        import { getSite, requireAuth, getMember, isAdmin, signOut, authFetch, handleUnauthorized, api, page } from '/js/auth.js';
 
         if (!requireAuth()) throw new Error('not authenticated');
 
+        const site = getSite();
         const member = getMember();
 
-        // Show admin link if applicable
+        // Update nav links for multi-tenant
+        document.querySelector('nav a[href="/dashboard"]').href = page('dashboard');
         if (isAdmin()) {
-            document.getElementById('adminLink').style.display = '';
+            const adminLink = document.getElementById('adminLink');
+            adminLink.style.display = '';
+            adminLink.href = page('admin');
         }
 
         // Personalize greeting
@@ -115,7 +119,7 @@
         // Load members list
         async function loadMembers() {
             try {
-                const res = await authFetch('/api/members');
+                const res = await authFetch(api('members'));
                 if (handleUnauthorized(res)) return;
                 const data = await res.json();
                 renderMembers(data.members || []);

@@ -2,6 +2,7 @@
 Pytest configuration — mock external services for unit tests.
 """
 import os
+import sys
 import pytest
 
 # Set env vars before any imports that read them
@@ -13,3 +14,6 @@ os.environ.setdefault('CRON_SECRET', 'test_cron_secret')
 os.environ.setdefault('SITE_URL', 'http://localhost:3000')
 os.environ.setdefault('ADMIN_EMAIL', 'admin@test.com')
 os.environ.setdefault('EMAIL_FROM', 'Test <noreply@test.com>')
+
+# Ensure the template directory is on the Python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

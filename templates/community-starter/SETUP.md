@@ -1,6 +1,6 @@
-# Community Starter — Setup Guide
+# Private Site Generator — Setup Guide
 
-A hardened template for private membership community sites.
+A multi-tenant platform that lets you spin up unlimited private micro-sites from a single deployment. Each site gets its own auth, database schema, and admin — created with one command.
 
 **Stack**: Vercel (static HTML + Python functions) + Supabase + Resend
 
@@ -8,46 +8,44 @@ A hardened template for private membership community sites.
 
 ## What You Get
 
-- Email/password login (backed by Supabase Auth)
-- Member directory with public profiles
+- One deployment, unlimited private sites at `yourdomain.com/{slug}`
+- Email/password login per site (Supabase Auth)
+- Member directory with profiles
 - Admin panel with role management
-- Scheduled email jobs with 504 false-alarm protection
+- Scheduled email jobs with dedup
 - Deny-all RLS so direct DB access is blocked
-- Auto-populated member rows on signup (via DB trigger)
+- Auto-member creation on signup (via DB trigger)
+- Schema-per-site data isolation
 
 ---
 
 ## Prerequisites
 
-- Vercel account (Hobby plan fine — supports up to 12 Python functions)
-- Supabase account (free tier fine — handles auth + DB)
-- Resend account (free tier: 3,000 emails/month, shared across verified domains)
-- Cloudflare account if you want a custom domain (recommended)
+- Vercel account (Hobby plan fine)
+- Supabase account (free tier fine)
+- Resend account (free tier: 3,000 emails/month)
+- Cloudflare account if you want a custom domain
 
 ---
 
 ## Step 1 — Supabase Setup
 
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to **Settings → API** and copy:
-   - `SUPABASE_URL` (e.g., `https://abcdef.supabase.co`)
-   - `SUPABASE_ANON_KEY` (safe for frontend — still protected by RLS)
-   - `SUPABASE_SERVICE_ROLE_KEY` (**SECRET** — server-side only, never expose)
+1. Create a project at [supabase.com](https://supabase.com)
+2. Copy from **Settings → API**:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
 
-3. Run migrations in **SQL Editor**:
+3. Run in **SQL Editor**:
    ```
-   Run: migrations/01_schema.sql
-   Run: migrations/02_rls.sql
+   Run: migrations/00_sites_table.sql
    ```
 
 4. Enable **Email/Password** auth:
-   - Go to **Authentication → Providers → Email**
-   - Enable it, configure confirm email if desired
+   - **Authentication → Providers → Email** → Enable
 
 5. (Optional) Enable **Google OAuth**:
-   - Go to **Authentication → Providers → Google**
-   - Add your Google OAuth client ID + secret
-   - Set redirect URL to: `https://your-domain.com/dashboard`
+   - **Authentication → Providers → Google** → Add credentials
 
 ---
 
@@ -55,131 +53,116 @@ A hardened template for private membership community sites.
 
 1. Create account at [resend.com](https://resend.com)
 2. Add and verify your sending domain
-3. Create an API key → copy it as `RESEND_API_KEY`
-4. Set `EMAIL_FROM` in env vars: `Your App <noreply@yourdomain.com>`
+3. Create an API key → `RESEND_API_KEY`
+4. Set `EMAIL_FROM`: `Your App <noreply@yourdomain.com>`
 
 ---
 
 ## Step 3 — Vercel Setup
 
-1. Import this repo into Vercel
-2. Add environment variables (Settings → Environment Variables):
+1. Import repo into Vercel
+2. Add environment variables:
 
-   | Variable | Value | Environment |
-   |----------|-------|-------------|
-   | `SUPABASE_URL` | Your project URL | All |
-   | `SUPABASE_ANON_KEY` | Public anon key | All |
-   | `SUPABASE_SERVICE_ROLE_KEY` | Service role key | **Production only** |
-   | `RESEND_API_KEY` | Your Resend key | Production |
-   | `EMAIL_FROM` | `App <noreply@domain.com>` | Production |
-   | `REPLY_TO` | `you@yourdomain.com` | Production |
-   | `SITE_URL` | `https://www.yourdomain.com` | Production |
-   | `ADMIN_EMAIL` | your admin email | Production |
-   | `CRON_SECRET` | Random secret (see below) | Production |
-
-3. Generate `CRON_SECRET`:
-   ```bash
-   openssl rand -hex 32
-   ```
+   | Variable | Where |
+   |----------|-------|
+   | `SUPABASE_URL` | All |
+   | `SUPABASE_ANON_KEY` | All |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Production only |
+   | `RESEND_API_KEY` | Production |
+   | `EMAIL_FROM` | Production |
+   | `REPLY_TO` | Production |
+   | `SITE_URL` | Production |
+   | `ADMIN_EMAIL` | Production |
+   | `CRON_SECRET` | Production (generate with `openssl rand -hex 32`) |
 
 ---
 
-## Step 4 — GitHub Secrets
+## Step 4 — Create Your First Site
 
-For scheduled jobs to work, add to **GitHub → Settings → Secrets**:
-- `SITE_URL` = `https://www.yourdomain.com`
-- `CRON_SECRET` = (same value as in Vercel)
+```bash
+./scripts/new-site.sh my-class "Mrs. Smith's 2nd Grade" --admin-email me@example.com
+```
 
----
+This creates:
+- A Supabase schema (`my-class`)
+- Tables: `members`, `email_log`
+- RLS policies (deny-all anon, read auth, update own)
+- Auto-member trigger (signup → member row)
+- Site registration in `public.sites`
+- Admin user via Supabase Auth Admin API
 
-## Step 5 — Cloudflare (Optional but Recommended)
-
-1. Add your domain to Cloudflare
-2. In Vercel → Settings → Domains, add your domain
-3. Set Cloudflare DNS records as directed by Vercel
-4. Keep **Proxy: enabled** in Cloudflare (orange cloud) for DDoS protection
-
----
-
-## Step 6 — Deploy
-
-Push to main. Vercel auto-deploys. Done.
-
----
-
-## Customization Checklist
-
-- [ ] **Branding**: Update `--color-primary` in all HTML files (it's the top CSS variable)
-- [ ] **App name**: Search/replace `Your App` in HTML titles and nav
-- [ ] **Email templates**: Update `send_welcome_email()` in `api/email.py`
-- [ ] **Scheduled job**: Update cron schedule and action in `.github/workflows/scheduled-jobs.yml`
-- [ ] **Member fields**: Add columns to `migrations/01_schema.sql` → update `PUBLIC_COLUMNS` / `OWN_COLUMNS` in `api/members.py`
+Output:
+```
+=== Site Created ===
+  URL:      https://yourdomain.com/my-class
+  Admin:    me@example.com
+  Password: <generated>
+  Login:    https://yourdomain.com/my-class/login
+```
 
 ---
 
-## Architecture Decisions
+## Step 5 — GitHub Secrets (for scheduled emails)
 
-### Why Supabase Auth instead of custom sessions?
-
-Networth Tennis used a custom `session_tokens` table + `verify_session()` lookup. It worked but required:
-- Manual token generation
-- Manual expiry checking
-- DB query on every request
-
-Supabase Auth gives you JWT validation, Google OAuth, password reset emails, and token refresh for free. The API just calls `db().auth.get_user(token)` — one line.
-
-### Why SERVICE_ROLE_KEY instead of anon key on the server?
-
-The anon key is subject to RLS policies. Using the service role key server-side means:
-- RLS enforced via your application code (not DB policies)
-- No "insufficient permissions" surprises when you add a new table
-- Simpler queries (no need to pass user context to every RLS policy)
-
-The tradeoff: if a bug bypasses your auth check, it has full DB access. Mitigation: add RLS deny-all policies (done in `02_rls.sql`) so that even if someone gets the anon key from browser network traffic, they can't query the DB directly.
-
-### Why plain HTML + vanilla JS instead of React/Next.js?
-
-- No build step = no Vercel build minutes consumed
-- No `node_modules` to maintain
-- Instant deploys
-- Easy for non-engineers to read and modify
-
-If you need complex UI interactions, consider adding Alpine.js (CDN, no build).
-
-### Why 60s maxDuration?
-
-Bulk email sends can take 30+ seconds for 30+ members at Resend's 2 req/s rate limit. The 504 false-alarm pattern (function delivers all emails then times out returning the response) is real and happens without this. 60s is the Vercel Hobby plan maximum.
-
-### Why check email_log on 504?
-
-A 504 from Vercel means "your function took too long to respond" — not "your function crashed." By the time the 504 fires, the function may have already sent all emails. Without the email_log check, GitHub Actions would fire a false admin alert.
+Add to **GitHub → Settings → Secrets**:
+- `SITE_URL` = your production URL
+- `CRON_SECRET` = same value as Vercel
 
 ---
 
-## Vercel Function Limit
+## Step 6 — Cloudflare (Optional)
 
-Hobby plan: **12 serverless functions max** (files in `api/` with `class handler`).
-
-Current count: 5 (`auth`, `members`, `admin`, `email`, `system`). You have 7 slots.
-
-The CI check in `tests.yml` enforces this automatically.
+1. Add domain to Cloudflare
+2. Vercel → Settings → Domains → Add domain
+3. Set DNS records per Vercel instructions
+4. Keep Proxy enabled (orange cloud)
 
 ---
 
-## Common Gotchas (Learned the Hard Way)
+## How It Works
+
+### Routing
+
+```
+yourdomain.com/                  → root page (site list)
+yourdomain.com/{slug}/           → site homepage
+yourdomain.com/{slug}/login      → login
+yourdomain.com/{slug}/dashboard  → member view
+yourdomain.com/{slug}/admin      → owner panel
+yourdomain.com/{slug}/api/*      → API (routed to single function)
+```
+
+### Multi-Tenant Database
+
+Each site is a Postgres schema. Queries use the `Accept-Profile` header to target the right schema — no table name changes needed.
+
+```
+public.sites          → site registry (slug, name, config)
+my-class.members      → that site's members
+my-class.email_log    → that site's emails
+other-site.members    → completely isolated
+```
+
+### API Router
+
+One Vercel function (`api/index.py`) handles all sites. It parses the path, looks up the site, sets the schema header, and dispatches to handler modules in `api/handlers/`.
+
+---
+
+## Customization
+
+- **Branding**: Update `--color-primary` in HTML files
+- **App name**: Search/replace in HTML titles and nav
+- **Email templates**: Update `send_welcome_email()` in `api/handlers/email.py`
+- **Scheduled job**: Update cron schedule in `.github/workflows/scheduled-jobs.yml`
+- **Member fields**: Add columns to `migrations/01_schema_template.sql`, update column lists in `api/handlers/members.py`
+
+---
+
+## Common Gotchas
 
 1. **Email case sensitivity**: Always `.lower()` emails before storing/comparing.
-
-2. **`date +%d` is zero-padded**: Use `date +%-d` in bash date comparisons — `"01" = "1"` is false.
-
-3. **Greedy bulk loops**: Never `break` on email failure. Collect errors, continue sending.
-
-4. **Column names**: Verify before `.order()` — a wrong column name returns a Supabase error dict, which your ORM may silently convert to `[]`.
-
-5. **Auth on every endpoint**: Use `get_user_from_request()` before ANY data read/write. No exceptions.
-
-6. **Strip sensitive fields**: Never return `password_hash`, internal tokens, or admin flags you didn't intend to expose. Use explicit column selects.
-
-7. **504 ≠ failure**: See "Why check email_log on 504?" above.
-
-8. **CRON_SECRET**: Never check `if '@' in auth` as a bypass. The only valid check is `auth == cron_secret`.
+2. **504 != failure**: Bulk emails may timeout, but emails are still sent. The template deduplicates via `email_log`.
+3. **Auth on every endpoint**: Use `get_user_from_request()` before ANY data read/write.
+4. **CRON_SECRET**: Never check `if '@' in auth` as a bypass.
+5. **Vercel Hobby plan**: 12 serverless functions max. This template uses 2 (`index.py`, `system.py`).

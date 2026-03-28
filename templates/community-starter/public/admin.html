@@ -42,7 +42,7 @@
 <body>
     <nav>
         <span class="title">Admin Panel</span>
-        <a href="/dashboard">Dashboard</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
         <button id="signOutBtn">Sign out</button>
     </nav>
     <main>
@@ -64,14 +64,17 @@
     </main>
 
     <script type="module">
-        import { requireAdmin, signOut, authFetch, handleUnauthorized } from '/js/auth.js';
+        import { requireAdmin, signOut, authFetch, handleUnauthorized, api, page } from '/js/auth.js';
 
         if (!requireAdmin()) throw new Error('not admin');
+
+        // Update nav links for multi-tenant
+        document.querySelector('a.nav-link').href = page('dashboard');
 
         document.getElementById('signOutBtn').addEventListener('click', signOut);
 
         async function loadMembers() {
-            const res = await authFetch('/api/admin?action=members');
+            const res = await authFetch(api('admin?action=members'));
             if (handleUnauthorized(res)) return;
             const data = await res.json();
             renderMembers(data.members || []);
@@ -103,7 +106,7 @@
         }
 
         window.toggleAdmin = async (userId, newValue) => {
-            const res = await authFetch('/api/admin', {
+            const res = await authFetch(api('admin'), {
                 method: 'POST',
                 body: JSON.stringify({ action: 'set_admin', user_id: userId, is_admin: newValue }),
             });

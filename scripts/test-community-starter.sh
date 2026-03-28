@@ -30,17 +30,21 @@ echo ""
 echo "--- 1. Required files ---"
 REQUIRED_FILES=(
     "api/_supabase.py"
-    "api/auth.py"
-    "api/members.py"
-    "api/admin.py"
-    "api/email.py"
+    "api/index.py"
     "api/system.py"
+    "api/handlers/__init__.py"
+    "api/handlers/auth.py"
+    "api/handlers/members.py"
+    "api/handlers/admin.py"
+    "api/handlers/email.py"
     "vercel.json"
     "requirements.txt"
     "SETUP.md"
+    "ARCHITECTURE.md"
     ".env.example"
-    "migrations/01_schema.sql"
-    "migrations/02_rls.sql"
+    "migrations/00_sites_table.sql"
+    "migrations/01_schema_template.sql"
+    "migrations/02_rls_template.sql"
     "public/js/auth.js"
 )
 for f in "${REQUIRED_FILES[@]}"; do
@@ -48,13 +52,32 @@ for f in "${REQUIRED_FILES[@]}"; do
 done
 echo ""
 
-# 2. vercel.json is valid JSON
-echo "--- 2. vercel.json validity ---"
+# 2. Old files should NOT exist
+echo "--- 2. No old monolith handlers ---"
+OLD_FILES=(
+    "api/auth.py"
+    "api/members.py"
+    "api/admin.py"
+    "api/email.py"
+)
+for f in "${OLD_FILES[@]}"; do
+    if [ -f "$TEMPLATE/$f" ]; then
+        echo "  $f should not exist ... FAIL"
+        ((FAIL++))
+    else
+        echo "  $f absent ... PASS"
+        ((PASS++))
+    fi
+done
+echo ""
+
+# 3. vercel.json is valid JSON
+echo "--- 3. vercel.json validity ---"
 check "valid JSON" python3 -c "import json; json.load(open('$TEMPLATE/vercel.json'))"
 echo ""
 
-# 3. Vercel function count <= 12
-echo "--- 3. Function count ---"
+# 4. Vercel function count (class handler) <= 12
+echo "--- 4. Function count ---"
 COUNT=$(grep -rl "class handler" "$TEMPLATE/api/"*.py 2>/dev/null | wc -l)
 if [ "$COUNT" -le 12 ]; then
     echo "  $COUNT/12 handlers ... PASS"
@@ -65,16 +88,29 @@ else
 fi
 echo ""
 
-# 4. Env vars in .env.example are referenced in code
-echo "--- 4. Env var references ---"
+# 5. Router function exists and dispatches
+echo "--- 5. Router function ---"
+check "index.py has class handler" grep -q "class handler" "$TEMPLATE/api/index.py"
+check "index.py imports handlers dict" grep -q "handlers" "$TEMPLATE/api/index.py"
+check "index.py calls set_site" grep -q "set_site" "$TEMPLATE/api/index.py"
+check "index.py calls site_exists" grep -q "site_exists" "$TEMPLATE/api/index.py"
+echo ""
+
+# 6. Multi-tenant helpers in _supabase.py
+echo "--- 6. Multi-tenant support ---"
+check "set_site function" grep -q "def set_site" "$TEMPLATE/api/_supabase.py"
+check "site_exists function" grep -q "def site_exists" "$TEMPLATE/api/_supabase.py"
+check "parse_request_path function" grep -q "def parse_request_path" "$TEMPLATE/api/_supabase.py"
+check "Accept-Profile header" grep -q "Accept-Profile" "$TEMPLATE/api/_supabase.py"
+echo ""
+
+# 7. Env vars in .env.example are referenced in code
+echo "--- 7. Env var references ---"
 while IFS='=' read -r key _; do
-    # Skip comments and empty lines
     [[ "$key" =~ ^#.*$ || -z "$key" ]] && continue
-    # Strip any inline comment
     key="${key%%#*}"
-    key="$(echo "$key" | xargs)"  # trim whitespace
+    key="$(echo "$key" | xargs)"
     REFS=$(grep -rl "$key" "$TEMPLATE/api/" "$TEMPLATE/.github/" 2>/dev/null | wc -l)
-    # Also check tests (accept refs in tests as valid)
     REFS_TESTS=$(grep -rl "$key" "$TEMPLATE/tests/" 2>/dev/null | wc -l)
     TOTAL=$((REFS + REFS_TESTS))
     if [ "$TOTAL" -gt 0 ]; then
@@ -87,17 +123,23 @@ while IFS='=' read -r key _; do
 done < "$TEMPLATE/.env.example"
 echo ""
 
-# 5. Python syntax check
-echo "--- 5. Python syntax ---"
-for py in "$TEMPLATE/api/"*.py; do
+# 8. Python syntax check
+echo "--- 8. Python syntax ---"
+find "$TEMPLATE/api" -name "*.py" -print0 | while IFS= read -r -d '' py; do
     basename_py="$(basename "$py")"
     check "$basename_py" python3 -m py_compile "$py"
 done
 echo ""
 
-# 6. Tests pass
-echo "--- 6. Tests ---"
+# 9. Tests pass
+echo "--- 9. Tests ---"
 check "pytest" bash -c "cd '$TEMPLATE' && PYTHONPATH=\"\$PWD\" python3 -m pytest tests/ -q 2>&1"
+echo ""
+
+# 10. Frontend uses multi-tenant helpers
+echo "--- 10. Frontend multi-tenant ---"
+check "auth.js has getSite" grep -q "getSite" "$TEMPLATE/public/js/auth.js"
+check "auth.js has api()" grep -q "function api" "$TEMPLATE/public/js/auth.js"
 echo ""
 
 # Summary

@@ -7,11 +7,14 @@
       "excludeFiles": "{tests/**,__tests__/**,**/*.test.py,**/test_*.py,fixtures/**}"
     }
   },
+  "rewrites": [
+    { "source": "/:site/api/(.*)", "destination": "/api/index" },
+    { "source": "/:site/login", "destination": "/login.html" },
+    { "source": "/:site/dashboard", "destination": "/dashboard.html" },
+    { "source": "/:site/admin", "destination": "/admin.html" },
+    { "source": "/:site", "destination": "/index.html" }
+  ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "^/$", "dest": "/index.html" },
-    { "src": "/login", "dest": "/login.html" },
-    { "src": "/dashboard", "dest": "/dashboard.html" },
-    { "src": "/admin", "dest": "/admin.html" }
+    { "src": "/api/(.*)", "dest": "/api/$1" }
   ]
 }

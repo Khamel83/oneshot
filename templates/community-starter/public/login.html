@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — Your App</title>
     <style>
-        /* ============================================================
-           BRANDING — Change these variables to match your app
-           ============================================================ */
         :root {
             --color-primary: #4f46e5;
             --color-primary-dark: #4338ca;
@@ -17,7 +14,6 @@
             --color-error: #dc2626;
             --color-card: #ffffff;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -78,20 +74,24 @@
             <label for="email">Email</label>
             <input id="email" type="email" required autocomplete="email" placeholder="you@example.com">
             <label for="password">Password</label>
-            <input id="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+            <input id="password" type="password" required autocomplete="current-password" placeholder="--------">
             <button type="submit" id="submitBtn">Sign In</button>
         </form>
         <div class="links">
-            <a href="/reset-password">Forgot password?</a> &middot;
-            <a href="/signup">Create account</a>
+            <a id="resetLink">Forgot password?</a>
         </div>
     </div>
 
     <script type="module">
-        import { saveSession, isLoggedIn } from '/js/auth.js';
+        import { getSite, saveSession, isLoggedIn, api, page } from '/js/auth.js';
+
+        const site = getSite();
 
         // Already logged in → go to dashboard
-        if (isLoggedIn()) window.location.href = '/dashboard';
+        if (isLoggedIn()) window.location.href = page('dashboard');
+
+        // Update page-relative links
+        if (site) document.getElementById('resetLink').href = page('reset-password');
 
         const form = document.getElementById('loginForm');
         const errorEl = document.getElementById('error');
@@ -101,13 +101,13 @@
             e.preventDefault();
             errorEl.style.display = 'none';
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Signing in…';
+            submitBtn.textContent = 'Signing in...';
 
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
             try {
-                const res = await fetch('/api/auth', {
+                const res = await fetch(api('auth'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'login', email, password }),
@@ -115,7 +115,7 @@
                 const data = await res.json();
                 if (data.success) {
                     saveSession(data.token, data.member);
-                    window.location.href = '/dashboard';
+                    window.location.href = page('dashboard');
                 } else {
                     showError(data.error || 'Login failed');
                 }
