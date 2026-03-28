@@ -59,7 +59,7 @@ Each site is a Postgres schema. The `Accept-Profile` header switches schemas per
 public.sites              → site registry
 {slug}.members            → user profiles
 {slug}.email_log          → sent email audit log
-{slug}.handle_new_user()  → trigger: signup → auto-create member
+(no trigger — signup handler inserts directly)
 ```
 
 ### Site Creation (`scripts/new-site.sh`)
@@ -69,14 +69,14 @@ public.sites              → site registry
 3. `CREATE SCHEMA IF NOT EXISTS {slug}`
 4. Create `members` + `email_log` tables
 5. Create RLS policies (deny-all anon, read auth, update own)
-6. Create `handle_new_user()` trigger gated on `raw_user_meta_data->>'site'`
+6. Member creation handled by signup handler (no trigger needed)
 7. Register in `public.sites`
 8. Create admin user via Supabase Auth Admin API
 
 ### Isolation
 
 - Each schema has its own RLS policies
-- The trigger uses `WHEN (NEW.raw_user_meta_data->>'site' = '{slug}')` to prevent cross-site member creation
+- The signup handler inserts into `{site}.members` directly using the Accept-Profile header set by the router
 - `Accept-Profile` header limits all queries to one schema
 - Service role key bypasses RLS server-side (application handles auth checks)
 

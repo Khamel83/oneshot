@@ -116,29 +116,8 @@ CREATE INDEX IF NOT EXISTS ${SLUG}_idx_members_user_id ON $SLUG.members(user_id)
 CREATE INDEX IF NOT EXISTS ${SLUG}_idx_members_email ON $SLUG.members(email);
 CREATE INDEX IF NOT EXISTS ${SLUG}_idx_email_log_action_sent ON $SLUG.email_log(action, sent_at);
 
-CREATE OR REPLACE FUNCTION $SLUG.handle_new_user()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER SET search_path = $SLUG
-AS \$\$
-BEGIN
-    INSERT INTO $SLUG.members (user_id, email, name)
-    VALUES (
-        NEW.id,
-        NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1))
-    )
-    ON CONFLICT (user_id) DO NOTHING;
-    RETURN NEW;
-END;
-\$\$;
-
-DROP TRIGGER IF EXISTS ${SLUG}_on_auth_user_created ON auth.users;
-CREATE TRIGGER ${SLUG}_on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW
-    WHEN (NEW.raw_user_meta_data->>'site' = '$SLUG')
-    EXECUTE FUNCTION $SLUG.handle_new_user();
+# Member creation handled by API signup handler (api/handlers/auth.py)
+# No trigger needed — router extracts site from URL path, handler inserts directly.
 
 ALTER TABLE $SLUG.members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE $SLUG.email_log ENABLE ROW LEVEL SECURITY;

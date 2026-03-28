@@ -14,7 +14,7 @@ A multi-tenant platform that lets you spin up unlimited private micro-sites from
 - Admin panel with role management
 - Scheduled email jobs with dedup
 - Deny-all RLS so direct DB access is blocked
-- Auto-member creation on signup (via DB trigger)
+- Auto-member creation on signup (via API handler)
 - Schema-per-site data isolation
 
 ---
@@ -87,7 +87,7 @@ This creates:
 - A Supabase schema (`my-class`)
 - Tables: `members`, `email_log`
 - RLS policies (deny-all anon, read auth, update own)
-- Auto-member trigger (signup → member row)
+- Auto-member on signup (handler inserts directly)
 - Site registration in `public.sites`
 - Admin user via Supabase Auth Admin API
 

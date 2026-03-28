@@ -35,29 +35,18 @@ CREATE INDEX IF NOT EXISTS {{SLUG}}_idx_members_user_id ON {{SLUG}}.members(user
 CREATE INDEX IF NOT EXISTS {{SLUG}}_idx_members_email ON {{SLUG}}.members(email);
 CREATE INDEX IF NOT EXISTS {{SLUG}}_idx_email_log_action_sent ON {{SLUG}}.email_log(action, sent_at);
 
--- Auto-create member row when a new user signs up
-CREATE OR REPLACE FUNCTION {{SLUG}}.handle_new_user()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER SET search_path = {{SLUG}}
-AS $$
-BEGIN
-    INSERT INTO {{SLUG}}.members (user_id, email, name)
-    VALUES (
-        NEW.id,
-        NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1))
-    )
-    ON CONFLICT (user_id) DO NOTHING;
-    RETURN NEW;
-END;
-$$;
+-- Member creation is handled by the API signup handler (api/handlers/auth.py)
+-- which inserts directly into {site}.members using Accept-Profile header.
+-- No trigger needed — the router knows the site from the URL path.
 
--- Wire trigger — only fires if user's app_metadata matches this site
--- This prevents cross-site member creation
-DROP TRIGGER IF EXISTS {{SLUG}}_on_auth_user_created ON auth.users;
-CREATE TRIGGER {{SLUG}}_on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW
-    WHEN (NEW.raw_user_meta_data->>'site' = '{{SLUG}}')
-    EXECUTE FUNCTION {{SLUG}}.handle_new_user();
+ALTER TABLE {{SLUG}}.members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {{SLUG}}.email_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "{{SLUG}}_anon_deny_members_select" ON {{SLUG}}.members FOR SELECT TO anon USING (false);
+CREATE POLICY "{{SLUG}}_anon_deny_members_insert" ON {{SLUG}}.members FOR INSERT TO anon WITH CHECK (false);
+CREATE POLICY "{{SLUG}}_anon_deny_members_update" ON {{SLUG}}.members FOR UPDATE TO anon USING (false);
+CREATE POLICY "{{SLUG}}_anon_deny_members_delete" ON {{SLUG}}.members FOR DELETE TO anon USING (false);
+CREATE POLICY "{{SLUG}}_auth_read_members" ON {{SLUG}}.members FOR SELECT TO authenticated USING (true);
+CREATE POLICY "{{SLUG}}_auth_update_own_member" ON {{SLUG}}.members FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "{{SLUG}}_anon_deny_email_log" ON {{SLUG}}.email_log FOR ALL TO anon USING (false);
+CREATE POLICY "{{SLUG}}_auth_deny_email_log" ON {{SLUG}}.email_log FOR ALL TO authenticated USING (false);
