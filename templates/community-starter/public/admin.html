@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Your App</title>
+    <style>
+        :root {
+            --color-primary: #4f46e5;
+            --color-bg: #f9fafb;
+            --color-text: #111827;
+            --color-muted: #6b7280;
+            --color-card: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--color-bg); color: var(--color-text); }
+        nav {
+            background: var(--color-card);
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            gap: 1rem;
+        }
+        nav .title { font-weight: 600; flex: 1; }
+        nav a { color: var(--color-muted); text-decoration: none; font-size: 0.875rem; }
+        nav button { background: none; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.375rem 0.75rem; cursor: pointer; font-size: 0.875rem; }
+        main { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+        h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+        table { width: 100%; border-collapse: collapse; background: var(--color-card); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        th { background: #f3f4f6; text-align: left; padding: 0.75rem 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); }
+        td { padding: 0.75rem 1rem; font-size: 0.875rem; border-top: 1px solid #e5e7eb; }
+        .badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; }
+        .badge-admin { background: #ede9fe; color: #5b21b6; }
+        .badge-member { background: #f3f4f6; color: var(--color-muted); }
+        button.danger { color: #dc2626; border-color: #fca5a5; }
+        button.danger:hover { background: #fee2e2; }
+        .action-btn { background: none; border: 1px solid #d1d5db; border-radius: 4px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="title">Admin Panel</span>
+        <a href="/dashboard">Dashboard</a>
+        <button id="signOutBtn">Sign out</button>
+    </nav>
+    <main>
+        <h2>Members</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="membersTable">
+                <tr><td colspan="5" style="color: var(--color-muted)">Loading…</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <script type="module">
+        import { requireAdmin, signOut, authFetch, handleUnauthorized } from '/js/auth.js';
+
+        if (!requireAdmin()) throw new Error('not admin');
+
+        document.getElementById('signOutBtn').addEventListener('click', signOut);
+
+        async function loadMembers() {
+            const res = await authFetch('/api/admin?action=members');
+            if (handleUnauthorized(res)) return;
+            const data = await res.json();
+            renderMembers(data.members || []);
+        }
+
+        function renderMembers(members) {
+            const tbody = document.getElementById('membersTable');
+            if (!members.length) {
+                tbody.innerHTML = '<tr><td colspan="5">No members found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = members.map(m => `
+                <tr>
+                    <td>${escapeHtml(m.name)}</td>
+                    <td>${escapeHtml(m.email)}</td>
+                    <td>
+                        <span class="badge ${m.is_admin ? 'badge-admin' : 'badge-member'}">
+                            ${m.is_admin ? 'Admin' : 'Member'}
+                        </span>
+                    </td>
+                    <td>${new Date(m.joined_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn" onclick="toggleAdmin('${m.user_id}', ${!m.is_admin})">
+                            ${m.is_admin ? 'Remove admin' : 'Make admin'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.toggleAdmin = async (userId, newValue) => {
+            const res = await authFetch('/api/admin', {
+                method: 'POST',
+                body: JSON.stringify({ action: 'set_admin', user_id: userId, is_admin: newValue }),
+            });
+            if (handleUnauthorized(res)) return;
+            loadMembers();
+        };
+
+        function escapeHtml(str) {
+            const el = document.createElement('div');
+            el.textContent = str;
+            return el.innerHTML;
+        }
+
+        loadMembers();
+    </script>
+</body>
+</html>

@@ -157,3 +157,26 @@ jobs:
           done
 
           echo "All required files present"
+
+  validate-community-starter:
+    name: Validate Community Starter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install template dependencies
+        run: pip install -r templates/community-starter/requirements.txt pytest
+
+      - name: Make script executable
+        run: chmod +x scripts/test-community-starter.sh
+
+      - name: Run community-starter validation
+        run: ./scripts/test-community-starter.sh

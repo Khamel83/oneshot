@@ -1,0 +1,53 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+
+      - name: Check Vercel function count
+        run: |
+          COUNT=$(grep -rl "class handler" api/*.py | wc -l)
+          echo "Vercel handler count: $COUNT"
+          if [ "$COUNT" -gt 12 ]; then
+            echo "::error::Vercel Hobby plan limit is 12 serverless functions. Found $COUNT."
+            exit 1
+          fi
+
+      - name: Run tests
+        run: python3 -m pytest tests/ -v
+        env:
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_SERVICE_ROLE_KEY: test_key
+          RESEND_API_KEY: test_key
+          CRON_SECRET: test_secret
+          SITE_URL: http://localhost:3000
+
+      - name: Check CRON endpoints require auth
+        run: |
+          for wf in .github/workflows/*.yml; do
+            if grep -q "CRON_SECRET" "$wf"; then
+              if ! grep -q "Authorization: Bearer" "$wf"; then
+                echo "::error::$wf has CRON_SECRET but no Authorization header in curl calls"
+                exit 1
+              fi
+            fi
+          done
+          echo "CRON auth check passed"

@@ -1,0 +1,84 @@
+name: Scheduled Jobs
+
+on:
+  schedule:
+    # Weekly digest — every Monday at 9am UTC
+    # Customize schedule and action name for your use case
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to run'
+        required: true
+        default: 'send_digest'
+        type: choice
+        options:
+          - send_digest
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    # Only run on Monday (day 1) for scheduled runs — workflow_dispatch always runs
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && contains(github.event.schedule, '0 9 * * 1'))
+
+    steps:
+      - name: Send weekly digest
+        id: send
+        run: |
+          HTTP_STATUS=$(curl -s \
+            -o /tmp/response.json \
+            -w "%{http_code}" \
+            -X POST "${{ secrets.SITE_URL }}/api/email" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -d '{"action":"send_digest"}')
+
+          echo "HTTP status: $HTTP_STATUS"
+          cat /tmp/response.json
+
+          # ---------------------------------------------------------------
+          # 504 / 502 false-alarm pattern:
+          # Bulk email runs can exceed Vercel's response timeout even though
+          # all emails were delivered. Check email_log before declaring failure.
+          # ---------------------------------------------------------------
+          if [ "$HTTP_STATUS" = "504" ] || [ "$HTTP_STATUS" = "502" ]; then
+            echo "Got $HTTP_STATUS — checking email_log before declaring failure..."
+            sleep 5
+            CHECK=$(curl -s \
+              -X POST "${{ secrets.SITE_URL }}/api/email" \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              -d '{"action":"check_recent_send","email_action":"send_digest"}')
+            echo "email_log check: $CHECK"
+            if [ "$(echo "$CHECK" | jq -r '.already_sent')" = "true" ]; then
+              SENT=$(echo "$CHECK" | jq -r '.sent // 0')
+              echo "::notice::Confirmed: $SENT emails delivered (email_log). $HTTP_STATUS was a response timeout, not a real failure."
+              exit 0
+            fi
+            echo "::error::HTTP $HTTP_STATUS and email_log shows no sends today. Real failure."
+            exit 1
+          fi
+
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Unexpected HTTP status $HTTP_STATUS"
+            exit 1
+          fi
+
+          SENT=$(cat /tmp/response.json | jq -r '.sent // 0')
+          echo "::notice::Digest sent to $SENT members"
+
+      - name: Check email connectivity
+        if: always()
+        run: |
+          HTTP_STATUS=$(curl -s \
+            -o /tmp/check.json \
+            -w "%{http_code}" \
+            -X POST "${{ secrets.SITE_URL }}/api/system" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -d '{"action":"check_email_connectivity"}')
+          echo "Email connectivity check: HTTP $HTTP_STATUS"
+          cat /tmp/check.json
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::warning::Email connectivity check failed — Resend API key may be invalid"
+          fi

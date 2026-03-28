@@ -39,6 +39,8 @@
 |-----------|---------|----------|
 | [name] | [what it does] | [file/dir] |
 
+> **Available template**: See `templates/community-starter/` for a deployable Vercel + Supabase + Python membership community starter. Full setup guide at `templates/community-starter/SETUP.md`.
+
 ### How It Fits Together
 [2-4 sentences describing the data flow or main interactions between components]
 

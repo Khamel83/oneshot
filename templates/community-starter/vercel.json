@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "functions": {
+    "api/*.py": {
+      "runtime": "@vercel/python@6.28.0",
+      "maxDuration": 60,
+      "excludeFiles": "{tests/**,__tests__/**,**/*.test.py,**/test_*.py,fixtures/**}"
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "^/$", "dest": "/index.html" },
+    { "src": "/login", "dest": "/login.html" },
+    { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/admin", "dest": "/admin.html" }
+  ]
+}

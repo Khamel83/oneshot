@@ -1,0 +1,113 @@
+"""
+System handler — health check, bug reports.
+
+GET  /api/system                    → health check (DB + email status)
+POST /api/system {"action": "report_bug", "message": "..."}   (auth required)
+POST /api/system {"action": "check_email_connectivity"}        (CRON_SECRET required)
+"""
+import json
+import os
+from http.server import BaseHTTPRequestHandler
+
+from api._supabase import db, get_user_from_request
+
+
+class handler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        status = {}
+
+        # Check DB
+        try:
+            result = db().table('members').select('user_id').limit(1).execute()
+            status['db'] = 'ok'
+        except Exception as e:
+            print(f'DB health check failed: {e}')
+            status['db'] = 'error'
+
+        # Check email config
+        resend_key = os.environ.get('RESEND_API_KEY', '')
+        status['email'] = 'configured' if resend_key else 'not_configured'
+
+        all_ok = all(v in ('ok', 'configured') for v in status.values())
+        self._send_success({'status': status, 'healthy': all_ok})
+
+    def do_POST(self):
+        try:
+            length = int(self.headers.get('Content-Length', 0))
+            data = json.loads(self.rfile.read(length) or '{}')
+        except Exception:
+            self._send_error(400, 'Invalid JSON')
+            return
+
+        action = data.get('action', '')
+
+        if action == 'report_bug':
+            user = get_user_from_request(self.headers)
+            if not user:
+                self._send_error(401, 'Authentication required')
+                return
+            self._handle_report_bug(user, data)
+
+        elif action == 'check_email_connectivity':
+            cron_secret = os.environ.get('CRON_SECRET', '')
+            auth = self.headers.get('Authorization', '').replace('Bearer ', '').strip()
+            if not cron_secret or auth != cron_secret:
+                self._send_error(401, 'Unauthorized')
+                return
+            self._handle_check_email_connectivity()
+
+        else:
+            self._send_error(400, 'Unknown action')
+
+    def _handle_report_bug(self, user, data):
+        message = (data.get('message') or '').strip()
+        if not message:
+            self._send_error(400, 'Message required')
+            return
+
+        admin_email = os.environ.get('ADMIN_EMAIL', '')
+        if not admin_email:
+            self._send_success({'message': 'Bug report received'})
+            return
+
+        try:
+            from api.email import send_email
+            send_email(
+                admin_email,
+                'Bug Report',
+                f'<p><strong>From:</strong> {user.email}</p><p>{message}</p>',
+            )
+        except Exception as e:
+            print(f'Bug report email failed: {e}')
+
+        self._send_success({'message': 'Bug report received'})
+
+    def _handle_check_email_connectivity(self):
+        try:
+            import resend
+            resend.api_key = os.environ.get('RESEND_API_KEY', '')
+            resend.ApiKeys.list()
+            self._send_success({'email': 'ok'})
+        except Exception as e:
+            print(f'Email connectivity check failed: {e}')
+            self._send_error(500, 'Email not configured or key invalid')
+
+    def _send_success(self, data: dict):
+        body = json.dumps({'success': True, **data}).encode()
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', len(body))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _send_error(self, status: int, message: str):
+        body = json.dumps({'success': False, 'error': message}).encode()
+        self.send_response(status)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', len(body))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, format, *args):
+        pass

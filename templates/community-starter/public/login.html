@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Your App</title>
+    <style>
+        /* ============================================================
+           BRANDING — Change these variables to match your app
+           ============================================================ */
+        :root {
+            --color-primary: #4f46e5;
+            --color-primary-dark: #4338ca;
+            --color-bg: #f9fafb;
+            --color-text: #111827;
+            --color-muted: #6b7280;
+            --color-error: #dc2626;
+            --color-card: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: var(--color-card);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
+        label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
+        input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0.625rem 0.75rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        input:focus { outline: 2px solid var(--color-primary); border-color: transparent; }
+        button {
+            width: 100%;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        button:hover { background: var(--color-primary-dark); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .error {
+            color: var(--color-error);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .links { text-align: center; margin-top: 1rem; font-size: 0.875rem; color: var(--color-muted); }
+        .links a { color: var(--color-primary); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Sign In</h1>
+        <p id="error" class="error"></p>
+        <form id="loginForm">
+            <label for="email">Email</label>
+            <input id="email" type="email" required autocomplete="email" placeholder="you@example.com">
+            <label for="password">Password</label>
+            <input id="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+            <button type="submit" id="submitBtn">Sign In</button>
+        </form>
+        <div class="links">
+            <a href="/reset-password">Forgot password?</a> &middot;
+            <a href="/signup">Create account</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { saveSession, isLoggedIn } from '/js/auth.js';
+
+        // Already logged in → go to dashboard
+        if (isLoggedIn()) window.location.href = '/dashboard';
+
+        const form = document.getElementById('loginForm');
+        const errorEl = document.getElementById('error');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorEl.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in…';
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'login', email, password }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    saveSession(data.token, data.member);
+                    window.location.href = '/dashboard';
+                } else {
+                    showError(data.error || 'Login failed');
+                }
+            } catch (err) {
+                showError('Network error. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
+            }
+        });
+
+        function showError(msg) {
+            errorEl.textContent = msg;
+            errorEl.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

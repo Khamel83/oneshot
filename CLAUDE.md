@@ -37,6 +37,14 @@ KhameL: ~/.claude/rules/khamel-mode.md
 
 ---
 
+## Deployable Templates
+
+| Use Case | Template | Stack |
+|----------|----------|-------|
+| Membership/community sites | `templates/community-starter/` | Vercel + Supabase + Python + Resend |
+
+---
+
 ## Quick Reference
 
 - **New project?** → `/full` operator
