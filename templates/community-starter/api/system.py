@@ -72,11 +72,12 @@ class handler(BaseHTTPRequestHandler):
             return
 
         try:
+            from html import escape as html_escape
             from api.email import send_email
             send_email(
                 admin_email,
                 'Bug Report',
-                f'<p><strong>From:</strong> {user.email}</p><p>{message}</p>',
+                f'<p><strong>From:</strong> {html_escape(user.email)}</p><p>{html_escape(message)}</p>',
             )
         except Exception as e:
             print(f'Bug report email failed: {e}')
