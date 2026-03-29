@@ -170,7 +170,7 @@ secrets_list() {
     local name
     name=$(basename "$file" .encrypted)
     local keys
-    keys=$(_sops_decrypt "$file" 2>/dev/null | grep '=' | grep -oP '^[A-Z_][A-Z0-9_]*' | tr '\n' ' ')
+    keys=$(_sops_decrypt "$file" 2>/dev/null | grep '=' | sed 's/=.*//' | grep -E '^[A-Z_][A-Z0-9_]*$' | tr '\n' ' ')
     echo "  $name: $keys"
   done
 
@@ -182,7 +182,7 @@ secrets_list() {
       local name
       name=$(basename "$file" .encrypted)
       local keys
-      keys=$(_sops_decrypt "$file" 2>/dev/null | grep '=' | grep -oP '^[A-Z_][A-Z0-9_]*' | tr '\n' ' ')
+      keys=$(_sops_decrypt "$file" 2>/dev/null | grep '=' | sed 's/=.*//' | grep -E '^[A-Z_][A-Z0-9_]*$' | tr '\n' ' ')
       echo "  $name: $keys"
     done
   fi
