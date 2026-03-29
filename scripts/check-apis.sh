@@ -188,10 +188,13 @@ check_context7() {
 # ─── Run all checks ─────────────────────────────────────────────────────────
 
 # Known keys (handled above with real API tests)
-declare -A KNOWN_KEYS=(
-  [ZAI_API_KEY]=1 [TAVILY_API_KEY]=1 [EXA_API_KEY]=1
-  [APIFY_TOKEN]=1 [CONTEXT7_API_KEY]=1
-)
+# Bash 3.2 compat — no associative arrays, use case statement
+_is_known_key() {
+  case "$1" in
+    ZAI_API_KEY|TAVILY_API_KEY|EXA_API_KEY|APIFY_TOKEN|CONTEXT7_API_KEY) return 0 ;;
+    *) return 1 ;;
+  esac
+}
 
 check_zai
 check_tavily
@@ -200,14 +203,21 @@ check_apify
 check_context7
 
 # Catch-all: any key in the vault we don't explicitly handle — format check only
+# Use subshell to isolate set -e from pipe failures
+(
 echo "── Other Keys ──"
 for file in "$ONESHOT_VAULT"/*.encrypted; do
   [ -f "$file" ] || continue
-  while IFS='=' read -r key value; do
-    [[ -z "$key" || "$key" == \#* ]] && continue
-    [[ "${KNOWN_KEYS[$key]:-}" == "1" ]] && continue
+  # Skip JSON files (dotenv only)
+  [ "$(head -c1 "$file")" = "{" ] && continue
+  _sops_decrypt "$file" 2>/dev/null | while IFS='=' read -r key value; do
+    # Skip lines without = (JSON files, empty lines, etc.)
+    [ -z "$value" ] && continue
+    [ -z "$key" ] && continue
+    _is_known_key "$key" && continue
     echo "  ✓ $key (${#value} chars)"
-  done < <(_sops_decrypt "$file" 2>/dev/null || true)
+  done
 done
+) || true
 
 exit $ISSUES
