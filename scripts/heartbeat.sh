@@ -103,10 +103,18 @@ fi
 
 MACHINE_OK=0
 MACHINE_TOTAL=0
+THIS_HOST=$(hostname | cut -d. -f1)
 
 check_machine() {
   local name="$1"
   local host="$2"
+
+  # Skip self
+  if [[ "$host" == "$THIS_HOST" ]]; then
+    if [[ "$QUIET" != "true" ]]; then echo "  ○ $name ($host) — self"; fi
+    return
+  fi
+
   MACHINE_TOTAL=$((MACHINE_TOTAL + 1))
 
   if ssh -o ConnectTimeout=3 -o BatchMode=yes "$host" true 2>/dev/null; then
@@ -118,8 +126,9 @@ check_machine() {
   fi
 }
 
+check_machine "oci-dev"  "oci-dev"
 check_machine "homelab" "homelab"
-check_machine "macmini" "macmini"
+check_machine "macmini"  "macmini"
 
 RESULTS+=("✓ Machines: $MACHINE_OK/$MACHINE_TOTAL reachable")
 
