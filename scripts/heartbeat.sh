@@ -63,7 +63,10 @@ run_check() {
 
   [[ "$FORCE" == "true" && "$script" == *"check-clis.sh" ]] && fix_flag="--fix"
 
-  if output=$("$script" $fix_flag 2>&1); then
+  local rc=0
+  output=$("$script" $fix_flag 2>&1) || rc=$?
+
+  if [[ $rc -eq 0 ]]; then
     # Extract just the pass/fail lines for summary
     local passed failed
     passed=$(echo "$output" | grep -c "^✓" || true)
@@ -80,7 +83,7 @@ run_check() {
       ISSUES=$((ISSUES + failed))
     fi
   else
-    RESULTS+=("⚠️  $name (exit $?)")
+    RESULTS+=("⚠️  $name (exit $rc)")
     ISSUES=$((ISSUES + 1))
   fi
 }
