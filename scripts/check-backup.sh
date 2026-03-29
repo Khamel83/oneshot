@@ -27,7 +27,13 @@ AGE_PUBKEY=$(age-keygen -y ~/.age/key.txt 2>/dev/null || echo "missing")
 VAULT_LIST=$(secrets_list 2>/dev/null | grep -v "^===" | grep -v "^$" | sed 's/^  //' || echo "unavailable")
 
 # Skills
-SKILLS=$(ls ~/.claude/skills/ 2>/dev/null | grep -v _shared | grep -v INDEX | grep -v SKILLS_REFERENCE | grep -v "\.md" | sort | tr '\n' ' ' || echo "unknown")
+SKILLS=""
+for s in ~/.claude/skills/*/; do
+  sname=$(basename "$s")
+  [[ "$sname" == "_shared" || "$sname" == "INDEX.md" || "$sname" == "SKILLS_REFERENCE.md" ]] && continue
+  SKILLS="${SKILLS}${sname} "
+done
+SKILLS=$(echo "$SKILLS" | xargs)  # trim whitespace
 
 # Git state
 if git rev-parse --git-dir >/dev/null 2>&1; then

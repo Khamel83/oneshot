@@ -35,7 +35,8 @@ oneshot_heartbeat_guarded() {
 
   # Check last run time
   local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
-  local now=$(date +%s)
+  local now
+  now=$(date +%s)
   local last_run=0
 
   if [[ -f "$last_run_file" ]]; then
@@ -65,8 +66,10 @@ install_bash_hook() {
 oneshot_heartbeat_guarded() {
   if [[ -f "CLAUDE.md" ]]; then
     local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
-    local now=$(date +%s)
-    local last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
+    local now
+    now=$(date +%s)
+    local last_run
+    last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
     if [[ $((now - last_run)) -gt 82800 ]]; then
       mkdir -p "$HOME/.cache"
       echo "$now" > "$last_run_file"
@@ -90,9 +93,11 @@ PROMPT_COMMAND="oneshot_heartbeat_guarded;$PROMPT_COMMAND"
   fi
 
   # Add new hook
-  echo "" >> "$bashrc"
-  echo "$marker" >> "$bashrc"
-  echo "$hook_code" >> "$bashrc"
+  {
+    echo ""
+    echo "$marker"
+    echo "$hook_code"
+  } >> "$bashrc"
 
   echo -e "${GREEN}✓${NC} Bash hook installed to ~/.bashrc"
 }
@@ -117,8 +122,10 @@ install_zsh_hook() {
 oneshot_heartbeat_guarded() {
   if [[ -f "CLAUDE.md" ]]; then
     local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
-    local now=$(date +%s)
-    local last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
+    local now
+    now=$(date +%s)
+    local last_run
+    last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
     if [[ $((now - last_run)) -gt 82800 ]]; then
       mkdir -p "$HOME/.cache"
       echo "$now" > "$last_run_file"

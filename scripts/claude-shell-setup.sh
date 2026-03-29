@@ -48,7 +48,6 @@ if [[ "$1" == "--install" ]]; then
         SHELL_TYPE="bash"
     fi
 
-    MARKER="##### Claude Code + ZAI shortcuts #####"
     if [[ "$SHELL_TYPE" == "zsh" ]]; then
         SHELLRC="$HOME/.zshrc"
     else
@@ -125,8 +124,8 @@ SHELLRC_BLOCK
 
     # Replace placeholders with actual values (escaped for safety)
     # Escape special characters in API key for sed
-    local escaped_key=$(printf '%s\n' "$ZAI_API_KEY" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    local escaped_model=$(printf '%s\n' "$GLM_MODEL" | sed 's/[[\.*^$()+?{|]/\\&/g')
+    escaped_key=$(printf '%s\n' "$ZAI_API_KEY" | sed 's/[[\.*^$()+?{|]/\\&/g')
+    escaped_model=$(printf '%s\n' "$GLM_MODEL" | sed 's/[[\.*^$()+?{|]/\\&/g')
     sed -i.bak "s|__ZAI_API_KEY__|${escaped_key}|g" "$SHELLRC"
     sed -i.bak "s|__GLM_MODEL__|${escaped_model}|g" "$SHELLRC"
     rm -f "${SHELLRC}.bak"

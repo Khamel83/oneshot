@@ -94,7 +94,7 @@ fi
 # Trim log file if too large (> 1MB)
 if [ -f "$SYNC_LOG" ]; then
     # Get file size (works on both Linux and macOS)
-    local size
+    size=""
     if [[ "$OSTYPE" == "darwin"* ]]; then
         size=$(stat -f%z "$SYNC_LOG" 2>/dev/null || echo "0")
     else
