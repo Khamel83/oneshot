@@ -187,10 +187,27 @@ check_context7() {
 
 # ─── Run all checks ─────────────────────────────────────────────────────────
 
+# Known keys (handled above with real API tests)
+declare -A KNOWN_KEYS=(
+  [ZAI_API_KEY]=1 [TAVILY_API_KEY]=1 [EXA_API_KEY]=1
+  [APIFY_TOKEN]=1 [CONTEXT7_API_KEY]=1
+)
+
 check_zai
 check_tavily
 check_exa
 check_apify
 check_context7
+
+# Catch-all: any key in the vault we don't explicitly handle — format check only
+echo "── Other Keys ──"
+for file in "$ONESHOT_VAULT"/*.encrypted; do
+  [ -f "$file" ] || continue
+  while IFS='=' read -r key value; do
+    [[ -z "$key" || "$key" == \#* ]] && continue
+    [[ "${KNOWN_KEYS[$key]:-}" == "1" ]] && continue
+    echo "  ✓ $key (${#value} chars)"
+  done < <(_sops_decrypt "$file" 2>/dev/null || true)
+done
 
 exit $ISSUES

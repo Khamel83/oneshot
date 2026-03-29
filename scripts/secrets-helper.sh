@@ -195,7 +195,16 @@ secrets_list() {
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   case "${1:-}" in
     get)     secrets_get "$2" "${3:-}" ;;
-    set)     secrets_set "$2" "$3" "${4:-}" ;;
+      set)
+      secrets_set "$2" "$3" "${4:-}"
+      if [ $? -eq 0 ] && [ -d "$ONESHOT_VAULT/.git" ]; then
+        echo ""
+        read -rp "Commit and push to all machines? [Y/n] " confirm
+        [[ "$confirm" =~ ^[Nn] ]] && exit 0
+        (cd "$ONESHOT_VAULT/.." && git add secrets/ && git commit -m "feat: update $2 secrets" && git push)
+        echo "Pushed. Other machines will pick it up on next git pull."
+      fi
+      ;;
     decrypt) secrets_decrypt "$2" ;;
     list)    secrets_list ;;
     *)
