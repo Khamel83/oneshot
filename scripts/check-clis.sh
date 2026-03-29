@@ -52,4 +52,18 @@ check_cli "Claude Code" "@anthropic-ai/claude-code" "claude" || true
 check_cli "Codex CLI"   "@openai/codex"             "codex"  || true
 check_cli "Gemini CLI"  "@google/gemini-cli"        "gemini" || true
 
+# secrets CLI — symlink to PATH if missing
+if command -v secrets >/dev/null 2>&1; then
+  echo "✓ secrets CLI: installed"
+else
+  if [[ "$FIX_MODE" == "--fix" ]]; then
+    mkdir -p ~/.local/bin
+    ln -sf ~/github/oneshot/scripts/secrets ~/.local/bin/secrets
+    echo "✓ secrets CLI: installed (symlinked to ~/.local/bin)"
+  else
+    echo "⚠️  secrets CLI: not on PATH"
+    ISSUES=1
+  fi
+fi
+
 exit $ISSUES
