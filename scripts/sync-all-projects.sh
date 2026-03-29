@@ -264,34 +264,21 @@ log ""
 if ! $HOMELAB_ONLY; then
   log "▶ LOCAL PROJECTS (oci-dev)"
 
-  # Projects with .claude/ dirs on oci-dev (from audit)
-  LOCAL_PROJECTS=(
-    arb
-    archon
-    atlas
-    atlas-voice
-    atlas_researcher
-    dada
-    divorce
-    docs-cache
-    gaas
-    homelab
-    networth
-    oos
-    ralex
-    trojanhorse
-    vig
-    WFM
+  # Auto-discover projects with .claude/ dirs (top-level only)
+  mapfile -t LOCAL_PROJECTS < <(
+    for d in "$GITHUB_DIR"/*/; do
+      [ -d "$d/.claude" ] && echo "$d"
+    done 2>/dev/null | sort
   )
 
-  for project in "${LOCAL_PROJECTS[@]}"; do
-    project_dir="$GITHUB_DIR/$project"
-    if [ -d "$project_dir" ]; then
-      sync_project "$project_dir"
-    else
-      warn "  $project — not found at $project_dir"
-      SKIPPED+=("$project")
-    fi
+  if [ ${#LOCAL_PROJECTS[@]} -eq 0 ]; then
+    warn "no projects with .claude/ found in $GITHUB_DIR"
+  else
+    log "  Found ${#LOCAL_PROJECTS[@]} project(s) with .claude/"
+  fi
+
+  for project_dir in "${LOCAL_PROJECTS[@]}"; do
+    sync_project "$project_dir"
   done
 fi
 
@@ -305,25 +292,16 @@ if ! $LOCAL_ONLY; then
     err "homelab unreachable — skipping remote sync"
     FAILED+=("homelab:unreachable")
   else
-    # Projects with .claude/ dirs on homelab (from audit, excluding duplicates we already did)
-    HOMELAB_PROJECTS=(
-      529
-      alex
-      arb
-      archon
-      atlas
-      atlas_researcher
-      atlas-voice
-      divorce
-      frugalos
-      homelab
-      networth
-      Notary
-      oos
-      ralex
-      trojanhorse
-      vig
+    # Auto-discover projects with .claude/ dirs on homelab (top-level only)
+    mapfile -t HOMELAB_PROJECTS < <(
+      ssh "$HOMELAB_HOST" "for d in $HOMELAB_GITHUB_DIR/*/; do [ -d \"\$d/.claude\" ] && basename \"\$d\"; done" 2>/dev/null | sort
     )
+
+    if [ ${#HOMELAB_PROJECTS[@]} -eq 0 ]; then
+      warn "no projects with .claude/ found on homelab"
+    else
+      log "  Found ${#HOMELAB_PROJECTS[@]} project(s) with .claude/"
+    fi
 
     for project in "${HOMELAB_PROJECTS[@]}"; do
       sync_homelab_project "$project"
