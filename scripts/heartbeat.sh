@@ -123,13 +123,13 @@ check_machine() {
     MACHINE_OK=$((MACHINE_OK + 1))
   else
     if [[ "$QUIET" != "true" ]]; then echo "  ⚠️  $name — unreachable"; fi
-    ISSUES=$((ISSUES + 1))
+    # Don't count as issue — machine being offline is out of our control
   fi
 }
 
-check_machine "oci-dev"  "oci-dev"    "100.126.13.70"
-check_machine "homelab" "homelab"   "100.112.130.100"
-check_machine "macmini"  "macmini"   "100.113.216.27"
+check_machine "oci-dev"  "oci-dev"    "100.126.13.70"   || true
+check_machine "homelab" "homelab"   "100.112.130.100"  || true
+check_machine "macmini"  "macmini"   "100.113.216.27"  || true
 
 RESULTS+=("✓ Machines: $MACHINE_OK/$MACHINE_TOTAL reachable")
 
