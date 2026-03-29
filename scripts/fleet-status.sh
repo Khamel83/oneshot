@@ -5,9 +5,9 @@
 set -euo pipefail
 
 MACHINES=(
-  "homelab:khamel83@100.112.130.100"
-  "macmini:macmini@100.113.216.27"
-  "oci:ubuntu@100.126.13.70"
+  "homelab:homelab"
+  "macmini:macmini"
+  "oci-dev:oci-dev"
 )
 
 # Detect if we're on a machine (skip SSH to self)
@@ -22,7 +22,7 @@ check_machine() {
   echo "=== $name ==="
 
   # Skip if we're on this machine
-  if [[ "$name" == "oci" && "$CURRENT_HOST" == "instance-first" ]]; then
+  if [[ "$name" == "oci-dev" && "$CURRENT_HOST" == "instance-first" ]]; then
     echo "  ℹ️  (this machine)"
     claude --version 2>/dev/null || echo "  ⚠️  Claude: not in PATH"
     echo ""
