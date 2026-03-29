@@ -249,6 +249,5 @@ check_quota_alert() {
 
 ## References
 
-- [ZAI MCP Setup Guide](./zai-mcp-setup.md)
 - [MCP Tool Catalog](./README.md)
 - [ZAI Dashboard](https://dashboard.z.ai/)

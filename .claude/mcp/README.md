@@ -16,7 +16,7 @@ Model Context Protocol (MCP) servers extend Claude Code with external tools. Thi
 | **Web Search MCP** | http | webSearchPrime | Real-time research, latest docs, news |
 | **Zread MCP** | http | search_doc, get_repo_structure, read_file | GitHub repo exploration, code research |
 
-**Setup Guide**: See [zai-mcp-setup.md](./zai-mcp-setup.md)
+**Setup**: `claude mcp add -s user <name> -- command` — see Claude Code docs
 
 ---
 
@@ -81,15 +81,10 @@ Model Context Protocol (MCP) servers extend Claude Code with external tools. Thi
 
 | Skill | Vision MCP | Web Search MCP | Zread MCP | Primary Use |
 |-------|------------|----------------|-----------|-------------|
-| `debugger` | ✅ diagnose_error_screenshot | ✅ search solutions | ✅ explore error sources | Error diagnosis |
-| `deep-research` | | ✅ primary research | ✅ codebase exploration | Comprehensive research |
-| `front-door` | ✅ analyze reference UIs | ✅ tech research | ✅ dependency research | Project planning |
-| `code-reviewer` | | ✅ search patterns | ✅ explore similar code | Quality checks |
-| `create-plan` | ✅ diagram analysis | ✅ research | ✅ dependency exploration | Plan creation |
-| `continuous-planner` | ✅ all vision tools | ✅ all research | ✅ all codebase | Living plans |
-| `refactorer` | | | ✅ understand patterns | Safe refactoring |
-| `observability-setup` | ✅ analyze dashboards | ✅ best practices | | Monitoring setup |
-| `visual-iteration` | ✅ ui_diff_check | ✅ design trends | | UI polish |
+| `/short`, `/full` | ✅ | ✅ | ✅ | Core operators |
+| `/research` | | ✅ | ✅ | Background research |
+| `/conduct` | ✅ | ✅ | ✅ | Multi-model orchestration |
+| `/vision` | ✅ all tools | | | Visual analysis |
 
 ---
 
@@ -245,7 +240,5 @@ zai quota
 
 ## References
 
-- [ZAI MCP Setup Guide](./zai-mcp-setup.md)
 - [ZAI DevPack Documentation](https://docs.z.ai/devpack/overview)
 - [Claude MCP Documentation](https://docs.anthropic.com/claude-code/mcp)
-- [continuous-planner Skill](../skills/continuous-planner/SKILL.md)
