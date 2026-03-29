@@ -7,6 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [13.2.0] - 2026-03-28
 
 ### Added
+- **Encrypted backup snapshot** - `check-backup.sh` creates daily `secrets/backup-snapshot.env.encrypted` with vault inventory, machine status, age pubkey, git state, and restore instructions (no secret values)
 - **Vault consolidation** - ~80 API keys from 14 projects consolidated into encrypted SOPS/Age vault
 - **14 API key validators** - `check-apis.sh` upgraded from 5 to 14 real HTTP validation checks (ZAI, OpenAI, Tavily, Exa, Apify, Context7, OpenRouter, DeepSeek, Brave, Jina, GitHub PAT, Cloudflare, Telegram bots)
 - **New vault files** - services.env, deployments.env, arb.env, homelab_backup.env

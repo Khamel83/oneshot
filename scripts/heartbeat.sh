@@ -11,6 +11,7 @@
 #   6. MCP servers configured
 #   7. Tailscale + internet connectivity
 #   8. Cross-machine reachability (oci, homelab, macmini)
+#   9. Encrypted backup snapshot
 #
 # Deploy to all machines via oneshot sync + git pull.
 
@@ -97,6 +98,7 @@ run_check "CLI Tools"      "$SCRIPT_DIR/check-clis.sh"
 run_check "API Keys"       "$SCRIPT_DIR/check-apis.sh"
 run_check "MCP Servers"    "$SCRIPT_DIR/check-mcps.sh"
 run_check "Connectivity"   "$SCRIPT_DIR/check-connections.sh"
+run_check "Backup"        "$SCRIPT_DIR/check-backup.sh"
 
 # ── Cross-machine check ────────────────────────────────────────────────────
 

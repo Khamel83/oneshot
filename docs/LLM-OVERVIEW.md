@@ -47,7 +47,7 @@ Protocol: intake questions (blocking) → plan → build loop → verify → adv
 ## 4. Infrastructure & Operations
 
 ### Heartbeat (daily)
-7 modules run once per day via systemd timer or `heartbeat.sh`:
+8 modules run once per day via systemd timer or `heartbeat.sh`:
 
 | Module | What it checks |
 |--------|----------------|
@@ -58,8 +58,13 @@ Protocol: intake questions (blocking) → plan → build loop → verify → adv
 | check-apis.sh | 14 API keys validated with real HTTP calls |
 | check-mcps.sh | MCP server processes running |
 | check-connections.sh | Tailscale connected, internet reachable |
+| check-backup.sh | Encrypted recovery snapshot (vault inventory, machine status, git state) |
 
 Plus cross-machine reachability test (oci-dev, homelab, macmini via SSH aliases).
+
+### Backup Snapshot
+
+Daily encrypted file at `secrets/backup-snapshot.env.encrypted`. Contains NO secret values — only metadata needed to rebuild from scratch: age public key, vault file inventory, machine aliases, active skills, git state, and machine reachability. Includes step-by-step restore instructions. Decrypt with `sops -d --input-type dotenv secrets/backup-snapshot.env.encrypted`.
 
 ### Secrets Vault
 - **Encryption**: SOPS + Age, one key at `~/.age/key.txt` (600 permissions, same on all 3 machines)

@@ -57,6 +57,7 @@ Operators discover skills on demand from `~/.claude/skills/`. Rules load by proj
 - [check-apis.sh](scripts/check-apis.sh): Validates 14 API keys with real HTTP calls (ZAI, OpenAI, Tavily, Exa, Apify, Context7, OpenRouter, DeepSeek, Brave, Jina, GitHub, Cloudflare, Telegram)
 - [secrets CLI](scripts/secrets-helper.sh): `secrets get KEY` / `secrets set NAME KEY=val` / `secrets list` / `secrets decrypt NAME`
 - [ci.sh](scripts/ci.sh): Verify loop — shellcheck, prettier, tsc, pyright, bats, pytest, skill/doc validation
+- [check-backup.sh](scripts/check-backup.sh): Daily encrypted recovery snapshot (vault inventory, machine status, git state — no secret values)
 
 ## Template
 
