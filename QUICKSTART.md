@@ -19,7 +19,7 @@ oneshot-update force  # Force update now
 oneshot-update status # Show version and last check
 ```
 
-## Skills (10 total)
+## Skills (10 + 1 external)
 
 | Skill | What it does |
 |-------|--------------|
@@ -46,7 +46,7 @@ claude .          # Open Claude Code
 
 | Location | Contents |
 |----------|----------|
-| `~/.claude/skills/` | 10 skills (global, all projects) |
+| `~/.claude/skills/` | 10+1 skills (global, all projects) |
 | `~/.local/bin/oneshot-update` | Update command |
 | `~/.local/bin/docs-link` | Docs cache manager |
 | `AGENTS.md` (project) | Operator spec (read-only) |

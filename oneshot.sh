@@ -44,7 +44,7 @@ for arg in "$@"; do
       echo "  --help       Show this help"
       echo ""
       echo "What gets installed globally (~/.claude/):"
-      echo "  Skills:      10 skills in ~/.claude/skills/"
+      echo "  Skills:      10+1 skills in ~/.claude/skills/"
       echo "  install.sh:  symlink to oneshot-update at ~/.local/bin/"
       echo ""
       echo "What gets added to your project:"
@@ -189,9 +189,9 @@ curl -sL "$SKILLS_BASE/../skills/INDEX.md" -o "${HOME}/.claude/skills/INDEX.md" 
 curl -sL "$SKILLS_BASE/../skills/SKILLS_REFERENCE.md" -o "${HOME}/.claude/skills/SKILLS_REFERENCE.md" 2>/dev/null || true
 
 if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "  ${GREEN}✓${NC} ~/.claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 10 total)"
+  echo -e "  ${GREEN}✓${NC} ~/.claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_UPDATED} updated, 10+1 total)"
 else
-  echo -e "  ${GREEN}✓${NC} ~/.claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 10 total)"
+  echo -e "  ${GREEN}✓${NC} ~/.claude/skills/ (${SKILLS_ADDED} added, ${SKILLS_SKIPPED} existing, 10+1 total)"
 fi
 
 # =============================================================================

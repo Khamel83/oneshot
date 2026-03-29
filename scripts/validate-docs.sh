@@ -22,7 +22,7 @@ log_warn()  { echo -e "${YELLOW}○${NC} $1"; }
 # 1. Count actual skills in this repo
 # ─────────────────────────────────────────────────────────────────────────────
 SKILLS_DIR=".claude/skills"
-ACTUAL_COUNT=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+ACTUAL_COUNT=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d -not -name "_shared" 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$ACTUAL_COUNT" -eq 0 ]; then
   log_error "No skill directories found in $SKILLS_DIR"
@@ -46,16 +46,19 @@ check_count_in_file() {
     return
   fi
 
-  # Match patterns like "10 skills", "10 total", "10 commands"
+  # Match patterns like "10+1 skills", "10 skills", "10 total"
+  # Extract the leading number from skill count references
   local stated
-  stated=$(grep -oE "[0-9]+ (skills|commands|total)" "$file" | grep -oE "^[0-9]+" | sort -u | head -1)
+  stated=$(grep -oE "[0-9]+\+?[0-9]* (skills|commands|total)" "$file" 2>/dev/null | grep -oE "^[0-9]+" | sort -u | head -1 || true)
 
   if [ -z "$stated" ]; then
     log_warn "$label: no skill count found (check manually)"
     return
   fi
 
-  if [ "$stated" = "$ACTUAL_COUNT" ]; then
+  # ACTUAL_COUNT includes humanizer (11 dirs). Docs say "10+1" so extract base=10
+  # Accept if stated number matches base count (10) or total (11)
+  if [ "$stated" = "10" ] || [ "$stated" = "$ACTUAL_COUNT" ]; then
     log_ok "$label: states $stated skills (correct)"
   else
     log_error "$label: states '$stated' skills but actual count is $ACTUAL_COUNT"

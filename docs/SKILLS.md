@@ -1,6 +1,6 @@
 # ONE_SHOT Skills Reference
 
-**v13 — Operator Framework.** 10 skills total: 3 operators + 7 utilities.
+**v13.2 — Operator Framework.** 10 skills + 1 external (humanizer): 3 operators + 7 utilities.
 
 ---
 

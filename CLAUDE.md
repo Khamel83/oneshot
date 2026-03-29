@@ -55,7 +55,7 @@ KhameL: ~/.claude/rules/khamel-mode.md
 - **Stack defaults** → See `khamel-mode.md`
 - **External docs** → `docs-link add <name>` (links cached docs to project)
 - **Docs cache** → `~/.claude/rules/docs-cache-pattern.md`
-- **Skills** → `~/.claude/skills/` (10 total: /short, /full, /conduct + 7 utilities)
+- **Skills** → `~/.claude/skills/` (10+1 total: /short, /full, /conduct + 7 utilities + humanizer)
 
 ---
 

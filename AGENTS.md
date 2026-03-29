@@ -141,4 +141,4 @@ On failure: escalate (original → inline → human)
 
 ## VERSION
 
-v13 | 10 skills | Operators discover skills on demand
+v13.2 | 10 skills + 1 external | Operators discover skills on demand

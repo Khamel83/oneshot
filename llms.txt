@@ -1,0 +1,72 @@
+# ONE_SHOT
+
+> Operator framework for Claude Code. Three operators, seven utilities, on-demand skill discovery. Progressive disclosure loads ~300 tokens always-on (down from ~2000). Encrypted secrets vault (SOPS/Age) with 80+ API keys synced across 3 machines.
+>
+> Key points:
+> - Install: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash`
+> - Three operators: `/short` (quick iteration), `/full` (structured work), `/conduct` (multi-model PMO)
+> - Stack defaults: Astro + Cloudflare + Better Auth + Postgres (web), Python + Click + SQLite (CLI), Python + systemd (service)
+> - Secrets: one age key at `~/.age/key.txt`, 17 encrypted vault files in `secrets/`, access via `secrets get KEY`
+> - Daily heartbeat: 14 API key validators, CLI version checks, Tailscale + cross-machine reachability
+> - Machines: oci-dev (100.126.13.70), homelab (100.112.130.100), macmini (100.113.216.27) — all on Tailscale
+
+Operators discover skills on demand from `~/.claude/skills/`. Rules load by project type detection (web, CLI, service, generic). Decision defaults let Claude make reasonable choices autonomously without asking. Handoffs survive `/clear`. Tasks persist via native TaskCreate/TaskList.
+
+## Operators
+
+- [/short SKILL.md](.claude/skills/short/SKILL.md): Quick iteration — loads context, asks what you're working on, executes in burn-down mode
+- [/full SKILL.md](.claude/skills/full/SKILL.md): Structured work — intake, plan, execute with context checkpoints
+- [/conduct SKILL.md](.claude/skills/conduct/SKILL.md): Multi-model PMO — routes work across Claude + Codex + Gemini, loops until done
+
+## Utility Skills
+
+- [/handoff SKILL.md](.claude/skills/handoff/SKILL.md): Save context before `/clear`
+- [/restore SKILL.md](.claude/skills/restore/SKILL.md): Resume from handoff checkpoint
+- [/research SKILL.md](.claude/skills/research/SKILL.md): Background research via Gemini CLI
+- [/freesearch SKILL.md](.claude/skills/freesearch/SKILL.md): Zero-token web search via Exa API
+- [/doc SKILL.md](.claude/skills/doc/SKILL.md): Cache external documentation locally
+- [/vision SKILL.md](.claude/skills/vision/SKILL.md): Image and website visual analysis
+- [/secrets SKILL.md](.claude/skills/secrets/SKILL.md): SOPS/Age encrypted secret management
+
+## Core Configuration
+
+- [AGENTS.md](AGENTS.md): Operator spec, decision defaults, delegation protocol, auto-approved actions
+- [CLAUDE.md](CLAUDE.md): Project-specific Claude instructions (per project, editable)
+- [CLAUDE.md (global)](CLAUDE.md): Global user rules, stack defaults, secrets management, infrastructure routing
+
+## Rules (Progressive Disclosure)
+
+- [core.md](.claude/rules/core.md): Always loaded — work discipline, delegation, AGENTS.md readonly rule
+- [khamel-mode.md](.claude/rules/khamel-mode.md): User defaults — stack, machines, anti-patterns, decision defaults
+- [delegation.md](.claude/rules/delegation.md): Assess-verify-escalate delegation with 3-attempt fallback
+- [web.md](.claude/rules/web.md): Web apps — Astro + Cloudflare Pages/Workers + Better Auth + Postgres on OCI
+- [cli.md](.claude/rules/cli.md): CLIs — Python + Click + SQLite
+- [service.md](.claude/rules/service.md): Services — Python + systemd, deploy to oci-dev
+- [community.md](.claude/rules/community.md): Membership sites — Vercel + Supabase + Python + Resend
+
+## Infrastructure
+
+- [STACK.md](.claude/infrastructure/STACK.md): Full stack reference — Astro, Cloudflare, Postgres, auth, backups, deployment
+- [secrets/](secrets/): SOPS/Age encrypted vault — 17 files, ~80 API keys, `secrets get KEY` for access
+- [public-access.md](docs/public-access.md): Public URL routing via poytz + Cloudflare Tunnel (replaces nginx/traefik)
+- [ssh/](ssh/): SSH alias configs for oci-dev, homelab, macmini
+
+## Scripts
+
+- [heartbeat.sh](scripts/heartbeat.sh): Daily health check — repo sync, GLM model pin, secrets decrypt, CLIs, 14 API validators, MCP servers, Tailscale, cross-machine reachability
+- [check-apis.sh](scripts/check-apis.sh): Validates 14 API keys with real HTTP calls (ZAI, OpenAI, Tavily, Exa, Apify, Context7, OpenRouter, DeepSeek, Brave, Jina, GitHub, Cloudflare, Telegram)
+- [secrets CLI](scripts/secrets-helper.sh): `secrets get KEY` / `secrets set NAME KEY=val` / `secrets list` / `secrets decrypt NAME`
+- [ci.sh](scripts/ci.sh): Verify loop — shellcheck, prettier, tsc, pyright, bats, pytest, skill/doc validation
+
+## Template
+
+- [community-starter](templates/community-starter/): Multi-tenant membership site — Vercel + Supabase + Python + Resend
+
+## Optional
+
+- [CHANGELOG.md](CHANGELOG.md): Version history (v12+)
+- [SKILLS.md](docs/SKILLS.md): Full command reference with examples
+- [LLM-OVERVIEW.md](docs/LLM-OVERVIEW.md): Design philosophy, token optimization strategy, glossary
+- [QUICKSTART.md](QUICKSTART.md): Install and update commands
+- [hooks/](.claude/hooks/): lessons-inject.sh (session start), delegation-log-hook.sh (subagent stop), docs-check.sh, context-v8.py, beads-v8.py
+- [providers.md](.claude/skills/_shared/providers.md): Multi-model routing table for /conduct

@@ -34,7 +34,7 @@ if [ -d "$ONESHOT_DIR/.claude/skills" ]; then
     mkdir -p "${HOME}/.claude/skills"
     echo "Syncing skills to ~/.claude/skills/..."
     cp -r "$ONESHOT_DIR/.claude/skills/"* "${HOME}/.claude/skills/" 2>/dev/null || true
-    echo "  10 skills synced"
+    echo "  10+1 skills synced"
 fi
 
 echo ""

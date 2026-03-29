@@ -106,7 +106,7 @@ Global config (installed once):
 │   ├── web.md          # Web apps
 │   ├── cli.md          # CLIs
 │   └── service.md      # Services
-├── skills/             # Skills (10 total)
+├── skills/             # Skills (10 + 1 external)
 └── tasks/              # Native task storage
 ```
 
@@ -201,4 +201,4 @@ curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh |
 
 ---
 
-**v13** | 10 skills | Operators discover skills on demand | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
+**v13.2** | 10+1 skills | Operators discover skills on demand | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
