@@ -103,32 +103,33 @@ fi
 
 MACHINE_OK=0
 MACHINE_TOTAL=0
-THIS_HOST=$(hostname | cut -d. -f1)
+THIS_IP=$(tailscale ip -4 2>/dev/null || echo "")
 
 check_machine() {
   local name="$1"
   local host="$2"
+  local ip="${3:-}"
 
-  # Skip self
-  if [[ "$host" == "$THIS_HOST" ]]; then
-    if [[ "$QUIET" != "true" ]]; then echo "  ○ $name ($host) — self"; fi
+  # Skip self (compare by IP)
+  if [[ -n "$ip" && "$ip" == "$THIS_IP" ]]; then
+    if [[ "$QUIET" != "true" ]]; then echo "  ○ $name — self"; fi
     return
   fi
 
   MACHINE_TOTAL=$((MACHINE_TOTAL + 1))
 
   if ssh -o ConnectTimeout=3 -o BatchMode=yes "$host" true 2>/dev/null; then
-    if [[ "$QUIET" != "true" ]]; then echo "  ✓ $name ($host)"; fi
+    if [[ "$QUIET" != "true" ]]; then echo "  ✓ $name"; fi
     MACHINE_OK=$((MACHINE_OK + 1))
   else
-    if [[ "$QUIET" != "true" ]]; then echo "  ⚠️  $name ($host) — unreachable"; fi
+    if [[ "$QUIET" != "true" ]]; then echo "  ⚠️  $name — unreachable"; fi
     ISSUES=$((ISSUES + 1))
   fi
 }
 
-check_machine "oci-dev"  "oci-dev"
-check_machine "homelab" "homelab"
-check_machine "macmini"  "macmini"
+check_machine "oci-dev"  "oci-dev"    "100.126.13.70"
+check_machine "homelab" "homelab"   "100.112.130.100"
+check_machine "macmini"  "macmini"   "100.113.216.27"
 
 RESULTS+=("✓ Machines: $MACHINE_OK/$MACHINE_TOTAL reachable")
 
