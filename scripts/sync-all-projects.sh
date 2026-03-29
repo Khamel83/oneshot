@@ -223,18 +223,28 @@ sync_homelab_project() {
     fi
   " 2>/dev/null || echo "SSH_FAILED")
 
+  # Match on sentinel lines (git commit output may precede them)
   case "$commit_result" in
-    NO_CHANGE)    ok "already up to date on homelab" ;;
-    COMMITTED)
+    *NO_CHANGE*)
+      ok "already up to date on homelab"
+      UPDATED+=("homelab:$project_name")
+      return
+      ;;
+    *COMMITTED*)
       ok "committed on homelab"
-      # Push from homelab
       ssh "$HOMELAB_HOST" "cd '$remote_dir' && git push 2>/dev/null" \
         && ok "pushed from homelab" \
         || { err "push failed from homelab"; FAILED+=("homelab:$project_name:push"); }
       ;;
-    COMMIT_FAILED) err "commit failed on homelab"; FAILED+=("homelab:$project_name:commit") ;;
-    SSH_FAILED)    err "SSH command failed"; FAILED+=("homelab:$project_name:ssh") ;;
-    *)             err "unexpected result: $commit_result"; FAILED+=("homelab:$project_name:unknown") ;;
+    *COMMIT_FAILED*)
+      err "commit failed on homelab"; FAILED+=("homelab:$project_name:commit")
+      ;;
+    SSH_FAILED)
+      err "SSH command failed"; FAILED+=("homelab:$project_name:ssh")
+      ;;
+    *)
+      err "unexpected result: $commit_result"; FAILED+=("homelab:$project_name:unknown")
+      ;;
   esac
 
   UPDATED+=("homelab:$project_name")
