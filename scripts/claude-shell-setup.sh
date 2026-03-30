@@ -81,12 +81,12 @@ export GLM_MODEL="__GLM_MODEL__"
 unalias cc zai 2>/dev/null || true
 unset -f cc zai 2>/dev/null || true
 
-# cc - Claude Code via Anthropic Pro (YOLO mode)
+# cc - Claude Code via Anthropic Pro (bypassPermissions via settings.json)
 cc() {
-    claude --dangerously-skip-permissions "$@"
+    claude "$@"
 }
 
-# zai - Claude Code via z.ai GLM API (YOLO mode)
+# zai - Claude Code via z.ai GLM API (bypassPermissions via settings.json)
 zai() {
     if ! command -v claude >/dev/null 2>&1; then
         echo "zai: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
@@ -94,11 +94,54 @@ zai() {
     fi
     [[ -z "$ZAI_API_KEY" ]] && { echo "zai: ZAI_API_KEY not set" >&2; return 1; }
 
-    echo "zai: z.ai/$GLM_MODEL (YOLO mode)" >&2
+    echo "zai: z.ai/$GLM_MODEL" >&2
     ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
     ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
     ANTHROPIC_MODEL="$GLM_MODEL" \
-        claude --dangerously-skip-permissions "$@"
+        claude "$@"
+}
+
+# saveplan - open $EDITOR on /tmp/claude-plan.md to paste a plan
+alias saveplan='${EDITOR:-nano} /tmp/claude-plan.md'
+
+# approveplan [project-dir] - write /tmp/claude-plan.md to <project>/.claude/CLAUDE.md,
+# launch a fresh claude session, then offer to clean up on exit
+approveplan() {
+    local project="${1:-$PWD}"
+    local plan_file="/tmp/claude-plan.md"
+    local claude_md="$project/.claude/CLAUDE.md"
+    local backup_file="/tmp/claude-plan-backup.md"
+    local was_fresh=false
+
+    if [[ ! -f "$plan_file" ]]; then
+        echo "approveplan: no plan at $plan_file — run 'saveplan' first" >&2
+        return 1
+    fi
+
+    mkdir -p "$project/.claude"
+
+    if [[ ! -f "$claude_md" ]]; then
+        was_fresh=true
+    else
+        cp "$claude_md" "$backup_file"
+    fi
+
+    cp "$plan_file" "$claude_md"
+    echo "Plan written to $claude_md"
+
+    (cd "$project" && claude)
+
+    read -r -p "Remove plan from CLAUDE.md? [y/N] " answer
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+        if [[ "$was_fresh" == "true" ]]; then
+            rm "$claude_md"
+            echo "Removed $claude_md"
+        else
+            mv "$backup_file" "$claude_md"
+            echo "Restored original $claude_md"
+        fi
+    fi
+    rm -f "$backup_file"
 }
 ##### end Claude Code + ZAI shortcuts #####
 
@@ -175,12 +218,12 @@ fi
 unalias cc zai 2>/dev/null || true
 unset -f cc zai 2>/dev/null || true
 
-# cc - Claude Code via Anthropic Pro (YOLO mode)
+# cc - Claude Code via Anthropic Pro (bypassPermissions via settings.json)
 cc() {
-    claude --dangerously-skip-permissions "$@"
+    claude "$@"
 }
 
-# zai - Claude Code via z.ai GLM API (YOLO mode)
+# zai - Claude Code via z.ai GLM API (bypassPermissions via settings.json)
 zai() {
     if ! command -v claude >/dev/null 2>&1; then
         echo "zai: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
@@ -188,11 +231,54 @@ zai() {
     fi
     [[ -z "$ZAI_API_KEY" ]] && { echo "zai: ZAI_API_KEY not set" >&2; return 1; }
 
-    echo "zai: z.ai/$GLM_MODEL (YOLO mode)" >&2
+    echo "zai: z.ai/$GLM_MODEL" >&2
     ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
     ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
     ANTHROPIC_MODEL="$GLM_MODEL" \
-        claude --dangerously-skip-permissions "$@"
+        claude "$@"
+}
+
+# saveplan - open $EDITOR on /tmp/claude-plan.md to paste a plan
+alias saveplan='${EDITOR:-nano} /tmp/claude-plan.md'
+
+# approveplan [project-dir] - write /tmp/claude-plan.md to <project>/.claude/CLAUDE.md,
+# launch a fresh claude session, then offer to clean up on exit
+approveplan() {
+    local project="${1:-$PWD}"
+    local plan_file="/tmp/claude-plan.md"
+    local claude_md="$project/.claude/CLAUDE.md"
+    local backup_file="/tmp/claude-plan-backup.md"
+    local was_fresh=false
+
+    if [[ ! -f "$plan_file" ]]; then
+        echo "approveplan: no plan at $plan_file — run 'saveplan' first" >&2
+        return 1
+    fi
+
+    mkdir -p "$project/.claude"
+
+    if [[ ! -f "$claude_md" ]]; then
+        was_fresh=true
+    else
+        cp "$claude_md" "$backup_file"
+    fi
+
+    cp "$plan_file" "$claude_md"
+    echo "Plan written to $claude_md"
+
+    (cd "$project" && claude)
+
+    read -r -p "Remove plan from CLAUDE.md? [y/N] " answer
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+        if [[ "$was_fresh" == "true" ]]; then
+            rm "$claude_md"
+            echo "Removed $claude_md"
+        else
+            mv "$backup_file" "$claude_md"
+            echo "Restored original $claude_md"
+        fi
+    fi
+    rm -f "$backup_file"
 }
 
 # Heartbeat function (for manual use or sourcing)

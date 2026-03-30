@@ -170,7 +170,7 @@ is_complete() {
 run_planning() {
     log_status "Phase 1: Planning"
 
-    $CLAUDE_CMD -p --dangerously-skip-permissions << EOF
+    $CLAUDE_CMD -p << EOF
 You are in autonomous builder mode. Use ONE_SHOT skills.
 
 IDEA: $IDEA
@@ -196,7 +196,7 @@ run_build_iteration() {
     local iter=$1
     log_status "Iteration $iter: Building"
 
-    $CLAUDE_CMD -p --dangerously-skip-permissions << EOF
+    $CLAUDE_CMD -p << EOF
 You are in autonomous builder mode. Continue implementing.
 
 INSTRUCTIONS:
