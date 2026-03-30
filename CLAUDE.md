@@ -33,6 +33,7 @@ Web: ~/.claude/rules/web.md
 CLI: ~/.claude/rules/cli.md
 Service: ~/.claude/rules/service.md
 KhameL: ~/.claude/rules/khamel-mode.md
+Codex: .claude/rules/codex.md
 ```
 
 ---
@@ -56,6 +57,7 @@ KhameL: ~/.claude/rules/khamel-mode.md
 - **External docs** → `docs-link add <name>` (links cached docs to project)
 - **Docs cache** → `~/.claude/rules/docs-cache-pattern.md`
 - **Skills** → `~/.claude/skills/` (10+1 total: /short, /full, /conduct + 7 utilities + humanizer)
+- **Codex CLI** → `.claude/rules/codex.md` (auth, sandbox fix, all 3 machines)
 
 ---
 
