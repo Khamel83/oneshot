@@ -1,5 +1,8 @@
 # Codex CLI — Multi-Machine Setup & Usage
 
+> **Canonical location**: `~/.claude/rules/codex.md` (global, loads in every project)
+> This copy lives in oneshot for version control. Keep them in sync.
+
 Codex (OpenAI's agentic coding CLI) runs on all three machines in this setup.
 This guide documents what works, what doesn't, and why — learned the hard way on 2026-03-30.
 
