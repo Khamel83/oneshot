@@ -2,6 +2,8 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| *(2026-03-30 — unencrypted, see .claude/rules/codex.md)* | 2026-03-30 | Codex CLI multi-machine debug & setup | codex, auth, oauth, sandbox, bwrap, chatgpt-plus, oci-dev, homelab, macmini |
+| [20260328_225743__command-name__clear__command-name_.md.age](20260328_225743__command-name__clear__command-name_.md.age) | 2026-03-28 22:57:43 | <command-name>/clear</command-name> | add, age, api, auth, bug, config, decrypt, deploy, encrypt, fix, go, install, oci, remove, rust, session, setup, sops, test, update |
 | [20260328_212108__command-name__clear__command-name_.md.age](20260328_212108__command-name__clear__command-name_.md.age) | 2026-03-28 21:21:08 | <command-name>/clear</command-name> | age |
 | [20260328_210345_does__conduct__wkr_now_with_codex_clearly__i_want_.md.age](20260328_210345_does__conduct__wkr_now_with_codex_clearly__i_want_.md.age) | 2026-03-28 21:03:45 | does "conduct" wkr now with codex clearly? i want ... | add, age, api, decrypt, deploy, encrypt, fix, go, implement, install, oci, python, remove, session, setup, sops, test, update |
 | [20260328_191027_pull_from_remote_and_update_oneshot_and_give_me_th.md.age](20260328_191027_pull_from_remote_and_update_oneshot_and_give_me_th.md.age) | 2026-03-28 19:10:27 | pull from remote and update oneshot and give me th... | auth, config, fix, go, oci, postgres, update |
