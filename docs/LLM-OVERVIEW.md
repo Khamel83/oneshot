@@ -64,13 +64,13 @@ Plus cross-machine reachability test (oci-dev, homelab, macmini via SSH aliases)
 
 ### Backup Snapshot
 
-Daily encrypted file at `secrets/backup-snapshot.env.encrypted`. Contains NO secret values — only metadata needed to rebuild from scratch: age public key, vault file inventory, machine aliases, active skills, git state, and machine reachability. Includes step-by-step restore instructions. Decrypt with `sops -d --input-type dotenv secrets/backup-snapshot.env.encrypted`.
+Daily encrypted file at `secrets/backup-snapshot.env.encrypted`. Contains NO secret values — only metadata needed to rebuild from scratch: age public key, vault file inventory, machine aliases, active skills, git state, and machine reachability. Includes step-by-step restore instructions. Decrypt with `secrets decrypt backup-snapshot`.
 
 ### Secrets Vault
 - **Encryption**: SOPS + Age, one key at `~/.age/key.txt` (600 permissions, same on all 3 machines)
-- **Location**: `~/github/oneshot/secrets/*.encrypted` (17 files)
-- **Access**: `secrets get KEY` — searches all vault files alphabetically, returns first match
-- **Sync**: git push/pull to keep all machines in sync
+- **Location**: `~/github/oneshot/secrets/*.encrypted`
+- **CLI**: `secrets get/set/list/decrypt/init` — works from any directory
+- **Sync**: `secrets set NAME KEY=val --commit` to push to all machines
 
 ### Machines
 | Alias | User | IP | Role |
