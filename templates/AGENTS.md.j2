@@ -1,0 +1,33 @@
+# ONE_SHOT v{{ version }} — Orchestration Control Plane
+
+> Lane-based routing. Claude plans, workers execute. Argus searches.
+
+## OPERATORS
+
+### `/short` — Quick Iteration
+1. Load context: git log -5, TaskList, DECISIONS.md, BLOCKERS.md
+2. Ask: "What are you working on?"
+3. Execute in burn-down mode
+
+### `/full` — Structured Work
+1. Create/load IMPLEMENTATION_CONTEXT.md
+2. Structured intake: goals, scope, architecture, constraints
+3. Phase-based planning with milestones
+4. Execute with context checkpoints
+
+### `/conduct` — Multi-Model Orchestration
+1. Detect available providers (read `config/workers.yaml`)
+2. Ask clarifying questions — BLOCKING
+3. Classify tasks by task class
+4. Route: task class → lane → worker pool → reviewer
+5. Loop until goal is fully met
+
+## TASK CLASSES
+
+Tasks classified → routed to lanes in `config/lanes.yaml`.
+See `docs/instructions/task-classes.md` for full routing contract.
+
+## PLANNER/WORKER SPLIT
+
+**Planner (Claude)**: planning, decomposition, review, sensitive edits
+**Workers (lane-based)**: bounded implementation, tests, docs, summarization

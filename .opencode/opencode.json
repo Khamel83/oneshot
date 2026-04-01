@@ -1,0 +1,6 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash",
+  "auto_approve": false,
+  "context": "oneshot-worker"
+}
