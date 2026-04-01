@@ -1,0 +1,54 @@
+models:
+  openrouter:minimax/minimax-m2.7:
+    lane: cheap
+    strengths: [coding, agentic, long_context]
+    weaknesses: [unknown_tool_stability]
+    max_task_size: medium
+    can_plan: false
+    can_review: true
+    context_window: 1m
+    latency_tier: medium
+
+  openrouter:stepfun/step-3.5-flash:
+    lane: cheap
+    strengths: [fast_reasoning, low_cost]
+    max_task_size: medium
+    can_plan: false
+    can_review: true
+    context_window: 131k
+    latency_tier: fast
+
+  openrouter:xiaomi/mimo-v2-flash:
+    lane: cheap
+    strengths: [coding, reasoning, agentic]
+    max_task_size: medium
+    can_plan: false
+    can_review: true
+    context_window: 1m
+    latency_tier: medium
+
+  openrouter:google/gemini-2.5-flash-lite:
+    lane: cheap
+    strengths: [throughput, low_cost]
+    max_task_size: small
+    can_plan: false
+    can_review: false
+    context_window: 1m
+    latency_tier: fast
+
+  openrouter:google/gemini-2.5-flash:
+    lane: balanced
+    strengths: [coding, reasoning, long_context]
+    max_task_size: medium
+    can_plan: false
+    can_review: true
+    context_window: 1m
+    latency_tier: medium
+
+  claude:sonnet:
+    lane: premium
+    strengths: [planning, orchestration, repo_synthesis]
+    can_plan: true
+    can_review: true
+    context_window: 200k
+    latency_tier: slow

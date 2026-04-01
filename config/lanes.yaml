@@ -1,0 +1,29 @@
+lanes:
+  premium:
+    planner: claude_code
+    review_with: claude_code
+    worker_pool: [claude_code, codex]
+    strategy: first_available
+    fallback_lane: null  # top tier, no escalation
+
+  balanced:
+    planner: claude_code
+    review_with: claude_code
+    worker_pool: [opencode_gemini_flash, codex, opencode_minimax]
+    strategy: first_available
+    fallback_lane: premium
+
+  cheap:
+    planner: claude_code
+    review_with: claude_code
+    worker_pool: [opencode_stepfun_flash, opencode_mimo_flash, opencode_minimax]
+    strategy: first_available
+    fallback_lane: balanced
+
+  research:
+    planner: claude_code
+    review_with: claude_code
+    worker_pool: [gemini_cli, opencode_gemini_flash_lite]
+    search_backend: argus
+    strategy: first_available
+    fallback_lane: balanced

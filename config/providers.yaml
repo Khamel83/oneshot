@@ -1,0 +1,20 @@
+providers:
+  anthropic:
+    env: ANTHROPIC_API_KEY
+    description: Claude API
+
+  openrouter:
+    env: OPENROUTER_API_KEY
+    description: Multi-model routing (MiniMax, StepFun, Xiaomi, Gemini, etc.)
+
+  openai:
+    env: OPENAI_API_KEY
+    description: Codex CLI (ChatGPT Plus OAuth)
+
+  gemini:
+    env: GEMINI_API_KEY
+    description: Gemini CLI
+
+  argus:
+    env: ARGUS_BASE_URL
+    description: Search broker (SearXNG, Brave, Serper, Tavily, Exa)

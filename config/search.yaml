@@ -1,0 +1,16 @@
+search:
+  default_backend: argus
+  base_url: http://localhost:8005
+  modes:
+    discovery:
+      providers: [searxng, brave, exa]
+      max_results: 10
+    precision:
+      providers: [serper, tavily]
+      max_results: 5
+    cheap:
+      providers: [searxng]
+      max_results: 5
+    research:
+      providers: [searxng, brave, exa, tavily]
+      max_results: 15

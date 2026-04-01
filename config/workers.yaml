@@ -1,0 +1,24 @@
+workers:
+  local:
+    host: localhost
+    transport: local
+    role: planner
+    harness: claude_code
+
+  oci:
+    host: oci-dev
+    transport: ssh
+    role: planner
+    harness: claude_code
+
+  macmini:
+    host: macmini
+    transport: ssh
+    role: worker
+    harness: opencode
+
+  homelab:
+    host: homelab
+    transport: ssh
+    role: worker
+    harness: opencode
