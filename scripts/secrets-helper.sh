@@ -43,38 +43,24 @@ _sops_decrypt() {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Core: encrypt a dotenv string to a .encrypted file
-# Handles the .sops.yaml discovery problem by working from the repo root
+# NOTE: input file MUST end in .encrypted to match path_regex in .sops.yaml
 # ─────────────────────────────────────────────────────────────────────────────
 _sops_encrypt_dotenv() {
   local content="$1"
   local output="$2"
 
-  # Find a directory with .sops.yaml (repo root)
   local sops_dir="$ONESHOT_VAULT/.."
   if [ ! -f "$sops_dir/.sops.yaml" ]; then
-    # Fall back: write a temp .sops.yaml and work from /tmp
-    local work_dir
-    work_dir=$(mktemp -d)
-    cat > "$work_dir/.sops.yaml" << SOPSEOF
-creation_rules:
-  - age: $AGE_RECIPIENT
-SOPSEOF
-    printf '%s\n' "$content" > "$work_dir/input.env"
-    SOPS_AGE_KEY_FILE="$AGE_KEY_FILE" sops -e --input-type dotenv --output-type dotenv \
-      "$work_dir/input.env" > "$work_dir/output.encrypted"
-    local exit_code=$?
-    if [ $exit_code -eq 0 ]; then
-      mv "$work_dir/output.encrypted" "$output"
-    fi
-    rm -rf "$work_dir"
-    return $exit_code
+    echo "secrets-helper: .sops.yaml not found at $sops_dir" >&2
+    return 1
   fi
 
   local work_dir
   work_dir=$(mktemp -d)
-  printf '%s\n' "$content" > "$work_dir/input.env"
-  (cd "$sops_dir" && SOPS_AGE_KEY_FILE="$AGE_KEY_FILE" sops -e --input-type dotenv \
-    --output-type dotenv "$work_dir/input.env" > "$work_dir/output.encrypted")
+  printf '%s\n' "$content" > "$work_dir/input.env.encrypted"
+  (cd "$sops_dir" && SOPS_AGE_KEY_FILE="$AGE_KEY_FILE" sops -e \
+    --input-type dotenv --output-type dotenv \
+    "$work_dir/input.env.encrypted" > "$work_dir/output.encrypted")
   local exit_code=$?
   if [ $exit_code -eq 0 ]; then
     mv "$work_dir/output.encrypted" "$output"
@@ -189,17 +175,51 @@ secrets_list() {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Public: bootstrap .env in the current project from the vault
+# Usage: secrets_init services  →  writes .env from services.env.encrypted
+# ─────────────────────────────────────────────────────────────────────────────
+secrets_init() {
+  local name="${1:-}"
+
+  if [ -z "$name" ]; then
+    echo "Usage: secrets init <name>" >&2
+    echo "  Decrypts <name>.env.encrypted from vault to .env" >&2
+    return 1
+  fi
+
+  local source=""
+  for dir in "secrets" "$ONESHOT_VAULT"; do
+    if [ -f "$dir/${name}.env.encrypted" ]; then
+      source="$dir/${name}.env.encrypted"
+      break
+    fi
+  done
+
+  if [ -z "$source" ]; then
+    echo "secrets-helper: '$name.env.encrypted' not found in vault" >&2
+    return 1
+  fi
+
+  if [ -f ".env" ]; then
+    cp ".env" ".env.bak"
+    echo "secrets-helper: backed up existing .env to .env.bak"
+  fi
+
+  _sops_decrypt "$source" > ".env"
+  chmod 600 ".env"
+  echo "secrets-helper: wrote .env from $source"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # If run directly (not sourced): act as a CLI
 # ─────────────────────────────────────────────────────────────────────────────
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   case "${1:-}" in
     get)     secrets_get "$2" "${3:-}" ;;
+    init)    secrets_init "$2" ;;
       set)
       secrets_set "$2" "$3" "${4:-}"
-      if [ $? -eq 0 ] && [ -d "$ONESHOT_VAULT/.git" ]; then
-        echo ""
-        read -rp "Commit and push to all machines? [Y/n] " confirm
-        [[ "$confirm" =~ ^[Nn] ]] && exit 0
+      if [ $? -eq 0 ] && [ "${4:-}" = "--commit" ] && [ -d "$ONESHOT_VAULT/.git" ]; then
         (cd "$ONESHOT_VAULT/.." && git add secrets/ && git commit -m "feat: update $2 secrets" && git push)
         echo "Pushed. Other machines will pick it up on next git pull."
       fi
@@ -211,13 +231,16 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
       echo ""
       echo "Commands:"
       echo "  get <KEY> [file-prefix]       Get a single key value"
-      echo "  set <name> <KEY=value>        Set/update a secret"
+      echo "  set <name> <KEY=value> [--commit]  Set/update a secret"
+      echo "  init <name>                   Write .env from vault"
       echo "  decrypt <name>               Decrypt full file to stdout"
       echo "  list                          List all files and key names"
       echo ""
       echo "Examples:"
       echo "  secrets-helper.sh get SKILLSMP_API_KEY"
       echo "  secrets-helper.sh set skillsmp 'SKILLSMP_API_KEY=sk_live_...'"
+      echo "  secrets-helper.sh set skillsmp 'KEY=val' --commit"
+      echo "  secrets-helper.sh init services"
       echo "  secrets-helper.sh decrypt openclaw"
       echo "  secrets-helper.sh list"
       ;;
