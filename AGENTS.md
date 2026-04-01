@@ -1,60 +1,46 @@
-<!-- FOR CLAUDE - NOT FOR HUMANS -->
+# ONE_SHOT v14 — Orchestration Control Plane
 
-# ONE_SHOT v13 — Operator Framework
-
-> **Context is the scarce resource.** Three operators, seven utilities. Discover skills on demand.
-
----
+> Lane-based routing. Claude plans, workers execute. Argus searches.
 
 ## OPERATORS
 
 ### `/short` — Quick Iteration
-
-```
-/short [scope]
-```
-
-**Behavior:**
 1. Load context: git log -5, TaskList, DECISIONS.md, BLOCKERS.md
 2. Ask: "What are you working on?"
-3. Discover skills on demand (~/.claude/skills/ index)
-4. Execute in burn-down mode
-5. Show delegation summary on completion
-
-**Decision defaults:** Simplest implementation, match existing patterns, skip refactors unless blocking.
+3. Execute in burn-down mode
+4. Show delegation summary
 
 ### `/full` — Structured Work
-
-```
-/full [project-description]
-```
-
-**Behavior:**
 1. Create/load IMPLEMENTATION_CONTEXT.md
 2. Structured intake: goals, scope, architecture, constraints
 3. Phase-based planning with milestones
-4. Skill discovery via ~/.claude/skills/ index
-5. Execute with context checkpoints (50% → suggest handoff, 70% → auto-handoff)
-6. Verify and show completion summary
+4. Execute with context checkpoints (50% → suggest handoff, 70% → auto-handoff)
+5. Verify and show completion summary
 
-**For:** New projects, refactors, complex features.
+### `/conduct` — Multi-Model Orchestration
+1. Detect available providers (read `config/workers.yaml`)
+2. Ask clarifying questions — BLOCKING
+3. Classify tasks by task class (see `docs/instructions/task-classes.md`)
+4. Route: task class → lane → worker pool → reviewer
+5. Loop until goal is fully met
 
-### `/conduct` — Multi-Model PMO Orchestrator
+## TASK CLASSES & LANE ROUTING
 
-```
-/conduct [idea or goal]
-```
+Tasks are classified, then routed to lanes defined in `config/lanes.yaml`.
 
-**Behavior:**
-1. Detect available providers (codex, gemini)
-2. Ask clarifying questions — BLOCKING, nothing runs until answered
-3. Create structured plan with task breakdown
-4. Route work across Claude + Codex + Gemini based on task type
-5. Loop until goal is fully met (not just started)
+| Task Class | Default Lane | Worker Pool |
+|-----------|-------------|-------------|
+| plan | premium | claude_code, codex |
+| research | research | gemini_cli, argus |
+| implement_small | cheap | openrouter pool |
+| implement_medium | balanced | mixed pool |
+| test_write | cheap | openrouter pool |
+| review_diff | premium | claude_code, codex |
+| doc_draft | cheap | openrouter pool |
+| search_sweep | research | argus + cheap summarizer |
+| summarize_findings | cheap | openrouter pool |
 
-**For:** Non-trivial tasks where you want autonomous execution across models until done.
-
----
+Resolve routing: `python -m core.router.resolve --class <task_class>`
 
 ## UTILITY COMMANDS
 
@@ -62,83 +48,34 @@
 |---------|---------|
 | `/handoff` | Save context before /clear |
 | `/restore` | Resume from handoff |
-| `/research` | Background research |
-| `/freesearch` | Zero-token web search (Exa) |
-| `/doc` | Cache external docs |
+| `/research` | Background research via Argus |
+| `/freesearch` | Zero-token search via Argus (cheap mode) |
+| `/doc` | Cache external documentation |
 | `/vision` | Image/website analysis |
-| `/secrets` | SOPS/Age secrets |
+| `/secrets` | SOPS/Age secrets management |
 
----
+## PLANNER/WORKER SPLIT
 
-## DEPLOYABLE TEMPLATES
-
-| Use Case | Template | Stack |
-|----------|----------|-------|
-| Membership/community sites | `templates/community-starter/` | Vercel + Supabase + Python + Resend |
-
----
+**Planner (Claude)**: planning, decomposition, repo synthesis, review, sensitive edits
+**Workers (lane-based)**: bounded implementation, tests, docs, search summarization
 
 ## DECISION DEFAULTS
 
-When ambiguous, apply without asking:
-
 | Ambiguity | Default |
 |-----------|---------|
-| Multiple implementations | **Simplest** |
+| Multiple implementations | Simplest |
 | Naming | Follow existing pattern |
-| Refactor opportunity | **Skip** unless blocking |
-| Stack | Follow CLAUDE.md |
-| Error handling | Match surrounding code |
-| Test framework | Use existing tests |
+| Refactor opportunity | Skip unless blocking |
+| Lane selection | Use task class routing |
 
-**Key rule:** When truly ambiguous, pick option A, note in DECISIONS.md.
+## AUTO-APPROVED
 
----
-
-## AUTO-APPROVED ACTIONS
-
-- Reading any file
-- Writing to scope-matched files
-- Running tests and linters
-- Creating DECISIONS.md, BLOCKERS.md, CHANGES.md
-- Git commit (not push)
-- Creating native tasks
+Reading files, writing to scope-matched files, running tests, git commit (not push), creating tasks.
 
 ## REQUIRES CONFIRMATION
 
-- Destructive operations (rm -rf, DROP TABLE)
-- Git push to shared branches
-- External API calls that cost money
-- Deploying to production
-
----
-
-## DELEGATION
-
-Before delegating: assess (complexity, criticality, uncertainty)
-After delegating: verify the result
-On failure: escalate (original → inline → human)
-
-**Delegation summary on completion:**
-```
-📊 Delegation Summary
-├─ N delegations, avg reward: X.XX
-├─ Best: [agent] (reward) - [description]
-└─ Tip: [optimization]
-```
-
----
-
-## PHILOSOPHY
-
-> "It's harder to read code than to write it." — Joel Spolsky
-
-**NEVER rewrite from scratch.** Extend, refactor, use existing solutions.
-
-**USER TIME IS PRECIOUS.** Agents should make reasonable decisions autonomously.
-
----
+Destructive ops, git push, external API calls that cost money, production deploy.
 
 ## VERSION
 
-v13.2 | 10 skills + 1 external | Operators discover skills on demand
+v14.0 | Lane-based routing | Argus search plane | Config-driven
