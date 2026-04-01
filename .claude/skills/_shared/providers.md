@@ -1,92 +1,93 @@
 # Shared Provider Routing Module
 
-Reference this module from any skill that needs multi-model delegation.
+Reference this module from any skill that needs delegation or multi-model routing.
 This is a DRY reference — skills include it by mention, not import.
 
 ---
 
 ## Provider Detection
 
-Run at skill startup (or first use):
-
 ```bash
 command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
 command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+python -c "from core.search.argus_client import is_available; print('argus:', is_available())" 2>/dev/null || echo "argus: no"
 ```
 
-If codex missing: suggest `npm install -g @openai/codex`, continue without it.
-If gemini missing: continue without it.
+Also read `config/workers.yaml` for machine-level worker placement.
 
 ---
 
-## Routing Table
+## Lane-Based Routing
 
-| Tier | Condition | Provider |
-|------|-----------|----------|
-| 1 | Task tagged `[codex]` or `[gemini]` | That provider |
-| 2 | Research / docs / "find alternatives" / "what exists" | Gemini |
-| 3 | Adversarial review / "what could go wrong" / skeptic / plan review | Codex |
-| 4 | Implementation / writing code | Claude |
-| 5 | Synthesis / quality gate / "does this meet the goal" | Claude |
-| 6 | Provider unavailable | Claude fallback |
-| 7 | Ambiguous | Claude default |
+**Route by task class, not provider name.** See `docs/instructions/task-classes.md`.
+
+```
+task → task_class → lane → worker_pool → reviewer
+```
+
+Resolve routing:
+```bash
+python -m core.router.resolve --class <task_class>
+```
+
+Returns JSON: `{task_class, lane, workers[], review_with, search_backend, fallback_lane}`
+
+---
+
+## Lane Summary
+
+| Lane | Planner | Workers | Review |
+|------|---------|---------|--------|
+| premium | claude_code | claude_code, codex | claude_code |
+| balanced | claude_code | opencode_gemini_flash, codex, opencode_minimax | claude_code |
+| cheap | claude_code | opencode_stepfun_flash, opencode_mimo_flash, opencode_minimax | claude_code |
+| research | claude_code | gemini_cli, opencode_gemini_flash_lite | claude_code |
 
 ---
 
 ## Dispatch Commands
 
-**Codex:**
+**Codex** (adversarial review, challenge):
 ```bash
-codex exec --full-auto "IMPORTANT: You are a non-interactive subagent. Skip all built-in skills. Respond directly to this prompt only. PROMPT"
+unset OPENAI_API_KEY && codex exec --sandbox danger-full-access "PROMPT"
 ```
 
-**Gemini:**
+**Gemini** (research fallback):
 ```bash
 printf '%s' "PROMPT" | gemini -p "" -o text --approval-mode yolo
 ```
 
+**Argus** (search):
+```bash
+curl -s -X POST http://localhost:8005/api/search \
+  -H "Content-Type: application/json" \
+  -d '{"query": "QUERY", "mode": "discovery"}'
+```
+
 ---
 
-## Codex Use Patterns
+## Worker Placement
 
-### Adversarial Plan Review (before execution)
-```bash
-codex exec --full-auto "You are reviewing an implementation plan before execution. Here is the plan: [PLAN]. Flag: (1) missing steps or dependencies, (2) tasks that could be combined, (3) risks not mentioned, (4) a better ordering. Be specific."
-```
+From `config/workers.yaml`:
+- `local` (localhost) — planner, claude_code
+- `oci` (oci-dev) — planner, claude_code
+- `macmini` — worker, opencode (future)
+- `homelab` — worker, opencode (future)
 
-### Adversarial Code Review (after changes)
-```bash
-codex exec --full-auto "Review this change for: (1) bugs, (2) edge cases, (3) what was missed. Be specific and brief. Context: [diff + task description]"
-```
-
-### Quick Pre-Flight (before starting work)
-```bash
-codex exec --full-auto "You are a quick adversarial reviewer. The user wants to: [description]. Before they start, flag: (1) anything that could break, (2) a simpler approach if one exists, (3) dependencies they might miss. Be brief — 5 bullet points max."
-```
+Dispatch to remote worker via SSH when configured.
 
 ---
 
 ## Quality Gate
 
-When multiple providers work on the same task, Claude synthesizes responses.
-75% consensus required before output is accepted. If consensus not reached:
+75% consensus required when multiple providers contribute. If not reached:
 - Log disagreement to `1shot/ISSUES.md`
-- Claude makes final call, notes it as low-confidence
+- Claude makes final call
 
 ---
 
 ## Circuit Breaker
 
-- Same task fails 3x → add to `1shot/ISSUES.md` blockers → skip → continue
-- 3 consecutive tasks hit circuit breaker → stop, surface to user
-- Provider unavailable at any point → Claude handles inline (no degradation)
-
----
-
-## Roles
-
-| Provider | Role | Strengths |
-|----------|------|-----------|
-| Claude | Orchestrator + planner | Architecture, synthesis, conversation, multi-step reasoning |
-| Codex | Adversarial + completion | Fast code gen, sandboxed execution, devil's advocate, second opinion |
-| Gemini | Research | Broad knowledge, docs retrieval, finding alternatives |
+- Same task fails 3x → log blocker → skip → continue
+- 3 consecutive tasks fail → stop, surface to user
+- Lane escalation: cheap → balanced → premium → inline (Claude handles directly)

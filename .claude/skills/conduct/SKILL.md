@@ -1,11 +1,11 @@
 ---
 name: conduct
-description: Multi-model PMO orchestrator. Asks clarifying questions first, creates a structured plan, routes work across Claude + Codex + Gemini, and loops until the goal is actually met. Use when the task is non-trivial and you want it to run until done without stopping early. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, run it, conduct.
+description: Multi-model orchestration with lane-based routing. Classifies tasks, routes to appropriate lanes (premium/balanced/cheap/research), and loops until the goal is met. Use when the task is non-trivial and you want it to run until done. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, conduct.
 ---
 
-# /conduct — Multi-Model PMO Orchestrator
+# /conduct — Lane-Based Orchestrator
 
-Routes work across Claude, Codex, and Gemini. Asks questions first. Loops until done.
+Classifies tasks by type, routes to lanes, dispatches to workers, reviews with Claude. Loops until done.
 
 ## Usage
 
@@ -16,17 +16,15 @@ Routes work across Claude, Codex, and Gemini. Asks questions first. Loops until 
 
 ## Behavior
 
-When invoked:
-
 ### Phase 0: Intake (BLOCKING — nothing else runs until complete)
 
-1. **Detect providers**
+1. **Detect providers and config**
    ```bash
    command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
    command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+   python -c "from core.search.argus_client import is_available; print('argus:', is_available())" 2>/dev/null || echo "argus: no"
    ```
-   If codex missing: suggest `npm install -g @openai/codex`, continue without it.
-   If gemini missing: continue without it.
+   Read `config/lanes.yaml` and `config/workers.yaml` for available routing.
 
 2. **Ask 5 required questions** using AskUserQuestion — do NOT proceed until answered:
    1. What is the goal / deliverable?
@@ -36,12 +34,9 @@ When invoked:
    5. What is the riskiest / most uncertain part?
 
 3. **Initialize `1shot/`** in the project root (create if missing):
-   - Copy templates from `~/.claude/skills/conduct/templates/`
    - Write intake answers to `1shot/PROJECT.md`
    - Update `1shot/STATE.md`: phase = "intake → plan"
-   - Update `1shot/config.json`: set providers based on detection
-   - Create `1shot/skills/` directory (for SkillsMP pulls)
-   - Create or refresh `1shot/LLM-OVERVIEW.md` with what is this, stack, key files
+   - Create `1shot/skills/` directory
 
 4. **Show PROJECT.md** to user and confirm before proceeding.
 
@@ -49,25 +44,19 @@ When invoked:
 
 1. **Explore codebase** (Explore subagent) — identify impacted files
 2. **Docs Check**
-   - Identify all external libraries, APIs, and tools needed
    - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
    - For anything missing → run `/doc <name> <url>` before assigning build tasks
-   - Use cached docs as source of truth — do NOT rely on training data for syntax
-3. **Write `1shot/ROADMAP.md`** — phases and success criteria from PROJECT.md
-4. **Skill Discovery** — for each major task type in the roadmap:
-   - Check `1shot/skills/` for already-pulled skills
-   - Ask: *"Is this specialized enough that a community skill would do this better?"*
-   - Specialized (security, blockchain, ML, specific APIs, infra tools): search SkillsMP
-     ```bash
-     ./scripts/skillsmp-search.sh "<task type>" --install
-     ```
-   - General (write tests, refactor, add endpoint): skip, use core skills
-5. **Create native tasks** — one TaskCreate per deliverable (not steps):
+3. **Write `1shot/ROADMAP.md`** — phases and success criteria
+4. **Create native tasks** — one TaskCreate per deliverable:
    - subject: deliverable title
-   - description: acceptance criteria from PROJECT.md, files to touch, skill to use if pulled
+   - description: acceptance criteria, files to touch
    - Set addBlockedBy for dependencies
+5. **Classify each task** using `docs/instructions/task-classes.md`:
+   ```bash
+   python -m core.router.resolve --class <task_class>
+   ```
+   This returns: lane, workers, reviewer, search_backend, fallback_lane
 6. **Update STATE.md**: phase = "plan → build"
-7. **Show task list** before proceeding
 
 ### Phase 2: Build Loop
 
@@ -75,11 +64,15 @@ Repeat until no unblocked tasks remain:
 
 1. Pick next unblocked task (`TaskList` → lowest ID pending)
 2. `TaskUpdate` → in_progress
-3. **Route to provider** (see Routing Logic below)
+3. **Classify and route**:
+   - Determine task class (see task-classes.md)
+   - Resolve lane: `python -m core.router.resolve --class <class>`
+   - Route to worker pool for that lane
 4. Execute fully, commit: `git add <files> && git commit -m "feat: <task>"`
-5. `TaskUpdate` → completed
-6. Update `1shot/STATE.md`: increment loop count, log action
-7. **Circuit breaker check**: if same task failed 3x → add to `1shot/ISSUES.md` blockers → skip → continue
+5. **Review**: If task requires review (see task-classes.md), route to reviewer
+6. `TaskUpdate` → completed
+7. Update `1shot/STATE.md`: increment loop count, log action
+8. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
 
 If 3 consecutive tasks hit circuit breaker → stop, surface to user.
 
@@ -87,72 +80,45 @@ If 3 consecutive tasks hit circuit breaker → stop, surface to user.
 
 For each completed task:
 1. Check acceptance criteria from `1shot/PROJECT.md`
-2. Run tests:
-   - `./scripts/ci.sh` if present
-   - else `npm test` / `pytest` / `go test ./...` based on project type
-3. Failed tasks → `TaskUpdate` status back to pending with failure notes → loop to Phase 2
+2. Run tests: `./scripts/ci.sh` if present, else appropriate test command
+3. Failed tasks → `TaskUpdate` back to pending → loop to Phase 2
 
 ### Phase 4: Challenge (adversarial pass)
 
 1. `git diff $(git merge-base HEAD main)..HEAD` — full diff since conduct started
 2. If Codex available:
    ```bash
-   codex exec --full-auto "You are an adversarial reviewer. Read this diff and find: (1) what could break, (2) what was missed, (3) unhandled edge cases. Be specific. Diff: [diff content]"
+   unset OPENAI_API_KEY && codex exec --sandbox danger-full-access "Review this diff: (1) what could break, (2) what was missed, (3) edge cases. Diff: [content]"
    ```
    If Codex unavailable: Claude performs adversarial review inline.
-3. New issues found → create new Tasks → loop back to Phase 2
+3. New issues → create Tasks → loop to Phase 2
 4. Clean pass → update STATE.md: phase = "complete"
+
+### Phase 5: Session-End Learning
+
+If any correction was given 2+ times during this session:
+- Write proposal to `docs/instructions/learned/{date}-{topic}.md`
+- Never auto-edit `CLAUDE.md` or rules
 
 ### Done
 
-- STATE.md phase = "complete"
-- Print summary:
-  ```
-  ✅ Conduct Complete
-  ├─ Tasks: X/Y completed
-  ├─ Providers used: [list]
-  ├─ Files changed: Z
-  ├─ Commits: N
-  └─ Blockers skipped: M (see 1shot/ISSUES.md)
-  ```
-
----
-
-## Routing Logic
-
-See `~/.claude/skills/_shared/providers.md` for provider detection, routing table, dispatch commands, quality gates, and circuit breaker.
-
-**Conduct-specific routing**: Conduct uses all tiers. Plan review and adversarial challenge phases always route to Codex when available. Research tasks route to Gemini. Implementation stays with Claude.
-
----
-
-## `1shot/PROJECT.md` Template
-
-```markdown
-# Project: [goal title]
-
-## Goal
-[What are we building / delivering?]
-
-## Done When
-[Specific acceptance criteria — measurable, not vague]
-
-## In Scope
-- [item]
-
-## Out of Scope
-- [item]
-
-## Constraints
-[Tech stack, time limits, things to avoid]
-
-## Riskiest Part
-[What's most likely to go wrong or be uncertain]
-
-## Status
-IN_PROGRESS
-<!-- change to COMPLETE when all tasks pass verify + challenge -->
 ```
+Conduct Complete
+├─ Tasks: X/Y completed
+├─ Lanes used: [list]
+├─ Files changed: Z
+├─ Commits: N
+└─ Blockers: M (see 1shot/ISSUES.md)
+```
+
+---
+
+## Routing Reference
+
+See `docs/instructions/task-classes.md` for full classification guide.
+See `~/.claude/skills/_shared/providers.md` for dispatch commands.
+
+**Key rule**: Route by task class, not provider name. Use lane policy from config.
 
 ---
 
@@ -161,12 +127,8 @@ IN_PROGRESS
 | Ambiguity | Default |
 |-----------|---------|
 | Multiple implementations | Simplest one |
-| Naming | Follow existing pattern in file |
-| Error handling | Match surrounding code |
-| Test framework | Use existing tests as guide |
-| Library choice | One already in project |
-| Refactor opportunity | Skip unless blocking |
-| Provider routing | Claude unless research or adversarial |
+| Naming | Follow existing pattern |
+| Lane selection | Use task class routing |
 | Stack | Follow CLAUDE.md defaults |
 
 ---
@@ -176,9 +138,7 @@ IN_PROGRESS
 - Reading any file
 - Writing to scope-matched files
 - Creating / updating `1shot/` files
-- Creating DECISIONS.md, BLOCKERS.md, ISSUES.md
 - Running tests and linters
-- Calling Codex and Gemini CLI via bash
 - Git commit (not push)
 - Creating and updating native tasks
 
@@ -186,6 +146,5 @@ IN_PROGRESS
 
 - Destructive operations (rm -rf, DROP TABLE, reset --hard)
 - Git push to shared branches
-- External API calls that cost money (beyond Codex/Gemini CLI)
+- External API calls that cost money
 - Deploying to production
-- Major architecture changes not in PROJECT.md scope
