@@ -5,25 +5,29 @@ lanes:
     worker_pool: [claude_code, codex]
     strategy: first_available
     fallback_lane: null  # top tier, no escalation
+    max_parallel: 2
 
   balanced:
     planner: claude_code
     review_with: claude_code
-    worker_pool: [opencode_gemini_flash, codex, opencode_minimax]
+    worker_pool: [codex, gemini_cli]
     strategy: first_available
     fallback_lane: premium
+    max_parallel: 3
 
   cheap:
     planner: claude_code
     review_with: claude_code
-    worker_pool: [opencode_stepfun_flash, opencode_mimo_flash, opencode_minimax]
+    worker_pool: [gemini_cli, codex]
     strategy: first_available
     fallback_lane: balanced
+    max_parallel: 3
 
   research:
     planner: claude_code
     review_with: claude_code
-    worker_pool: [gemini_cli, opencode_gemini_flash_lite]
+    worker_pool: [gemini_cli, codex]
     search_backend: argus
     strategy: first_available
     fallback_lane: balanced
+    max_parallel: 3

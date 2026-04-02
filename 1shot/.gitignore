@@ -1,0 +1,7 @@
+# Dispatch manifests are runtime artifacts, not source
+dispatch/*.md
+dispatch/*.json
+dispatch/*.jsonl
+
+# But keep the directory
+!.gitkeep

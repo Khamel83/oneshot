@@ -7,22 +7,36 @@
 ### `/short` — Quick Iteration
 1. Load context: git log -5, TaskList, DECISIONS.md, BLOCKERS.md
 2. Ask: "What are you working on?"
-3. Execute in burn-down mode
+3. Execute via dispatch protocol (non-premium tasks → Codex/Gemini)
 4. Show delegation summary
 
 ### `/full` — Structured Work
 1. Create/load IMPLEMENTATION_CONTEXT.md
 2. Structured intake: goals, scope, architecture, constraints
 3. Phase-based planning with milestones
-4. Execute with context checkpoints (50% → suggest handoff, 70% → auto-handoff)
-5. Verify and show completion summary
+4. Execute via dispatch protocol (parallel Codex/Gemini workers)
+5. Context checkpoints (50% → suggest handoff, 70% → auto-handoff)
+6. Verify and show completion summary
 
 ### `/conduct` — Multi-Model Orchestration
 1. Detect available providers (read `config/workers.yaml`)
 2. Ask clarifying questions — BLOCKING
 3. Classify tasks by task class (see `docs/instructions/task-classes.md`)
 4. Route: task class → lane → worker pool → reviewer
-5. Loop until goal is fully met
+5. Dispatch non-premium tasks in parallel via dispatch protocol
+6. Loop until goal is fully met
+
+## DISPATCH PROTOCOL
+
+All non-premium tasks use the dispatch protocol (`_shared/dispatch.md`):
+- Claude builds self-contained prompts with full context
+- Codex and Gemini execute in parallel (up to `max_parallel` per lane)
+- Structured JSON output captured and validated
+- Manifests written to `1shot/dispatch/{id}.md`
+
+```
+Claude (thinker) → classify → build prompt → dispatch to worker(s) → capture output → validate → commit
+```
 
 ## TASK CLASSES & LANE ROUTING
 
@@ -30,17 +44,18 @@ Tasks are classified, then routed to lanes defined in `config/lanes.yaml`.
 
 | Task Class | Default Lane | Worker Pool |
 |-----------|-------------|-------------|
-| plan | premium | claude_code, codex |
-| research | research | gemini_cli, argus |
-| implement_small | cheap | openrouter pool |
-| implement_medium | balanced | mixed pool |
-| test_write | cheap | openrouter pool |
-| review_diff | premium | claude_code, codex |
-| doc_draft | cheap | openrouter pool |
-| search_sweep | research | argus + cheap summarizer |
-| summarize_findings | cheap | openrouter pool |
+| plan | premium | claude_code (inline) |
+| research | research | gemini_cli, codex |
+| implement_small | cheap | gemini_cli, codex |
+| implement_medium | balanced | codex, gemini_cli |
+| test_write | cheap | gemini_cli, codex |
+| review_diff | premium | claude_code (inline) |
+| doc_draft | cheap | gemini_cli, codex |
+| search_sweep | research | gemini_cli, codex + argus |
+| summarize_findings | cheap | gemini_cli, codex |
 
 Resolve routing: `python -m core.router.resolve --class <task_class>`
+Parallel dispatch: `python3 -m core.dispatch.run --class <class> --prompts-file batch.json`
 
 ## UTILITY COMMANDS
 
@@ -57,7 +72,8 @@ Resolve routing: `python -m core.router.resolve --class <task_class>`
 ## PLANNER/WORKER SPLIT
 
 **Planner (Claude)**: planning, decomposition, repo synthesis, review, sensitive edits
-**Workers (lane-based)**: bounded implementation, tests, docs, search summarization
+**Workers (Codex + Gemini)**: bounded implementation, tests, docs, search summarization
+**Dispatch**: parallel execution with structured output and manifest tracking
 
 ## DECISION DEFAULTS
 
@@ -78,4 +94,4 @@ Destructive ops, git push, external API calls that cost money, production deploy
 
 ## VERSION
 
-v14.0 | Lane-based routing | Argus search plane | Config-driven
+v14.1 | Parallel dispatch | Codex + Gemini workers | Manifest tracking

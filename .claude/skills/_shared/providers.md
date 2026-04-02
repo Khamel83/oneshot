@@ -47,9 +47,28 @@ Returns JSON: `{task_class, lane, workers[], review_with, search_backend, fallba
 
 ## Dispatch Commands
 
-**Codex** (adversarial review, challenge):
+**Codex** (adversarial review, challenge, worker tasks):
+
+Structured output (preferred for all programmatic dispatch):
 ```bash
-unset OPENAI_API_KEY && codex exec --sandbox danger-full-access "PROMPT"
+unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access "PROMPT"
+# Returns JSONL stream: thread.started, turn.started, item.*, turn.completed
+# Parse final agent message:  | jq 'select(.type == "item.completed") | select(.item.type == "agent_message")'
+```
+
+Quick single-run with last-message capture:
+```bash
+unset OPENAI_API_KEY && codex exec --sandbox danger-full-access -o /tmp/codex-output.txt "PROMPT"
+```
+
+Structured output with schema (for downstream processing):
+```bash
+unset OPENAI_API_KEY && codex exec --sandbox danger-full-access --output-schema ./schema.json -o ./result.json "PROMPT"
+```
+
+Resume a previous session:
+```bash
+unset OPENAI_API_KEY && codex exec resume --last "follow-up prompt"
 ```
 
 **Gemini** (research fallback):

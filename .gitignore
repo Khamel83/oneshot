@@ -11,6 +11,12 @@ secrets/*.env
 
 # Output directories (runtime generated, not source)
 dispatch/
+# But DO track the dispatch Python module and 1shot directory structure
+!core/dispatch/
+!core/dispatch/__init__.py
+!core/dispatch/run.py
+!1shot/dispatch/
+!1shot/dispatch/.gitkeep
 
 # But DO track research results
 !docs/research/

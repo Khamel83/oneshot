@@ -91,17 +91,18 @@ When invoked:
    - Commit after each milestone
    - Update `1shot/STATE.md` with progress
 
-2. **Burn-Down Mode**
+2. **Dispatch Non-Premium Tasks**
+   - For each milestone task, classify using task-classes.md
+   - **Follow the dispatch protocol** (see `~/.claude/skills/_shared/dispatch.md`):
+     - Premium tasks (planning, review, integration) → Claude handles inline
+     - Implementation, test, doc tasks → dispatch to Codex or Gemini
+     - Use `python3 -m core.dispatch.run` for parallel execution
+     - Write manifests to `1shot/dispatch/`
+   - Review dispatch output, validate against acceptance criteria, commit
+
+3. **Burn-Down Mode**
    - Complete one milestone fully before starting next
    - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
-
-3. **Codex Milestone Review** (after each milestone commit)
-   - If codex available:
-     ```bash
-     codex exec --full-auto "Review this milestone change for: (1) bugs, (2) edge cases, (3) what was missed. Be specific. Context: [diff]"
-     ```
-   - If issues found → address before continuing (use judgment — don't create blocking tasks for every nit)
-   - If codex unavailable → skip silently
 
 4. **Context Checkpoints**
    - At 50% context: suggest /handoff
@@ -109,12 +110,11 @@ When invoked:
 
 ### Phase 4: Completion
 
-1. **Codex Challenge Pass** (adversarial review of full implementation)
+1. **Challenge Pass** (adversarial review of full implementation)
    - `git diff $(git merge-base HEAD main)..HEAD` — full diff since full started
-   - If codex available:
-     ```bash
-     codex exec --full-auto "You are an adversarial reviewer. Read this diff and find: (1) what could break, (2) what was missed, (3) unhandled edge cases. Be specific. Diff: [diff content]"
-     ```
+   - **Follow the dispatch protocol** for the review (see `_shared/dispatch.md`):
+     - Dispatch to Codex for adversarial review
+     - Use `codex exec --json -o /tmp/full-challenge.json`
    - If codex unavailable: Claude performs adversarial review inline
    - New issues found → fix, then re-verify
 
@@ -138,9 +138,10 @@ When invoked:
 
 ## Provider Routing
 
-See `~/.claude/skills/_shared/providers.md` for provider detection, dispatch commands, quality gates, and circuit breaker.
+See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol.
+See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
 
-**Full-specific routing**: Full uses Codex for plan review + milestone review + challenge pass. Research tasks route to Gemini if available. All implementation stays with Claude. Full is one operator, not a PMO — don't make it behave like conduct.
+**Full-specific routing**: Claude plans and reviews. Codex and Gemini execute implementation tasks via the dispatch protocol. Research tasks route to Gemini. Full is one operator, not a PMO — don't make it behave like conduct.
 
 ## `1shot/` Structure
 

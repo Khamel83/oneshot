@@ -1,0 +1,354 @@
+"""Parallel dispatch runner for Codex and Gemini.
+
+Usage:
+    python -m core.dispatch.run --class implement_small --prompt "Fix the auth bug in login.py" --output /tmp/dispatch
+    python -m core.dispatch.run --class implement_small --prompt "..." --parallel 3
+    python -m core.dispatch.run --manifest 1shot/dispatch
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from datetime import datetime, timezone
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+CONFIG_PATH = REPO_ROOT / "config" / "lanes.yaml"
+
+
+def load_yaml(path: str) -> dict:
+    import yaml
+    with open(path) as f:
+        return yaml.safe_load(f)
+
+
+def resolve_lane(task_class: str) -> dict:
+    """Resolve task class to lane config using the router module."""
+    sys.path.insert(0, str(REPO_ROOT))
+    from core.router.lane_policy import resolve
+    return resolve(task_class, str(CONFIG_PATH))
+
+
+def codex_command(prompt: str, output_file: str) -> list[str]:
+    # Codex exec with --json writes JSONL to stdout and last message to -o file
+    # Use </dev/null to prevent stdin blocking, capture stdout to the output file
+    jsonl_file = output_file.replace(".json", ".jsonl")
+    return [
+        "bash", "-c",
+        f"unset OPENAI_API_KEY OPENAI_BASE_URL && "
+        f"codex exec --json --sandbox danger-full-access "
+        f"-o {output_file} "
+        f"{json.dumps(prompt)} "
+        f"</dev/null > {jsonl_file} 2>&1"
+    ]
+
+
+def gemini_command(prompt: str, output_file: str) -> list[str]:
+    return [
+        "bash", "-c",
+        f"gemini -p {json.dumps(prompt)} "
+        f"--output-format json --yolo "
+        f"> {output_file} 2>/dev/null"
+    ]
+
+
+def clean_env() -> dict[str, str]:
+    """Return a clean environment for worker subprocesses."""
+    env = os.environ.copy()
+    for key in ["OPENAI_API_KEY", "OPENAI_BASE_URL"]:
+        env.pop(key, None)
+    return env
+
+
+def parse_codex_output(output_file: str) -> dict:
+    """Parse Codex JSONL output into structured result."""
+    result = {"worker": "codex", "messages": [], "errors": [], "usage": None}
+
+    # Codex writes JSONL stream to stdout (captured as .jsonl) and last message to -o (.json)
+    jsonl_file = output_file.replace(".json", ".jsonl")
+    sources = []
+    if os.path.exists(jsonl_file):
+        sources.append(jsonl_file)
+    if os.path.exists(output_file):
+        # The -o file contains the last message as plain text
+        try:
+            with open(output_file) as f:
+                last_msg = f.read().strip()
+            if last_msg:
+                result["messages"].append(last_msg)
+        except Exception:
+            pass
+
+    if not sources:
+        if not result["messages"]:
+            result["errors"].append("No output file")
+        return result
+
+    for source in sources:
+        try:
+            with open(source) as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        obj = json.loads(line)
+                        if obj.get("type") == "item.completed":
+                            item = obj.get("item", {})
+                            if isinstance(item, dict) and item.get("type") == "agent_message":
+                                result["messages"].append(item.get("text", ""))
+                        elif obj.get("type") == "turn.completed":
+                            result["usage"] = obj.get("usage")
+                        elif obj.get("type") == "error":
+                            msg = obj.get("message", str(obj))
+                            if isinstance(msg, str):
+                                result["errors"].append(msg)
+                    except json.JSONDecodeError:
+                        continue
+        except Exception as e:
+            result["errors"].append(str(e))
+
+    return result
+
+
+def parse_gemini_output(output_file: str) -> dict:
+    """Parse Gemini JSON output into structured result."""
+    result = {"worker": "gemini_cli", "messages": [], "errors": [], "usage": None}
+
+    if not os.path.exists(output_file):
+        result["errors"].append("No output file")
+        return result
+
+    try:
+        with open(output_file) as f:
+            data = json.load(f)
+        result["messages"].append(data.get("response", ""))
+        result["usage"] = data.get("stats")
+        if data.get("error"):
+            result["errors"].append(data["error"])
+    except json.JSONDecodeError:
+        # Try JSONL (stream-json)
+        try:
+            with open(output_file) as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        obj = json.loads(line)
+                        if obj.get("type") == "result":
+                            result["messages"].append(str(obj.get("data", "")))
+                        elif obj.get("type") == "error":
+                            result["errors"].append(str(obj.get("data", obj)))
+                    except json.JSONDecodeError:
+                        continue
+        except Exception as e:
+            result["errors"].append(str(e))
+    except Exception as e:
+        result["errors"].append(str(e))
+
+    return result
+
+
+def dispatch_single(task: dict, output_dir: str) -> dict:
+    """Dispatch a single task to the appropriate worker and return result."""
+    worker = task["worker"]
+    prompt = task["prompt"]
+    task_id = task["id"]
+    output_file = os.path.join(output_dir, f"dispatch-{task_id}.json")
+    started = datetime.now(timezone.utc)
+
+    # Build command
+    if worker == "codex":
+        cmd = codex_command(prompt, output_file)
+    elif worker == "gemini_cli":
+        cmd = gemini_command(prompt, output_file)
+    else:
+        return {"task_id": task_id, "worker": worker, "status": "failed",
+                "error": f"Unknown worker: {worker}"}
+
+    # Execute
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300,
+                             env=clean_env())
+        exit_code = proc.returncode
+        stderr = proc.stderr.strip() if proc.stderr else ""
+    except subprocess.TimeoutExpired:
+        exit_code = -1
+        stderr = "Timeout (300s)"
+    except Exception as e:
+        exit_code = -1
+        stderr = str(e)
+
+    completed = datetime.now(timezone.utc)
+    duration = (completed - started).total_seconds()
+
+    # Parse output
+    if worker == "codex":
+        parsed = parse_codex_output(output_file)
+    else:
+        parsed = parse_gemini_output(output_file)
+
+    # Determine status
+    status = "succeeded" if exit_code == 0 and not parsed["errors"] else "failed"
+    last_message = parsed["messages"][-1] if parsed["messages"] else ""
+
+    return {
+        "task_id": task_id,
+        "worker": worker,
+        "status": status,
+        "exit_code": exit_code,
+        "stderr": stderr,
+        "started": started.isoformat(),
+        "completed": completed.isoformat(),
+        "duration": round(duration, 1),
+        "output_file": output_file,
+        "message": last_message,
+        "errors": parsed["errors"],
+        "usage": parsed["usage"],
+    }
+
+
+def write_manifest(result: dict, manifest_dir: str):
+    """Write a markdown manifest for a dispatched task."""
+    os.makedirs(manifest_dir, exist_ok=True)
+    path = os.path.join(manifest_dir, f"{result['task_id']}.md")
+
+    status_icon = "OK" if result["status"] == "succeeded" else "FAIL"
+    duration_str = f"{result['duration']}s"
+
+    lines = [
+        f"# Dispatch: {result['task_id']}",
+        "",
+        f"**Status**: {status_icon} — {result['status']}",
+        f"**Worker**: {result['worker']}",
+        f"**Duration**: {duration_str}",
+        f"**Started**: {result['started']}",
+        f"**Completed**: {result['completed']}",
+        f"**Exit code**: {result['exit_code']}",
+        f"**Output file**: `{result['output_file']}`",
+        "",
+    ]
+
+    if result.get("usage"):
+        lines.append(f"**Usage**: ```json\n{json.dumps(result['usage'], indent=2)}\n```")
+        lines.append("")
+
+    if result.get("message"):
+        lines.extend(["## Output", "", result["message"][:2000], ""])
+
+    if result.get("errors"):
+        lines.extend(["## Errors", ""])
+        for err in result["errors"]:
+            lines.append(f"- {err}")
+        lines.append("")
+
+    if result.get("stderr"):
+        lines.extend(["## Stderr", "", "```", result["stderr"][:1000], "```", ""])
+
+    Path(path).write_text("\n".join(lines))
+
+
+def dispatch_parallel(tasks: list[dict], max_parallel: int = 3,
+                      output_dir: str = "/tmp/dispatch",
+                      manifest_dir: str = "1shot/dispatch") -> list[dict]:
+    """Dispatch multiple tasks in parallel and return results."""
+    os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(manifest_dir, exist_ok=True)
+    results = []
+
+    with ProcessPoolExecutor(max_workers=max_parallel) as executor:
+        future_to_task = {
+            executor.submit(dispatch_single, t, output_dir): t
+            for t in tasks
+        }
+        for future in as_completed(future_to_task):
+            task = future_to_task[future]
+            try:
+                result = future.result()
+                results.append(result)
+                write_manifest(result, manifest_dir)
+            except Exception as e:
+                results.append({
+                    "task_id": task["id"],
+                    "worker": task.get("worker", "unknown"),
+                    "status": "failed",
+                    "error": str(e),
+                })
+
+    return sorted(results, key=lambda r: r["task_id"])
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Dispatch tasks to Codex/Gemini workers")
+    parser.add_argument("--class", dest="task_class", required=True,
+                        help="Task class (implement_small, test_write, etc.)")
+    parser.add_argument("--prompt", default=None,
+                        help="Self-contained prompt for the worker")
+    parser.add_argument("--worker", default=None,
+                        help="Override worker (codex or gemini_cli)")
+    parser.add_argument("--output", default="/tmp/dispatch",
+                        help="Output directory for dispatch files")
+    parser.add_argument("--manifest", default="1shot/dispatch",
+                        help="Manifest directory")
+    parser.add_argument("--parallel", type=int, default=1,
+                        help="Number of parallel dispatches (for batch mode)")
+    parser.add_argument("--prompts-file", default=None,
+                        help="JSON file with array of {id, prompt} for batch mode")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Show what would be dispatched without running")
+    args = parser.parse_args()
+
+    if not args.prompt and not args.prompts_file:
+        parser.error("Either --prompt or --prompts-file is required")
+
+    # Resolve lane
+    resolution = resolve_lane(args.task_class)
+
+    if args.dry_run:
+        print(json.dumps({
+            "task_class": args.task_class,
+            "lane": resolution["lane"],
+            "workers": resolution["workers"],
+            "review_with": resolution["review_with"],
+            "max_parallel": resolution.get("max_parallel", 3),
+            "prompt_preview": args.prompt[:200],
+        }, indent=2))
+        return
+
+    # Build task
+    worker = args.worker or resolution["workers"][0]
+    task_id = f"{args.task_class}-{int(time.time())}"
+
+    tasks = []
+    if args.prompts_file:
+        with open(args.prompts_file) as f:
+            prompts = json.load(f)
+        for i, p in enumerate(prompts):
+            w = p.get("worker", worker)
+            tasks.append({"id": f"{w}-{i}-{task_id}", "worker": w, "prompt": p["prompt"]})
+    else:
+        tasks.append({"id": task_id, "worker": worker, "prompt": args.prompt})
+
+    max_p = min(args.parallel, resolution.get("max_parallel", 3))
+    results = dispatch_parallel(tasks, max_parallel=max_p,
+                               output_dir=args.output,
+                               manifest_dir=args.manifest)
+
+    # Summary
+    succeeded = sum(1 for r in results if r["status"] == "succeeded")
+    failed = sum(1 for r in results if r["status"] == "failed")
+    print(json.dumps({
+        "dispatched": len(results),
+        "succeeded": succeeded,
+        "failed": failed,
+        "results": results,
+    }, indent=2))
+
+
+if __name__ == "__main__":
+    main()

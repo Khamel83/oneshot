@@ -1,6 +1,13 @@
 {
-  "provider": "openrouter",
-  "model": "google/gemini-2.5-flash",
-  "auto_approve": false,
-  "context": "oneshot-worker"
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "anthropic": {
+      "options": {
+        "apiKey": "{env:ANTHROPIC_API_KEY}"
+      }
+    }
+  },
+  "instructions": [
+    "AGENTS.md"
+  ]
 }

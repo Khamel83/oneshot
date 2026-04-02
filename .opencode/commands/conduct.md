@@ -1,5 +1,4 @@
 ---
-name: conduct
 description: Multi-model orchestration with lane-based routing
 ---
 

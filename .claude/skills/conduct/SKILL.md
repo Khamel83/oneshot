@@ -64,15 +64,18 @@ Repeat until no unblocked tasks remain:
 
 1. Pick next unblocked task (`TaskList` → lowest ID pending)
 2. `TaskUpdate` → in_progress
-3. **Classify and route**:
+3. **Classify and dispatch**:
    - Determine task class (see task-classes.md)
    - Resolve lane: `python -m core.router.resolve --class <class>`
-   - Route to worker pool for that lane
-4. Execute fully, commit: `git add <files> && git commit -m "feat: <task>"`
-5. **Review**: If task requires review (see task-classes.md), route to reviewer
-6. `TaskUpdate` → completed
-7. Update `1shot/STATE.md`: increment loop count, log action
-8. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
+   - **Follow the dispatch protocol** (see `~/.claude/skills/_shared/dispatch.md`):
+     - If premium lane → execute inline with Claude
+     - Otherwise → build self-contained prompt → dispatch to Codex/Gemini
+     - For parallel tasks → use `python3 -m core.dispatch.run --prompts-file batch.json`
+     - Capture output, validate, write manifest to `1shot/dispatch/`
+4. **Review**: If task requires review, dispatch review to reviewer (see dispatch.md Step 7)
+5. `TaskUpdate` → completed
+6. Update `1shot/STATE.md`: increment loop count, log action
+7. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
 
 If 3 consecutive tasks hit circuit breaker → stop, surface to user.
 
@@ -88,8 +91,9 @@ For each completed task:
 1. `git diff $(git merge-base HEAD main)..HEAD` — full diff since conduct started
 2. If Codex available:
    ```bash
-   unset OPENAI_API_KEY && codex exec --sandbox danger-full-access "Review this diff: (1) what could break, (2) what was missed, (3) edge cases. Diff: [content]"
+   unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access -o /tmp/conduct-challenge.json "Review this diff: (1) what could break, (2) what was missed, (3) edge cases. Diff: [content]"
    ```
+   Parse: `jq 'select(.type=="item.completed") | .item.text' /tmp/conduct-challenge.json`
    If Codex unavailable: Claude performs adversarial review inline.
 3. New issues → create Tasks → loop to Phase 2
 4. Clean pass → update STATE.md: phase = "complete"
@@ -116,9 +120,11 @@ Conduct Complete
 ## Routing Reference
 
 See `docs/instructions/task-classes.md` for full classification guide.
-See `~/.claude/skills/_shared/providers.md` for dispatch commands.
+See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol (how to build prompts, run parallel workers, capture output, write manifests).
+See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
 
 **Key rule**: Route by task class, not provider name. Use lane policy from config.
+Claude thinks. Codex and Gemini execute.
 
 ---
 

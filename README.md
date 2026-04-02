@@ -1,6 +1,6 @@
 # ONE_SHOT v14
 
-**Control plane for Claude-first orchestration.** Lane-based routing, Argus search, model-agnostic workers.
+**Control plane for Claude-first orchestration.** Lane-based routing, parallel dispatch, Argus search.
 
 **[Quick Start](#quick-start)** | **[Skills](#skills)** | **[Architecture](#architecture)**
 
@@ -24,27 +24,51 @@ OneShot is a portable orchestration layer:
 
 - **Control plane**: YAML config + Python schemas + Markdown instructions
 - **Planner**: Claude Code (planning, review, repo synthesis)
-- **Workers**: Lane-based pool (cheap models via OpenRouter, Codex, Gemini)
+- **Workers**: Codex and Gemini execute tasks via parallel dispatch
 - **Search**: Argus broker (SearXNG, Brave, Serper, Tavily, Exa)
+- **Dispatch**: Self-contained prompts → parallel workers → structured output → manifest trail
 - **Instructions**: Single source of truth at `docs/instructions/`
 
 ### Lane-Based Routing
 
 Tasks are classified, then routed to lanes:
 
-| Lane | Use Case | Workers |
-|------|----------|---------|
-| premium | Planning, review | Claude, Codex |
-| balanced | Medium implementation | Gemini Flash, Codex, MiniMax |
-| cheap | Small tasks, docs, tests | StepFun, MiMo, MiniMax |
-| research | Search-heavy tasks | Gemini, Argus |
+| Lane | Use Case | Workers | Max Parallel |
+|------|----------|---------|-------------|
+| premium | Planning, review | Claude (inline) | 2 |
+| balanced | Medium implementation | Codex, Gemini | 3 |
+| cheap | Small tasks, docs, tests | Gemini, Codex | 3 |
+| research | Search-heavy tasks | Gemini, Codex + Argus | 3 |
 
 Config: `config/lanes.yaml`, `config/models.yaml`
+
+### Dispatch Protocol
+
+Claude thinks, Codex and Gemini execute. The dispatch protocol (`_shared/dispatch.md`) handles:
+
+1. Classify task → resolve lane
+2. Build self-contained prompt (files, criteria, patterns, output format)
+3. Dispatch to Codex/Gemini in parallel (up to `max_parallel`)
+4. Capture structured output (JSON from both)
+5. Validate against acceptance criteria
+6. Write manifest to `1shot/dispatch/{id}.md`
+7. Retry or escalate on failure
+
+```bash
+# Single dispatch
+python3 -m core.dispatch.run --class implement_small --prompt "Fix auth bug"
+
+# Parallel batch
+python3 -m core.dispatch.run --class implement_small --prompts-file batch.json --parallel 3
+
+# Dry run (show routing without executing)
+python3 -m core.dispatch.run --class implement_small --prompt "..." --dry-run
+```
 
 ### CLI Resolver
 
 ```bash
-python -m core.router.resolve --class implement_small
+python3 -m core.router.resolve --class implement_small
 # → {"task_class": "implement_small", "lane": "cheap", "workers": [...]}
 ```
 
@@ -89,20 +113,49 @@ python -m core.router.resolve --class implement_small
 ```
 oneshot/
 ├── config/              # YAML routing policy
-│   ├── lanes.yaml       # Lane definitions and worker pools
+│   ├── lanes.yaml       # Lane definitions, worker pools, max_parallel
 │   ├── models.yaml      # Model capabilities and costs
 │   ├── workers.yaml     # Machine placement
 │   ├── search.yaml      # Argus search modes
 │   └── providers.yaml   # Environment variable mapping
 ├── core/                # Python schemas and utilities
 │   ├── task_schema.py   # Task class definitions
-│   └── router/          # Lane policy, model registry, CLI resolver
+│   ├── router/          # Lane policy, model registry, CLI resolver
+│   └── dispatch/        # Parallel dispatch runner, output capture, manifests
 ├── docs/instructions/   # Neutral instruction source (authoritative)
 ├── .claude/rules/       # Thin imports to docs/instructions/
 ├── .claude/skills/      # Operator and utility skill prompts
-├── .opencode/           # OpenCode adapter (future activation)
+├── .opencode/           # OpenCode adapter (installed, pending auth)
 ├── templates/           # Jinja2 templates for CLAUDE.md/AGENTS.md
 └── secrets/             # SOPS/Age encrypted vault
+```
+
+---
+
+## Prerequisites
+
+Required:
+```bash
+# Claude Code
+# Already installed if you're reading this
+```
+
+Workers (at least one recommended):
+```bash
+# Codex CLI (worker — uses ChatGPT Plus OAuth, no API cost)
+npm install -g @openai/codex && codex login
+
+# Gemini CLI (worker — uses Google Sign-in, no API cost)
+npm install -g @google/gemini-cli && gemini auth login
+```
+
+Optional:
+```bash
+# Argus (search broker — recommended)
+# See https://github.com/Khamel83/argus
+
+# OpenCode (additional worker — requires API keys, costs money)
+curl -fsSL https://opencode.ai/install | bash
 ```
 
 ---
@@ -117,22 +170,6 @@ oneshot/
 
 ---
 
-## Prerequisites
-
-Optional:
-```bash
-# Codex CLI (adversarial review)
-npm install -g @openai/codex
-
-# Gemini CLI (research fallback)
-npm install -g @google/gemini-cli && gemini auth login
-
-# Argus (search broker — recommended)
-# See https://github.com/Khamel83/argus
-```
-
----
-
 ## Updating
 
 ```bash
@@ -141,4 +178,4 @@ curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/ones
 
 ---
 
-**v14.0** | Lane-based routing | Argus search plane | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
+**v14.1** | Parallel dispatch | Codex + Gemini workers | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)

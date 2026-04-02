@@ -2,6 +2,13 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260401_130521__command-name__model__command-name_.md.age](20260401_130521__command-name__model__command-name_.md.age) | 2026-04-01 13:05:21 | <command-name>/model</command-name> | add, age, api, config, decrypt, encrypt, fix, go, python, remove, session, sops, test, update |
+| [20260401_112355__command-name__model__command-name_.md.age](20260401_112355__command-name__model__command-name_.md.age) | 2026-04-01 11:23:55 | <command-name>/model</command-name> | age |
+| [20260331_200003__command-name__model__command-name_.md.age](20260331_200003__command-name__model__command-name_.md.age) | 2026-03-31 20:00:03 | <command-name>/model</command-name> | add, age, api, config, decrypt, encrypt, fix, go, python, remove, session, sops, test, update |
+| [20260331_193641__command-name__model__command-name_.md.age](20260331_193641__command-name__model__command-name_.md.age) | 2026-03-31 19:36:41 | <command-name>/model</command-name> | age |
+| [20260331_190941__command-name__model__command-name_.md.age](20260331_190941__command-name__model__command-name_.md.age) | 2026-03-31 19:09:41 | <command-name>/model</command-name> | add, age, api, config, decrypt, encrypt, fix, go, python, remove, session, sops, test, update |
+| [20260330_164914_so_right_now_we_use_cc_and_zai_for_it_to_run_claud.md.age](20260330_164914_so_right_now_we_use_cc_and_zai_for_it_to_run_claud.md.age) | 2026-03-30 16:49:14 | so right now we use cc and zai for it to run claud... | bug, database, prisma, setup |
+| [20260329_223436_Plan_approved__Fixing_Codex_first__then_re-launchi.md.age](20260329_223436_Plan_approved__Fixing_Codex_first__then_re-launchi.md.age) | 2026-03-29 22:34:36 | Plan approved. Fixing Codex first, then re-launchi... | age, api, auth, config, fix, go, test |
 | *(2026-03-30 — unencrypted, see .claude/rules/codex.md)* | 2026-03-30 | Codex CLI multi-machine debug & setup | codex, auth, oauth, sandbox, bwrap, chatgpt-plus, oci-dev, homelab, macmini |
 | [20260328_225743__command-name__clear__command-name_.md.age](20260328_225743__command-name__clear__command-name_.md.age) | 2026-03-28 22:57:43 | <command-name>/clear</command-name> | add, age, api, auth, bug, config, decrypt, deploy, encrypt, fix, go, install, oci, remove, rust, session, setup, sops, test, update |
 | [20260328_212108__command-name__clear__command-name_.md.age](20260328_212108__command-name__clear__command-name_.md.age) | 2026-03-28 21:21:08 | <command-name>/clear</command-name> | age |

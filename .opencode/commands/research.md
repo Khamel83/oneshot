@@ -1,5 +1,4 @@
 ---
-name: research
 description: Search via Argus search broker
 ---
 

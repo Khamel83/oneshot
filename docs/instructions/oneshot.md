@@ -6,9 +6,10 @@ For general coding/workflow rules, see the other instruction files.
 ## What OneShot Is
 
 OneShot is a **control plane for Claude-first orchestration**:
-- Claude Code is the primary planner and reviewer
+- Claude Code is the primary planner and reviewer (thinker)
+- Codex and Gemini execute tasks via parallel dispatch (doers)
 - Lane-based routing policy (config/lanes.yaml) drives task dispatch
-- Model-agnostic worker pool (config/models.yaml) supports any backend
+- Dispatch protocol (`_shared/dispatch.md`) handles prompt construction, parallel execution, output capture
 - Argus is the default search plane
 - Instructions are the single source of truth (docs/instructions/)
 
@@ -17,10 +18,11 @@ OneShot is a **control plane for Claude-first orchestration**:
 ```
 oneshot/
   config/           # YAML routing policy (lanes, models, workers, search, providers)
-  core/             # Python schemas and utilities
+  core/             # Python schemas, router, and dispatch runner
   docs/instructions/ # Neutral instruction source (this directory)
   .claude/rules/    # Thin imports to docs/instructions/
   .claude/skills/   # Operator and utility skill prompts
+  .opencode/        # OpenCode adapter (installed, pending interactive auth)
   templates/        # Project templates (AGENTS.md.j2, CLAUDE.md.j2)
   secrets/          # SOPS/Age encrypted vault
   scripts/          # Build, deployment, and maintenance scripts
