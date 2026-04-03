@@ -495,9 +495,15 @@ VAULT_ENV
   echo -e "${GREEN}╚══════════════════════════════════════════════════╝${NC}"
   echo ""
   echo -e "${BLUE}Next steps:${NC}"
-  echo "  1. Push to GitHub and import into Vercel"
-  echo "  2. Add env vars in Vercel dashboard (see .env.example)"
-  echo "  3. Add more sites: scripts/new-site.sh <slug> '<name>' --admin-email <email>"
+  echo "  1. Push to GitHub: git add -A && git commit -m 'init' && git push -u origin master"
+  echo "  2. Import repo into Vercel (vercel.com → Add New → select your repo)"
+  echo "  3. Add env vars in Vercel dashboard (or via CLI — see .env.example):"
+  echo "     SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY"
+  echo "  4. Push again → Vercel auto-deploys. Site is live at yourdomain.com/${WEB_SLUG}"
+  echo ""
+  echo -e "${BLUE}After first deploy:${NC}"
+  echo "  - Add more sites: scripts/new-site.sh <slug> '<name>' --admin-email <email>"
+  echo "  - Push to GitHub → auto-deploys to Vercel"
   echo ""
   exit 0
 fi

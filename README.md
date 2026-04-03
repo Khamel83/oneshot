@@ -168,13 +168,27 @@ curl -fsSL https://opencode.ai/install | bash
 | CLIs | Python + Click + SQLite |
 | Services | Python + systemd → oci-dev |
 
-Web apps use a single deployment — all sites share one Vercel project and one Supabase project. Bootstrap a new site with:
+Web apps use a single deployment — all sites share one Vercel project and one Supabase project.
+
+### First-time setup (per repo)
 
 ```bash
+mkdir my-project && cd my-project && git init
 oneshot.sh --web <slug> --admin-email <email>
+git add -A && git commit && git push -u origin master
+# Then import repo into Vercel and add these env vars (from the vault):
+#   SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+# After that: git push auto-deploys
 ```
 
-This copies the scaffold, pulls credentials from the vault, and creates the site in Supabase. See `templates/community-starter/` for the full template.
+### Adding more sites (after first-time setup)
+
+```bash
+scripts/new-site.sh <slug> "<name>" --admin-email <email>
+git add -A && git commit && git push
+```
+
+`oneshot.sh --web <slug>` copies the scaffold from `templates/community-starter/`, pulls Supabase credentials from the vault, and creates the site. All env vars come from the encrypted vault at `secrets/deployments.env.encrypted`.
 
 ---
 
