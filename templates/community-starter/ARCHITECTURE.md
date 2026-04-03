@@ -1,8 +1,8 @@
-# Architecture — Multi-Tenant Private Site Generator
+# Architecture — Web App Scaffold
 
 ## Overview
 
-One Vercel deployment serves unlimited private micro-sites at `domain/{slug}`. Each site gets isolated data (Postgres schema), auth, and management — created with one command.
+One Vercel deployment serves unlimited sites at `domain/{slug}`. Each site gets isolated data (Postgres schema), auth, and management — created with one command.
 
 ## Routing
 

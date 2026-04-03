@@ -27,10 +27,10 @@
 
 | Component | Technology |
 |-----------|------------|
-| **Frontend** | [e.g. Astro + Cloudflare Pages] |
-| **Backend** | [e.g. Python + systemd on oci-dev] |
-| **Database** | [e.g. SQLite / Postgres on OCI] |
-| **Auth** | [e.g. Better Auth + Google OAuth] |
+| **Frontend** | [e.g. Plain HTML + vanilla JS on Vercel] |
+| **Backend** | [e.g. Python serverless on Vercel] |
+| **Database** | [e.g. SQLite / Supabase Postgres] |
+| **Auth** | [e.g. Supabase Auth (email/password + Google OAuth)] |
 | **Secrets** | SOPS/Age |
 
 ### Key Components

@@ -6,7 +6,7 @@ Auto-detect project type from files and use the corresponding stack defaults.
 
 | Detection | Type | Stack |
 |-----------|------|-------|
-| `astro.config.*` or `wrangler.toml` | Web app | Astro + Cloudflare + Better Auth + Postgres |
+| `vercel.json` or `supabase/` directory | Web app | Vercel + Supabase + Python |
 | `setup.py` or `pyproject.toml` | CLI | Python + Click + SQLite |
 | `*.service` systemd file | Service | Python + systemd → oci-dev |
 | No detection | Generic | Defaults only |
@@ -14,7 +14,7 @@ Auto-detect project type from files and use the corresponding stack defaults.
 ## Storage Progression
 
 ```
-SQLite (default for CLIs) → Postgres on OCI (web/services) → OCI Autonomous DB (>20GB/multi-user)
+SQLite (default for CLIs) → Supabase Postgres (web apps) → OCI Autonomous DB (>20GB/multi-user)
 ```
 
 ## CLI Projects (Python + Click)
@@ -25,16 +25,15 @@ SQLite (default for CLIs) → Postgres on OCI (web/services) → OCI Autonomous 
 - SQLite via `sqlite3` module — no ORM for simple CLIs
 - `pyproject.toml` for packaging, console scripts for entry points
 
-## Web Apps (Astro + Cloudflare)
+## Web Apps (Vercel + Supabase + Python)
 
-- Astro is the framework — don't suggest Next.js, Remix, SvelteKit
-- `@astrojs/cloudflare` adapter for SSR
-- Islands architecture: server-first, client directives for interactivity
-- Cloudflare Workers for API — don't suggest Express or FastAPI
-- Better Auth with Google OAuth — don't suggest Clerk, Auth0, NextAuth
-- Postgres on OCI with direct Tailscale connection for local dev
-- `postgres` npm package — don't use pg/knex/prisma/drizzle unless needed
-- Deploy to Cloudflare Pages
+- Vercel for hosting — don't suggest Cloudflare Pages, Netlify, or AWS Amplify
+- Supabase Postgres for database — don't suggest self-hosted Postgres, MongoDB, or MySQL
+- Supabase Auth for authentication (email/password + Google OAuth)
+- Python serverless functions for API — don't suggest Express, FastAPI, Flask, or Node.js backends
+- Plain HTML + vanilla JS for frontend — no build step required
+- `vercel.json` for project config, `supabase/` directory for DB migrations
+- Deploy with `vercel` CLI or GitHub integration
 
 ## Services (Python + systemd)
 
@@ -48,10 +47,10 @@ SQLite (default for CLIs) → Postgres on OCI (web/services) → OCI Autonomous 
 | Don't suggest | Use instead |
 |--------------|-------------|
 | nginx, traefik, caddy | Tailscale Funnel |
-| postgres, mysql, mongodb | SQLite → Postgres on OCI |
-| express, fastapi, flask (for web) | Cloudflare Workers |
+| postgres, mysql, mongodb (self-hosted) | Supabase Postgres |
+| express, fastapi, flask (for web) | Python serverless on Vercel |
 | AWS, GCP, Azure | OCI free tier or homelab |
 | Docker for local dev | Direct execution |
-| Convex, Next.js, Clerk, Vercel | Astro + CF + Better Auth |
-| Lucia auth | Better Auth |
+| Astro, Cloudflare Workers, Better Auth | Vercel + Supabase + Python |
+| Convex, Next.js, Clerk | Vercel + Supabase + Python |
 | Heavy ORMs | Lightweight or none |

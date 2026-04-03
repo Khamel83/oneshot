@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# new-site.sh — Create a new private site in the multi-tenant platform
+# new-site.sh — Create a new site in the web app scaffold
 #
 # Usage:
 #   ./scripts/new-site.sh <slug> "<name>" --admin-email <email> [--theme <preset>]
@@ -12,8 +12,8 @@
 # Theme presets: slate (default), forest, sunset, mono
 # Or use --accent "color1,color2,color3" for custom gradient
 #
-# Required env vars:
-#   SUPABASE_URL           — e.g. https://abcdef.supabase.co
+# Required env vars (sourced from .env, .env.local, or vault):
+#   SUPABASE_URL              — e.g. https://abcdef.supabase.co
 #   SUPABASE_SERVICE_ROLE_KEY — server-side key (bypasses RLS)
 
 set -uo pipefail
@@ -30,6 +30,7 @@ THEMES=(
 SLUG="$1"
 NAME="$2"
 ADMIN_EMAIL=""
+ADMIN_PASSWORD=""
 THEME="slate"
 ACCENT_CUSTOM=""
 LOGO_TEXT=""
@@ -92,16 +93,27 @@ fi
 
 # --- Env vars ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_FILE="${SCRIPT_DIR}/../.env"
 
-if [ -f "$ENV_FILE" ]; then
-    set -a
-    source "$ENV_FILE"
-    set +a
+# Source from .env.local or .env
+for ENV_FILE in "${SCRIPT_DIR}/../.env.local" "${SCRIPT_DIR}/../.env"; do
+    if [ -f "$ENV_FILE" ]; then
+        set -a
+        source "$ENV_FILE"
+        set +a
+        break
+    fi
+done
+
+# Vault fallback — if env vars still missing, try secrets CLI
+if [ -z "${SUPABASE_URL:-}" ] && command -v secrets &>/dev/null; then
+    SUPABASE_URL=$(secrets get SUPABASE_URL 2>/dev/null || true)
+fi
+if [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ] && command -v secrets &>/dev/null; then
+    SUPABASE_SERVICE_ROLE_KEY=$(secrets get SUPABASE_SERVICE_ROLE_KEY 2>/dev/null || true)
 fi
 
-SUPABASE_URL="${SUPABASE_URL:?SUPABASE_URL not set}"
-SERVICE_KEY="${SUPABASE_SERVICE_ROLE_KEY:?SUPABASE_SERVICE_ROLE_KEY not set}"
+SUPABASE_URL="${SUPABASE_URL:?SUPABASE_URL not set — set in .env, .env.local, or vault}"
+SERVICE_KEY="${SUPABASE_SERVICE_ROLE_KEY:?SUPABASE_SERVICE_ROLE_KEY not set — set in .env, .env.local, or vault}"
 SITE_URL="${SITE_URL:-https://khamel.com}"
 
 echo "=== Creating site: $SLUG ==="
@@ -118,7 +130,10 @@ EXISTS=$(curl -s "$SUPABASE_URL/rest/v1/sites?select=id&slug=eq.$SLUG" \
     -H "Authorization: Bearer $SERVICE_KEY" | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
-print('yes' if data else 'no')
+if isinstance(data, list) and len(data) > 0:
+    print('yes')
+else:
+    print('no')
 " 2>/dev/null)
 
 if [ "$EXISTS" = "yes" ]; then
@@ -187,9 +202,9 @@ RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$SUPABASE_URL/rest/v1/rpc/exe
 # Fallback: try direct SQL endpoint
 if [ "$RESPONSE" != "200" ] && [ "$RESPONSE" != "201" ]; then
     echo "    Trying direct SQL..."
-    # Use psql or supabase CLI if available
+    # Use supabase CLI if available (requires SUPABASE_ACCESS_TOKEN)
     if command -v supabase &>/dev/null; then
-        echo "$SCHEMA_SQL" | supabase db execute
+        echo "$SCHEMA_SQL" | supabase db query --linked -
     else
         echo "WARNING: Could not run schema creation via API."
         echo "Run migrations/01_schema_template.sql and 02_rls_template.sql manually,"

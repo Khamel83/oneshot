@@ -1,6 +1,6 @@
-# Private Site Generator — Setup Guide
+# Web App Scaffold — Setup Guide
 
-A multi-tenant platform that lets you spin up unlimited private micro-sites from a single deployment. Each site gets its own auth, database schema, and admin — created with one command.
+The default web app scaffold for OneShot projects. A single deployment that hosts multiple sites at `yourdomain.com/{slug}`. Each site gets its own database schema, auth, and admin — created with one command.
 
 **Stack**: Vercel (static HTML + Python functions) + Supabase + Resend
 
@@ -8,7 +8,7 @@ A multi-tenant platform that lets you spin up unlimited private micro-sites from
 
 ## What You Get
 
-- One deployment, unlimited private sites at `yourdomain.com/{slug}`
+- One deployment, unlimited sites at `yourdomain.com/{slug}`
 - Email/password login per site (Supabase Auth)
 - Member directory with profiles
 - Admin panel with role management

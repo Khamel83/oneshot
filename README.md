@@ -164,9 +164,17 @@ curl -fsSL https://opencode.ai/install | bash
 
 | Project Type | Stack |
 |--------------|-------|
-| Web apps | Astro + Cloudflare + Better Auth + Postgres |
+| Web apps | Vercel + Supabase + Python |
 | CLIs | Python + Click + SQLite |
 | Services | Python + systemd → oci-dev |
+
+Web apps use a single deployment — all sites share one Vercel project and one Supabase project. Bootstrap a new site with:
+
+```bash
+oneshot.sh --web <slug> --admin-email <email>
+```
+
+This copies the scaffold, pulls credentials from the vault, and creates the site in Supabase. See `templates/community-starter/` for the full template.
 
 ---
 

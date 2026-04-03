@@ -1,21 +1,23 @@
-# Private Site Generator Rules (Vercel + Supabase + Python + Resend)
+# Web App Scaffold Rules (Vercel + Supabase + Python + Resend)
 
 ## What It Is
 
-A multi-tenant platform for spinning up private micro-sites from a single deployment.
-Each site gets its own auth, database schema, and admin. Lives at `templates/community-starter/`.
+The default web app scaffold for all OneShot projects. A single deployment that hosts
+multiple sites via schema-per-site isolation. Each site gets its own database schema,
+auth, and admin. Lives at `templates/community-starter/`.
 
 See `templates/community-starter/SETUP.md` for setup, `ARCHITECTURE.md` for design.
 
-## When to Recommend
+## When This Applies
 
-Use this stack when the user asks for:
-- Private membership site / community platform
-- "Spin up a site for my class/team/group"
-- Multi-tenant app with isolated data per site
-- League management / cohort tracking
-- Invite-only web app with admin controls
-- "Like a private Slack but as a website"
+This is the default for all new web projects. Use `oneshot.sh --web <slug>` to bootstrap.
+
+Common use cases:
+- Any web app with users and authentication
+- Membership sites / community platforms
+- Team or group management tools
+- Invite-only apps with admin controls
+- "Spin up a site for X" — any scoped web presence
 
 ## Stack
 
@@ -37,7 +39,6 @@ Use this stack when the user asks for:
 
 ## Anti-Patterns
 
-- Don't use for public marketing sites (use Astro + Cloudflare)
 - Don't use for high-traffic APIs (not designed for scale)
 - Don't use when payments/Stripe are needed
 - Don't suggest React/Next.js additions unless explicitly asked

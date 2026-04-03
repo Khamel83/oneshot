@@ -1,9 +1,13 @@
 #!/bin/bash
-# ONE_SHOT Bootstrap Script v13
+# ONE_SHOT Bootstrap Script v14
 # Usage: curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
 #
 # Options:
 #   --upgrade    Update all skills to latest version (overwrites existing)
+#   --web <slug> Bootstrap a new web app site (copies scaffold, pulls vault creds, runs new-site.sh)
+#   --name       Site name (used with --web, defaults to slug)
+#   --admin-email Admin email (used with --web, prompted if missing)
+#   --theme      Theme preset: slate (default), forest, sunset, mono
 #   --help       Show this help
 #
 # NON-DESTRUCTIVE: Only adds to your project, never overwrites existing files.
@@ -19,6 +23,11 @@ set -euo pipefail
 # Parse arguments
 UPGRADE_MODE=false
 FORCE_MODE=false
+WEB_MODE=false
+WEB_SLUG=""
+WEB_NAME=""
+WEB_ADMIN_EMAIL=""
+WEB_THEME="slate"
 for arg in "$@"; do
   case $arg in
     --upgrade)
@@ -29,19 +38,41 @@ for arg in "$@"; do
       FORCE_MODE=true
       shift
       ;;
+    --web)
+      WEB_MODE=true
+      WEB_SLUG="$2"
+      shift 2
+      ;;
+    --name)
+      WEB_NAME="$2"
+      shift 2
+      ;;
+    --admin-email)
+      WEB_ADMIN_EMAIL="$2"
+      shift 2
+      ;;
+    --theme)
+      WEB_THEME="$2"
+      shift 2
+      ;;
     --help)
-      echo "ONE_SHOT Bootstrap Script v13"
+      echo "ONE_SHOT Bootstrap Script v14"
       echo ""
       echo "Usage:"
-      echo "  curl -sL .../oneshot.sh | bash                   # Install"
-      echo "  curl -sL .../oneshot.sh | bash -s -- --upgrade   # Update skills"
+      echo "  curl -sL .../oneshot.sh | bash                        # Install"
+      echo "  curl -sL .../oneshot.sh | bash -s -- --upgrade         # Update skills"
+      echo "  curl -sL .../oneshot.sh | bash -s -- --web <slug>       # New web app site"
       echo ""
       echo "Prerequisites:"
       echo "  age    sudo apt install age (optional, for secrets)"
       echo ""
       echo "Options:"
-      echo "  --upgrade    Update all skills to latest version"
-      echo "  --help       Show this help"
+      echo "  --upgrade            Update all skills to latest version"
+      echo "  --web <slug>         Bootstrap a new web app site"
+      echo "  --name <name>        Site name (default: same as slug)"
+      echo "  --admin-email <addr> Admin email for the site (prompted if missing)"
+      echo "  --theme <preset>     Theme: slate, forest, sunset, mono (default: slate)"
+      echo "  --help               Show this help"
       echo ""
       echo "What gets installed globally (~/.claude/):"
       echo "  Skills:      10+1 skills in ~/.claude/skills/"
@@ -50,6 +81,12 @@ for arg in "$@"; do
       echo "What gets added to your project:"
       echo "  AGENTS.md    Operator spec (read-only, curl from oneshot)"
       echo "  CLAUDE.md    Project instructions (created if missing)"
+      echo ""
+      echo "With --web <slug>:"
+      echo "  Copies the web scaffold (api/, public/, migrations/, vercel.json)"
+      echo "  Pulls Supabase credentials from the encrypted vault"
+      echo "  Creates the site schema and admin user in Supabase"
+      echo "  Site is live at yourdomain.com/<slug>"
       echo ""
       echo "Never touched:"
       echo "  Existing CLAUDE.md, your custom skills"
@@ -67,11 +104,14 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo ""
-if [ "$UPGRADE_MODE" = true ]; then
-  echo -e "${BLUE}ONE_SHOT Upgrade v13${NC}"
+if [ "$WEB_MODE" = true ]; then
+  echo -e "${BLUE}ONE_SHOT Web Scaffold v14${NC}"
+  echo "==========================="
+elif [ "$UPGRADE_MODE" = true ]; then
+  echo -e "${BLUE}ONE_SHOT Upgrade v14${NC}"
   echo "====================="
 else
-  echo -e "${BLUE}ONE_SHOT Bootstrap v13${NC}"
+  echo -e "${BLUE}ONE_SHOT Bootstrap v14${NC}"
   echo "========================"
 fi
 echo ""
@@ -342,11 +382,132 @@ else
 fi
 
 # =============================================================================
+# 9. Web Scaffold (--web mode)
+# =============================================================================
+if [ "$WEB_MODE" = true ]; then
+  if [ -z "$WEB_SLUG" ]; then
+    echo -e "  ${YELLOW}ERROR: --web requires a slug. Usage: oneshot.sh --web <slug>${NC}"
+    exit 1
+  fi
+
+  if [ -z "$WEB_NAME" ]; then
+    WEB_NAME="$WEB_SLUG"
+  fi
+
+  echo -e "${BLUE}Web Scaffold: ${WEB_SLUG}${NC}"
+  echo "---------------------------"
+
+  # 9a. Copy template files if this isn't already a web project
+  if [ ! -f vercel.json ]; then
+    echo -e "  ${BLUE}Copying scaffold from community-starter...${NC}"
+
+    # Determine template source
+    if [ -d "$ONESHOT_DIR/templates/community-starter" ]; then
+      TEMPLATE_DIR="$ONESHOT_DIR/templates/community-starter"
+    elif [ -d "templates/community-starter" ]; then
+      TEMPLATE_DIR="templates/community-starter"
+    else
+      # Running via curl — download key files
+      TEMPLATE_DIR=""
+    fi
+
+    if [ -n "$TEMPLATE_DIR" ]; then
+      # Copy scaffold files (skip .git, templates, docs, etc.)
+      for item in api public migrations vercel.json requirements.txt .env.example; do
+        if [ -e "$TEMPLATE_DIR/$item" ]; then
+          cp -r "$TEMPLATE_DIR/$item" . 2>/dev/null
+          echo -e "  ${GREEN}✓${NC} $item"
+        fi
+      done
+      # Copy .github if not present
+      if [ -d "$TEMPLATE_DIR/.github" ] && [ ! -d .github ]; then
+        cp -r "$TEMPLATE_DIR/.github" . 2>/dev/null
+        echo -e "  ${GREEN}✓${NC} .github/"
+      fi
+      # Copy new-site.sh (lives in oneshot/scripts/, not in template)
+      if [ -f "$ONESHOT_DIR/scripts/new-site.sh" ]; then
+        cp "$ONESHOT_DIR/scripts/new-site.sh" scripts/new-site.sh
+        chmod +x scripts/new-site.sh
+        echo -e "  ${GREEN}✓${NC} scripts/new-site.sh"
+      fi
+    else
+      echo -e "  ${YELLOW}Template not found locally — downloading key files...${NC}"
+      for item in vercel.json requirements.txt .env.example; do
+        curl -sL "$ONESHOT_BASE/templates/community-starter/$item" -o "$item" 2>/dev/null
+        echo -e "  ${GREEN}✓${NC} $item"
+      done
+      echo -e "  ${YELLOW}Run 'git clone' of the full repo for api/, public/, migrations/${NC}"
+    fi
+  else
+    echo -e "  ${GREEN}✓${NC} vercel.json exists (already a web project, skipping template copy)"
+  fi
+
+  # 9b. Pull Supabase credentials from vault
+  echo -e "  ${BLUE}Setting up credentials...${NC}"
+
+  if command -v secrets &>/dev/null; then
+    # Try to get creds from vault
+    VAULT_URL=$(secrets get SUPABASE_URL 2>/dev/null || true)
+    VAULT_ANON=$(secrets get SUPABASE_ANON_KEY 2>/dev/null || true)
+    VAULT_SERVICE=$(secrets get SUPABASE_SERVICE_ROLE_KEY 2>/dev/null || true)
+
+    if [ -n "$VAULT_URL" ] && [ -n "$VAULT_ANON" ]; then
+      # Write .env.local with vault creds
+      cat > .env.local << VAULT_ENV
+# Pulled from encrypted vault — do not commit
+SUPABASE_URL=$VAULT_URL
+SUPABASE_ANON_KEY=$VAULT_ANON
+VAULT_ENV
+      if [ -n "$VAULT_SERVICE" ]; then
+        echo "SUPABASE_SERVICE_ROLE_KEY=$VAULT_SERVICE" >> .env.local
+      fi
+      echo -e "  ${GREEN}✓${NC} .env.local (credentials from vault)"
+    else
+      echo -e "  ${YELLOW}○${NC} Could not read Supabase credentials from vault"
+      echo -e "  ${YELLOW}○${NC} Copy .env.example to .env.local and fill in manually"
+    fi
+  else
+    echo -e "  ${YELLOW}○${NC} 'secrets' CLI not found — copy .env.example to .env.local and fill in manually"
+  fi
+
+  # 9c. Prompt for admin email if not provided
+  if [ -z "$WEB_ADMIN_EMAIL" ]; then
+    echo ""
+    echo -e "  ${BLUE}Enter admin email for site '${WEB_SLUG}':${NC}"
+    read -r WEB_ADMIN_EMAIL
+  fi
+
+  # 9d. Run new-site.sh
+  echo ""
+  echo -e "  ${BLUE}Creating site in Supabase...${NC}"
+  if [ -f scripts/new-site.sh ]; then
+    bash scripts/new-site.sh "$WEB_SLUG" "$WEB_NAME" \
+      --admin-email "$WEB_ADMIN_EMAIL" \
+      --theme "$WEB_THEME"
+  else
+    echo -e "  ${YELLOW}scripts/new-site.sh not found. Run it manually after setup.${NC}"
+    echo "  Usage: scripts/new-site.sh $WEB_SLUG \"$WEB_NAME\" --admin-email $WEB_ADMIN_EMAIL"
+  fi
+
+  echo ""
+  echo -e "${GREEN}╔══════════════════════════════════════════════════╗${NC}"
+  echo -e "${GREEN}║              Web Scaffold Ready!                 ║${NC}"
+  echo -e "${GREEN}╚══════════════════════════════════════════════════╝${NC}"
+  echo ""
+  echo -e "${BLUE}Next steps:${NC}"
+  echo "  1. Push to GitHub and import into Vercel"
+  echo "  2. Add env vars in Vercel dashboard (see .env.example)"
+  echo "  3. Add more sites: scripts/new-site.sh <slug> '<name>' --admin-email <email>"
+  echo ""
+  exit 0
+fi
+
+# =============================================================================
 # Done
 # =============================================================================
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║                   ONE_SHOT v13 Ready!                      ║${NC}"
+echo -e "${GREEN}║                   ONE_SHOT v14 Ready!                      ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${BLUE}Start a session:${NC}"
@@ -356,6 +517,9 @@ echo -e "${BLUE}Then use:${NC}"
 echo "  /short    Quick iteration on existing work"
 echo "  /full     New project or major refactor"
 echo "  /conduct  Multi-model orchestration until done"
+echo ""
+echo -e "${BLUE}Web apps:${NC}"
+echo "  oneshot.sh --web <slug> --admin-email <email>   # Bootstrap a new site"
 echo ""
 echo -e "${BLUE}Context management:${NC}"
 echo "  /handoff  Save context before /clear"

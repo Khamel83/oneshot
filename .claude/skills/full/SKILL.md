@@ -167,9 +167,9 @@ Only `AGENTS.md` and `CLAUDE.md` belong at the project root. Everything else goe
 | Stack | Follow CLAUDE.md defaults |
 | Multiple implementations | Simplest |
 | Naming | Follow existing pattern |
-| Auth | Better Auth + Google OAuth |
-| Database | SQLite → Postgres on OCI |
-| Deploy | Cloudflare Pages / oci-dev |
+| Auth | Supabase Auth (email/password + Google OAuth) |
+| Database | SQLite → Supabase Postgres |
+| Deploy | Vercel / oci-dev |
 | SkillsMP search bar | Specialized domain → search; general task → skip |
 | Codex review? | Always run if available (advisory, not a gate) |
 

@@ -69,7 +69,8 @@ class handler(BaseHTTPRequestHandler):
     def _handle_health_check(self):
         status = {}
         try:
-            db().table('members').select('user_id').limit(1).execute()
+            # Query public.sites table (always exists) instead of schema-specific table
+            _raw_db().table('sites').select('slug').limit(1).execute()
             status['db'] = 'ok'
         except Exception as e:
             print(f'DB health check failed: {e}')

@@ -5,7 +5,7 @@
 > Key points:
 > - Install: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash`
 > - Three operators: `/short` (quick iteration), `/full` (structured work), `/conduct` (multi-model PMO)
-> - Stack defaults: Astro + Cloudflare + Better Auth + Postgres (web), Python + Click + SQLite (CLI), Python + systemd (service)
+> - Stack defaults: Vercel + Supabase + Python (web), Python + Click + SQLite (CLI), Python + systemd (service)
 > - Secrets: one age key at `~/.age/key.txt`, 17 encrypted vault files in `secrets/`, access via `secrets get KEY`
 > - Daily heartbeat: 14 API key validators, CLI version checks, Tailscale + cross-machine reachability
 > - Machines: oci-dev (100.126.13.70), homelab (100.112.130.100), macmini (100.113.216.27) — all on Tailscale
@@ -39,14 +39,14 @@ Operators discover skills on demand from `~/.claude/skills/`. Rules load by proj
 - [core.md](.claude/rules/core.md): Always loaded — work discipline, delegation, AGENTS.md readonly rule
 - [khamel-mode.md](.claude/rules/khamel-mode.md): User defaults — stack, machines, anti-patterns, decision defaults
 - [delegation.md](.claude/rules/delegation.md): Assess-verify-escalate delegation with 3-attempt fallback
-- [web.md](.claude/rules/web.md): Web apps — Astro + Cloudflare Pages/Workers + Better Auth + Postgres on OCI
+- [web.md](.claude/rules/web.md): Web apps — Vercel + Supabase (Auth + Postgres) + Python
 - [cli.md](.claude/rules/cli.md): CLIs — Python + Click + SQLite
 - [service.md](.claude/rules/service.md): Services — Python + systemd, deploy to oci-dev
 - [community.md](.claude/rules/community.md): Membership sites — Vercel + Supabase + Python + Resend
 
 ## Infrastructure
 
-- [STACK.md](.claude/infrastructure/STACK.md): Full stack reference — Astro, Cloudflare, Postgres, auth, backups, deployment
+- [STACK.md](.claude/infrastructure/STACK.md): Full stack reference — Vercel, Supabase, Python, auth, deployment
 - [secrets/](secrets/): SOPS/Age encrypted vault — 17 files, ~80 API keys, `secrets get KEY` for access
 - [public-access.md](docs/public-access.md): Public URL routing via poytz + Cloudflare Tunnel (replaces nginx/traefik)
 - [ssh/](ssh/): SSH alias configs for oci-dev, homelab, macmini
@@ -61,7 +61,7 @@ Operators discover skills on demand from `~/.claude/skills/`. Rules load by proj
 
 ## Template
 
-- [community-starter](templates/community-starter/): Multi-tenant membership site — Vercel + Supabase + Python + Resend
+- [community-starter](templates/community-starter/): Default web app scaffold — Vercel + Supabase + Python + Resend (bootstrap with `oneshot.sh --web <slug>`)
 
 ## Optional
 

@@ -11,7 +11,7 @@ When building ANYTHING for this user, assume these defaults without asking.
 | **macmini** | 100.113.216.27 | Apple Silicon GPU, tasks needing throughput |
 
 - **Networking**: All machines on Tailscale (deer-panga.ts.net)
-- **Public access**: Cloudflare Tunnel + Cloudflare Pages (NOT nginx/traefik)
+- **Public access**: Tailscale Funnel + poytz (NOT nginx/traefik)
 - **Internal tools**: Cloudflare Access (already configured)
 - **Secrets**: SOPS/Age, decrypt from `~/github/oneshot/secrets/`
 
@@ -19,7 +19,7 @@ When building ANYTHING for this user, assume these defaults without asking.
 
 | Project Type | Default Stack |
 |--------------|---------------|
-| Web apps | Astro + Cloudflare Pages/Workers + Better Auth + Postgres on OCI |
+| Web apps | Vercel + Supabase (Auth + Postgres) + Python + HTML/JS |
 | CLIs | Python + Click + SQLite |
 | Services/APIs | Python + systemd → oci-dev |
 | Heavy compute / throughput | Route to macmini |
@@ -30,13 +30,13 @@ When building ANYTHING for this user, assume these defaults without asking.
 ## Storage Progression
 
 ```
-SQLite (default for CLIs) → Postgres on OCI (web apps, services) → OCI Autonomous DB (>20GB/multi-user)
+SQLite (default for CLIs) → Supabase Postgres (web apps) → OCI Autonomous DB (>20GB/multi-user)
 ```
 
 ## Auth Default
 
 ```
-Better Auth + Google OAuth → sessions in Postgres
+Supabase Auth (email/password + Google OAuth) → sessions in Supabase Postgres
 Cloudflare Access → internal/admin tools (already configured)
 ```
 
@@ -48,12 +48,12 @@ Cloudflare Access → internal/admin tools (already configured)
 
 ## Anti-Patterns to Flag
 
-- nginx/traefik → Use Cloudflare Tunnel / Cloudflare Pages
-- mysql/mongodb → Default is SQLite (CLIs) or Postgres on OCI (web/services)
-- express/fastapi/flask for web → Cloudflare Workers handles the API
-- Convex/Next.js/Clerk/Vercel → Old stack, use Astro + CF + Better Auth + Postgres
+- nginx/traefik → Use Tailscale Funnel + poytz
+- mysql/mongodb (self-hosted) → Default is SQLite (CLIs) or Supabase Postgres (web)
+- express/fastapi/flask for web → Python serverless on Vercel
+- Astro/Cloudflare Workers/Better Auth → Old stack, use Vercel + Supabase + Python
+- Convex/Next.js/Clerk → Old stack, use Vercel + Supabase + Python
 - aws/gcp/azure → Default is OCI free tier or homelab
-- Lucia auth → Deprecated, use Better Auth
 
 ## Decision Defaults (Don't Ask, Just Pick)
 
