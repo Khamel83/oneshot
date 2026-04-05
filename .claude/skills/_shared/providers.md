@@ -50,10 +50,36 @@ Returns JSON: `{task_class, lane, workers[], review_with, search_backend, fallba
 |------|---------|----------------------------------|--------|
 | premium | claude_code | claude_code, codex | claude_code |
 | balanced | claude_code | codex, gemini_cli | claude_code |
-| cheap | claude_code | gemini_cli → codex → glm_claude → claw_code | claude_code |
+| cheap | claude_code | gemini_cli → codex → glm_claude | claude_code |
 | research | claude_code | gemini_cli, codex | claude_code |
 
 **glm_claude**: `claude` CLI running on ZAI/GLM-5-turbo via `ANTHROPIC_BASE_URL`. Full native toolchain (bash, read, edit, glob, grep, git). Free on GLM Coding Plan (expires **2026-05-02**). Same dispatch pattern as codex/gemini — `claude --print --dangerously-skip-permissions "prompt"`.
+
+**claw_code**: Available but **manual opt-in only** (not in lane pools). Re-enable by adding `claw_code` back to `worker_pool` in `config/lanes.yaml`. Use `--worker claw_code` flag on dispatch.
+
+---
+
+## Category-Based Worker Preference
+
+Each lane has `category_preference` in `config/lanes.yaml` that reorders workers
+when the task category is known. Workers not in the preference list are appended
+in their original pool order.
+
+```
+task → task_class → lane → category_preference[category] → reordered workers
+```
+
+| Category | Cheap Lane Preference | Balanced | Premium | Research |
+|----------|-----------------------|----------|---------|----------|
+| coding | codex, gemini_cli, glm_claude | codex, gemini_cli | claude_code, codex | codex, gemini_cli |
+| research | gemini_cli, codex, glm_claude | gemini_cli, codex | claude_code, codex | gemini_cli, codex |
+| writing | gemini_cli, codex, glm_claude | gemini_cli, codex | claude_code, codex | gemini_cli, codex |
+| review | codex, glm_claude, gemini_cli | codex, gemini_cli | claude_code, codex | codex, gemini_cli |
+| general | gemini_cli, codex, glm_claude | codex, gemini_cli | claude_code, codex | gemini_cli, codex |
+
+Category is inferred from task_class by default, or passed explicitly via `--category`.
+Inferred mapping: plan→general, research/search_sweep→research, implement_*/test_write→coding,
+review_diff→review, doc_draft/summarize_findings→writing.
 
 ## claw_code Worker Model Priority
 

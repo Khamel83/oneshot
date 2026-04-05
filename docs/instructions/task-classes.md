@@ -107,9 +107,10 @@ Three consecutive failures → circuit breaker → log blocker → skip.
 
 | Worker | Lane(s) | Backend | Notes |
 |--------|---------|---------|-------|
-| `claw_code` | cheap | OpenRouter | Flexible model via `--model` flag or `OPENAI_MODEL` env |
 | `codex` | cheap, balanced | ChatGPT Plus OAuth | Requires `unset OPENAI_API_KEY` |
-| `gemini_cli` | cheap, research | Google API | Direct CLI |
+| `gemini_cli` | cheap, research, balanced | Google API | Direct CLI |
+| `glm_claude` | cheap | ZAI/GLM-5-turbo | Full claude CLI, free until 2026-05-02 |
+| `claw_code` | opt-in | OpenRouter | Manual opt-in via `--worker claw_code` |
 | `claude_code` | premium, planner | Anthropic API | Main orchestrator, never dispatched externally |
 
 ## Risk Classification

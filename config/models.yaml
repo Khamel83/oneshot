@@ -139,6 +139,7 @@ claw_code:
     openrouter_base_url: https://openrouter.ai/api/v1
     openrouter_key_env: OPENROUTER_API_KEY
     default_model: glm-5-turbo  # free on plan (expires 2026-05-02), fast, strong
+    post_expiry_default_model: deepseek/deepseek-v3.2  # cheapest paid when ZAI plan expires
     # Fallback priority: free ZAI models first, then paid OpenRouter
     fallback_priority:
       - glm-5-turbo           # free — fast, strong (plan expires 2026-05-02)
