@@ -152,18 +152,12 @@ REVIEW_KEYWORDS = [
 def infer_category(description: str) -> TaskCategory:
     """Infer task category from description keywords.
 
-    Priority: coding > research > writing > review > general.
-    First keyword match wins within a category; coding keywords checked first.
+    Priority: writing > review > coding > research > general.
+    Writing and review are checked first because their intent verbs
+    (document, summarize, review, audit) are strong signals that
+    override incidental coding/research nouns (api, endpoint, profile).
     """
     desc_lower = description.lower()
-
-    for kw in CODING_KEYWORDS:
-        if kw in desc_lower:
-            return TaskCategory.coding
-
-    for kw in RESEARCH_KEYWORDS:
-        if kw in desc_lower:
-            return TaskCategory.research
 
     for kw in WRITING_KEYWORDS:
         if kw in desc_lower:
@@ -172,5 +166,13 @@ def infer_category(description: str) -> TaskCategory:
     for kw in REVIEW_KEYWORDS:
         if kw in desc_lower:
             return TaskCategory.review
+
+    for kw in CODING_KEYWORDS:
+        if kw in desc_lower:
+            return TaskCategory.coding
+
+    for kw in RESEARCH_KEYWORDS:
+        if kw in desc_lower:
+            return TaskCategory.research
 
     return TaskCategory.general
