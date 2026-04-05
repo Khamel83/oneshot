@@ -24,6 +24,7 @@ OneShot provides three operators for different work styles:
 - Route work across planner, workers, and reviewers
 - Loop until goal is fully met
 - See `docs/instructions/task-classes.md` for routing contract
+- **v2**: Produces structured artifacts (explore.json, plan.json, TASK_SPEC.md) and gates autonomy by inferred risk level (low/medium/high). Build loop includes a mandatory verification gate and scope creep detection.
 
 ## Lane-Based Routing
 

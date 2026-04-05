@@ -118,9 +118,22 @@ When invoked:
    - If codex unavailable: Claude performs adversarial review inline
    - New issues found → fix, then re-verify
 
-2. **Verification**
-   - Run tests (`./scripts/ci.sh` if present, else npm test / pytest)
-   - Check acceptance criteria from `1shot/PROJECT.md`
+2. **Verification (MANDATORY — non-negotiable)**
+
+   **No verification, no completion. This is non-negotiable.**
+
+   Every milestone must pass through this checklist before it can be marked completed:
+
+   1. **Run targeted tests** — if test files exist for the changed files, run them
+   2. **Run lint/static analysis** — shellcheck, prettier, ruff, or whatever the project uses
+   3. **Run type check** — tsc, pyright, or equivalent
+   4. **Check acceptance criteria** — verify each criterion from `1shot/PROJECT.md` or the task's description
+   5. **Review diff against plan** — confirm changed files match what was scoped in ROADMAP.md; flag out-of-scope changes
+
+   If any check fails:
+   - Do not proceed to the summary — go back and fix the issue
+   - Re-run the failed check(s) to confirm the fix
+   - Document persistent failures in `1shot/BLOCKERS.md`
 
 3. **Update `1shot/LLM-OVERVIEW.md`**
    - Refresh "Current State" section to reflect what was built

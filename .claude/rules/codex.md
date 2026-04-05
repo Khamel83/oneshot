@@ -45,11 +45,12 @@ Always `unset OPENAI_API_KEY` before running codex.
 ### If auth.json is missing or broken
 
 ```bash
-# Option 1: Re-login (requires browser)
-codex login
-# Then paste the localhost:1455 callback URL back to Claude
+# Option 1: Device code auth (best for remote/headless machines)
+codex login --device-auth
+# Opens https://auth.openai.com/codex/device — enter the one-time code in your browser
+# No browser needed on the server itself
 
-# Option 2: Copy from a working machine (fastest)
+# Option 2: Copy from a working machine (fastest if available)
 scp homelab:/home/khamel83/.codex/auth.json ~/.codex/auth.json
 ```
 
@@ -126,11 +127,11 @@ Or Claude Code can dispatch tasks to all three in parallel using Bash with `&` +
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | `404 Not Found` on `wss://.../responses` | `OPENAI_API_KEY` is set with no credits | `unset OPENAI_API_KEY` |
-| `401 Missing bearer` | `auth.json` is missing | Copy from homelab or re-login |
-| `401 Missing scopes: api.responses.write` | Stale/incomplete token | Re-login or copy from working machine |
+| `401 Missing bearer` | `auth.json` is missing | `codex login --device-auth` or copy from homelab |
+| `401 Missing scopes: api.responses.write` | Stale/incomplete token | `codex login --device-auth` or copy from working machine |
 | `bwrap: loopback: Failed RTM_NEWADDR` | bwrap blocked by kernel | Use `--sandbox danger-full-access` |
 | `insufficient_quota` | Using API key account (no credits) | `unset OPENAI_API_KEY` |
-| Subscription expired 404 | ChatGPT Plus lapsed | Renew at chat.openai.com + re-login |
+| Subscription expired 404 | ChatGPT Plus lapsed | Renew at chat.openai.com + `codex login --device-auth` |
 
 ---
 

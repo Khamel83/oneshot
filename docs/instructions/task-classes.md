@@ -91,6 +91,44 @@ Each lane has a `fallback_lane` in `config/lanes.yaml`. If a worker fails:
 
 Three consecutive failures → circuit breaker → log blocker → skip.
 
+## Risk Classification
+
+Every task has a **risk level** (`low`, `medium`, `high`) that controls what workers
+can do autonomously. Risk and complexity (task class) are **independent axes** -- a
+3-line auth change is small complexity but high risk; a large refactoring of utility
+functions is high complexity but low risk.
+
+### Risk Levels
+
+| Level | Auto-edit | Auto-verify | Auto-commit | Needs approval | Sync-only |
+|-------|-----------|-------------|-------------|----------------|-----------|
+| `low` | Yes | Yes | No | No | No |
+| `medium` | No | Yes | No | Yes | No |
+| `high` | No | Yes | No | Yes | Yes |
+
+### Inference Rules
+
+Risk is inferred from keywords in the task description and affected file paths:
+
+**High risk** (any match): auth, billing, migration, security, password, token,
+secret, credential, production, deploy
+
+**Low risk** (any match): refactor, rename, test, lint, doc, format, comment
+
+**Medium risk**: everything else (default)
+
+High-risk keywords take priority over low-risk keywords -- if a description contains
+both "refactor" and "auth", it's classified as high risk.
+
+### Examples
+
+- "Fix typo in README" -- `implement_small`, risk `low`
+- "Rename `utils.py` to `helpers.py`" -- `implement_small`, risk `low`
+- "Add login endpoint" -- `implement_medium`, risk `high`
+- "Deploy v2 to production" -- `plan`, risk `high`
+- "Format all Python files with black" -- `implement_small`, risk `low`
+- "Add caching to API handler" -- `implement_medium`, risk `medium`
+
 ## CLI Reference
 
 ```bash

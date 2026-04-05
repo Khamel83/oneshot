@@ -54,6 +54,13 @@ Instructions load based on project type:
 | `/vision` | Image/website visual analysis |
 | `/secrets` | SOPS/Age secrets management |
 
+## v2 Capabilities
+
+New structured artifacts and schemas available to operators:
+- `templates/TASK_SPEC.md` — Template for task specification documents
+- `core/plan_schema.py` — Machine-readable plan schema (plan.json)
+- `core/task_schema.py` — Task schema with `infer_risk()` for risk classification (low/medium/high)
+
 ## AGENTS.md
 
 AGENTS.md is the **neutral operating contract** — not Claude-specific.

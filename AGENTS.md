@@ -92,6 +92,16 @@ Reading files, writing to scope-matched files, running tests, git commit (not pu
 
 Destructive ops, git push, external API calls that cost money, production deploy.
 
+## V2 FEATURES
+
+- Risk-based autonomy gating: `RiskLevel` (low/medium/high) controls what requires confirmation
+- Structured exploration artifact: `explore.json` from intake phase
+- Machine-readable plan schema: `plan.json` via `core/plan_schema.py`
+- TASK_SPEC template: `templates/TASK_SPEC.md` for formal task specification
+- Mandatory verification gate after each build step
+- Scope creep detection in the build loop
+- Session-end feedback loop: handoff proposes CLAUDE.md/rule updates when patterns repeat
+
 ## VERSION
 
 v14.1 | Parallel dispatch | Codex + Gemini workers | Manifest tracking

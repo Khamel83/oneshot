@@ -52,6 +52,17 @@ check_cli "Claude Code" "@anthropic-ai/claude-code" "claude" || true
 check_cli "Codex CLI"   "@openai/codex"             "codex"  || true
 check_cli "Gemini CLI"  "@google/gemini-cli"        "gemini" || true
 
+# Codex auth check — verify auth.json exists and is non-empty
+if command -v codex >/dev/null 2>&1; then
+  if [[ -f "$HOME/.codex/auth.json" ]] && [[ -s "$HOME/.codex/auth.json" ]]; then
+    echo "✓ Codex auth: ~/.codex/auth.json present"
+  else
+    echo "⚠️  Codex auth: missing or empty ~/.codex/auth.json"
+    echo "   Fix: codex login --device-auth"
+    ISSUES=1
+  fi
+fi
+
 # secrets CLI — symlink to PATH if missing
 if command -v secrets >/dev/null 2>&1; then
   echo "✓ secrets CLI: installed"

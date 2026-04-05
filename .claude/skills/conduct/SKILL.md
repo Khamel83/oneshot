@@ -43,20 +43,54 @@ Classifies tasks by type, routes to lanes, dispatches to workers, reviews with C
 ### Phase 1: Plan
 
 1. **Explore codebase** (Explore subagent) — identify impacted files
-2. **Docs Check**
+2. **Persist exploration artifact** — Write structured output to `1shot/explore.json`:
+   ```json
+   {
+     "goal": "[from PROJECT.md]",
+     "candidate_files": ["list of relevant files"],
+     "commands_to_run": ["test commands", "lint commands"],
+     "constraints": ["architectural constraints discovered"],
+     "unknowns": ["open questions to resolve"],
+     "risk_assessment": {"level": "low|medium|high", "reasoning": "..."},
+     "existing_patterns": ["patterns found in relevant files"]
+   }
+   ```
+   This artifact is visible, editable, and reusable. Update it as exploration progresses.
+3. **Docs Check**
    - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
    - For anything missing → run `/doc <name> <url>` before assigning build tasks
-3. **Write `1shot/ROADMAP.md`** — phases and success criteria
-4. **Create native tasks** — one TaskCreate per deliverable:
+4. **Write `1shot/ROADMAP.md`** — phases and success criteria
+5. **Task specs for non-trivial work**: If any task is medium or high risk, generate a TASK_SPEC.md from the template at `templates/TASK_SPEC.md` and write it to `1shot/TASK_SPEC.md`. Use `1shot/explore.json` to populate the Files Involved section of TASK_SPEC.
+6. **Generate machine-readable plan** — Create `1shot/plan.json` from the TASK_SPEC:
+   Use the plan schema from `core/plan_schema.py`:
+   ```python
+   from core.plan_schema import Plan, PlanStep, VerifyStep, StepAction, VerifyType
+   from core.task_schema import RiskLevel
+
+   plan = Plan(
+       objective="[from TASK_SPEC Goal]",
+       risk_level=RiskLevel.medium,
+       steps=[
+           PlanStep(id="1", action=StepAction.explore, description="...", files=[...]),
+           PlanStep(id="2", action=StepAction.implement, description="...", files=[...], depends_on=["1"]),
+       ],
+       verification=[
+           VerifyStep(verify_type=VerifyType.test, command="pytest tests/"),
+       ],
+       rollback="git restore [files]",
+   )
+   ```
+   Write to `1shot/plan.json`. This file is the executable plan that drives the build loop.
+7. **Create native tasks** — one TaskCreate per deliverable:
    - subject: deliverable title
    - description: acceptance criteria, files to touch
    - Set addBlockedBy for dependencies
-5. **Classify each task** using `docs/instructions/task-classes.md`:
+8. **Classify each task** using `docs/instructions/task-classes.md`:
    ```bash
    python -m core.router.resolve --class <task_class>
    ```
    This returns: lane, workers, reviewer, search_backend, fallback_lane
-6. **Update STATE.md**: phase = "plan → build"
+9. **Update STATE.md**: phase = "plan → build"
 
 ### Phase 2: Build Loop
 
@@ -73,18 +107,44 @@ Repeat until no unblocked tasks remain:
      - For parallel tasks → use `python3 -m core.dispatch.run --prompts-file batch.json`
      - Capture output, validate, write manifest to `1shot/dispatch/`
 4. **Review**: If task requires review, dispatch review to reviewer (see dispatch.md Step 7)
-5. `TaskUpdate` → completed
-6. Update `1shot/STATE.md`: increment loop count, log action
-7. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
+5. **Scope check** — Before verification, compare actual changes against plan:
+   ```bash
+   # Get files actually changed
+   git diff --name-only
+
+   # Compare against planned files from TASK_SPEC (1shot/TASK_SPEC.md "Files Involved" section)
+   ```
+
+   - If changes touch files listed in "Must NOT Touch" → **STOP**, flag as blocker, require human decision
+   - If changes touch files not in "Will Change" or "Read-Only" → **WARN**, log to `1shot/BLOCKERS.md` with explanation, ask if the new files should be added to the plan
+   - If changes are within plan → continue to verification
+
+   This prevents the common pattern where a "small fix" grows to touch unrelated subsystems.
+6. **Verify**: Run the Phase 3 verification checklist (see below) — all checks must pass before marking completed
+7. `TaskUpdate` → completed (only after verification passes)
+8. Update `1shot/STATE.md`: increment loop count, log action
+9. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
 
 If 3 consecutive tasks hit circuit breaker → stop, surface to user.
 
-### Phase 3: Verify
+### Phase 3: Verify (MANDATORY — non-negotiable)
 
-For each completed task:
-1. Check acceptance criteria from `1shot/PROJECT.md`
-2. Run tests: `./scripts/ci.sh` if present, else appropriate test command
-3. Failed tasks → `TaskUpdate` back to pending → loop to Phase 2
+**No verification, no completion. This is non-negotiable.**
+
+Every task must pass through this phase before it can be marked completed. There are no exceptions — even if the change is "trivial," "just a doc edit," or "obviously correct."
+
+For each completed task, run this checklist in order:
+
+1. **Run targeted tests** — if test files exist for the changed files, run them
+2. **Run lint/static analysis** — shellcheck, prettier, ruff, or whatever the project uses
+3. **Run type check** — tsc, pyright, or equivalent
+4. **Check acceptance criteria** — verify each criterion from `1shot/PROJECT.md` or the task's description
+5. **Review diff against plan** — confirm changed files match what was scoped in the plan; flag out-of-scope changes
+
+If any check fails:
+- `TaskUpdate` back to **pending** — never mark as completed with failing checks
+- Loop back to Phase 2 with the specific failure as context
+- Document what failed in `1shot/BLOCKERS.md` if it was not resolved in one retry
 
 ### Phase 4: Challenge (adversarial pass)
 
