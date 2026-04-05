@@ -2,6 +2,7 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260404_214633__command-name__clear__command-name_.md.age](20260404_214633__command-name__clear__command-name_.md.age) | 2026-04-04 21:46:33 | <command-name>/clear</command-name> | age, session |
 | [20260404_213840_https___openrouter_ai_models_order_most-popular_fm.md.age](20260404_213840_https___openrouter_ai_models_order_most-popular_fm.md.age) | 2026-04-04 21:38:40 | https://openrouter.ai/models?order=most-popular&fm... | add, age, api, auth, bug, build, config, feature, fix, go, implement, python, session, test |
 | [20260404_212633__command-name__model__command-name_.md.age](20260404_212633__command-name__model__command-name_.md.age) | 2026-04-04 21:26:33 | <command-name>/model</command-name> | age |
 | [20260404_212622_https___openrouter_ai_models_order_most-popular_fm.md.age](20260404_212622_https___openrouter_ai_models_order_most-popular_fm.md.age) | 2026-04-04 21:26:22 | https://openrouter.ai/models?order=most-popular&fm... | add, age, api, auth, bug, build, config, feature, fix, go, implement, python, session, test |

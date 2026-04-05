@@ -4,6 +4,36 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [14.2.0] - 2026-04-04
+
+### Added
+- **Category-based routing** — `TaskCategory` enum (coding, research, writing, review, general) with `infer_category()` keyword classifier
+- **`CATEGORY_ASSIGNMENTS`** — automatic category inference from task class when not explicitly provided
+- **`category_preference`** blocks in all lanes (premium, balanced, cheap, research) — workers reordered by best fit for each category
+- **`infer_category()`** — keyword-based task classification with priority: writing > review > coding > research > general
+- **ZAI expiry guard** — `worker_available()` checks `plan_expires` from `config/workers.yaml`, auto-disables `glm_claude` when expired
+- **`post_expiry_default_model`** — `claw_code` in `config/models.yaml` defaults to `deepseek/deepseek-v3.2` when ZAI plan expires
+- **`shot` shell function** — terminal auto-router: picks best model (GLM free, falls back to OpenRouter on expiry), `--code` flag for Qwen3-Coder
+- **GLM Claude dispatch** — full Claude Code session on GLM-5-turbo via ZAI as dispatchable worker
+- **Python router `--category` flag** — `python3 -m core.router.resolve --class <class> --category <cat>` returns category-ordered workers
+- **Category routing tests** — 12 infer_category tests + 5 router resolve tests in `tests/test_workflow.bats`
+- **CI: `test-router` job** — Python-based category routing and router validation in GitHub Actions
+- **CI: config consistency checks** — validates category_preference on all lanes, claw_code exclusion, plan_expires presence
+
+### Changed
+- **`claw_code` disabled in cheap lane pool** — removed from `worker_pool`, available as manual opt-in via `--worker claw_code`
+- **`resolve()` returns category** — routing response now includes `category` field (inferred or explicit)
+- **`dispatch.md`** — Step 1 now classifies category, passes `--category` to resolver, added glm_claude as dispatchable worker, replaced hardcoded codex/gemini preference with category-driven table
+- **`/short` and `/full` operators** — dispatch step now uses `--category` flag for category-ordered worker selection
+- **`providers.md`** — added category routing table, claw_code marked opt-in, glm_claude documented
+- **`task-classes.md`** — added category column and preferred workers to each task class, updated worker table
+- **`AGENTS.md`** — updated to v14.2 with category routing, intelligence tiers, terminal entry points
+
+### Fixed
+- **`infer_category` priority** — writing/review keywords checked before coding to prevent "document the API endpoints" misclassifying as coding
+
+---
+
 ## [13.2.0] - 2026-03-28
 
 ### Added
