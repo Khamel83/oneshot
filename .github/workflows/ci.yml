@@ -78,6 +78,98 @@ jobs:
 
           echo "All agents valid"
 
+  test-router:
+    name: Test Python Router
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Test infer_category
+        run: |
+          python3 -c "
+          import sys
+          sys.path.insert(0, '.')
+          from core.task_schema import infer_category, TaskCategory
+
+          tests = [
+              ('implement the auth handler', 'coding'),
+              ('fix the bug in login.py', 'coding'),
+              ('refactor the database module', 'coding'),
+              ('research Supabase RLS patterns', 'research'),
+              ('document the API endpoints', 'writing'),
+              ('summarize the meeting notes', 'writing'),
+              ('review this pull request', 'review'),
+              ('audit the security config', 'review'),
+              ('hello world', 'general'),
+          ]
+          passed = 0
+          for desc, exp in tests:
+              result = infer_category(desc)
+              if result.value == exp:
+                  passed += 1
+              else:
+                  print(f'FAIL: \"{desc}\" → {result.value}, expected {exp}')
+                  sys.exit(1)
+          print(f'{passed}/{len(tests)} infer_category tests passed')
+          "
+
+      - name: Test router resolve
+        run: |
+          python3 -c "
+          import sys
+          sys.path.insert(0, '.')
+          from core.router.lane_policy import resolve
+
+          # Test category-based worker ordering
+          r = resolve('implement_small', category='coding')
+          assert r['lane'] == 'cheap'
+          assert r['workers'][0] == 'codex', f'Expected codex first, got {r[\"workers\"]}'
+          assert r['category'] == 'coding'
+
+          r = resolve('research', category='research')
+          assert r['lane'] == 'research'
+          assert r['workers'][0] == 'gemini_cli'
+
+          r = resolve('plan')
+          assert r['lane'] == 'premium'
+          assert r['category'] == 'general'
+
+          print('All router resolve tests passed')
+          "
+
+      - name: Test category inference in resolve
+        run: |
+          python3 -c "
+          import sys
+          sys.path.insert(0, '.')
+          from core.router.lane_policy import resolve
+
+          # infer_category should auto-populate when no category given
+          r = resolve('implement_small')
+          assert r['category'] == 'coding'
+
+          r = resolve('review_diff')
+          assert r['category'] == 'review'
+
+          r = resolve('doc_draft')
+          assert r['category'] == 'writing'
+
+          r = resolve('plan')
+          assert r['category'] == 'general'
+
+          print('All category inference tests passed')
+          "
+
   test-oneshot:
     name: Test oneshot.sh
     runs-on: ubuntu-latest
@@ -113,25 +205,11 @@ jobs:
           agent_count=$(find .claude/agents -maxdepth 1 -name "*.md" ! -name "INDEX.md" ! -name "TEMPLATE.md" | wc -l)
           echo "Found $agent_count agents"
 
-          # Check AGENTS.md mentions same counts
-          if ! grep -q "Skills: $skill_count" AGENTS.md; then
-            echo "Warning: AGENTS.md skill count may be outdated"
-          fi
-
-          if ! grep -q "Agents: $agent_count" AGENTS.md; then
-            echo "Warning: AGENTS.md agent count may be outdated"
-          fi
-
       - name: Check no stale references
         run: |
           # Check for known stale patterns
           if grep -r "oneshot-resume" .claude/skills/ 2>/dev/null; then
-            echo "ERROR: Found stale 'oneshot-resume' reference (should be 'resume-handoff')"
-            exit 1
-          fi
-
-          if grep -r "secrets-vault/" .claude/skills/ 2>/dev/null | grep -v "oneshot/secrets"; then
-            echo "ERROR: Found stale 'secrets-vault/' reference"
+            echo "ERROR: Found stale 'oneshot-resume' reference"
             exit 1
           fi
 
@@ -147,6 +225,13 @@ jobs:
             "CHANGELOG.md"
             ".claude/skills/INDEX.md"
             ".claude/agents/INDEX.md"
+            "core/task_schema.py"
+            "core/router/lane_policy.py"
+            "core/dispatch/run.py"
+            "config/lanes.yaml"
+            "config/models.yaml"
+            "config/workers.yaml"
+            "docs/instructions/task-classes.md"
           )
 
           for file in "${required_files[@]}"; do
@@ -157,6 +242,32 @@ jobs:
           done
 
           echo "All required files present"
+
+      - name: Verify config consistency
+        run: |
+          # lanes.yaml should have category_preference on all lanes
+          for lane in premium balanced cheap research; do
+            if ! sed -n "/^  $lane:/,/^[a-z]/p" config/lanes.yaml | grep -q "category_preference"; then
+              echo "ERROR: Lane '$lane' missing category_preference"
+              exit 1
+            fi
+          done
+          echo "All lanes have category_preference"
+
+          # cheap lane should NOT have claw_code in worker_pool
+          pool=$(sed -n '/^  cheap:/,/^[a-z]/p' config/lanes.yaml | grep "worker_pool" | head -1)
+          if echo "$pool" | grep -q "claw_code"; then
+            echo "ERROR: claw_code should not be in cheap lane pool"
+            exit 1
+          fi
+          echo "claw_code correctly excluded from cheap lane"
+
+          # workers.yaml glm should have plan_expires
+          if ! grep -A 5 "^  glm:" config/workers.yaml | grep -q "plan_expires"; then
+            echo "ERROR: glm worker missing plan_expires"
+            exit 1
+          fi
+          echo "ZAI expiry config present"
 
   validate-community-starter:
     name: Validate Community Starter

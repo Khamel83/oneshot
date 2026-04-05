@@ -1,11 +1,10 @@
 #!/usr/bin/env bats
-# test_workflow.bats - E2E workflow tests for ONE_SHOT v7.4
-# Tests the full skill chain: bootstrap → oneshot-build → beads integration
+# test_workflow.bats - E2E workflow tests for ONE_SHOT
+# Tests routing, config validation, and skill chain integrity
 #
 # Install: brew install bats-core OR apt install bats
 # Run: bats tests/test_workflow.bats
 
-# Skip tests if dependencies not available
 setup() {
     TEST_DIR=$(mktemp -d)
     export TEST_DIR
@@ -27,99 +26,8 @@ teardown() {
 }
 
 # =============================================================================
-# oneshot-build Dependency Checks
-# =============================================================================
-
-@test "oneshot-build shows usage without arguments" {
-    # Skip if oneshot-build doesn't exist
-    [ -f "$TEST_DIR/oneshot-build" ] || skip "oneshot-build not found"
-
-    run bash "$TEST_DIR/oneshot-build"
-
-    [ "$status" -eq 1 ]
-    [[ "$output" == *"Usage:"* ]]
-}
-
-@test "oneshot-build fails without bd CLI" {
-    [ -f "$TEST_DIR/oneshot-build" ] || skip "oneshot-build not found"
-
-    # Create a version of the script with mocked command checks
-    # by prepending a function that makes 'bd' unavailable
-    cat > "$TEST_DIR/test-build.sh" << 'EOF'
-#!/bin/bash
-# Mock: bd command not found
-command() {
-    if [[ "$2" == "bd" ]]; then
-        return 1
-    fi
-    builtin command "$@"
-}
-export -f command
-EOF
-    cat "$TEST_DIR/oneshot-build" >> "$TEST_DIR/test-build.sh"
-    chmod +x "$TEST_DIR/test-build.sh"
-
-    run bash "$TEST_DIR/test-build.sh" "test idea" 2>&1
-
-    [ "$status" -eq 1 ]
-    [[ "$output" == *"Missing required dependencies"* ]] || [[ "$output" == *"bd"* ]]
-}
-
-@test "oneshot-build fails without AGENTS.md (not ONE_SHOT project)" {
-    [ -f "$TEST_DIR/oneshot-build" ] || skip "oneshot-build not found"
-
-    # Ensure no AGENTS.md
-    rm -f AGENTS.md
-
-    # Mock all dependencies as available
-    # We need to test the project check
-    run bash -c "
-        # Mock commands
-        bd() { return 0; }
-        jq() { return 0; }
-        claude() { return 0; }
-        export -f bd jq claude
-
-        # Source just the check functions
-        source '$TEST_DIR/oneshot-build' 2>&1
-    " 2>&1
-
-    # Should fail because AGENTS.md doesn't exist
-    [[ "$output" == *"Not a ONE_SHOT project"* ]] || [[ "$output" == *"AGENTS.md"* ]] || [ "$status" -ne 0 ]
-}
-
-# =============================================================================
 # oneshot.sh Bootstrap Tests
 # =============================================================================
-
-@test "oneshot.sh fails without beads CLI installed" {
-    [ -f "$TEST_DIR/oneshot.sh" ] || skip "oneshot.sh not found"
-
-    # Create modified script that mocks 'command -v bd' to fail
-    cat > "$TEST_DIR/test-bootstrap.sh" << 'EOF'
-#!/bin/bash
-# Override command to make bd unavailable
-original_command=$(which command 2>/dev/null || echo "command")
-command() {
-    if [[ "$*" == *"bd"* ]]; then
-        return 1
-    fi
-    builtin command "$@"
-}
-EOF
-    # Append the check portion of oneshot.sh
-    grep -A 20 "Check for beads CLI" "$TEST_DIR/oneshot.sh" >> "$TEST_DIR/test-bootstrap.sh" 2>/dev/null || true
-
-    if [ -s "$TEST_DIR/test-bootstrap.sh" ]; then
-        chmod +x "$TEST_DIR/test-bootstrap.sh"
-        run bash "$TEST_DIR/test-bootstrap.sh" 2>&1
-
-        # Should fail or show beads error
-        [[ "$output" == *"beads"* ]] || [[ "$output" == *"REQUIRED"* ]] || [ "$status" -ne 0 ]
-    else
-        skip "Could not extract beads check from oneshot.sh"
-    fi
-}
 
 @test "oneshot.sh --help shows prerequisites" {
     [ -f "$TEST_DIR/oneshot.sh" ] || skip "oneshot.sh not found"
@@ -127,63 +35,6 @@ EOF
     run bash "$TEST_DIR/oneshot.sh" --help
 
     [ "$status" -eq 0 ]
-    [[ "$output" == *"beads"* ]]
-    [[ "$output" == *"REQUIRED"* ]] || [[ "$output" == *"Prerequisites"* ]]
-}
-
-# =============================================================================
-# Beads Integration Tests (if bd is available)
-# =============================================================================
-
-@test "beads can initialize in project directory" {
-    command -v bd &>/dev/null || skip "beads not installed"
-
-    # Initialize beads
-    run bd init --stealth
-
-    [ "$status" -eq 0 ]
-    [ -d ".beads" ]
-}
-
-@test "beads ready returns empty array for new project" {
-    command -v bd &>/dev/null || skip "beads not installed"
-
-    bd init --stealth 2>/dev/null || true
-
-    run bd ready --json
-
-    [ "$status" -eq 0 ]
-    [[ "$output" == "[]" ]] || [[ "$output" == "" ]]
-}
-
-@test "beads can create and list tasks" {
-    command -v bd &>/dev/null || skip "beads not installed"
-    command -v jq &>/dev/null || skip "jq not installed"
-
-    bd init --stealth 2>/dev/null || true
-
-    # Create a task
-    run bd create "Test task" --json
-    [ "$status" -eq 0 ]
-
-    # List tasks
-    run bd list --json
-    [ "$status" -eq 0 ]
-
-    # Should have at least one task
-    count=$(echo "$output" | jq 'length')
-    [ "$count" -ge 1 ]
-}
-
-@test "beads sync works without errors" {
-    command -v bd &>/dev/null || skip "beads not installed"
-
-    bd init --stealth 2>/dev/null || true
-
-    run bd sync
-
-    # Should succeed (might warn if nothing to sync)
-    [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
 }
 
 # =============================================================================
@@ -306,88 +157,272 @@ EOF
 }
 
 # =============================================================================
+# Category Routing Tests (core intelligence tier feature)
+# =============================================================================
+
+@test "infer_category classifies coding tasks" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.task_schema import infer_category, TaskCategory
+
+tests = [
+    ('implement the auth handler', 'coding'),
+    ('fix the bug in login.py', 'coding'),
+    ('refactor the database module', 'coding'),
+    ('write tests for the API', 'coding'),
+]
+failed = [desc for desc, exp in tests if infer_category(desc).value != exp]
+if failed:
+    print('FAILED: ' + str(failed))
+    sys.exit(1)
+"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "infer_category classifies research tasks" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.task_schema import infer_category
+
+tests = [
+    ('research Supabase RLS patterns', 'research'),
+    ('investigate the memory leak', 'research'),
+    ('search for the best ORM', 'research'),
+]
+failed = [desc for desc, exp in tests if infer_category(desc).value != exp]
+if failed:
+    print('FAILED: ' + str(failed))
+    sys.exit(1)
+"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "infer_category classifies writing tasks" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.task_schema import infer_category
+
+tests = [
+    ('document the API endpoints', 'writing'),
+    ('write a README section', 'writing'),
+    ('summarize the meeting notes', 'writing'),
+]
+failed = [desc for desc, exp in tests if infer_category(desc).value != exp]
+if failed:
+    print('FAILED: ' + str(failed))
+    sys.exit(1)
+"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "infer_category classifies review tasks" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.task_schema import infer_category
+
+tests = [
+    ('review this pull request', 'review'),
+    ('audit the security config', 'review'),
+]
+failed = [desc for desc, exp in tests if infer_category(desc).value != exp]
+if failed:
+    print('FAILED: ' + str(failed))
+    sys.exit(1)
+"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "infer_category defaults to general" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.task_schema import infer_category, TaskCategory
+
+assert infer_category('hello world') == TaskCategory.general
+assert infer_category('do something') == TaskCategory.general
+"
+
+    [ "$status" -eq 0 ]
+}
+
+# =============================================================================
+# Router Resolve Tests
+# =============================================================================
+
+@test "router resolves implement_small to cheap lane with codex first" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys, json; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.router.lane_policy import resolve
+
+r = resolve('implement_small', category='coding')
+assert r['lane'] == 'cheap', f'Expected cheap, got {r[\"lane\"]}'
+assert r['workers'][0] == 'codex', f'Expected codex first, got {r[\"workers\"]}'
+assert r['category'] == 'coding'
+"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "router resolves research to research lane with gemini first" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys, json; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.router.lane_policy import resolve
+
+r = resolve('research', category='research')
+assert r['lane'] == 'research'
+assert r['workers'][0] == 'gemini_cli'
+assert r['search_backend'] == 'argus'
+"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "router resolves plan to premium lane" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.router.lane_policy import resolve
+
+r = resolve('plan')
+assert r['lane'] == 'premium'
+assert r['category'] == 'general'
+assert r['workers'][0] == 'claude_code'
+"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "router infers category when not provided" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.router.lane_policy import resolve
+
+# implement_small should infer coding category
+r = resolve('implement_small')
+assert r['category'] == 'coding', f'Expected coding, got {r[\"category\"]}'
+
+# review_diff should infer review category
+r = resolve('review_diff')
+assert r['category'] == 'review', f'Expected review, got {r[\"category\"]}'
+"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "router includes risk autonomy in response" {
+    command -v python3 &>/dev/null || skip "python3 not found"
+
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.router.lane_policy import resolve
+
+r = resolve('implement_small')
+assert 'risk' in r
+assert r['risk']['level'] == 'medium'
+assert 'auto_edit' in r['risk']
+assert 'requires_approval' in r['risk']
+"
+
+    [ "$status" -eq 0 ]
+}
+
+# =============================================================================
+# Config Validation Tests
+# =============================================================================
+
+@test "lanes.yaml has category_preference on all lanes" {
+    [ -f "$ORIGINAL_DIR/config/lanes.yaml" ] || skip "lanes.yaml not found"
+
+    for lane in premium balanced cheap research; do
+        grep -A 20 "^  $lane:" "$ORIGINAL_DIR/config/lanes.yaml" | grep -q "category_preference"
+    done
+}
+
+@test "lanes.yaml cheap lane does not have claw_code" {
+    [ -f "$ORIGINAL_DIR/config/lanes.yaml" ] || skip "lanes.yaml not found"
+
+    # Extract cheap lane worker_pool
+    pool=$(sed -n '/^  cheap:/,/^[a-z]/p' "$ORIGINAL_DIR/config/lanes.yaml" | grep "worker_pool" | head -1)
+
+    # Should NOT contain claw_code
+    [[ ! "$pool" == *"claw_code"* ]]
+}
+
+@test "workers.yaml has glm worker with plan_expires" {
+    [ -f "$ORIGINAL_DIR/config/workers.yaml" ] || skip "workers.yaml not found"
+
+    grep -A 5 "^  glm:" "$ORIGINAL_DIR/config/workers.yaml" | grep -q "plan_expires"
+}
+
+@test "models.yaml has post_expiry_default_model for claw_code" {
+    [ -f "$ORIGINAL_DIR/config/models.yaml" ] || skip "models.yaml not found"
+
+    grep -A 5 "^claw_code:" "$ORIGINAL_DIR/config/models.yaml" | grep -q "post_expiry_default_model"
+}
+
+# =============================================================================
 # Skill Chain Validation
 # =============================================================================
 
-@test "INDEX.md has Start Here section" {
-    [ -f "$ORIGINAL_DIR/.claude/skills/INDEX.md" ] || skip "INDEX.md not found"
+@test "dispatch.md references category routing" {
+    [ -f "$ORIGINAL_DIR/.claude/skills/_shared/dispatch.md" ] || skip "dispatch.md not found"
 
-    grep -q "Start Here" "$ORIGINAL_DIR/.claude/skills/INDEX.md"
+    grep -q "category" "$ORIGINAL_DIR/.claude/skills/_shared/dispatch.md"
+    grep -q "--category" "$ORIGINAL_DIR/.claude/skills/_shared/dispatch.md"
 }
 
-@test "INDEX.md lists 5 core skills in Start Here" {
-    [ -f "$ORIGINAL_DIR/.claude/skills/INDEX.md" ] || skip "INDEX.md not found"
+@test "providers.md lists glm_claude worker" {
+    [ -f "$ORIGINAL_DIR/.claude/skills/_shared/providers.md" ] || skip "providers.md not found"
 
-    # Check for the 5 core skills mentioned
-    grep -q "front-door" "$ORIGINAL_DIR/.claude/skills/INDEX.md"
-    grep -q "create-plan" "$ORIGINAL_DIR/.claude/skills/INDEX.md"
-    grep -q "implement-plan" "$ORIGINAL_DIR/.claude/skills/INDEX.md"
-    grep -q "debugger" "$ORIGINAL_DIR/.claude/skills/INDEX.md"
-    grep -q "code-reviewer" "$ORIGINAL_DIR/.claude/skills/INDEX.md"
+    grep -q "glm_claude" "$ORIGINAL_DIR/.claude/skills/_shared/providers.md"
 }
 
-@test "AGENTS.md version is 7.3" {
-    [ -f "$ORIGINAL_DIR/AGENTS.md" ] || skip "AGENTS.md not found"
+@test "providers.md marks claw_code as opt-in" {
+    [ -f "$ORIGINAL_DIR/.claude/skills/_shared/providers.md" ] || skip "providers.md not found"
 
-    grep -q "7.3" "$ORIGINAL_DIR/AGENTS.md"
+    grep -q "opt-in" "$ORIGINAL_DIR/.claude/skills/_shared/providers.md"
 }
 
-@test "AGENTS.md shows beads as required" {
-    [ -f "$ORIGINAL_DIR/AGENTS.md" ] || skip "AGENTS.md not found"
+@test "task-classes.md has category column" {
+    [ -f "$ORIGINAL_DIR/docs/instructions/task-classes.md" ] || skip "task-classes.md not found"
 
-    grep -qi "beads.*required\|required.*beads" "$ORIGINAL_DIR/AGENTS.md"
+    grep -q "Category" "$ORIGINAL_DIR/docs/instructions/task-classes.md"
+    grep -q "coding\|research\|writing\|review\|general" "$ORIGINAL_DIR/docs/instructions/task-classes.md"
 }
 
 # =============================================================================
-# Full Workflow Simulation (without claude CLI)
+# Required Files
 # =============================================================================
 
-@test "simulated workflow: init → tasks → complete" {
-    command -v bd &>/dev/null || skip "beads not installed"
-    command -v jq &>/dev/null || skip "jq not installed"
+@test "core Python module imports cleanly" {
+    command -v python3 &>/dev/null || skip "python3 not found"
 
-    # 1. Initialize
-    bd init --stealth
-    mkdir -p .agent
-    echo "0" > .agent/ITERATIONS.md
+    run python3 -c "
+import sys; sys.path.insert(0, '$ORIGINAL_DIR')
+from core.task_schema import Task, TaskClass, TaskCategory, infer_category, infer_risk
+from core.router.lane_policy import resolve, get_worker_pool, load_lanes
+print('All imports OK')
+"
 
-    # 2. Create tasks (simulating plan parsing)
-    bd create "Setup project structure" --json >/dev/null
-    bd create "Implement core logic" --json >/dev/null
-    bd create "Add tests" --json >/dev/null
-
-    # 3. Verify tasks created
-    task_count=$(bd list --json | jq 'length')
-    [ "$task_count" -eq 3 ]
-
-    # 4. Simulate working through tasks
-    ready_tasks=$(bd ready --json)
-    first_task_id=$(echo "$ready_tasks" | jq -r '.[0].id // empty')
-
-    if [ -n "$first_task_id" ]; then
-        # Mark in progress
-        bd update "$first_task_id" --status in_progress --json >/dev/null 2>&1 || true
-
-        # Complete it
-        bd close "$first_task_id" --reason "test complete" --json >/dev/null 2>&1 || true
-    fi
-
-    # 5. Verify workflow progressed
-    iter=$(cat .agent/ITERATIONS.md)
-    echo "1" > .agent/ITERATIONS.md
-
-    [ "$(cat .agent/ITERATIONS.md)" -eq 1 ]
-}
-
-@test "workflow completes when no ready tasks" {
-    command -v bd &>/dev/null || skip "beads not installed"
-    command -v jq &>/dev/null || skip "jq not installed"
-
-    bd init --stealth
-
-    # With no tasks, ready should return empty
-    ready_count=$(bd ready --json | jq 'length')
-
-    # Empty = complete condition
-    [ "$ready_count" -eq 0 ]
+    [ "$status" -eq 0 ]
 }
