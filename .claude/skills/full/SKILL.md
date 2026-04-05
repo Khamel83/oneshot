@@ -92,11 +92,11 @@ When invoked:
    - Update `1shot/STATE.md` with progress
 
 2. **Dispatch Non-Premium Tasks**
-   - For each milestone task, classify using task-classes.md
+   - For each milestone task, classify using task-classes.md and determine category
    - **Follow the dispatch protocol** (see `~/.claude/skills/_shared/dispatch.md`):
      - Premium tasks (planning, review, integration) → Claude handles inline
-     - Implementation, test, doc tasks → dispatch to Codex or Gemini
-     - Use `python3 -m core.dispatch.run` for parallel execution
+     - Implementation, test, doc tasks → dispatch to best available worker for that category
+     - Use `python3 -m core.dispatch.run --category <category>` for parallel execution
      - Write manifests to `1shot/dispatch/`
    - Review dispatch output, validate against acceptance criteria, commit
 

@@ -75,8 +75,9 @@ When invoked:
 See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol.
 See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
 
-**Short-specific routing**: Short dispatches Codex for advisory reviews (pre-flight + post-completion).
-Claude handles everything else. If Codex is unavailable, zero degradation.
+**Short-specific routing**: Short dispatches workers for advisory reviews (pre-flight + post-completion).
+Uses category-based worker selection — the resolver returns workers ordered by category preference.
+Claude handles everything else. If workers are unavailable, zero degradation.
 
 ## Scope
 

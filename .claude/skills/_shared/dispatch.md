@@ -21,14 +21,18 @@ Claude plans, reviews, and integrates. Codex and Gemini execute.
 For each task to dispatch:
 
 1. Determine task class using `docs/instructions/task-classes.md`
-2. Resolve lane and worker pool:
+2. Determine category (coding, research, writing, review, general) — infer from the task
+   description keywords (implement/code/fix→coding, research/search→research,
+   doc/write/summarize→writing, review/audit→review, default→general)
+3. Resolve lane, worker pool (reordered by category preference), and routing:
    ```bash
-   python -m core.router.resolve --class <task_class>
+   python3 -m core.router.resolve --class <task_class> --category <category>
    ```
-   Returns: `{task_class, lane, workers[], review_with, search_backend, fallback_lane}`
-3. Read `max_parallel` from `config/lanes.yaml` for the resolved lane
-4. If lane is `premium` → execute inline with Claude (no dispatch). Stop here.
-5. Otherwise → continue to Step 2
+   Returns: `{task_class, category, lane, workers[], review_with, search_backend, fallback_lane}`
+   Workers are already ordered by category preference — first available wins.
+4. Read `max_parallel` from `config/lanes.yaml` for the resolved lane
+5. If lane is `premium` → execute inline with Claude (no dispatch). Stop here.
+6. Otherwise → continue to Step 2
 
 ---
 
@@ -81,6 +85,17 @@ End with a summary of what you changed and any concerns.
 ## Step 3: Dispatch
 
 ### Worker Commands
+
+**GLM Claude** (full Claude Code session on GLM-5-turbo via ZAI, free until 2026-05-02):
+```bash
+ZAI_KEY="$(secrets get ZAI_API_KEY 2>/dev/null)" && \
+ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+ANTHROPIC_AUTH_TOKEN="$ZAI_KEY" \
+ANTHROPIC_API_KEY="" \
+ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5-turbo" \
+ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5-turbo" \
+claude --print --dangerously-skip-permissions "{prompt}"
+```
 
 **Codex** (structured JSON output):
 ```bash
@@ -279,11 +294,28 @@ After successful dispatch:
 
 ---
 
-## Worker Selection Priority
+## Worker Selection
 
-Within a lane's worker pool, prefer:
-1. **Codex** for code-heavy tasks (implementation, refactoring, test writing)
-2. **Gemini** for research-heavy tasks (documentation, analysis, summarization)
-3. **Either** for mixed tasks — alternate to balance load
+Worker ordering is **category-driven** via `config/lanes.yaml`. The resolver returns
+workers already sorted by category preference. Just pick the first available.
 
-Both are unlimited via ChatGPT Plus / Google Sign-in. No API cost.
+| Category | Cheap Lane (first_available) | Balanced | Premium | Research |
+|----------|------------------------------|----------|---------|----------|
+| coding | codex → gemini_cli → glm_claude | codex → gemini_cli | claude_code → codex | codex → gemini_cli |
+| research | gemini_cli → codex → glm_claude | gemini_cli → codex | claude_code → codex | gemini_cli → codex |
+| writing | gemini_cli → codex → glm_claude | gemini_cli → codex | claude_code → codex | gemini_cli → codex |
+| review | codex → glm_claude → gemini_cli | codex → gemini_cli | claude_code → codex | codex → gemini_cli |
+| general | gemini_cli → codex → glm_claude | codex → gemini_cli | claude_code → codex | gemini_cli → codex |
+
+No manual selection needed — `python3 -m core.router.resolve --class <class> --category <cat>`
+returns the correct order. See `~/.claude/skills/_shared/providers.md` for full provider details.
+
+## Terminal Entry Points
+
+From the terminal (outside CC sessions), use shell functions:
+- `shot "task"` — auto-routes to best model (GLM by default, falls back to OpenRouter when ZAI expires)
+- `zai` — force GLM-5-turbo (ZAI, free)
+- `or` — force OpenRouter model (paid)
+- `or --code` — force Qwen3-Coder (OpenRouter, free)
+
+Inside a CC session, use the dispatch protocol above to hand off tasks to workers.
