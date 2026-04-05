@@ -28,11 +28,11 @@ def load_yaml(path: str) -> dict:
         return yaml.safe_load(f)
 
 
-def resolve_lane(task_class: str) -> dict:
+def resolve_lane(task_class: str, category: str = None) -> dict:
     """Resolve task class to lane config using the router module."""
     sys.path.insert(0, str(REPO_ROOT))
     from core.router.lane_policy import resolve
-    return resolve(task_class, str(CONFIG_PATH))
+    return resolve(task_class, config_path=str(CONFIG_PATH), category=category)
 
 
 def codex_command(prompt: str, output_file: str) -> list[str]:
@@ -115,7 +115,11 @@ def glm_claude_command(prompt: str, output_file: str, model: str = "glm-5-turbo"
 
 
 def worker_available(worker: str) -> bool:
-    """Check if a worker is available on this machine."""
+    """Check if a worker is available on this machine.
+
+    For ZAI-backed workers (glm_claude, claw_code), also checks plan_expires
+    from workers.yaml. Returns False if the ZAI plan has expired.
+    """
     if worker == "codex":
         return subprocess.run(
             ["bash", "-c", "command -v codex"],
@@ -139,8 +143,31 @@ def worker_available(worker: str) -> bool:
             ["bash", "-c", "command -v claude"], capture_output=True
         ).returncode == 0
         has_key = bool(os.environ.get("ZAI_API_KEY"))
-        return has_claude and has_key
+        if not has_claude or not has_key:
+            return False
+        # Check ZAI plan expiry from workers.yaml
+        if not _zai_plan_active():
+            return False
+        return True
     return True
+
+
+def _zai_plan_active() -> bool:
+    """Check if the ZAI GLM Coding Plan is still active.
+
+    Reads plan_expires from config/workers.yaml (glm worker entry).
+    Returns True if the plan has not expired or if the field is missing.
+    """
+    try:
+        workers_config = load_yaml(str(REPO_ROOT / "config" / "workers.yaml"))
+        plan_expires = workers_config.get("workers", {}).get("glm", {}).get("plan_expires")
+        if not plan_expires:
+            return True  # no expiry configured, assume active
+        from datetime import date
+        expiry = date.fromisoformat(plan_expires)
+        return date.today() <= expiry
+    except Exception:
+        return True  # on any parse error, don't block
 
 
 def clean_env() -> dict[str, str]:
@@ -423,6 +450,8 @@ def main():
                         help="Self-contained prompt for the worker")
     parser.add_argument("--worker", default=None,
                         help="Override worker (codex, gemini_cli, or claw_code)")
+    parser.add_argument("--category", default=None,
+                        help="Task category (coding, research, writing, review, general) for worker preference ordering")
     parser.add_argument("--model", default=None,
                         help="Model for claw_code worker (e.g. openai/gpt-4o-mini)")
     parser.add_argument("--output", default="/tmp/dispatch",
@@ -441,7 +470,7 @@ def main():
         parser.error("Either --prompt or --prompts-file is required")
 
     # Resolve lane
-    resolution = resolve_lane(args.task_class)
+    resolution = resolve_lane(args.task_class, category=args.category)
 
     if args.dry_run:
         print(json.dumps({

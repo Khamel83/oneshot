@@ -2,6 +2,7 @@
 
 Usage:
     python -m core.router.resolve --class implement_small
+    python -m core.router.resolve --class implement_small --category coding
     python -m core.router.resolve --class research
 """
 
@@ -16,12 +17,14 @@ def main():
     parser = argparse.ArgumentParser(description="Resolve task class to routing directive")
     parser.add_argument("--class", dest="task_class", required=True,
                         help="Task class (plan, research, implement_small, etc.)")
+    parser.add_argument("--category", default=None,
+                        help="Task category override (coding, research, writing, review, general)")
     parser.add_argument("--config", default=None,
                         help="Path to config directory")
     args = parser.parse_args()
 
     try:
-        result = resolve(args.task_class, args.config)
+        result = resolve(args.task_class, category=args.category, config_path=args.config)
         print(json.dumps(result, indent=2))
     except (ValueError, KeyError) as e:
         print(f"Error: {e}", file=sys.stderr)
