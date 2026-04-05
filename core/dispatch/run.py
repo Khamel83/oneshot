@@ -18,6 +18,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 CONFIG_PATH = REPO_ROOT / "config" / "lanes.yaml"
+CLAW_INSTALL_PATH = Path.home() / "github" / "claw-code-agent"
 
 
 def load_yaml(path: str) -> dict:
@@ -52,6 +53,22 @@ def gemini_command(prompt: str, output_file: str) -> list[str]:
         "bash", "-c",
         f"gemini -p {json.dumps(prompt)} "
         f"--output-format json --yolo "
+        f"> {output_file} 2>/dev/null"
+    ]
+
+
+def claw_code_command(prompt: str, output_file: str, model: str = "") -> list[str]:
+    """Build Claw Code Agent CLI command."""
+    install = CLAW_INSTALL_PATH
+    cwd = os.getcwd()
+    model_part = f"OPENAI_MODEL={model} " if model else ""
+    return [
+        "bash", "-c",
+        f"cd {install} && "
+        f"{model_part}"
+        f"OPENAI_BASE_URL=https://openrouter.ai/api/v1 "
+        f"python3 -m src.main agent {json.dumps(prompt)} "
+        f"--cwd {cwd} --allow-write --allow-shell "
         f"> {output_file} 2>/dev/null"
     ]
 
@@ -154,6 +171,43 @@ def parse_gemini_output(output_file: str) -> dict:
     return result
 
 
+def parse_claw_code_output(output_file: str) -> dict:
+    """Parse Claw Code Agent output into structured result."""
+    result = {"worker": "claw_code", "messages": [], "errors": [], "usage": None}
+
+    if not os.path.exists(output_file):
+        result["errors"].append("No output file")
+        return result
+
+    # Try JSON first (if --response-schema-file was used)
+    try:
+        with open(output_file) as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            # Structured output — extract response
+            if data.get("response"):
+                result["messages"].append(data["response"])
+            elif data.get("text"):
+                result["messages"].append(data["text"])
+            result["usage"] = data.get("usage")
+            if data.get("error"):
+                result["errors"].append(data["error"])
+            return result
+    except (json.JSONDecodeError, ValueError):
+        pass
+
+    # Fall back to plain text — read the file as-is
+    try:
+        with open(output_file) as f:
+            text = f.read().strip()
+        if text:
+            result["messages"].append(text)
+    except Exception as e:
+        result["errors"].append(str(e))
+
+    return result
+
+
 def dispatch_single(task: dict, output_dir: str) -> dict:
     """Dispatch a single task to the appropriate worker and return result."""
     worker = task["worker"]
@@ -167,6 +221,9 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
         cmd = codex_command(prompt, output_file)
     elif worker == "gemini_cli":
         cmd = gemini_command(prompt, output_file)
+    elif worker == "claw_code":
+        model = task.get("model", os.environ.get("OPENAI_MODEL", ""))
+        cmd = claw_code_command(prompt, output_file, model=model)
     else:
         return {"task_id": task_id, "worker": worker, "status": "failed",
                 "error": f"Unknown worker: {worker}"}
@@ -190,6 +247,8 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
     # Parse output
     if worker == "codex":
         parsed = parse_codex_output(output_file)
+    elif worker == "claw_code":
+        parsed = parse_claw_code_output(output_file)
     else:
         parsed = parse_gemini_output(output_file)
 
@@ -284,13 +343,15 @@ def dispatch_parallel(tasks: list[dict], max_parallel: int = 3,
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Dispatch tasks to Codex/Gemini workers")
+    parser = argparse.ArgumentParser(description="Dispatch tasks to Codex/Gemini/Claw workers")
     parser.add_argument("--class", dest="task_class", required=True,
                         help="Task class (implement_small, test_write, etc.)")
     parser.add_argument("--prompt", default=None,
                         help="Self-contained prompt for the worker")
     parser.add_argument("--worker", default=None,
-                        help="Override worker (codex or gemini_cli)")
+                        help="Override worker (codex, gemini_cli, or claw_code)")
+    parser.add_argument("--model", default=None,
+                        help="Model for claw_code worker (e.g. openai/gpt-4o-mini)")
     parser.add_argument("--output", default="/tmp/dispatch",
                         help="Output directory for dispatch files")
     parser.add_argument("--manifest", default="1shot/dispatch",
@@ -325,14 +386,16 @@ def main():
     task_id = f"{args.task_class}-{int(time.time())}"
 
     tasks = []
+    model = args.model or ""
     if args.prompts_file:
         with open(args.prompts_file) as f:
             prompts = json.load(f)
         for i, p in enumerate(prompts):
             w = p.get("worker", worker)
-            tasks.append({"id": f"{w}-{i}-{task_id}", "worker": w, "prompt": p["prompt"]})
+            m = p.get("model", model)
+            tasks.append({"id": f"{w}-{i}-{task_id}", "worker": w, "prompt": p["prompt"], "model": m})
     else:
-        tasks.append({"id": task_id, "worker": worker, "prompt": args.prompt})
+        tasks.append({"id": task_id, "worker": worker, "prompt": args.prompt, "model": model})
 
     max_p = min(args.parallel, resolution.get("max_parallel", 3))
     results = dispatch_parallel(tasks, max_parallel=max_p,

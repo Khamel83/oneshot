@@ -22,3 +22,10 @@ workers:
     transport: ssh
     role: worker
     harness: opencode
+
+  claw:
+    host: localhost
+    transport: local
+    role: worker
+    harness: claw_code
+    install_path: ~/github/claw-code-agent

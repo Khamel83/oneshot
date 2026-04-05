@@ -18,3 +18,7 @@ providers:
   argus:
     env: ARGUS_BASE_URL
     description: Search broker (SearXNG, Brave, Serper, Tavily, Exa)
+
+  claw_code:
+    env: OPENAI_API_KEY
+    description: Claw Code Agent via OpenRouter (~/github/claw-code-agent)

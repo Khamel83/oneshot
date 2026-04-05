@@ -18,7 +18,7 @@ lanes:
   cheap:
     planner: claude_code
     review_with: claude_code
-    worker_pool: [gemini_cli, codex]
+    worker_pool: [claw_code, gemini_cli, codex]
     strategy: first_available
     fallback_lane: balanced
     max_parallel: 3

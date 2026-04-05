@@ -91,6 +91,15 @@ Each lane has a `fallback_lane` in `config/lanes.yaml`. If a worker fails:
 
 Three consecutive failures → circuit breaker → log blocker → skip.
 
+## Available Workers
+
+| Worker | Lane(s) | Backend | Notes |
+|--------|---------|---------|-------|
+| `claw_code` | cheap | OpenRouter | Flexible model via `--model` flag or `OPENAI_MODEL` env |
+| `codex` | cheap, balanced | ChatGPT Plus OAuth | Requires `unset OPENAI_API_KEY` |
+| `gemini_cli` | cheap, research | Google API | Direct CLI |
+| `claude_code` | premium, planner | Anthropic API | Main orchestrator, never dispatched externally |
+
 ## Risk Classification
 
 Every task has a **risk level** (`low`, `medium`, `high`) that controls what workers

@@ -52,3 +52,11 @@ models:
     can_review: true
     context_window: 200k
     latency_tier: slow
+
+# Claw Code Agent — model config (model specified per-dispatch or via OPENAI_MODEL)
+claw_code:
+    base_url: https://openrouter.ai/api/v1
+    default_model: ""  # must specify per-dispatch or via OPENAI_MODEL env
+    supported_models: [openai/gpt-4o-mini, anthropic/claude-haiku-4-5, google/gemini-2.5-flash]
+    harness: claw_code
+    install_path: ~/github/claw-code-agent
