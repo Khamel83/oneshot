@@ -6,65 +6,77 @@ pool, and review path.
 
 ## Task Classes
 
+| Class | Lane | Category | Preferred Workers |
+|-------|------|----------|-------------------|
+| `plan` | premium | general | claude_code |
+| `research` | research | research | gemini_cli, codex |
+| `search_sweep` | research | research | gemini_cli, codex |
+| `implement_small` | cheap | coding | codex, gemini_cli, glm_claude |
+| `implement_medium` | balanced | coding | codex, gemini_cli |
+| `test_write` | cheap | coding | codex, gemini_cli, glm_claude |
+| `review_diff` | premium | review | codex, claude_code |
+| `doc_draft` | cheap | writing | gemini_cli, codex, glm_claude |
+| `summarize_findings` | cheap | writing | gemini_cli, codex, glm_claude |
+
 ### `plan` — Planning & Decomposition
-- **Lane**: premium
+- **Lane**: premium | **Category**: general
 - **Planner**: claude_code (required)
 - **Worker**: None (planner handles directly)
 - **Review**: claude_code
 - **Use when**: Starting any non-trivial work, creating a roadmap, breaking down goals
 
 ### `research` — Deep Research
-- **Lane**: research
+- **Lane**: research | **Category**: research
 - **Planner**: claude_code
 - **Worker**: gemini_cli + argus (search backend)
 - **Review**: claude_code (optional, for synthesis)
 - **Use when**: Need to understand a domain, gather information, investigate options
 
 ### `search_sweep` — Quick Search Scan
-- **Lane**: research
+- **Lane**: research | **Category**: research
 - **Planner**: None
 - **Worker**: argus + cheap summarizer
 - **Review**: claude_code (optional)
 - **Use when**: Quick fact-checking, finding specific docs, looking up syntax
 
 ### `implement_small` — Bounded Implementation
-- **Lane**: cheap
+- **Lane**: cheap | **Category**: coding
 - **Planner**: claude_code (for task decomposition)
-- **Worker**: cheap pool (MiniMax, MiMo, StepFun, etc.)
+- **Worker**: cheap pool (codex, gemini_cli, glm_claude)
 - **Review**: claude_code (required)
 - **Use when**: Small code change, single file, clear requirements, isolated scope
 - **Max scope**: Single module, well-defined inputs/outputs
 
 ### `implement_medium` — Medium Implementation
-- **Lane**: balanced
+- **Lane**: balanced | **Category**: coding
 - **Planner**: claude_code (required)
-- **Worker**: balanced pool (Gemini Flash, Codex, MiniMax)
+- **Worker**: balanced pool (codex, gemini_cli)
 - **Review**: claude_code (required)
 - **Use when**: Multi-file change, cross-cutting concern, moderate complexity
 
 ### `test_write` — Test Generation
-- **Lane**: cheap
+- **Lane**: cheap | **Category**: coding
 - **Planner**: claude_code (for test strategy)
 - **Worker**: cheap pool
 - **Review**: claude_code
 - **Use when**: Writing tests for existing code, test scaffolding
 
 ### `review_diff` — Code Review
-- **Lane**: premium
+- **Lane**: premium | **Category**: review
 - **Planner**: None
 - **Worker**: claude_code or strong reviewer
 - **Review**: claude_code (final say)
 - **Use when**: Adversarial review, quality gate, challenge pass
 
 ### `doc_draft` — Documentation Draft
-- **Lane**: cheap
+- **Lane**: cheap | **Category**: writing
 - **Planner**: None
 - **Worker**: cheap pool
 - **Review**: claude_code (optional polish)
 - **Use when**: Writing README sections, API docs, inline comments
 
 ### `summarize_findings` — Result Summarization
-- **Lane**: cheap
+- **Lane**: cheap | **Category**: writing
 - **Planner**: None
 - **Worker**: cheap pool
 - **Review**: None

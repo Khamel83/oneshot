@@ -17,6 +17,14 @@ class RiskLevel(str, Enum):
     high = "high"
 
 
+class TaskCategory(str, Enum):
+    coding = "coding"
+    research = "research"
+    writing = "writing"
+    review = "review"
+    general = "general"
+
+
 class TaskClass(str, Enum):
     plan = "plan"
     research = "research"
@@ -38,6 +46,7 @@ class Task:
     requires_review: bool = True
     requires_search: bool = False
     risk_level: RiskLevel = RiskLevel.medium
+    category: TaskCategory = TaskCategory.general
 
 
 # Routing contract: task_class -> default lane
@@ -102,3 +111,66 @@ def infer_risk(description: str, files: list[str] = None) -> RiskLevel:
             return RiskLevel.low
 
     return RiskLevel.medium
+
+
+# Category assignment: task_class -> default category
+CATEGORY_ASSIGNMENTS = {
+    TaskClass.plan: TaskCategory.general,
+    TaskClass.research: TaskCategory.research,
+    TaskClass.search_sweep: TaskCategory.research,
+    TaskClass.implement_small: TaskCategory.coding,
+    TaskClass.implement_medium: TaskCategory.coding,
+    TaskClass.test_write: TaskCategory.coding,
+    TaskClass.review_diff: TaskCategory.review,
+    TaskClass.doc_draft: TaskCategory.writing,
+    TaskClass.summarize_findings: TaskCategory.writing,
+}
+
+CODING_KEYWORDS = [
+    "implement", "code", "fix", "refactor", "bug", "feature", "add function",
+    "add method", "add class", "write test", "create test", "build", "api",
+    "endpoint", "handler", "migrate", "schema", "query", "database",
+]
+
+RESEARCH_KEYWORDS = [
+    "research", "investigate", "explore", "search", "find", "look up",
+    "discover", "understand", "learn about", "compare", "evaluate",
+    "benchmark", "profile", "analyze",
+]
+
+WRITING_KEYWORDS = [
+    "document", "write doc", "readme", "comment", "summarize", "draft",
+    "write up", "explain", "describe", "notes", "synthesis",
+]
+
+REVIEW_KEYWORDS = [
+    "review", "audit", "inspect", "check", "verify", "validate",
+    "quality", "challenge", "adversarial",
+]
+
+
+def infer_category(description: str) -> TaskCategory:
+    """Infer task category from description keywords.
+
+    Priority: coding > research > writing > review > general.
+    First keyword match wins within a category; coding keywords checked first.
+    """
+    desc_lower = description.lower()
+
+    for kw in CODING_KEYWORDS:
+        if kw in desc_lower:
+            return TaskCategory.coding
+
+    for kw in RESEARCH_KEYWORDS:
+        if kw in desc_lower:
+            return TaskCategory.research
+
+    for kw in WRITING_KEYWORDS:
+        if kw in desc_lower:
+            return TaskCategory.writing
+
+    for kw in REVIEW_KEYWORDS:
+        if kw in desc_lower:
+            return TaskCategory.review
+
+    return TaskCategory.general

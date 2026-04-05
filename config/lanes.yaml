@@ -6,6 +6,12 @@ lanes:
     strategy: first_available
     fallback_lane: null  # top tier, no escalation
     max_parallel: 2
+    category_preference:
+      coding: [claude_code, codex]
+      research: [claude_code, codex]
+      writing: [claude_code, codex]
+      review: [claude_code, codex]
+      general: [claude_code, codex]
 
   balanced:
     planner: claude_code
@@ -14,19 +20,31 @@ lanes:
     strategy: first_available
     fallback_lane: premium
     max_parallel: 3
+    category_preference:
+      coding: [codex, gemini_cli]
+      research: [gemini_cli, codex]
+      writing: [gemini_cli, codex]
+      review: [codex, gemini_cli]
+      general: [codex, gemini_cli]
 
   cheap:
     planner: claude_code
     review_with: claude_code
-    # Priority: paid-subscription workers first (no extra cost), then free ZAI, then paid APIs
+    # Priority: paid-subscription workers first (no extra cost), then free ZAI
     # gemini_cli: Google AI Pro (paid until EOY 2026)
     # codex: ChatGPT Plus $20/mo
     # glm_claude: ZAI GLM-5-turbo, claude CLI harness, free until 2026-05-02
-    # claw_code: last resort — paid OpenRouter APIs
-    worker_pool: [gemini_cli, codex, glm_claude, claw_code]
+    # claw_code: available but manual opt-in only (not in pool)
+    worker_pool: [gemini_cli, codex, glm_claude]
     strategy: first_available
     fallback_lane: balanced
     max_parallel: 3
+    category_preference:
+      coding: [codex, gemini_cli, glm_claude]
+      research: [gemini_cli, codex, glm_claude]
+      writing: [gemini_cli, codex, glm_claude]
+      review: [codex, glm_claude, gemini_cli]
+      general: [gemini_cli, codex, glm_claude]
 
   research:
     planner: claude_code
@@ -36,3 +54,9 @@ lanes:
     strategy: first_available
     fallback_lane: balanced
     max_parallel: 3
+    category_preference:
+      coding: [codex, gemini_cli]
+      research: [gemini_cli, codex]
+      writing: [gemini_cli, codex]
+      review: [codex, gemini_cli]
+      general: [gemini_cli, codex]
