@@ -29,3 +29,11 @@ workers:
     role: worker
     harness: claw_code
     install_path: ~/github/claw-code-agent
+
+  glm:
+    host: localhost
+    transport: local
+    role: worker
+    harness: glm_claude          # claude CLI + ZAI backend
+    model: glm-5-turbo
+    plan_expires: "2026-05-02"   # GLM Coding Plan expiry — reassess or renew before this date

@@ -11,8 +11,17 @@ This is a DRY reference — skills include it by mention, not import.
 command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
 command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
 [ -d ~/github/claw-code-agent/src ] && echo "claw_code: yes" || echo "claw_code: no"
+[ -n "$ZAI_API_KEY" ] && echo "zai: yes" || echo "zai: no"
+[ -n "$OPENROUTER_API_KEY" ] && echo "openrouter: yes" || echo "openrouter: no"
 python -c "from core.search.argus_client import is_available; print('argus:', is_available())" 2>/dev/null || echo "argus: no"
 ```
+
+**Fallback chain for cheap lane**: codex → gemini_cli → claw_code
+Within claw_code, model routing is automatic:
+- GLM models (`glm-5.1`, `glm-4.7`, etc.) → ZAI endpoint (free on plan)
+- Everything else → OpenRouter (paid)
+
+`strategy: first_available` is implemented in `core/dispatch/run.py`.
 
 Also read `config/workers.yaml` for machine-level worker placement.
 
@@ -37,12 +46,46 @@ Returns JSON: `{task_class, lane, workers[], review_with, search_backend, fallba
 
 ## Lane Summary
 
-| Lane | Planner | Workers | Review |
-|------|---------|---------|--------|
+| Lane | Planner | Workers (first_available order) | Review |
+|------|---------|----------------------------------|--------|
 | premium | claude_code | claude_code, codex | claude_code |
-| balanced | claude_code | opencode_gemini_flash, codex, opencode_minimax | claude_code |
-| cheap | claude_code | claw_code, gemini_cli, codex | claude_code |
-| research | claude_code | gemini_cli, opencode_gemini_flash_lite | claude_code |
+| balanced | claude_code | codex, gemini_cli | claude_code |
+| cheap | claude_code | gemini_cli → codex → glm_claude → claw_code | claude_code |
+| research | claude_code | gemini_cli, codex | claude_code |
+
+**glm_claude**: `claude` CLI running on ZAI/GLM-5-turbo via `ANTHROPIC_BASE_URL`. Full native toolchain (bash, read, edit, glob, grep, git). Free on GLM Coding Plan (expires **2026-05-02**). Same dispatch pattern as codex/gemini — `claude --print --dangerously-skip-permissions "prompt"`.
+
+## claw_code Worker Model Priority
+
+Used when codex and gemini_cli are unavailable. Priority order in `config/models.yaml`:
+
+**ZAI (free on GLM Coding Plan, expires 2026-05-02):**
+
+glm_claude harness → `api.z.ai/api/anthropic` (Anthropic-compat, full claude CLI):
+
+| Model | Cost | Strengths |
+|-------|------|-----------|
+| glm-5-turbo | free | fast, strong coding+reasoning — **default** |
+
+claw_code harness → `api.z.ai/api/coding/paas/v4` (OpenAI-compat, claw-code-agent):
+
+| Model | Cost | Strengths |
+|-------|------|-----------|
+| glm-5-turbo | free | **default fallback** |
+| glm-5.1 | free | deep reasoning |
+| glm-4.7 | free | balanced |
+| glm-4.5-air | free | throughput |
+
+**OpenRouter (paid) — routed to `openrouter.ai/api/v1`:**
+
+| Model | Input/M | Output/M | Strengths |
+|-------|---------|----------|-----------|
+| deepseek/deepseek-v3.2 | $0.26 | $0.38 | coding, low-cost |
+| google/gemini-2.5-flash-lite | $0.10 | $0.40 | throughput, cheapest |
+| minimax/minimax-m2.7 | $0.30 | $1.20 | long context |
+| moonshotai/kimi-k2.5 | $0.38 | $1.72 | strong agentic |
+
+All models support tool calling. Key env vars: `ZAI_API_KEY` (in `research_keys.env`), `OPENROUTER_API_KEY` (in `services.env`).
 
 ---
 

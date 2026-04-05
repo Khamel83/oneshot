@@ -1,13 +1,87 @@
 models:
+  # ZAI GLM models — free on GLM Coding Plan, OpenAI-compatible via api.z.ai/api/coding/paas/v4
+  # ZAI GLM Coding Plan — expires 2026-05-02. Reassess/renew before that date.
+  # Endpoint: https://api.z.ai/api/anthropic (Anthropic-compatible, use as claude CLI backend)
+  #           https://api.z.ai/api/coding/paas/v4 (OpenAI-compatible, use with claw-code-agent)
+  zai:glm-5-turbo:
+    lane: cheap
+    strengths: [coding, reasoning, agentic, instruction_following]
+    max_task_size: large
+    can_plan: true               # can run as full claude CLI session via glm_claude harness
+    can_review: true
+    tool_calling: true
+    context_window: 200k
+    max_tokens: 131072
+    latency_tier: fast
+    pricing_per_m: {input: 0, output: 0}  # included in GLM Coding Plan (expires 2026-05-02)
+
+  zai:glm-5.1:
+    lane: cheap
+    strengths: [coding, reasoning, agentic, instruction_following]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 200k
+    max_tokens: 131072
+    latency_tier: medium
+    pricing_per_m: {input: 0, output: 0}
+
+  zai:glm-4.7:
+    lane: cheap
+    strengths: [coding, reasoning, instruction_following]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 200k
+    max_tokens: 131072
+    latency_tier: medium
+    pricing_per_m: {input: 0, output: 0}
+
+  zai:glm-4.5-air:
+    lane: cheap
+    strengths: [throughput, low_latency]
+    max_task_size: small
+    can_plan: false
+    can_review: false
+    tool_calling: true
+    context_window: 200k
+    latency_tier: fast
+    pricing_per_m: {input: 0, output: 0}
+
   openrouter:minimax/minimax-m2.7:
     lane: cheap
     strengths: [coding, agentic, long_context]
-    weaknesses: [unknown_tool_stability]
     max_task_size: medium
     can_plan: false
     can_review: true
+    tool_calling: true
     context_window: 1m
     latency_tier: medium
+    pricing_per_m: {input: 0.30, output: 1.20}
+
+  openrouter:deepseek/deepseek-v3.2:
+    lane: cheap
+    strengths: [coding, instruction_following, agentic_tool_use, low_cost]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 128k
+    latency_tier: medium
+    pricing_per_m: {input: 0.26, output: 0.38}
+
+  openrouter:moonshotai/kimi-k2.5:
+    lane: cheap
+    strengths: [coding, long_context, agentic]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 131k
+    latency_tier: medium
+    pricing_per_m: {input: 0.3827, output: 1.72}
 
   openrouter:stepfun/step-3.5-flash:
     lane: cheap
@@ -33,8 +107,10 @@ models:
     max_task_size: small
     can_plan: false
     can_review: false
+    tool_calling: true
     context_window: 1m
     latency_tier: fast
+    pricing_per_m: {input: 0.10, output: 0.40}
 
   openrouter:google/gemini-2.5-flash:
     lane: balanced
@@ -53,10 +129,37 @@ models:
     context_window: 200k
     latency_tier: slow
 
-# Claw Code Agent — model config (model specified per-dispatch or via OPENAI_MODEL)
+# Claw Code Agent — routes to ZAI (GLM, free) or OpenRouter (paid) based on model
+# Fallback worker: used when codex and gemini_cli are unavailable
 claw_code:
-    base_url: https://openrouter.ai/api/v1
-    default_model: ""  # must specify per-dispatch or via OPENAI_MODEL env
-    supported_models: [openai/gpt-4o-mini, anthropic/claude-haiku-4-5, google/gemini-2.5-flash]
+    # GLM models → ZAI endpoint (free on plan)
+    zai_base_url: https://api.z.ai/api/coding/paas/v4
+    zai_key_env: ZAI_API_KEY
+    # Other models → OpenRouter
+    openrouter_base_url: https://openrouter.ai/api/v1
+    openrouter_key_env: OPENROUTER_API_KEY
+    default_model: glm-5-turbo  # free on plan (expires 2026-05-02), fast, strong
+    # Fallback priority: free ZAI models first, then paid OpenRouter
+    fallback_priority:
+      - glm-5-turbo           # free — fast, strong (plan expires 2026-05-02)
+      - glm-5.1               # free — deep reasoning fallback
+      - glm-4.7               # free — balanced
+      - deepseek/deepseek-v3.2       # $0.26/$0.38/M — best paid value
+      - google/gemini-2.5-flash-lite  # $0.10/$0.40/M — cheapest paid
+      - minimax/minimax-m2.7          # $0.30/$1.20/M — long context
+      - moonshotai/kimi-k2.5          # $0.38/$1.72/M — strong agentic
+    supported_models:
+      # ZAI (free on plan until 2026-05-02)
+      - glm-5-turbo
+      - glm-5.1
+      - glm-4.7
+      - glm-4.5-air
+      # OpenRouter (paid)
+      - deepseek/deepseek-v3.2
+      - google/gemini-2.5-flash-lite
+      - minimax/minimax-m2.7
+      - moonshotai/kimi-k2.5
+      - openai/gpt-4o-mini
+      - google/gemini-2.5-flash
     harness: claw_code
     install_path: ~/github/claw-code-agent

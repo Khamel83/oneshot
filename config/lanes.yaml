@@ -18,7 +18,12 @@ lanes:
   cheap:
     planner: claude_code
     review_with: claude_code
-    worker_pool: [claw_code, gemini_cli, codex]
+    # Priority: paid-subscription workers first (no extra cost), then free ZAI, then paid APIs
+    # gemini_cli: Google AI Pro (paid until EOY 2026)
+    # codex: ChatGPT Plus $20/mo
+    # glm_claude: ZAI GLM-5-turbo, claude CLI harness, free until 2026-05-02
+    # claw_code: last resort — paid OpenRouter APIs
+    worker_pool: [gemini_cli, codex, glm_claude, claw_code]
     strategy: first_available
     fallback_lane: balanced
     max_parallel: 3

@@ -9,6 +9,7 @@ Usage:
 import argparse
 import json
 import os
+import shlex
 import subprocess
 import sys
 import time
@@ -57,20 +58,89 @@ def gemini_command(prompt: str, output_file: str) -> list[str]:
     ]
 
 
+ZAI_MODELS = {"glm-5.1", "glm-5", "glm-5-turbo", "glm-4.7", "glm-4.6", "glm-4.5", "glm-4.5-air"}
+ZAI_BASE_URL = "https://api.z.ai/api/coding/paas/v4"          # OpenAI-compatible (claw-code-agent)
+ZAI_ANTHROPIC_URL = "https://api.z.ai/api/anthropic"           # Anthropic-compatible (claude CLI)
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+
 def claw_code_command(prompt: str, output_file: str, model: str = "") -> list[str]:
-    """Build Claw Code Agent CLI command."""
+    """Build Claw Code Agent CLI command.
+
+    Routes GLM models to ZAI (free on plan), everything else to OpenRouter.
+    """
     install = CLAW_INSTALL_PATH
     cwd = os.getcwd()
-    model_part = f"OPENAI_MODEL={model} " if model else ""
+    resolved_model = model or os.environ.get("OPENAI_MODEL", "glm-5.1")
+
+    if resolved_model in ZAI_MODELS:
+        base_url = ZAI_BASE_URL
+        api_key = os.environ.get("ZAI_API_KEY", "")
+    else:
+        base_url = OPENROUTER_BASE_URL
+        api_key = os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
+
+    key_part = f"OPENAI_API_KEY={shlex.quote(api_key)} " if api_key else ""
     return [
         "bash", "-c",
         f"cd {install} && "
-        f"{model_part}"
-        f"OPENAI_BASE_URL=https://openrouter.ai/api/v1 "
+        f"{key_part}"
+        f"OPENAI_MODEL={shlex.quote(resolved_model)} "
+        f"OPENAI_BASE_URL={shlex.quote(base_url)} "
         f"python3 -m src.main agent {json.dumps(prompt)} "
         f"--cwd {cwd} --allow-write --allow-shell "
         f"> {output_file} 2>/dev/null"
     ]
+
+
+def glm_claude_command(prompt: str, output_file: str, model: str = "glm-5-turbo") -> list[str]:
+    """Run claude CLI with ZAI as the Anthropic-compatible backend.
+
+    This gives a full Claude Code session (all native tools: bash, read, edit, glob, grep)
+    running on GLM-5-turbo via ZAI — free on the GLM Coding Plan (expires 2026-05-02).
+    Equivalent to how codex/gemini are used but with the full claude toolchain.
+    """
+    zai_key = os.environ.get("ZAI_API_KEY", "")
+    return [
+        "bash", "-c",
+        f"ANTHROPIC_AUTH_TOKEN={shlex.quote(zai_key)} "
+        f"ANTHROPIC_BASE_URL={shlex.quote(ZAI_ANTHROPIC_URL)} "
+        f"ANTHROPIC_DEFAULT_SONNET_MODEL={shlex.quote(model)} "
+        f"ANTHROPIC_DEFAULT_OPUS_MODEL={shlex.quote(model)} "
+        f"ANTHROPIC_DEFAULT_HAIKU_MODEL=glm-4.5-air "
+        f"claude --print --dangerously-skip-permissions "
+        f"{json.dumps(prompt)} "
+        f"> {output_file} 2>/dev/null"
+    ]
+
+
+def worker_available(worker: str) -> bool:
+    """Check if a worker is available on this machine."""
+    if worker == "codex":
+        return subprocess.run(
+            ["bash", "-c", "command -v codex"],
+            capture_output=True
+        ).returncode == 0
+    elif worker == "gemini_cli":
+        return subprocess.run(
+            ["bash", "-c", "command -v gemini"],
+            capture_output=True
+        ).returncode == 0
+    elif worker == "claw_code":
+        has_install = (CLAW_INSTALL_PATH / "src" / "main.py").exists()
+        has_key = bool(
+            os.environ.get("ZAI_API_KEY")
+            or os.environ.get("OPENROUTER_API_KEY")
+            or os.environ.get("OPENAI_API_KEY")
+        )
+        return has_install and has_key
+    elif worker == "glm_claude":
+        has_claude = subprocess.run(
+            ["bash", "-c", "command -v claude"], capture_output=True
+        ).returncode == 0
+        has_key = bool(os.environ.get("ZAI_API_KEY"))
+        return has_claude and has_key
+    return True
 
 
 def clean_env() -> dict[str, str]:
@@ -224,6 +294,9 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
     elif worker == "claw_code":
         model = task.get("model", os.environ.get("OPENAI_MODEL", ""))
         cmd = claw_code_command(prompt, output_file, model=model)
+    elif worker == "glm_claude":
+        model = task.get("model", "glm-5-turbo")
+        cmd = glm_claude_command(prompt, output_file, model=model)
     else:
         return {"task_id": task_id, "worker": worker, "status": "failed",
                 "error": f"Unknown worker: {worker}"}
@@ -247,7 +320,7 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
     # Parse output
     if worker == "codex":
         parsed = parse_codex_output(output_file)
-    elif worker == "claw_code":
+    elif worker in ("claw_code", "glm_claude"):
         parsed = parse_claw_code_output(output_file)
     else:
         parsed = parse_gemini_output(output_file)
@@ -381,8 +454,15 @@ def main():
         }, indent=2))
         return
 
-    # Build task
-    worker = args.worker or resolution["workers"][0]
+    # Pick first available worker (implements strategy: first_available)
+    worker = args.worker
+    if not worker:
+        for w in resolution["workers"]:
+            if worker_available(w):
+                worker = w
+                break
+        if not worker:
+            worker = resolution["workers"][0]  # try anyway, may fail gracefully
     task_id = f"{args.task_class}-{int(time.time())}"
 
     tasks = []
