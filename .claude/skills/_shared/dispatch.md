@@ -109,7 +109,7 @@ codex exec --json --sandbox danger-full-access \
 ```bash
 gemini -p "{prompt}" \
   --output-format json \
-  --yolo \
+  --approval-mode yolo \
   > /tmp/dispatch-{id}.json 2>/dev/null
 ```
 
@@ -117,7 +117,7 @@ gemini -p "{prompt}" \
 ```bash
 gemini -p "{prompt}" \
   --output-format stream-json \
-  --yolo \
+  --approval-mode yolo \
   > /tmp/dispatch-{id}.jsonl 2>/dev/null
 ```
 

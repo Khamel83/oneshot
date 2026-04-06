@@ -106,6 +106,11 @@ Repeat until no unblocked tasks remain:
      - Otherwise → build self-contained prompt → dispatch to Codex/Gemini
      - For parallel tasks → use `python3 -m core.dispatch.run --prompts-file batch.json`
      - Capture output, validate, write manifest to `1shot/dispatch/`
+   - **CRITICAL: Use subprocess dispatch, NOT Agent tool subagents.**
+     The dispatch runner (`core.dispatch.run`) spawns lightweight CLI processes.
+     The Agent tool spawns full Claude Code sessions — only use Agent tool for
+     complex multi-step reasoning that the dispatch runner can't handle.
+     For batch file processing, extraction, summarization → always use `core.dispatch.run`.
 4. **Review**: If task requires review, dispatch review to reviewer (see dispatch.md Step 7)
 5. **Scope check** — Before verification, compare actual changes against plan:
    ```bash

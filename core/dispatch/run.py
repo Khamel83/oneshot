@@ -53,7 +53,7 @@ def gemini_command(prompt: str, output_file: str) -> list[str]:
     return [
         "bash", "-c",
         f"gemini -p {json.dumps(prompt)} "
-        f"--output-format json --yolo "
+        f"--output-format json --approval-mode yolo "
         f"> {output_file} 2>/dev/null"
     ]
 
@@ -101,6 +101,15 @@ def glm_claude_command(prompt: str, output_file: str, model: str = "glm-5-turbo"
     Equivalent to how codex/gemini are used but with the full claude toolchain.
     """
     zai_key = os.environ.get("ZAI_API_KEY", "")
+    if not zai_key:
+        # Fall back to vault
+        try:
+            zai_key = subprocess.run(
+                ["bash", "-c", "secrets get ZAI_API_KEY 2>/dev/null"],
+                capture_output=True, text=True
+            ).stdout.strip()
+        except Exception:
+            pass
     return [
         "bash", "-c",
         f"ANTHROPIC_AUTH_TOKEN={shlex.quote(zai_key)} "
@@ -136,13 +145,28 @@ def worker_available(worker: str) -> bool:
             os.environ.get("ZAI_API_KEY")
             or os.environ.get("OPENROUTER_API_KEY")
             or os.environ.get("OPENAI_API_KEY")
+            or subprocess.run(
+                ["bash", "-c", "secrets get ZAI_API_KEY 2>/dev/null"],
+                capture_output=True
+            ).stdout.strip()
+            or subprocess.run(
+                ["bash", "-c", "secrets get OPENROUTER_API_KEY 2>/dev/null"],
+                capture_output=True
+            ).stdout.strip()
         )
         return has_install and has_key
     elif worker == "glm_claude":
         has_claude = subprocess.run(
             ["bash", "-c", "command -v claude"], capture_output=True
         ).returncode == 0
-        has_key = bool(os.environ.get("ZAI_API_KEY"))
+        # Check env first, then fall back to vault (secrets CLI)
+        has_key = bool(
+            os.environ.get("ZAI_API_KEY")
+            or subprocess.run(
+                ["bash", "-c", "secrets get ZAI_API_KEY 2>/dev/null"],
+                capture_output=True
+            ).stdout.strip()
+        )
         if not has_claude or not has_key:
             return False
         # Check ZAI plan expiry from workers.yaml
