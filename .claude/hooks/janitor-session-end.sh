@@ -1,63 +1,32 @@
 #!/bin/bash
-# SessionEnd hook: processes accumulated events when a Claude Code session ends.
-# Runs session digest and file change analysis via openrouter/free.
-# This fires automatically when you exit Claude, even without /handoff.
+# SessionEnd hook: lightweight session wrap-up.
+# Only writes a timestamp marker — heavy processing happens via cron.
 #
-# INSTALL: Add to ~/.claude/settings.json under SessionEnd hooks
+# The cron job (janitor-cron.sh) is the real processor.
+# This hook just marks the session as ended so the cron knows
+# there's unprocessed data.
 
 # Find project root
 project_dir="$PWD"
 while [ "$project_dir" != "/" ]; do
-  if [ -d "$project_dir/.git" ]; then
-    break
-  fi
+  [ -d "$project_dir/.git" ] && break
   project_dir=$(dirname "$project_dir")
 done
-
-if [ "$project_dir" = "/" ]; then
-  exit 0
-fi
+[ "$project_dir" = "/" ] && exit 0
 
 events_file="$project_dir/.oneshot/events.jsonl"
 
-# Skip if no events to process
-if [ ! -f "$events_file" ] || [ ! -s "$events_file" ]; then
-  exit 0
-fi
+# Skip if no events
+[ ! -f "$events_file" ] && exit 0
 
-# Count events — skip if too few to be worth processing
-event_count=$(wc -l < "$events_file" | tr -d ' ')
-if [ "$event_count" -lt 3 ]; then
-  exit 0
-fi
+line_count=$(wc -l < "$events_file" | tr -d ' ')
+[ "$line_count" -lt 3 ] && exit 0
 
-# Run janitor jobs in the background so they don't block session exit
-# Use nohup so they survive the session process exiting
-(
-  cd "$project_dir" 2>/dev/null || exit 0
+# Just mark session end — cron does the actual processing
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+session_id="${CLAUDE_CODE_SESSION_ID:-unknown}"
 
-  # Generate session digest
-  python3 -c "
-from core.janitor.recorder import SessionRecorder
-from core.janitor.jobs import generate_session_digest, analyze_file_changes
-
-try:
-    r = SessionRecorder()
-    digest = generate_session_digest(r)
-
-    # Save digest to .oneshot/last-digest.md
-    with open('.oneshot/last-digest.md', 'w') as f:
-        f.write(digest)
-
-    # Analyze file changes
-    changes = analyze_file_changes()
-    import json
-    with open('.oneshot/last-changes.json', 'w') as f:
-        json.dump(changes, f, indent=2)
-
-except Exception as e:
-    print(f'[janitor session-end] error: {e}')
-" 2>>"$project_dir/.oneshot/janitor-errors.log"
-) &
+printf '{"ts":"%s","session":"%s","type":"session_end","content":"Session ended","meta":{"auto":true},"files":[]}\n' \
+  "$timestamp" "$session_id" >> "$events_file"
 
 exit 0

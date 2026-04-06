@@ -7,12 +7,13 @@ more than model quality.
 Rate limits (openrouter/free):
   - 1000 requests/day
   - 20 requests/minute
-Typical session usage: 5-10 calls. Tracked loosely via .oneshot/usage.jsonl.
+Tracked loosely via .oneshot/usage.jsonl with in-memory caching.
 """
 
 import json
 import os
 import re
+import subprocess
 import time
 import urllib.request
 import urllib.error
@@ -26,24 +27,34 @@ ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 DAILY_LIMIT = 1000
 MINUTE_LIMIT = 20
 
-# Try env first, then vault
-DEFAULT_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+# --- Cached API key (avoid subprocess on every call) ---
+_cached_api_key: str | None = None
 
 
 def _get_api_key() -> str:
-    """Get OpenRouter API key from environment or vault."""
-    if DEFAULT_API_KEY:
-        return DEFAULT_API_KEY
-    import subprocess
+    """Get OpenRouter API key from environment or vault. Cached after first lookup."""
+    global _cached_api_key
+    if _cached_api_key:
+        return _cached_api_key
+
+    # Try env first
+    key = os.environ.get("OPENROUTER_API_KEY", "")
+    if key:
+        _cached_api_key = key
+        return key
+
+    # Try vault (one subprocess, cached forever after)
     try:
         r = subprocess.run(
             ["secrets", "get", "OPENROUTER_API_KEY"],
             capture_output=True, text=True, timeout=5
         )
         if r.returncode == 0 and r.stdout.strip():
-            return r.stdout.strip()
+            _cached_api_key = r.stdout.strip()
+            return _cached_api_key
     except (FileNotFoundError, subprocess.TimeoutExpired):
         pass
+
     raise RuntimeError("No OPENROUTER_API_KEY found. Set env var or add to vault.")
 
 
@@ -58,16 +69,32 @@ def _usage_log_path() -> Path:
     return Path(".oneshot/usage.jsonl")
 
 
+# --- Cached rate limit counters (avoid O(n) file scan on every call) ---
+_rate_cache: dict = {"minute_count": 0, "day_count": 0, "cached_at": 0}
+_RATE_TTL = 5  # seconds
+
+
 def _check_rate_limit() -> bool:
-    """Check if we're within rate limits. Returns True if OK to proceed."""
-    path = _usage_log_path()
-    if not path.exists():
+    """Check if we're within rate limits. Cached — only reads file every 5s."""
+    global _rate_cache
+    now = time.time()
+
+    # Return cached counts if fresh
+    if now - _rate_cache["cached_at"] < _RATE_TTL:
+        if _rate_cache["minute_count"] >= MINUTE_LIMIT:
+            return False
+        if _rate_cache["day_count"] >= DAILY_LIMIT:
+            return False
         return True
 
-    now = time.time()
+    # Cache expired — re-read file
+    path = _usage_log_path()
+    if not path.exists():
+        _rate_cache = {"minute_count": 0, "day_count": 0, "cached_at": now}
+        return True
+
     minute_ago = now - 60
     day_ago = now - 86400
-
     recent_minute = 0
     recent_day = 0
 
@@ -77,14 +104,19 @@ def _check_rate_limit() -> bool:
             if not line:
                 continue
             try:
-                entry = json.loads(line)
-                ts = entry.get("ts", 0)
+                ts = float(line.split('"ts":', 1)[1].split(",")[0])
                 if ts > minute_ago:
                     recent_minute += 1
                 if ts > day_ago:
                     recent_day += 1
-            except (json.JSONDecodeError, KeyError):
+            except (IndexError, ValueError):
                 continue
+
+    _rate_cache = {
+        "minute_count": recent_minute,
+        "day_count": recent_day,
+        "cached_at": now,
+    }
 
     if recent_minute >= MINUTE_LIMIT:
         print(f"[janitor] Rate limited: {recent_minute}/{MINUTE_LIMIT} per minute")
@@ -109,17 +141,20 @@ def _log_usage(model: str, tokens_in: int = 0, tokens_out: int = 0):
     with open(path, "a") as f:
         f.write(json.dumps(entry, separators=(",", ":")) + "\n")
 
+    # Invalidate rate cache so next check picks up new entry
+    global _rate_cache
+    _rate_cache["cached_at"] = 0
+
 
 def get_usage_stats() -> dict:
     """Get current usage statistics."""
     path = _usage_log_path()
     if not path.exists():
-        return {"today": 0, "this_minute": 0, "daily_limit": DAILY_LIMIT, "minute_limit": MINUTE_LIMIT}
+        return {"today": 0, "this_minute": 0, "total": 0, "daily_limit": DAILY_LIMIT, "minute_limit": MINUTE_LIMIT}
 
     now = time.time()
     minute_ago = now - 60
     day_ago = now - 86400
-
     recent_minute = 0
     recent_day = 0
     total = 0
@@ -130,14 +165,13 @@ def get_usage_stats() -> dict:
             if not line:
                 continue
             try:
-                entry = json.loads(line)
-                ts = entry.get("ts", 0)
+                ts = float(line.split('"ts":', 1)[1].split(",")[0])
                 total += 1
                 if ts > minute_ago:
                     recent_minute += 1
                 if ts > day_ago:
                     recent_day += 1
-            except (json.JSONDecodeError, KeyError):
+            except (IndexError, ValueError):
                 continue
 
     return {
@@ -208,7 +242,6 @@ def call_free(
                 content = data["choices"][0]["message"]["content"]
                 model_used = data.get("model", "unknown")
 
-                # Log usage
                 usage = data.get("usage", {})
                 _log_usage(
                     model_used,

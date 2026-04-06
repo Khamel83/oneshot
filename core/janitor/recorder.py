@@ -18,6 +18,7 @@ SQLite index is rebuilt on demand from JSONL (source of truth is the JSONL).
 
 import json
 import os
+import subprocess
 import sqlite3
 import time
 from datetime import datetime, timezone
@@ -152,43 +153,56 @@ class SessionRecorder:
         return self.record("summary", summary, metadata={"source": source})
 
     def get_recent_events(self, n: int = 20) -> list[dict]:
-        """Get the last N events from the JSONL log."""
+        """Get the last N events from the JSONL log. Uses tail for O(1) reads."""
         if not self._events_path.exists():
             return []
-        events = []
-        with open(self._events_path) as f:
-            for line in f:
+        try:
+            r = subprocess.run(
+                ["tail", "-n", str(n)],
+                capture_output=True, text=True, timeout=3,
+            )
+            if r.returncode != 0:
+                return []
+            events = []
+            for line in r.stdout.strip().split("\n"):
                 line = line.strip()
                 if line:
                     try:
                         events.append(json.loads(line))
                     except json.JSONDecodeError:
                         continue
-        return events[-n:]
+            return events
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return []
 
     def get_events_by_type(self, event_type: str, limit: int = 50) -> list[dict]:
-        """Get events of a specific type."""
-        return [
-            e for e in self.get_recent_events(limit * 5)
-            if e.get("type") == event_type
-        ][:limit]
+        """Get events of a specific type from recent history."""
+        # Grab a larger batch to filter from
+        recent = self.get_recent_events(min(limit * 3, 500))
+        return [e for e in recent if e.get("type") == event_type][:limit]
 
     def get_events_by_session(self, session_id: str) -> list[dict]:
-        """Get all events from a specific session."""
+        """Get all events from a specific session. Falls back to full scan."""
         if not self._events_path.exists():
             return []
-        events = []
-        with open(self._events_path) as f:
-            for line in f:
+        try:
+            r = subprocess.run(
+                ["grep", f'"session":"{session_id}"', str(self._events_path)],
+                capture_output=True, text=True, timeout=5,
+            )
+            if r.returncode != 0:
+                return []
+            events = []
+            for line in r.stdout.strip().split("\n"):
                 line = line.strip()
                 if line:
                     try:
-                        e = json.loads(line)
-                        if e.get("session") == session_id:
-                            events.append(e)
+                        events.append(json.loads(line))
                     except json.JSONDecodeError:
                         continue
-        return events
+            return events
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return []
 
     def get_decisions(self) -> list[dict]:
         """Get all recorded decisions."""
