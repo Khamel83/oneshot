@@ -14,38 +14,18 @@ See @docs/instructions/oneshot.md
 See @docs/meta-harness/eval_framework.md
 See @docs/meta-harness/trace_architecture.md
 
-## What Happens Automatically
+### What This Is
+The eval system lets you (or Claude in a session) verify that changes to the routing and classification code don't break anything. Think of it as tests for the routing layer — same idea as running tests after changing application code.
+
+### What Happens Automatically
 - Every dispatch writes a trace bundle to `eval/traces/{date}/{task_class}-{HHMMSS}-{worker}/`
 - Traces include: `trace.json` (structured metadata), `prompt.md` (rendered prompt), `output.raw` (raw worker output)
+- These accumulate passively — you don't need to do anything with them yet
 
-## What You Need To Do Manually
-- **After changing `core/task_schema.py` keywords**: run `./scripts/eval.sh` — checks classification accuracy against 40 benchmarks
-- **After changing `config/lanes.yaml` routing**: run `./scripts/eval.sh` — checks routing correctness against 10 benchmarks
-- **After changing any config file**: run `./scripts/eval.sh` — cross-validates all YAML against Python enums
-- **If eval regresses**: fix the change or revert. If you accept the regression (rare), save a new baseline with `./scripts/eval.sh --save {description}`
-- **Later — when traces accumulate**: run `grep`/`jq` on `eval/traces/` to see worker success rates, latency patterns, retry rates. No rush on this.
+### What Happens In-Session (Claude runs it, not you)
+When you ask Claude to change `core/task_schema.py` keywords, `config/lanes.yaml`, or routing code, Claude should run `./scripts/eval.sh` afterward to confirm nothing broke. If it regresses, Claude fixes or reverts. You don't need to touch this.
 
-### Eval Commands
-```bash
-./scripts/eval.sh                      # Run all benchmarks
-./scripts/eval.sh --category routing   # Run one category
-./scripts/eval.sh --save baseline      # Save results as named snapshot
-./scripts/eval.sh --compare baseline   # Compare current against snapshot
-```
-
-### Trace Queries (use when you have enough traces)
-```bash
-# Success rate by worker
-grep -rl '"status": "succeeded"' eval/traces/*/ | wc -l
-
-# Failed dispatches
-grep -rl '"status": "failed"' eval/traces/*/
-
-# Specific worker traces
-find eval/traces -name trace.json | xargs grep '"selected_worker": "codex"'
-```
-
-## What's Planned But Not Built Yet
+### What's Planned But Not Built Yet
 - `eval/scripts/worker_stats.py` — aggregate traces into per-worker success rates (needs trace data)
 - `eval/scripts/compare_traces.py` — compare two trace directories (needs trace data)
 - Eval as CI gate in `.github/workflows/ci.yml` (after eval stabilizes)
