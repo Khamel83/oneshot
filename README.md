@@ -42,6 +42,25 @@ Tasks are classified, then routed to lanes:
 
 Config: `config/lanes.yaml`, `config/models.yaml`
 
+### Janitor — Background Intelligence
+
+Janitor runs automatically via Claude Code hooks — no setup or cron needed. It provides session-aware project intelligence:
+
+| Hook | What runs | Cost |
+|------|-----------|------|
+| SessionStart | Test gaps, code smells, config drift, dependency map | $0 (pure compute) |
+| PostToolUse | Records file reads/writes, commits, dead-ends to `.janitor/events.jsonl` | $0 |
+| SessionEnd | Session summary, commit enrichment, pattern mining, onboarding generation | $0 (openrouter/free) |
+| PreCompact | Summarizes decisions/blockers before context compaction | $0 (openrouter/free) |
+
+Output lives in `.janitor/` per project:
+- `events.jsonl` — append-only event log
+- `test-gaps.json`, `code-smells.json`, `config-drift.json`, `dep-graph.json` — computed fresh each session
+- `patterns.json`, `onboarding.md` — LLM-generated daily
+- `CLAUDE.local.md` — auto-generated onboarding summary (survives without janitor)
+
+Requires `OPENROUTER_API_KEY` for LLM jobs (free tier). Pure-compute jobs work without it.
+
 ### Dispatch Protocol
 
 Claude thinks, Codex and Gemini execute. The dispatch protocol (`_shared/dispatch.md`) handles:
@@ -121,7 +140,8 @@ oneshot/
 ├── core/                # Python schemas and utilities
 │   ├── task_schema.py   # Task class definitions
 │   ├── router/          # Lane policy, model registry, CLI resolver
-│   └── dispatch/        # Parallel dispatch runner, output capture, manifests
+│   ├── dispatch/        # Parallel dispatch runner, output capture, manifests
+│   └── janitor/         # Background intelligence (hooks + jobs + recorder)
 ├── docs/instructions/   # Neutral instruction source (authoritative)
 ├── .claude/rules/       # Thin imports to docs/instructions/
 ├── .claude/skills/      # Operator and utility skill prompts
@@ -200,4 +220,4 @@ curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/ones
 
 ---
 
-**v14.1** | Parallel dispatch | Codex + Gemini workers | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
+**v14.3** | Janitor intelligence | Lane routing | Parallel dispatch | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)

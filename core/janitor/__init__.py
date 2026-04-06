@@ -1,13 +1,22 @@
-"""OneShot Janitor — Background intelligence layer.
+"""Janitor — free background intelligence for Claude Code sessions."""
 
-Free model processing for session recording, decision extraction,
-memory hygiene, and project intelligence tasks.
-
-All jobs route to openrouter/free via the janitor lane.
-Cost: $0. Storage: append-only JSONL + SQLite index.
-"""
-
-from core.janitor.recorder import SessionRecorder
+from core.janitor.jobs import (
+    run_session_start,
+    run_session_end,
+    detect_test_gaps,
+    scan_code_smells,
+    detect_config_drift,
+    build_dependency_map,
+)
 from core.janitor.worker import call_free, extract_structured
 
-__all__ = ["SessionRecorder", "call_free", "extract_structured"]
+__all__ = [
+    "run_session_start",
+    "run_session_end",
+    "detect_test_gaps",
+    "scan_code_smells",
+    "detect_config_drift",
+    "build_dependency_map",
+    "call_free",
+    "extract_structured",
+]

@@ -1,5 +1,5 @@
 #!/bin/bash
-# PostToolUse hook: records tool calls to .oneshot/events.jsonl
+# PostToolUse hook: records tool calls to .janitor/events.jsonl
 # Fires AFTER every tool call during a Claude Code session.
 # Optimized: uses printf instead of jq (one process instead of 3-4).
 #
@@ -13,7 +13,7 @@ tool_name="${tool_name%%\"*}"
 
 # Skip noise early — before any further processing
 case "$tool_name" in
-  Glob|Grep|WebFetch|WebSearch|mcp__*|TaskCreate|TaskUpdate|TaskList|TaskGet|CronCreate|CronDelete|CronList|AskUserQuestion)
+  WebFetch|WebSearch|mcp__*|TaskCreate|TaskUpdate|TaskList|TaskGet|CronCreate|CronDelete|CronList|AskUserQuestion)
     exit 0
     ;;
 esac
@@ -26,9 +26,9 @@ while [ "$project_dir" != "/" ]; do
 done
 [ "$project_dir" = "/" ] && exit 0
 
-oneshot_dir="$project_dir/.oneshot"
-events_file="$oneshot_dir/events.jsonl"
-mkdir -p "$oneshot_dir"
+janitor_dir="$project_dir/.janitor"
+events_file="$janitor_dir/events.jsonl"
+mkdir -p "$janitor_dir"
 
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 session_id="${CLAUDE_CODE_SESSION_ID:-$(date +%Y%m%d-%H%M%S)}"
@@ -43,8 +43,44 @@ case "$tool_name" in
     ;;
 esac
 
+# Extract tool_output for dead-end detection (lightweight: just check for failure signals)
+# Strip backslash escapes then check for non-zero exit code
+has_failed_output=0
+if echo "$input" | tr -d '\\' | grep -qE '"exit_code"\s*:\s*[1-9]'; then
+    has_failed_output=1
+fi
+
 # Build event based on tool type
 case "$tool_name" in
+  Glob|Grep)
+    # Dead-end detection: check if results indicate no matches
+    # Extract the pattern/query for context
+    query="${input#*\"pattern\":\"}"
+    query="${query%%\"*}"
+    [ -z "$query" ] && query="${input#*\"glob_pattern\":\"}"
+    query="${query%%\"*}"
+    [ -z "$query" ] && query="${input#*\"query\":\"}"
+    query="${query%%\"*}"
+    query="${query:0:100}"
+
+    # Check for no results in the raw input (no output content after tool_output)
+    is_empty=0
+    case "$input" in
+      *"\"tool_output\":\"\""*|*"\"tool_output\":\"\[\"]"*)
+        is_empty=1
+        ;;
+    esac
+    # Also check for common "no results" messages in output
+    if echo "$input" | grep -qE '"tool_output":"[^"]*([Nn]o (matches|results)|0 results|found 0|empty)'; then
+      is_empty=1
+    fi
+
+    if [ "$is_empty" -eq 1 ] && [ -n "$query" ]; then
+      printf '{"ts":"%s","session":"%s","type":"dead_end","content":"No results for: %s","meta":{"tool":"%s","auto":true},"files":[]}\n' \
+        "$timestamp" "$session_id" "$query" "$tool_name" >> "$events_file"
+    fi
+    exit 0
+    ;;
   Read)
     [ -z "$file_path" ] && exit 0
     printf '{"ts":"%s","session":"%s","type":"file_read","content":"Read %s","meta":{"tool":"Read","auto":true},"files":["%s"]}\n' \
@@ -65,6 +101,11 @@ case "$tool_name" in
     cmd="${input#*\"command\":\"}"
     cmd="${cmd%%\"*}"
     cmd="${cmd:0:200}"
+    # Dead-end detection: failed commands (non-zero exit code)
+    if [ "$has_failed_output" -eq 1 ]; then
+      printf '{"ts":"%s","session":"%s","type":"dead_end","content":"Failed: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
+        "$timestamp" "$session_id" "${cmd:0:100}" >> "$events_file"
+    fi
     case "$cmd" in
       git\ commit*|git\ push*)
         printf '{"ts":"%s","session":"%s","type":"commit","content":"Git: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \

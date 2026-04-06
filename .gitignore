@@ -8,7 +8,8 @@ secrets/*.env
 # Agent working directories (local only)
 .agent/
 .beads/
-.oneshot/  # Janitor runtime data (events.jsonl, intelligence.db, usage.jsonl)
+.oneshot/  # Legacy janitor runtime data (migrated to .janitor/)
+.janitor/  # Janitor runtime data (events.jsonl, intelligence.db, usage.jsonl)
 
 # Output directories (runtime generated, not source)
 dispatch/

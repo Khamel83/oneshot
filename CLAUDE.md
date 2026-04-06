@@ -21,7 +21,11 @@ The eval system lets you (or Claude in a session) verify that changes to the rou
 - Every dispatch writes a trace bundle to `eval/traces/{date}/{task_class}-{HHMMSS}-{worker}/`
 - Traces include: `trace.json` (structured metadata), `prompt.md` (rendered prompt), `output.raw` (raw worker output)
 - These accumulate passively — you don't need to do anything with them yet
-- **Janitor system** records every tool call to `.oneshot/events.jsonl` via hook, processes events with free model via cron. See AGENTS.md "Janitor System" section.
+- **Janitor** (`core/janitor/`) runs background intelligence via Claude Code hooks:
+  - Test gaps, code smells, config drift, dependency map — computed fresh every session start
+  - Session summaries, pattern mining — run at session end via free LLM (if OPENROUTER_API_KEY set)
+  - Raw event log: `.janitor/events.jsonl` — every tool call recorded, append-only
+  - Onboarding summary: `CLAUDE.local.md` — auto-generated daily, survives without janitor installed
 
 ### What Happens In-Session (Claude runs it, not you)
 When you ask Claude to change `core/task_schema.py` keywords, `config/lanes.yaml`, or routing code, Claude should run `./scripts/eval.sh` afterward to confirm nothing broke. If it regresses, Claude fixes or reverts. You don't need to touch this.
@@ -37,3 +41,19 @@ When you ask Claude to change `core/task_schema.py` keywords, `config/lanes.yaml
 ## Tool-Specific (Claude Code)
 See @.claude/rules/khamel-mode.md
 See @.claude/rules/codex.md
+
+## Project Intelligence
+Need to understand what's been happening? Start here:
+
+| Question | Look at |
+|----------|---------|
+| What's the current state of the project? | `CLAUDE.local.md` (auto-generated onboarding summary) |
+| What files were changed recently? | `.janitor/events.jsonl` — grep for `file_written` or `commit` |
+| What decisions were made? | `.janitor/events.jsonl` — grep for `decision` |
+| What's broken or stuck? | `.janitor/events.jsonl` — grep for `blocker` or `dead_end` |
+| What approaches already failed? | `.janitor/events.jsonl` — grep for `dead_end` |
+| What files have no tests? | `.janitor/test-gaps.json` |
+| What files are too big? | `.janitor/code-smells.json` |
+| What config is uncommitted? | `.janitor/config-drift.json` |
+| What files have the most dependents? | `.janitor/dep-graph.json` |
+| What patterns repeat across sessions? | `.janitor/patterns.json` |

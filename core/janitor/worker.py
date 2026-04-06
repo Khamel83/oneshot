@@ -7,55 +7,41 @@ more than model quality.
 Rate limits (openrouter/free):
   - 1000 requests/day
   - 20 requests/minute
-Tracked loosely via .oneshot/usage.jsonl with in-memory caching.
+Tracked via .janitor/usage.jsonl with in-memory caching.
 """
 
 import json
 import os
 import re
-import subprocess
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-# openrouter/free endpoint
 ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 
-# Rate limits
 DAILY_LIMIT = 1000
 MINUTE_LIMIT = 20
 
-# --- Cached API key (avoid subprocess on every call) ---
 _cached_api_key: str | None = None
 
 
 def _get_api_key() -> str:
-    """Get OpenRouter API key from environment or vault. Cached after first lookup."""
+    """Get OpenRouter API key from environment. Cached after first lookup."""
     global _cached_api_key
     if _cached_api_key:
         return _cached_api_key
 
-    # Try env first
     key = os.environ.get("OPENROUTER_API_KEY", "")
-    if key:
-        _cached_api_key = key
-        return key
-
-    # Try vault (one subprocess, cached forever after)
-    try:
-        r = subprocess.run(
-            ["secrets", "get", "OPENROUTER_API_KEY"],
-            capture_output=True, text=True, timeout=5
+    if not key:
+        raise RuntimeError(
+            "No OPENROUTER_API_KEY found. Set it as an environment variable:\n"
+            "  export OPENROUTER_API_KEY=sk-or-...\n"
+            "Get a free key at https://openrouter.ai/keys"
         )
-        if r.returncode == 0 and r.stdout.strip():
-            _cached_api_key = r.stdout.strip()
-            return _cached_api_key
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        pass
-
-    raise RuntimeError("No OPENROUTER_API_KEY found. Set env var or add to vault.")
+    _cached_api_key = key
+    return key
 
 
 def _usage_log_path() -> Path:
@@ -63,15 +49,14 @@ def _usage_log_path() -> Path:
     project = Path(os.getcwd())
     for parent in [project] + list(project.parents):
         if (parent / ".git").exists():
-            d = parent / ".oneshot"
+            d = parent / ".janitor"
             d.mkdir(exist_ok=True)
             return d / "usage.jsonl"
-    return Path(".oneshot/usage.jsonl")
+    return Path(".janitor/usage.jsonl")
 
 
-# --- Cached rate limit counters (avoid O(n) file scan on every call) ---
 _rate_cache: dict = {"minute_count": 0, "day_count": 0, "cached_at": 0}
-_RATE_TTL = 5  # seconds
+_RATE_TTL = 5
 
 
 def _check_rate_limit() -> bool:
@@ -79,7 +64,6 @@ def _check_rate_limit() -> bool:
     global _rate_cache
     now = time.time()
 
-    # Return cached counts if fresh
     if now - _rate_cache["cached_at"] < _RATE_TTL:
         if _rate_cache["minute_count"] >= MINUTE_LIMIT:
             return False
@@ -87,7 +71,6 @@ def _check_rate_limit() -> bool:
             return False
         return True
 
-    # Cache expired — re-read file
     path = _usage_log_path()
     if not path.exists():
         _rate_cache = {"minute_count": 0, "day_count": 0, "cached_at": now}
@@ -124,7 +107,6 @@ def _check_rate_limit() -> bool:
     if recent_day >= DAILY_LIMIT:
         print(f"[janitor] Daily limit reached: {recent_day}/{DAILY_LIMIT}")
         return False
-
     return True
 
 
@@ -141,7 +123,6 @@ def _log_usage(model: str, tokens_in: int = 0, tokens_out: int = 0):
     with open(path, "a") as f:
         f.write(json.dumps(entry, separators=(",", ":")) + "\n")
 
-    # Invalidate rate cache so next check picks up new entry
     global _rate_cache
     _rate_cache["cached_at"] = 0
 
@@ -189,20 +170,7 @@ def call_free(
     max_tokens: int = 1024,
     timeout: int = 30,
 ) -> str:
-    """Send a prompt to openrouter/free and return the response text.
-
-    Args:
-        prompt: The user message to send.
-        system: Optional system prompt for task context.
-        max_tokens: Max response tokens (default 1024).
-        timeout: Per-attempt timeout in seconds (default 30).
-
-    Returns:
-        The model's response text.
-
-    Raises:
-        RuntimeError: If rate limited or API call fails after retries.
-    """
+    """Send a prompt to openrouter/free and return the response text."""
     if not _check_rate_limit():
         raise RuntimeError("Rate limit reached. Wait before retrying.")
 
@@ -213,14 +181,12 @@ def call_free(
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
 
-    payload_dict = {
+    payload = json.dumps({
         "model": "openrouter/free",
         "messages": messages,
         "max_tokens": max_tokens,
         "temperature": 0.1,
-    }
-
-    payload = json.dumps(payload_dict).encode()
+    }).encode()
 
     req = urllib.request.Request(
         ENDPOINT,
@@ -228,13 +194,12 @@ def call_free(
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/Khamel83/oneshot",
-            "X-Title": "OneShot Janitor",
+            "HTTP-Referer": "https://github.com/Khamel83/janitor",
+            "X-Title": "Janitor",
         },
     )
 
     last_error = None
-    model_used = "unknown"
     for attempt in range(3):
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -251,7 +216,7 @@ def call_free(
 
                 if attempt > 0:
                     print(f"[janitor] succeeded on attempt {attempt + 1} via {model_used}")
-                return content
+                return content or ""
         except urllib.error.HTTPError as e:
             body = ""
             try:
@@ -280,19 +245,8 @@ def extract_structured(
 ) -> dict:
     """Call free model and parse JSON response.
 
-    Tries multiple parsing strategies:
-    1. Direct JSON parse
-    2. Strip markdown code fences
-    3. Extract JSON from surrounding text
-    4. Fall back to {"raw": text} if nothing works
-
-    Args:
-        prompt: The extraction prompt.
-        system: Optional system prompt.
-        schema_hint: Expected JSON shape, appended to prompt.
-
-    Returns:
-        Parsed dict. Falls back to {"raw": text} on parse failure.
+    Tries: direct parse, strip code fences, extract JSON from text,
+    fall back to {"raw": text}.
     """
     if schema_hint:
         prompt += f"\n\nRespond with valid JSON only. No explanation. Expected shape: {schema_hint}"
@@ -302,15 +256,16 @@ def extract_structured(
     except RuntimeError as e:
         return {"raw": str(e), "status": "failed"}
 
+    if not raw:
+        return {"raw": "", "status": "empty_response"}
+
     stripped = raw.strip()
 
-    # Strategy 1: Direct parse
     try:
         return json.loads(stripped)
     except json.JSONDecodeError:
         pass
 
-    # Strategy 2: Strip code fences
     if stripped.startswith("```"):
         lines = stripped.split("\n")
         inner = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
@@ -319,7 +274,6 @@ def extract_structured(
         except json.JSONDecodeError:
             pass
 
-    # Strategy 3: Find JSON object in text
     match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', stripped, re.DOTALL)
     if match:
         try:
@@ -327,6 +281,5 @@ def extract_structured(
         except json.JSONDecodeError:
             pass
 
-    # Strategy 4: Fall back to raw text
     print("[janitor] Could not parse JSON from free model, returning raw text")
     return {"raw": stripped, "status": "unstructured"}
