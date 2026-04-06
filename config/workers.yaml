@@ -37,3 +37,14 @@ workers:
     harness: glm_claude          # claude CLI + ZAI backend
     model: glm-5-turbo
     plan_expires: "2026-05-02"   # GLM Coding Plan expiry — reassess or renew before this date
+
+  free:
+    host: localhost
+    transport: local
+    role: worker
+    harness: openrouter_api     # direct OpenRouter API call
+    model: openrouter/free       # free model router (random selection from free pool)
+    cost: 0
+    plan_expires: null           # free tier, no expiry
+    max_tokens: 1024             # bounded output for background tasks
+    timeout: 30                  # 30s timeout — these are quick jobs

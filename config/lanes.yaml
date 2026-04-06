@@ -60,3 +60,15 @@ lanes:
       writing: [gemini_cli, codex]
       review: [codex, gemini_cli]
       general: [gemini_cli, codex]
+
+  janitor:
+    planner: claude_code
+    review_with: null            # no review needed for housekeeping
+    worker_pool: [free]          # openrouter/free exclusively
+    strategy: first_available
+    fallback_lane: null          # no escalation — retry on failure
+    max_parallel: 1              # one job at a time, these are low priority
+    category_preference:
+      general: [free]            # all janitor tasks are general category
+    retry_limit: 3               # retry up to 3 times on failure
+    retry_delay: 5               # seconds between retries

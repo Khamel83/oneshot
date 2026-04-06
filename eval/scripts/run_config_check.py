@@ -53,7 +53,8 @@ def run_config_check() -> dict:
     # workers.yaml defines machine-level workers (local, oci, macmini, homelab, claw, glm),
     # which are different from dispatch worker names.
     known_dispatch_workers = {
-        "claude_code", "codex", "gemini_cli", "glm_claude", "claw_code"
+        "claude_code", "codex", "gemini_cli", "glm_claude", "claw_code",
+        "free",  # openrouter/free via openrouter_api harness (janitor lane)
     }
     for lane_name, lane_cfg in lanes.items():
         for w in lane_cfg.get("worker_pool", []):

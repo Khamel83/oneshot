@@ -35,6 +35,11 @@ class TaskClass(str, Enum):
     review_diff = "review_diff"
     doc_draft = "doc_draft"
     summarize_findings = "summarize_findings"
+    # Janitor class — background maintenance, always routes to free lane
+    janitor_summarize = "janitor_summarize"
+    janitor_extract = "janitor_extract"
+    janitor_hygiene = "janitor_hygiene"
+    janitor_analyze = "janitor_analyze"
 
 
 @dataclass
@@ -60,6 +65,11 @@ LANE_ASSIGNMENTS = {
     TaskClass.review_diff: "premium",
     TaskClass.doc_draft: "cheap",
     TaskClass.summarize_findings: "cheap",
+    # Janitor tasks always go to free lane
+    TaskClass.janitor_summarize: "janitor",
+    TaskClass.janitor_extract: "janitor",
+    TaskClass.janitor_hygiene: "janitor",
+    TaskClass.janitor_analyze: "janitor",
 }
 
 # Risk-based autonomy rules
@@ -124,6 +134,11 @@ CATEGORY_ASSIGNMENTS = {
     TaskClass.review_diff: TaskCategory.review,
     TaskClass.doc_draft: TaskCategory.writing,
     TaskClass.summarize_findings: TaskCategory.writing,
+    # Janitor tasks are always general
+    TaskClass.janitor_summarize: TaskCategory.general,
+    TaskClass.janitor_extract: TaskCategory.general,
+    TaskClass.janitor_hygiene: TaskCategory.general,
+    TaskClass.janitor_analyze: TaskCategory.general,
 }
 
 CODING_KEYWORDS = [
@@ -148,6 +163,12 @@ WRITING_KEYWORDS = [
 REVIEW_KEYWORDS = [
     "review", "audit", "inspect", "check", "verify", "validate",
     "quality", "challenge", "adversarial",
+]
+
+JANITOR_KEYWORDS = [
+    "janitor", "summarize session", "extract decisions", "memory hygiene",
+    "compact memory", "analyze traces", "dedup memory", "session digest",
+    "file tracker", "stale detection", "dependency graph", "config drift",
 ]
 
 
