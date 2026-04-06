@@ -21,6 +21,7 @@ The eval system lets you (or Claude in a session) verify that changes to the rou
 - Every dispatch writes a trace bundle to `eval/traces/{date}/{task_class}-{HHMMSS}-{worker}/`
 - Traces include: `trace.json` (structured metadata), `prompt.md` (rendered prompt), `output.raw` (raw worker output)
 - These accumulate passively — you don't need to do anything with them yet
+- **Janitor system** records every tool call to `.oneshot/events.jsonl` via hook, processes events with free model via cron. See AGENTS.md "Janitor System" section.
 
 ### What Happens In-Session (Claude runs it, not you)
 When you ask Claude to change `core/task_schema.py` keywords, `config/lanes.yaml`, or routing code, Claude should run `./scripts/eval.sh` afterward to confirm nothing broke. If it regresses, Claude fixes or reverts. You don't need to touch this.

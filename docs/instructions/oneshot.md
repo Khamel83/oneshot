@@ -67,6 +67,17 @@ AGENTS.md is the **neutral operating contract** — not Claude-specific.
 It references config/lanes.yaml for routing and defines task classes.
 Any code assistant (Claude, OpenCode, etc.) can read it directly.
 
+## Janitor System
+
+Background intelligence layer (`core/janitor/`) that runs automatically:
+- Records session events (file reads/writes/edits) via PostToolUse hook
+- Processes events with openrouter/free ($0) via system cron (every 15 min)
+- Produces structured decisions, blockers, discoveries, session digests
+- Storage: `.oneshot/events.jsonl` (append-only), `.oneshot/intelligence.db` (SQLite index)
+
+The janitor lane (`janitor` task classes) routes exclusively to the `free` worker.
+No review needed — these are housekeeping tasks.
+
 ## Secrets
 
 SOPS/Age encrypted vault at `secrets/`. Use the `secrets` CLI:

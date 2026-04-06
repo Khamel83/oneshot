@@ -4,6 +4,27 @@ All notable changes to ONE_SHOT are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [14.3.0] - 2026-04-05
+
+### Added
+- **Janitor lane** — dedicated lane for $0 background intelligence tasks via `openrouter/free`
+- **Janitor task classes** — `janitor_summarize`, `janitor_extract`, `janitor_hygiene`, `janitor_analyze` (always route to janitor lane, no review)
+- **`free` worker** — `config/workers.yaml` entry using openrouter/free model router ($0, no expiry)
+- **Session recorder** — `core/janitor/recorder.py`: append-only JSONL event log with SQLite index. Records user requests, actions, files touched, decisions, blockers, discoveries. ~200B/event.
+- **Free model caller** — `core/janitor/worker.py`: direct OpenRouter API calls with rate limiting (1000/day, 20/min tracked in `.oneshot/usage.jsonl`), structured JSON extraction with 4-level parse fallback
+- **Janitor jobs** — `core/janitor/jobs.py`: 5 implemented jobs (turn summarizer, memory hygiene, session digest, file change analysis, stale file detection)
+- **Jobs catalog** — `core/janitor/jobs_catalog.md`: ~20 additional jobs spec'd by value and effort
+- **PostToolUse hook** — `.claude/hooks/janitor-record.sh`: automatically records file reads/writes/edits to events.jsonl on every tool call. Zero-overhead (single printf, no jq).
+- **SessionEnd hook** — `.claude/hooks/janitor-session-end.sh`: writes session_end marker; cron does the actual processing
+- **System cron** — `scripts/janitor-cron.sh`: runs every 15min across all projects, finds unprocessed events, runs summarizer + memory hygiene. Safety net for "I just quit" scenarios
+- **`.oneshot/` runtime data** — `.gitignore`d directory for events.jsonl, usage.jsonl, intelligence.db
+
+### Performance
+- API key cached after first lookup (was subprocess per call)
+- Rate limit counters cached in memory with 5s TTL (was O(n) file scan per call)
+- Event reads use `tail`/`grep` (O(1)) instead of full-file JSON parse (O(n))
+- Hook uses printf instead of jq (0 process forks vs 3-4)
+
 ## [14.2.0] - 2026-04-04
 
 ### Added

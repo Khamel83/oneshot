@@ -1,6 +1,6 @@
 # ONE_SHOT v14 — Orchestration Control Plane
 
-> Category-based routing. Claude plans, workers execute. Argus searches.
+> Category-based routing. Claude plans, workers execute. Argus searches. Janitor runs in the background.
 
 ## OPERATORS
 
@@ -54,6 +54,10 @@ Tasks are classified by task class AND category. Category determines worker pref
 | doc_draft | cheap | writing | gemini_cli, codex, glm_claude |
 | search_sweep | research | research | gemini_cli, codex + argus |
 | summarize_findings | cheap | writing | gemini_cli, codex, glm_claude |
+| janitor_summarize | janitor | general | free (openrouter/free) |
+| janitor_extract | janitor | general | free (openrouter/free) |
+| janitor_hygiene | janitor | general | free (openrouter/free) |
+| janitor_analyze | janitor | general | free (openrouter/free) |
 
 Resolve routing: `python3 -m core.router.resolve --class <task_class> --category <category>`
 Parallel dispatch: `python3 -m core.dispatch.run --class <class> --category <category> --prompt "..."`
@@ -65,6 +69,7 @@ Parallel dispatch: `python3 -m core.dispatch.run --class <class> --category <cat
 | glm_claude | ZAI/GLM-5-turbo | Free until 2026-05-02 | Full Claude Code session, all tools |
 | codex | ChatGPT Plus | $20/mo sub | Strong coding, structured output |
 | gemini_cli | Google API | Free (sign-in) | Research, documentation |
+| free | openrouter/free | $0 (always) | Background intelligence, janitor lane only |
 | claw_code | OpenRouter | Pay per token | Manual opt-in via `--worker claw_code` |
 
 Auto-expiry: `glm_claude` worker checks `plan_expires` from `config/workers.yaml` and disables itself when expired. `shot` terminal command auto-falls back to OpenRouter.
@@ -123,6 +128,23 @@ Destructive ops, git push, external API calls that cost money, production deploy
 - Scope creep detection in the build loop
 - Session-end feedback loop: handoff proposes CLAUDE.md/rule updates when patterns repeat
 
+## JANITOR SYSTEM
+
+Background intelligence layer that runs automatically — no manual action needed.
+
+**How it works:**
+1. **PostToolUse hook** records every file read/write/edit to `.oneshot/events.jsonl` (transparent, zero overhead)
+2. **System cron** (every 15min) finds unprocessed events across all projects, runs free model summarizer
+3. **SessionEnd hook** marks session as ended; cron picks up remaining data
+
+**What it produces:** structured decisions, blockers, discoveries, file change summaries — all queryable across sessions via grep, SQLite, or future sessions.
+
+**Cost:** $0. openrouter/free model router. ~60-150 calls/day. Storage: ~30MB/year.
+
+**Files:** `core/janitor/` — worker.py (OpenRouter caller), recorder.py (event log), jobs.py (job implementations), jobs_catalog.md (planned jobs)
+
+**Cron install (all machines):** Already installed on oci-dev, homelab, macmini.
+
 ## VERSION
 
-v14.2 | Category routing | Intelligence tiers | Auto-expiry | GLM/Codex/Gemini workers
+v14.3 | Janitor lane | Background intelligence | openrouter/free worker | Session recording
