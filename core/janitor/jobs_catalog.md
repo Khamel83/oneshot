@@ -56,12 +56,18 @@ Negligible. Even 10x growth is fine.
 
 ## Rate Budget
 
-| Trigger | Calls/session | Calls/day |
-|---------|--------------|-----------|
-| Turn summarizer | 3-5 | 3-5 |
-| Session digest | 1 | 1 |
-| Memory hygiene | 0-1 | 1 |
-| File analysis | 1-2 | 2 |
-| **Total** | **5-9** | **7-9** |
+Limits: 1000/day, 20/minute.
 
-Well under 1000/day and 20/min limits.
+| Trigger | Frequency | Calls/session | Calls/day |
+|---------|-----------|---------------|-----------|
+| Turn summarizer | Every 5-10 min during active work | 20-50 | 40-100 |
+| Decision extractor | Every few turns | 5-10 | 10-20 |
+| File change analysis | Every commit | 5-10 | 10-20 |
+| Memory hygiene | Once per session | 1-2 | 2-4 |
+| Session digest | End of session | 1 | 1-3 |
+| Stale detection | Once per session | 1 | 1-3 |
+| **Total** | | **30-70** | **60-150** |
+
+60-150/day is 6-15% of the 1000/day budget. Comfortable margin.
+20/min limit is the real ceiling — avoid batching many calls at once.
+Rate tracker in .oneshot/usage.jsonl catches problems before they matter.
