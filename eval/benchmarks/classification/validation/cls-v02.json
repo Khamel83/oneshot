@@ -1,0 +1,1 @@
+{"id": "cls-v02", "category": "classification", "input": {"description": "Benchmark the response time of the search API"}, "expected": {"category": "research", "risk_level": "low"}}

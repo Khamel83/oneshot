@@ -1,0 +1,1 @@
+{"id": "cls-v06", "category": "classification", "input": {"description": "Investigate why the CI pipeline fails on Python 3.12"}, "expected": {"category": "research", "risk_level": "medium"}}

@@ -1,0 +1,1 @@
+{"id": "cls-005", "category": "classification", "input": {"description": "Research Supabase RLS policies for multi-tenant apps"}, "expected": {"category": "research", "risk_level": "medium"}}

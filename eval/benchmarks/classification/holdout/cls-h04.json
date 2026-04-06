@@ -1,0 +1,1 @@
+{"id": "cls-h04", "category": "classification", "input": {"description": "Inspect the dependency tree for license violations"}, "expected": {"category": "review", "risk_level": "medium"}}

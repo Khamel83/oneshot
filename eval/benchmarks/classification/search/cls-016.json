@@ -1,0 +1,1 @@
+{"id": "cls-016", "category": "classification", "input": {"description": "Deploy the staging build to production"}, "expected": {"category": "coding", "risk_level": "high"}}

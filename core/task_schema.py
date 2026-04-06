@@ -130,17 +130,19 @@ CODING_KEYWORDS = [
     "implement", "code", "fix", "refactor", "bug", "feature", "add function",
     "add method", "add class", "write test", "create test", "build", "api",
     "endpoint", "handler", "migrate", "schema", "query", "database",
+    "error handling", "format", "deploy", "lint",
 ]
 
 RESEARCH_KEYWORDS = [
     "research", "investigate", "explore", "search", "find", "look up",
     "discover", "understand", "learn about", "compare", "evaluate",
-    "benchmark", "profile", "analyze",
+    "benchmark", "profile", "analyze", "discover",
 ]
 
 WRITING_KEYWORDS = [
     "document", "write doc", "readme", "comment", "summarize", "draft",
     "write up", "explain", "describe", "notes", "synthesis",
+    "write a", "update the", "release notes",
 ]
 
 REVIEW_KEYWORDS = [

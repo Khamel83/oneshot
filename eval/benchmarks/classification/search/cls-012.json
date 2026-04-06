@@ -1,0 +1,1 @@
+{"id": "cls-012", "category": "classification", "input": {"description": "Validate that the database query runs correctly"}, "expected": {"category": "review", "risk_level": "medium"}}

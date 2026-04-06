@@ -1,0 +1,1 @@
+{"id": "cls-v04", "category": "classification", "input": {"description": "Check the test coverage for the auth module"}, "expected": {"category": "review", "risk_level": "medium"}}

@@ -1,0 +1,1 @@
+{"id": "cls-006", "category": "classification", "input": {"description": "Investigate the memory leak in the worker process"}, "expected": {"category": "research", "risk_level": "medium"}}

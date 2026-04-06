@@ -1,0 +1,1 @@
+{"id": "cls-h02", "category": "classification", "input": {"description": "Profile the dispatch runner to find performance bottlenecks"}, "expected": {"category": "research", "risk_level": "low"}}

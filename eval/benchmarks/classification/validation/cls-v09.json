@@ -1,0 +1,1 @@
+{"id": "cls-v09", "category": "classification", "input": {"description": "Evaluate Litestream vs WAL mode for SQLite backups"}, "expected": {"category": "research", "risk_level": "low"}}

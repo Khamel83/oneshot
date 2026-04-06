@@ -1,0 +1,1 @@
+{"id": "cls-v01", "category": "classification", "input": {"description": "Create a new database schema for the blog module"}, "expected": {"category": "coding", "risk_level": "medium"}}

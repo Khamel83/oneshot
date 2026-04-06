@@ -1,0 +1,1 @@
+{"id": "cls-010", "category": "classification", "input": {"description": "Review the pull request for the payment integration"}, "expected": {"category": "review", "risk_level": "medium"}}

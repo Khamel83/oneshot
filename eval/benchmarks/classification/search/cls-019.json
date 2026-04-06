@@ -1,0 +1,1 @@
+{"id": "cls-019", "category": "classification", "input": {"description": "Update the project CLAUDE.md with new deployment instructions"}, "expected": {"category": "writing", "risk_level": "high"}}

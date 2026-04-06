@@ -1,0 +1,1 @@
+{"id": "cls-020", "category": "classification", "input": {"description": "Migrate the secrets from plaintext .env to encrypted vault"}, "expected": {"category": "coding", "risk_level": "high"}}

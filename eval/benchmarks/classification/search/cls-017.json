@@ -1,0 +1,1 @@
+{"id": "cls-017", "category": "classification", "input": {"description": "Write tests for the auth handler"}, "expected": {"category": "coding", "risk_level": "high"}}

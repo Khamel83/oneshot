@@ -1,0 +1,1 @@
+{"id": "cls-002", "category": "classification", "input": {"description": "Fix the login bug where session tokens expire prematurely"}, "expected": {"category": "coding", "risk_level": "high"}}

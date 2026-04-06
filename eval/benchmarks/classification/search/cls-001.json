@@ -1,0 +1,1 @@
+{"id": "cls-001", "category": "classification", "input": {"description": "Add error handling to the auth middleware"}, "expected": {"category": "coding", "risk_level": "high"}}

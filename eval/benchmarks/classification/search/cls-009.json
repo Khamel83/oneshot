@@ -1,0 +1,1 @@
+{"id": "cls-009", "category": "classification", "input": {"description": "Summarize the meeting notes from the architecture review"}, "expected": {"category": "writing", "risk_level": "medium"}}

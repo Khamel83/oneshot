@@ -1,0 +1,1 @@
+{"id": "cls-v10", "category": "classification", "input": {"description": "Challenge the architecture of the dispatch runner"}, "expected": {"category": "review", "risk_level": "medium"}}

@@ -1,0 +1,1 @@
+{"id": "cls-008", "category": "classification", "input": {"description": "Write a README section explaining the setup process"}, "expected": {"category": "writing", "risk_level": "medium"}}

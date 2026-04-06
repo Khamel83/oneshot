@@ -1,0 +1,1 @@
+{"id": "rte-005", "category": "routing", "input": {"task_class": "test_write", "category": "coding"}, "expected": {"lane": "cheap", "workers_first": "codex", "review_with": "claude_code"}}

@@ -1,0 +1,1 @@
+{"id": "cls-v05", "category": "classification", "input": {"description": "Rename the config loader to use snake_case"}, "expected": {"category": "coding", "risk_level": "low"}}

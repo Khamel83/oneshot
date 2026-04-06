@@ -1,0 +1,1 @@
+{"id": "cls-h05", "category": "classification", "input": {"description": "Lint the shell scripts for POSIX compliance"}, "expected": {"category": "coding", "risk_level": "low"}}

@@ -1,0 +1,1 @@
+{"id": "cls-004", "category": "classification", "input": {"description": "Implement a new endpoint for user profile updates"}, "expected": {"category": "coding", "risk_level": "medium"}}

@@ -4,6 +4,13 @@ Usage:
     python -m core.dispatch.run --class implement_small --prompt "Fix the auth bug in login.py" --output /tmp/dispatch
     python -m core.dispatch.run --class implement_small --prompt "..." --parallel 3
     python -m core.dispatch.run --manifest 1shot/dispatch
+
+Trace writing:
+    Every dispatch writes a trace bundle to eval/traces/{date}/{task_class}-{HHMMSS}-{worker}/:
+      trace.json     — full structured trace (primary artifact)
+      prompt.md      — rendered prompt sent to worker
+      output.raw     — raw worker output
+      manifest.md    — human-readable summary (derived from trace.json)
 """
 
 import argparse
@@ -329,6 +336,108 @@ def parse_claw_code_output(output_file: str) -> dict:
     return result
 
 
+def get_config_sha() -> str:
+    """Get the git SHA of config files for trace provenance."""
+    try:
+        result = subprocess.run(
+            ["git", "log", "-1", "--format=%h", "--", "config/"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT)
+        )
+        return result.stdout.strip() or "unknown"
+    except Exception:
+        return "unknown"
+
+
+def write_trace(result: dict, prompt: str, task_class: str, category: str,
+                lane: str, resolution: dict, trace_base_dir: str = ""):
+    """Write a trace bundle for a dispatched task.
+
+    Creates:
+      trace.json     — full structured trace (primary artifact, IMMUTABLE)
+      prompt.md      — rendered prompt sent to worker
+      output.raw     — raw worker output (copied from dispatch output file)
+      manifest.md    — human-readable summary (DERIVED from trace.json)
+    """
+    if not trace_base_dir:
+        trace_base_dir = str(REPO_ROOT / "eval" / "traces")
+
+    date_str = result["started"][:10]  # YYYY-MM-DD
+    time_str = result["started"][11:19].replace(":", "")  # HHMMSS
+    worker = result["worker"]
+    trace_dir_name = f"{task_class}-{time_str}-{worker}"
+    trace_dir = os.path.join(trace_base_dir, date_str, trace_dir_name)
+    os.makedirs(trace_dir, exist_ok=True)
+
+    # trace.json (primary artifact)
+    trace = {
+        "trace_id": f"{task_class}-{date_str}-{time_str}-{worker}",
+        "schema_version": "1",
+        "timestamp": result["started"],
+        "harness_version": "14.2",
+        "classification": {
+            "description": prompt[:200],
+            "task_class": task_class,
+            "category": category,
+            "inferred_by": "dispatch runner"
+        },
+        "routing": {
+            "lane": lane,
+            "workers": resolution.get("workers", []),
+            "selected_worker": worker,
+            "selection_reason": "first_available",
+            "review_with": resolution.get("review_with", ""),
+            "fallback_lane": resolution.get("fallback_lane"),
+        },
+        "prompt": {
+            "template": "dispatch_v1",
+            "word_count": len(prompt.split()),
+            "file_path": "prompt.md"
+        },
+        "execution": {
+            "worker": worker,
+            "exit_code": result["exit_code"],
+            "started": result["started"],
+            "completed": result["completed"],
+            "duration_seconds": result["duration"]
+        },
+        "output": {
+            "errors": result.get("errors", []),
+            "message_preview": (result.get("message", "") or "")[:200]
+        },
+        "retry": {
+            "attempt": 1,
+            "previous_traces": [],
+            "escalated": False
+        },
+        "cost": {
+            "estimated_cost_usd": 0,
+            "worker_cost_basis": "subscription"
+        },
+        "config_snapshot": {
+            "lanes_sha": get_config_sha(),
+        },
+        "status": result["status"]
+    }
+
+    with open(os.path.join(trace_dir, "trace.json"), "w") as f:
+        json.dump(trace, f, indent=2)
+
+    # prompt.md
+    with open(os.path.join(trace_dir, "prompt.md"), "w") as f:
+        f.write(prompt)
+
+    # output.raw — copy from dispatch output file
+    src_output = result.get("output_file", "")
+    if src_output and os.path.exists(src_output):
+        import shutil
+        shutil.copy2(src_output, os.path.join(trace_dir, "output.raw"))
+
+    # manifest.md — human-readable summary
+    write_manifest(result, trace_dir)
+
+    return trace_dir
+
+
 def dispatch_single(task: dict, output_dir: str) -> dict:
     """Dispatch a single task to the appropriate worker and return result."""
     worker = task["worker"]
@@ -438,11 +547,14 @@ def write_manifest(result: dict, manifest_dir: str):
 
 def dispatch_parallel(tasks: list[dict], max_parallel: int = 3,
                       output_dir: str = "/tmp/dispatch",
-                      manifest_dir: str = "1shot/dispatch") -> list[dict]:
+                      manifest_dir: str = "1shot/dispatch",
+                      task_class: str = "", category: str = "",
+                      lane: str = "", resolution: dict = None) -> list[dict]:
     """Dispatch multiple tasks in parallel and return results."""
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(manifest_dir, exist_ok=True)
     results = []
+    _resolution = resolution or {}
 
     with ProcessPoolExecutor(max_workers=max_parallel) as executor:
         future_to_task = {
@@ -455,6 +567,14 @@ def dispatch_parallel(tasks: list[dict], max_parallel: int = 3,
                 result = future.result()
                 results.append(result)
                 write_manifest(result, manifest_dir)
+                # Write trace bundle (additive, doesn't affect dispatch)
+                write_trace(
+                    result, task.get("prompt", ""),
+                    task_class=task_class or task.get("task_class", ""),
+                    category=category or task.get("category", ""),
+                    lane=lane or _resolution.get("lane", ""),
+                    resolution=_resolution
+                )
             except Exception as e:
                 results.append({
                     "task_id": task["id"],
@@ -533,7 +653,11 @@ def main():
     max_p = min(args.parallel, resolution.get("max_parallel", 3))
     results = dispatch_parallel(tasks, max_parallel=max_p,
                                output_dir=args.output,
-                               manifest_dir=args.manifest)
+                               manifest_dir=args.manifest,
+                               task_class=args.task_class,
+                               category=args.category or resolution.get("category", ""),
+                               lane=resolution.get("lane", ""),
+                               resolution=resolution)
 
     # Summary
     succeeded = sum(1 for r in results if r["status"] == "succeeded")

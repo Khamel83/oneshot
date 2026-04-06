@@ -1,0 +1,1 @@
+{"id": "cls-003", "category": "classification", "input": {"description": "Refactor the utils module to use helper functions"}, "expected": {"category": "coding", "risk_level": "low"}}

@@ -1,0 +1,1 @@
+{"id": "cls-013", "category": "classification", "input": {"description": "Format all Python files with black"}, "expected": {"category": "coding", "risk_level": "low"}}

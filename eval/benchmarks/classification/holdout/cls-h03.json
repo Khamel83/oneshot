@@ -1,0 +1,1 @@
+{"id": "cls-h03", "category": "classification", "input": {"description": "Summarize the key findings from the API benchmark report"}, "expected": {"category": "writing", "risk_level": "low"}}
