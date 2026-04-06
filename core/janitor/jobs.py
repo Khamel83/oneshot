@@ -33,7 +33,7 @@ def summarize_recent_turns(recorder: SessionRecorder, n: int = 10) -> dict:
 
     # Build a compact text representation
     turn_text = "\n".join(
-        f"[{e['turn']}] ({e['type']}) {e['content'][:200]}"
+        f"[{e.get('turn', '?')}] ({e['type']}) {e['content'][:200]}"
         for e in events
     )
 
