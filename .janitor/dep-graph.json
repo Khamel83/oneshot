@@ -1,0 +1,21 @@
+{
+  "files_with_imports": 9,
+  "impact_ranking": [
+    {
+      "file": "core/task_schema.py",
+      "downstream_count": 4
+    },
+    {
+      "file": "core/router/lane_policy.py",
+      "downstream_count": 3
+    },
+    {
+      "file": "core/janitor/worker.py",
+      "downstream_count": 2
+    },
+    {
+      "file": "core/janitor/jobs.py",
+      "downstream_count": 1
+    }
+  ]
+}

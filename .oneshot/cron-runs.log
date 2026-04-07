@@ -1,0 +1,57 @@
+[2026-04-06T05:00:01Z] --- Janitor cron start ---
+[2026-04-06T05:00:01Z] Rate limit: unavailable
+[2026-04-06T05:00:01Z] Processing: /home/ubuntu/github/oneshot
+[2026-04-06T05:00:01Z]   Usage: 0/1000 today, 0/20 this minute
+[2026-04-06T05:00:01Z]   Extracted: 0 decisions, 0 blockers
+[2026-04-06T05:00:01Z] Running memory hygiene
+[2026-04-06T05:00:01Z]   Memory hygiene: 8 files, 0 overlaps
+[2026-04-06T05:00:01Z] --- Janitor cron end ---
+[2026-04-06T05:15:01Z] --- Janitor cron start ---
+[2026-04-06T05:15:01Z] Rate limit: unavailable
+[2026-04-06T05:15:01Z] Processing: /home/ubuntu/github/oneshot
+[2026-04-06T05:15:01Z]   Usage: 0/1000 today, 0/20 this minute
+[2026-04-06T05:15:01Z]   Extracted: 0 decisions, 0 blockers
+[2026-04-06T05:15:01Z] Running memory hygiene
+[2026-04-06T05:15:01Z]   Memory hygiene: 8 files, 0 overlaps
+[2026-04-06T05:15:01Z] --- Janitor cron end ---
+[2026-04-06T05:30:01Z] --- Janitor cron start ---
+[2026-04-06T05:30:01Z] Rate limit: unavailable
+[2026-04-06T05:30:01Z] Processing: /home/ubuntu/github/oneshot
+[2026-04-06T05:30:01Z]   Usage: 0/1000 today, 0/20 this minute
+[2026-04-06T05:30:01Z]   Extracted: 0 decisions, 0 blockers
+[2026-04-06T05:30:01Z] Running memory hygiene
+[2026-04-06T05:30:01Z]   Memory hygiene: 8 files, 0 overlaps
+[2026-04-06T05:30:01Z] --- Janitor cron end ---
+[2026-04-06T05:45:02Z] --- Janitor cron start ---
+[2026-04-06T05:45:02Z] Rate limit: unavailable
+[2026-04-06T05:45:02Z] Processing: /home/ubuntu/github/oneshot
+[2026-04-06T05:45:02Z]   Usage: 0/1000 today, 0/20 this minute
+[2026-04-06T05:45:02Z]   Extracted: 0 decisions, 0 blockers
+[2026-04-06T05:45:02Z] Running memory hygiene
+[2026-04-06T05:45:02Z]   Memory hygiene: 8 files, 0 overlaps
+[2026-04-06T05:45:02Z] --- Janitor cron end ---
+[2026-04-06T05:48:40Z] --- Janitor cron start ---
+[2026-04-06T05:48:40Z] Rate limit: {"today": 5, "this_minute": 3, "total": 5, "daily_limit": 1000, "minute_limit": 20}
+[2026-04-06T05:48:40Z] Running memory hygiene
+[2026-04-06T05:48:40Z]   Memory hygiene: 8 files, 0 overlaps
+[2026-04-06T05:48:40Z] --- Janitor cron end ---
+[2026-04-06T05:49:12Z] --- Janitor cron start ---
+[2026-04-06T05:49:12Z] Rate limit: {"today": 6, "this_minute": 3, "total": 6, "daily_limit": 1000, "minute_limit": 20}
+[2026-04-06T05:49:12Z] Processing: /home/ubuntu/github/oneshot
+[2026-04-06T05:49:12Z]   Usage: 6/1000 today
+[2026-04-06T05:49:12Z]   Test gaps: 4 found
+[2026-04-06T05:49:12Z]   Code smells: 2 oversized files, 4 long funcs
+[2026-04-06T05:49:12Z]   Config drift: 0 drifted
+[2026-04-06T05:49:12Z]   Dep graph: 9 files with imports
+[2026-04-06T05:49:12Z]   Extracted: 0 decisions, 0 blockers
+[2026-04-06T05:49:12Z]   Commit enrichments: 0 new
+[2026-04-06T05:49:12Z]   Patterns: 0 found
+[2026-04-06T05:49:12Z]   Onboarding: 1402 chars
+[2026-04-06T05:49:12Z] Running memory hygiene
+[2026-04-06T05:49:12Z]   Memory hygiene: 8 files, 0 overlaps
+[2026-04-06T05:49:12Z] --- Janitor cron end ---
+[2026-04-06T06:00:01Z] --- Janitor cron start ---
+[2026-04-06T06:00:01Z] Rate limit: unavailable
+[2026-04-06T06:00:01Z] Running memory hygiene
+[2026-04-06T06:00:01Z]   Memory hygiene: 8 files, 0 overlaps
+[2026-04-06T06:00:01Z] --- Janitor cron end ---

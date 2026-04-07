@@ -1,0 +1,106 @@
+{
+  "status": "ok",
+  "files_scanned": 36,
+  "files_with_imports": 9,
+  "graph": {
+    "core/dispatch/run.py": [
+      "core.router.lane_policy"
+    ],
+    "core/janitor/__init__.py": [
+      "core.janitor.jobs",
+      "core.janitor.recorder",
+      "core.janitor.worker"
+    ],
+    "core/janitor/jobs.py": [
+      "core.janitor.recorder",
+      "core.janitor.worker"
+    ],
+    "core/plan_schema.py": [
+      "core.task_schema"
+    ],
+    "core/router/lane_policy.py": [
+      "core.task_schema"
+    ],
+    "core/router/resolve.py": [
+      "core.router.lane_policy"
+    ],
+    "eval/scripts/run_classification.py": [
+      "core.task_schema"
+    ],
+    "eval/scripts/run_config_check.py": [
+      "core.task_schema"
+    ],
+    "eval/scripts/run_routing.py": [
+      "core.router.lane_policy"
+    ]
+  },
+  "reverse_deps": {
+    "core.router.lane_policy": [
+      "core/dispatch/run.py",
+      "core/router/resolve.py",
+      "eval/scripts/run_routing.py"
+    ],
+    "core.janitor.jobs": [
+      "core/janitor/__init__.py"
+    ],
+    "core.janitor.recorder": [
+      "core/janitor/__init__.py",
+      "core/janitor/jobs.py"
+    ],
+    "core.janitor.worker": [
+      "core/janitor/__init__.py",
+      "core/janitor/jobs.py"
+    ],
+    "core.task_schema": [
+      "core/plan_schema.py",
+      "core/router/lane_policy.py",
+      "eval/scripts/run_classification.py",
+      "eval/scripts/run_config_check.py"
+    ]
+  },
+  "impact_ranking": [
+    {
+      "file": "core/task_schema.py",
+      "downstream_count": 4,
+      "dependents": [
+        "core/plan_schema.py",
+        "core/router/lane_policy.py",
+        "eval/scripts/run_classification.py",
+        "eval/scripts/run_config_check.py"
+      ]
+    },
+    {
+      "file": "core/router/lane_policy.py",
+      "downstream_count": 3,
+      "dependents": [
+        "core/dispatch/run.py",
+        "core/router/resolve.py",
+        "eval/scripts/run_routing.py"
+      ]
+    },
+    {
+      "file": "core/janitor/recorder.py",
+      "downstream_count": 2,
+      "dependents": [
+        "core/janitor/__init__.py",
+        "core/janitor/jobs.py"
+      ]
+    },
+    {
+      "file": "core/janitor/worker.py",
+      "downstream_count": 2,
+      "dependents": [
+        "core/janitor/__init__.py",
+        "core/janitor/jobs.py"
+      ]
+    },
+    {
+      "file": "core/janitor/jobs.py",
+      "downstream_count": 1,
+      "dependents": [
+        "core/janitor/__init__.py"
+      ]
+    }
+  ],
+  "timestamp": "2026-04-06T05:49:12.231826+00:00"
+}

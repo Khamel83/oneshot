@@ -1,0 +1,41 @@
+{
+  "status": "ok",
+  "changed_source_files": 4,
+  "total_changed_files": 14,
+  "gaps": [
+    {
+      "source_file": "core/janitor/recorder.py",
+      "expected_test_candidates": [
+        "tests/test_recorder.py",
+        "tests/core/janitor/test_recorder.py",
+        "core/janitor/test_recorder.py"
+      ]
+    },
+    {
+      "source_file": "core/janitor/worker.py",
+      "expected_test_candidates": [
+        "tests/test_worker.py",
+        "tests/core/janitor/test_worker.py",
+        "core/janitor/test_worker.py"
+      ]
+    },
+    {
+      "source_file": "core/janitor/jobs.py",
+      "expected_test_candidates": [
+        "tests/test_jobs.py",
+        "tests/core/janitor/test_jobs.py",
+        "core/janitor/test_jobs.py"
+      ]
+    },
+    {
+      "source_file": "core/janitor/__init__.py",
+      "expected_test_candidates": [
+        "tests/test___init__.py",
+        "tests/core/janitor/test___init__.py",
+        "core/janitor/test___init__.py"
+      ]
+    }
+  ],
+  "gap_count": 4,
+  "timestamp": "2026-04-06T06:12:57.664313+00:00"
+}

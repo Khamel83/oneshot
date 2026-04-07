@@ -1,0 +1,30 @@
+[2026-04-06T06:15:01Z] --- Janitor cron start ---
+[2026-04-06T06:15:01Z] Rate limit: {"today": 0, "this_minute": 0, "total": 0, "daily_limit": 1000, "minute_limit": 20}
+[2026-04-06T06:15:01Z] No projects with unprocessed events
+[2026-04-06T06:15:01Z] Running memory hygiene
+[2026-04-06T06:15:01Z]   Memory hygiene: 0 files, 0 overlaps
+[2026-04-06T06:15:01Z] --- Janitor cron end ---
+[2026-04-06T06:30:01Z] --- Janitor cron start ---
+[2026-04-06T06:30:01Z] Rate limit: {"today": 0, "this_minute": 0, "total": 0, "daily_limit": 1000, "minute_limit": 20}
+[2026-04-06T06:30:01Z] No projects with unprocessed events
+[2026-04-06T06:30:01Z] Running memory hygiene
+[2026-04-06T06:30:01Z]   Memory hygiene: 0 files, 0 overlaps
+[2026-04-06T06:30:01Z] --- Janitor cron end ---
+[2026-04-07T22:10:30Z] --- Janitor cron start ---
+[2026-04-07T22:10:30Z]   detect_test_gaps...
+[2026-04-07T22:10:30Z]   scan_code_smells...
+[2026-04-07T22:10:30Z]   detect_config_drift...
+[2026-04-07T22:10:30Z]   build_dependency_map...
+[2026-04-07T22:10:30Z]   All pure-compute jobs completed
+[2026-04-07T22:10:30Z]   ONBOARDING_SKIP: No OPENROUTER_API_KEY found. Set it as an environment variable:
+[2026-04-07T22:10:30Z]   export OPENROUTER_API_KEY=sk-or-...
+[2026-04-07T22:10:30Z]   Get a free key at https://openrouter.ai/keys
+[2026-04-07T22:10:30Z] --- Janitor cron end ---
+[2026-04-07T22:15:09Z] --- Janitor cron start ---
+[2026-04-07T22:15:09Z]   detect_test_gaps...
+[2026-04-07T22:15:09Z]   scan_code_smells...
+[2026-04-07T22:15:09Z]   detect_config_drift...
+[2026-04-07T22:15:09Z]   build_dependency_map...
+[2026-04-07T22:15:09Z]   All pure-compute jobs completed
+[2026-04-07T22:15:09Z]   Onboarding updated
+[2026-04-07T22:15:09Z] --- Janitor cron end ---

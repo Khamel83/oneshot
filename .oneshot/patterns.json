@@ -1,0 +1,126 @@
+{
+  "status": "ok",
+  "events_analyzed": 122,
+  "days_scanned": 7,
+  "hot_files": {
+    "/home/ubuntu/github/oneshot/CHANGELOG.md": {
+      "sessions": 3,
+      "unique_sessions": [
+        "20260405-221808",
+        "20260405-221834",
+        "20260405-221859"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/core/janitor/jobs_catalog.md": {
+      "sessions": 5,
+      "unique_sessions": [
+        "20260405-223635",
+        "20260405-224537",
+        "20260405-223354",
+        "20260405-221808",
+        "20260405-223828"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/core/janitor/worker.py": {
+      "sessions": 7,
+      "unique_sessions": [
+        "20260405-224640",
+        "20260405-223602",
+        "20260405-224626",
+        "20260405-224631",
+        "20260405-224636",
+        "20260405-223820",
+        "20260405-221820"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/AGENTS.md": {
+      "sessions": 7,
+      "unique_sessions": [
+        "20260405-221921",
+        "20260405-221834",
+        "20260405-223623",
+        "20260405-221840",
+        "20260405-221905",
+        "20260405-221914",
+        "20260405-221930"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/CLAUDE.md": {
+      "sessions": 3,
+      "unique_sessions": [
+        "20260405-221939",
+        "20260405-221934",
+        "20260405-221946"
+      ]
+    },
+    "/home/ubuntu/.claude/settings.json": {
+      "sessions": 3,
+      "unique_sessions": [
+        "20260405-222253",
+        "20260405-222314",
+        "20260405-222321"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/.claude/hooks/janitor-context.sh": {
+      "sessions": 4,
+      "unique_sessions": [
+        "20260405-223612",
+        "20260405-223825",
+        "20260405-222436",
+        "20260405-224524"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/core/janitor/jobs.py": {
+      "sessions": 8,
+      "unique_sessions": [
+        "20260405-224355",
+        "20260405-224330",
+        "20260405-223559",
+        "20260405-224326",
+        "20260405-224418",
+        "20260405-223354",
+        "20260405-223820",
+        "20260405-224442"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/core/janitor/recorder.py": {
+      "sessions": 5,
+      "unique_sessions": [
+        "20260405-224412",
+        "20260405-223821",
+        "20260405-223606",
+        "20260405-224402",
+        "20260405-224711"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/scripts/janitor-cron.sh": {
+      "sessions": 4,
+      "unique_sessions": [
+        "20260405-224212",
+        "20260405-224504",
+        "20260405-223609",
+        "20260405-223831"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/.claude/hooks/janitor-record.sh": {
+      "sessions": 3,
+      "unique_sessions": [
+        "20260405-223825",
+        "20260405-223633",
+        "20260405-223623"
+      ]
+    },
+    "/home/ubuntu/github/oneshot/core/janitor/__init__.py": {
+      "sessions": 3,
+      "unique_sessions": [
+        "20260405-224212",
+        "20260405-224451",
+        "20260405-223828"
+      ]
+    }
+  },
+  "recurring_errors": {},
+  "revisited_decisions": {},
+  "insights": [],
+  "timestamp": "2026-04-06T05:50:56.869711+00:00"
+}

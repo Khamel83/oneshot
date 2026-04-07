@@ -1,0 +1,17 @@
+{
+  "ee7600beced497f09070609393b3f8af3de88e05": {
+    "hash": "ee7600beced4",
+    "original_message": "feat: janitor context hook \u2014 inject accumulated intelligence at session start",
+    "enriched": {
+      "summary": "Adds a janitor context hook that injects accumulated intelligence at the start of a session.",
+      "tags": [
+        "janitor",
+        "context hook",
+        "session start",
+        "intelligence injection"
+      ],
+      "category": "feature"
+    },
+    "timestamp": "2026-04-06T05:46:48.346868+00:00"
+  }
+}

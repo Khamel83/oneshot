@@ -1,0 +1,53 @@
+{
+  "status": "ok",
+  "files_scanned": 36,
+  "thresholds": {
+    "max_file_lines": 500,
+    "max_func_lines": 100
+  },
+  "oversized_files": [
+    {
+      "path": "core/janitor/jobs.py",
+      "line_count": 821,
+      "over_by": 321
+    },
+    {
+      "path": "core/dispatch/run.py",
+      "line_count": 675,
+      "over_by": 175
+    }
+  ],
+  "oversized_functions": [
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "build_dependency_map",
+      "line_start": 464,
+      "line_count": 358,
+      "over_by": 258
+    },
+    {
+      "path": "core/janitor/worker.py",
+      "function": "get_usage_stats",
+      "line_start": 149,
+      "line_count": 188,
+      "over_by": 88
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "detect_test_gaps",
+      "line_start": 258,
+      "line_count": 150,
+      "over_by": 50
+    },
+    {
+      "path": "core/dispatch/run.py",
+      "function": "get_config_sha",
+      "line_start": 339,
+      "line_count": 102,
+      "over_by": 2
+    }
+  ],
+  "oversized_file_count": 2,
+  "oversized_function_count": 4,
+  "timestamp": "2026-04-06T06:12:57.669361+00:00"
+}

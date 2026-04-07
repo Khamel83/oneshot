@@ -1,0 +1,26 @@
+{
+  "oversized_files": [
+    {
+      "path": "core/dispatch/run.py",
+      "lines": 675
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "lines": 544
+    }
+  ],
+  "oversized_functions": [
+    {
+      "path": "core/janitor/worker.py",
+      "function": "get_usage_stats",
+      "lines": 157
+    },
+    {
+      "path": "core/dispatch/run.py",
+      "function": "get_config_sha",
+      "lines": 102
+    }
+  ],
+  "oversized_file_count": 2,
+  "oversized_function_count": 2
+}

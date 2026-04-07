@@ -1,0 +1,17 @@
+{
+  "gap_count": 4,
+  "gaps": [
+    {
+      "source_file": "core/janitor/__init__.py"
+    },
+    {
+      "source_file": "core/janitor/jobs.py"
+    },
+    {
+      "source_file": "core/janitor/recorder.py"
+    },
+    {
+      "source_file": "core/janitor/worker.py"
+    }
+  ]
+}

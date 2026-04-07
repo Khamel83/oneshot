@@ -2,6 +2,8 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260407_145739__command-message_conduct__command-message_.md.age](20260407_145739__command-message_conduct__command-message_.md.age) | 2026-04-07 14:57:39 | <command-message>conduct</command-message> | age, build, go |
+| [20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age](20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age) | 2026-04-06 11:43:45 | So we added back in janitor here. I just want to m... | add, age, refactor, session, update |
 | [20260405_231732__command-name__clear__command-name_.md.age](20260405_231732__command-name__clear__command-name_.md.age) | 2026-04-05 23:17:32 | <command-name>/clear</command-name> | add, age, api, auth, backend, build, config, database, deploy, encrypt, feature, fix, go, implement, install, logger, migration, oci, postgres, python, refactor, session, setup, sqlite, test, update |
 | [20260405_212546__command-message_conduct__command-message_.md.age](20260405_212546__command-message_conduct__command-message_.md.age) | 2026-04-05 21:25:46 | <command-message>conduct</command-message> | add, age, auth, build, config, go, implement, migration, refactor, remove, rust, session, test |
 | [20260405_191723_We_need_to_make_sure_that_the_dispatch_skill_almos.md.age](20260405_191723_We_need_to_make_sure_that_the_dispatch_skill_almos.md.age) | 2026-04-05 19:17:23 | We need to make sure that the dispatch skill almos... | add, age, api, bug, build, config, feature, fix, go, install, python, remove, session, test, update |

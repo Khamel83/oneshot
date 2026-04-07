@@ -1,202 +1,197 @@
 # OpenCode CLI Documentation
 
-> Cached from https://opencode.ai/docs on 2026-04-01
+> Cached from https://opencode.ai/docs on 2026-04-07 (v1.3.13)
 > Open-source AI coding agent with TUI, desktop app, and IDE extensions.
+> Provider-agnostic: supports 75+ LLM providers natively.
 
 ---
 
-## Table of Contents
-
-- [Getting Started](#getting-started)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Agents](#agents)
-- [Providers](#providers)
-
----
-
-## Getting Started
-
-OpenCode is an open-source AI coding agent. It provides terminal, desktop app, and IDE extension interfaces.
-
-### Prerequisites
-
-To use OpenCode in the terminal, you need:
-
-1. A modern terminal emulator (WezTerm, Alacritty, Ghostty, Kitty)
-2. API keys for the LLM providers you want to use
-
-### Quick Start
-
-1. Run `/connect` to configure API keys
-2. Navigate to your project directory
-3. Run OpenCode -- it will analyze your project and create an `AGENTS.md` file
-4. Start asking questions or requesting changes
-
-### Usage Patterns
-
-**Ask questions**: `How is authentication handled in @packages/functions/src/api/index.ts`
-
-**Plan mode** (Tab key to toggle): Describe what you want, OpenCode suggests how without making changes
-
-**Build mode** (Tab key to toggle): OpenCode implements the plan
-
-**Undo/Redo**: `/undo` and `/redo` commands to revert or re-apply changes
-
-**Share**: Conversations can be shared via generated links
-
----
-
-## Installation
-
-### Install Script (recommended)
+## Quick Start
 
 ```bash
 curl -fsSL https://opencode.ai/install | bash
+# or: npm install -g opencode-ai
+# or: brew install anomalyco/tap/opencode
 ```
 
-### Node.js
-
-```bash
-npm install -g opencode-ai
-```
-
-### Homebrew (macOS/Linux)
-
-```bash
-brew install anomalyco/tap/opencode
-```
-
-> Use the OpenCode tap for latest version. Official `brew install opencode` formula updates less frequently.
-
-### Arch Linux
-
-```bash
-sudo pacman -S opencode           # Stable
-paru -S opencode-bin              # Latest from AUR
-```
-
-### Other Methods
-
-- **Mise**: `mise use -g github:anomalyco/opencode`
-- **Docker**: `docker run -it --rm ghcr.io/anomalyco/opencode`
-- **NPM**: `npm install -g opencode-ai` (Windows compatible)
-- Direct binary downloads from Releases page
+Run `/init` in a project to generate `AGENTS.md`. Run `/connect` to add API keys.
 
 ---
 
-## Configuration
+## Config File: `opencode.json`
 
-### Connecting Providers
+### Full Schema
 
-1. Run `/connect` in the TUI, select a provider, follow auth flow
-2. Recommended for beginners: **OpenCode Zen** (curated models tested by the OpenCode team)
-3. Credentials stored in `~/.local/share/opencode/auth.json`
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
 
-### Config File
+  // Default model (provider/model-id format)
+  "model": "openrouter/google/gemini-2.5-flash",
+  "small_model": "provider/model",     // for title generation etc
+  "default_agent": "build",            // primary agent name
+  "username": "ubuntu",
 
-Configuration lives in `opencode.json` at project root:
+  // Instructions (loaded as system context)
+  "instructions": ["AGENTS.md"],       // file paths, string array
+
+  // Provider config (see Providers section below)
+  "provider": { },
+
+  // Commands (see Commands section below)
+  "command": { },
+
+  // Agents (see Agents section below)
+  "agent": { },
+
+  // Permissions (see Tools section below)
+  "permission": { },
+
+  // MCP servers (see MCP section below)
+  "mcp": { },
+
+  // Tools — enable/disable specific tools
+  "tools": { "tool_name": true/false },
+
+  // Misc
+  "logLevel": "INFO",                  // DEBUG | INFO | WARN | ERROR
+  "share": "manual",                   // manual | auto | disabled
+  "autoupdate": true,
+  "snapshot": true,                    // filesystem snapshots for undo
+  "disabled_providers": ["copilot"],
+  "enabled_providers": ["openrouter", "anthropic"],
+  "plugin": ["npm-module-name"],
+  "compaction": { "auto": true, "prune": true, "reserved": 1000 },
+  "skills": { "paths": ["/path/to/skills/"], "urls": ["https://..."] },
+  "watcher": { "ignore": ["node_modules", ".git"] },
+  "formatter": { },
+  "lsp": { },
+  "server": { "port": 4096, "hostname": "127.0.0.1" }
+}
+```
+
+### File Locations
+
+| Path | Purpose |
+|------|---------|
+| `.opencode/opencode.json` | Project-level config (this is the one that matters) |
+| `~/.config/opencode/` | Global config dir |
+| `~/.local/share/opencode/` | Runtime data: `opencode.db`, `log/`, `snapshot/` |
+| `~/.cache/opencode/` | Cache dir |
+| `~/.local/state/opencode/` | State dir |
+
+### Env Var Interpolation
+
+Use `{env:VAR_NAME}` in any string value:
+```json
+{ "provider": { "anthropic": { "options": { "apiKey": "{env:ANTHROPIC_API_KEY}" } } } }
+```
+
+---
+
+## Providers
+
+OpenCode supports 75+ LLM providers. Key ones:
+
+| Provider | Config ID | Notes |
+|----------|-----------|-------|
+| Anthropic | `anthropic` | Supports Claude Pro/Max subscription via `/connect` |
+| OpenAI | `openai` | Supports ChatGPT Plus/Pro subscription |
+| OpenRouter | `openrouter` | Multi-model routing, many models preloaded |
+| Google Vertex AI | `google-vertex-ai` | Requires `GOOGLE_APPLICATION_CREDENTIALS` |
+| Z.AI | `z-ai` | GLM models, supports GLM Coding Plan |
+| DeepSeek | `deepseek` | DeepSeek Reasoner etc |
+| Local (Ollama) | `ollama` | Requires `@ai-sdk/openai-compatible` |
+| Local (LM Studio) | `lmstudio` | Requires `@ai-sdk/openai-compatible` |
+| OpenCode Zen | `opencode` | Curated models tested by OpenCode team |
+
+### Adding a Provider
+
+1. Run `/connect` → select provider → enter API key
+2. Credentials stored in `~/.local/share/opencode/auth.json`
+3. Run `/models` to select a model
+
+### Custom Provider (OpenAI-compatible)
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
   "provider": {
-    "anthropic": {
+    "myprovider": {
+      "npm": "@ai-sdk/openai-compatible",    // for /v1/chat/completions
+      "name": "My Provider Display Name",
       "options": {
-        "baseURL": "https://api.anthropic.com/v1"
+        "baseURL": "https://api.myprovider.com/v1",
+        "apiKey": "{env:MY_API_KEY}"
+      },
+      "models": {
+        "my-model": {
+          "name": "My Model Display Name",
+          "limit": { "context": 200000, "output": 65536 }
+        }
       }
-    }
-  },
-  "agent": {
-    "build": {
-      "model": "anthropic/claude-sonnet-4-20250514"
     }
   }
 }
 ```
 
-**Note**: The `/docs/configuration` page returned 403 (blocked) when caching. Provider config and agent config sections are documented above and below from the providers and agents pages.
+**npm package choice**: Use `@ai-sdk/openai-compatible` for `/v1/chat/completions` endpoints, `@ai-sdk/openai` for `/v1/responses`.
 
 ---
 
 ## Agents
 
-OpenCode has two types of agents: **primary** (you interact directly) and **subagents** (called by primary agents or via `@` mention).
+Two types: **primary** (direct interaction) and **subagent** (specialized, called via `@` mention or Task tool).
 
-### Built-in Primary Agents
+### Built-in Agents
 
-| Agent | Description | Tools |
-|-------|-------------|-------|
-| **Build** | Default agent with all tools enabled | All |
-| **Plan** | Restricted agent for planning/analysis only | Read-only (file edits and bash set to `ask`) |
+| Agent | Mode | Purpose |
+|-------|------|---------|
+| `build` | primary | Default, all tools enabled |
+| `plan` | primary | Analysis/planning only, no edits |
+| `general` | subagent | General-purpose, full tools (except todo) |
+| `explore` | subagent | Fast read-only codebase exploration |
+| `compaction` | internal (hidden) | Context compression |
+| `title` | internal (hidden) | Session title generation |
+| `summary` | internal (hidden) | Session summary |
 
-### Built-in Subagents
+### Defining Agents
 
-| Agent | Description | Tools |
-|-------|-------------|-------|
-| **General** | General-purpose research and multi-step tasks | All (except todo) |
-| **Explore** | Fast read-only codebase exploration | Read-only |
-
-### System Agents (hidden, auto-run)
-
-- **Compaction**: Compresses long context into smaller summaries
-- **Title**: Generates session titles
-- **Summary**: Creates session summaries
-
-### Agent Configuration (JSON)
-
-In `opencode.json`:
-
+**In opencode.json:**
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
   "agent": {
-    "build": {
-      "mode": "primary",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "{file:./prompts/build.txt}",
-      "tools": {
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "plan": {
-      "mode": "primary",
-      "model": "anthropic/claude-haiku-4-20250514",
+    "reviewer": {
+      "description": "Reviews code for best practices",
+      "mode": "subagent",
+      "model": "openrouter/google/gemini-2.5-flash",
+      "temperature": 0.1,
+      "steps": 10,                        // max iterations (optional)
+      "prompt": "You are a code reviewer...", // or "{file:./prompts/review.txt}"
       "tools": {
         "write": false,
         "edit": false,
         "bash": false
-      }
-    },
-    "code-reviewer": {
-      "description": "Reviews code for best practices and potential issues",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "You are a code reviewer. Focus on security, performance, and maintainability.",
-      "tools": {
-        "write": false,
-        "edit": false
-      }
+      },
+      "permission": {
+        "bash": {
+          "git diff": "allow",
+          "git log*": "allow",
+          "*": "deny"
+        }
+      },
+      "hidden": false,                    // hide from @ autocomplete
+      "color": "#FF5733"                   // hex or theme color name
     }
   }
 }
 ```
 
-### Agent Configuration (Markdown)
-
-Place `.md` files in:
-- Global: `~/.config/opencode/agents/`
-- Project-level: `.opencode/agents/`
-
-Filename becomes the agent name. Example `.opencode/agents/review.md`:
-
+**As Markdown file** (`.opencode/agents/reviewer.md`):
 ```markdown
 ---
-description: Reviews code for quality and best practices
+description: Reviews code for quality
 mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+model: openrouter/google/gemini-2.5-flash
 temperature: 0.1
 tools:
   write: false
@@ -204,214 +199,257 @@ tools:
   bash: false
 ---
 
-You are in code review mode. Focus on:
-- Code quality and best practices
-- Potential bugs and edge cases
-- Performance implications
-- Security considerations
-Provide constructive feedback without making direct changes.
+You are a code reviewer. Focus on security, performance, and maintainability.
 ```
 
-### Agent Options Reference
+Markdown file name = agent name. Locations:
+- Global: `~/.config/opencode/agents/`
+- Project: `.opencode/agents/`
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `description` | Brief description (required for subagents) | - |
-| `mode` | `primary`, `subagent`, or `all` | `all` |
-| `model` | Override model with `provider/model-id` format | Default model |
-| `prompt` | System prompt file path: `{file:./prompts/foo.txt}` | Built-in |
-| `tools` | Object of tool names to `true`/`false` | All enabled |
-| `temperature` | 0.0-1.0 (0=deterministic, 1=creative) | Model default |
-| `top_p` | Alternative to temperature for diversity | Model default |
-| `steps` | Max agent iterations before text-only response | Unlimited |
-| `disable` | Set `true` to disable agent | `false` |
-| `hidden` | Hide subagent from `@` autocomplete menu | `false` |
-| `color` | UI color (hex or theme name) | Default |
-| `permission` | Per-agent permission overrides | Inherited |
-| `permission.task` | Control which subagents can be called via Task tool | - |
+### Key Agent Options
 
-### Permissions
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `mode` | string | `"all"` | `"primary"`, `"subagent"`, or `"all"` |
+| `model` | string | (default) | Override model for this agent |
+| `temperature` | float | (model default) | 0.0-1.0, controls randomness |
+| `steps` | int | (unlimited) | Max agent iterations before forced summary |
+| `prompt` | string | (built-in) | Custom system prompt; use `{file:./path}` for file reference |
+| `description` | string | **required** | What this agent does |
+| `hidden` | bool | false | Hide from @ autocomplete (subagent only) |
+| `disable` | bool | false | Disable this agent |
+| `color` | string | (default) | Hex color or theme name |
+| `tools` | object | (all enabled) | Per-tool boolean enable/disable |
+| `permission` | object | (inherited) | Per-tool permission overrides |
 
-Configure what agents can do:
+### Task Permissions (controlling which subagents an agent can call)
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "orchestrator": {
+      "permission": {
+        "task": {
+          "*": "deny",
+          "code-reviewer": "ask"
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## Commands
+
+Custom commands are prompts triggered by `/name`. Defined in `opencode.json` or as markdown files.
+
+### In opencode.json
+
+```json
+{
+  "command": {
+    "test": {
+      "template": "Run tests and show failures",
+      "description": "Run tests with coverage",
+      "agent": "build",              // optional: run with specific agent
+      "model": "provider/model",    // optional: override model
+      "subtask": false              // optional: force subtask mode
+    }
+  }
+}
+```
+
+### As Markdown File (`.opencode/commands/test.md`)
+
+```markdown
+---
+description: Run tests with coverage
+agent: build
+model: anthropic/claude-sonnet-4-20250514
+---
+
+Run the full test suite with coverage report and show any failures.
+Focus on the failing tests and suggest fixes.
+```
+
+File name = command name. Locations:
+- Global: `~/.config/opencode/commands/`
+- Project: `.opencode/commands/`
+
+### Prompt Placeholders
+
+| Syntax | Description |
+|--------|-------------|
+| `$ARGUMENTS` | User-provided arguments |
+| `$1`, `$2`, `$3` | Positional arguments |
+| `` !`command` `` | Shell output injection (runs in project root) |
+| `@filename` | File content inclusion |
+
+Example:
+```markdown
+---
+description: Review recent changes
+---
+
+Recent git commits:
+!`git log --oneline -10`
+
+Review these changes and suggest improvements.
+```
+
+---
+
+## Tools
+
+### Built-in Tools
+
+| Tool | Permission Key | Description |
+|------|---------------|-------------|
+| `bash` | `bash` | Execute shell commands |
+| `read` | `read` | Read file contents (supports offset/limit) |
+| `write` | `write` | Create or overwrite files |
+| `edit` | `edit` | Find-replace in existing files |
+| `grep` | `grep` | Regex content search (ripgrep) |
+| `glob` | `glob` | File pattern matching (ripgrep) |
+| `list` | `list` | List directory contents |
+| `patch` | `patch` | Apply patch files |
+| `lsp` | `lsp` | LSP operations (experimental) |
+| `skill` | `skill` | Load a SKILL.md file |
+| `todowrite` | `todowrite` | Session-scoped task tracking |
+| `webfetch` | `webfetch` | Fetch URL content |
+| `websearch` | `websearch` | Web search (Exa AI, no API key needed) |
+| `question` | `question` | Ask user questions interactively |
+| `task` | `task` | Spawn subagent tasks |
+| `batch` | `batch` | Execute up to 25 tool calls in parallel |
+| `plan_exit` | `plan_exit` | Exit plan mode, switch to build |
+
+### Permission System
+
+```json
+{
   "permission": {
-    "edit": "deny"
-  },
-  "agent": {
-    "build": {
-      "permission": {
-        "edit": "ask"
-      }
+    // Simple: string action
+    "bash": "ask",           // "ask" | "allow" | "deny"
+    "todowrite": "allow",
+    "question": "deny",
+
+    // Pattern-based: glob → action
+    "read": {
+      "*": "allow",
+      "*.env": "ask"
+    },
+    "bash": {
+      "*": "ask",
+      "git push *": "ask",
+      "git status *": "allow",
+      "grep *": "allow",
+      "python -m core.*": "allow"
+    },
+    "external_directory": {
+      "*": "ask",
+      "/home/ubuntu/.claude/skills/*": "allow"
     }
   }
 }
 ```
 
-Permission values: `"ask"` (prompt), `"allow"` (auto-approve), `"deny"` (block)
+**Rules**: Last match wins. Put `*` wildcard first, specific rules after.
 
-Per-agent bash command permissions with glob patterns:
+Pattern-based permissions available for: `read`, `edit`, `glob`, `grep`, `list`, `bash`, `task`, `external_directory`, `lsp`, `skill`.
+
+Wildcard for MCP tools: `mymcp_*` matches all tools from `mymcp` server.
+
+### `.ignore` file
+
+To include `.gitignore`d files in search/list:
+```
+!node_modules/
+!dist/
+```
+
+---
+
+## MCP Servers
+
+### Local (stdio) MCP Server
 
 ```json
 {
-  "agent": {
-    "build": {
-      "permission": {
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow"
-        }
-      }
+  "mcp": {
+    "myserver": {
+      "type": "local",
+      "command": ["npx", "-y", "@some-org/mcp-server", "--arg"],
+      "environment": { "API_KEY": "{env:MY_API_KEY}" },
+      "enabled": true,
+      "timeout": 5000
     }
   }
 }
 ```
 
-Last matching rule wins. Place `*` first, specific rules after.
-
-### Usage
-
-- **Switch primary agents**: `Tab` key or configured `switch_agent` shortcut
-- **Call subagents**: `@general help me search for this function`
-- **Navigate sessions**: `<Leader>+Right` / `<Leader>+Left` to cycle parent/child sessions
-
-### Example Agents
-
-**Documentation Agent**:
-```markdown
----
-description: Writes and maintains project documentation
-mode: subagent
-tools:
-  bash: false
----
-You are a technical writer. Create clear, comprehensive documentation.
-```
-
-**Security Audit Agent**:
-```markdown
----
-description: Performs security audits and identifies vulnerabilities
-mode: subagent
-tools:
-  write: false
-  edit: false
----
-You are a security expert. Focus on identifying potential security issues.
-```
-
----
-
-## Providers
-
-OpenCode supports **75+ LLM providers** via AI SDK and Models.dev, including local models.
-
-### Quick Setup
-
-1. `/connect` to add API key
-2. Configure provider in `opencode.json` if needed
-3. `/models` to select a model
-
-### Notable Providers
-
-| Provider | Notes |
-|----------|-------|
-| **Anthropic** | Claude Pro/Max subscription or API key |
-| **OpenAI** | ChatGPT Plus/Pro subscription or API key |
-| **OpenCode Zen** | Curated models tested by OpenCode team |
-| **GitHub Copilot** | Device flow auth at github.com/login/device |
-| **GitLab Duo** | OAuth or PAT, with plugin for MR/issue tools |
-| **Amazon Bedrock** | AWS credentials, profile, or bearer token |
-| **Google Vertex AI** | Service account JSON or gcloud CLI auth |
-| **Azure OpenAI** | Resource name + API key |
-| **Ollama** | Local models via OpenAI-compatible API |
-| **LM Studio** | Local models via OpenAI-compatible API |
-| **llama.cpp** | Local models via llama-server |
-
-### Custom Provider (OpenAI-compatible)
+### Remote (SSE) MCP Server
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "myprovider": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "My AI Provider Display Name",
-      "options": {
-        "baseURL": "https://api.myprovider.com/v1",
-        "apiKey": "{env:MY_API_KEY}",
-        "headers": {
-          "Authorization": "Bearer custom-token"
-        }
-      },
-      "models": {
-        "my-model-name": {
-          "name": "My Model Display Name",
-          "limit": {
-            "context": 200000,
-            "output": 65536
-          }
-        }
-      }
+  "mcp": {
+    "myserver": {
+      "type": "remote",
+      "url": "https://mcp.example.com/sse",
+      "headers": { "Authorization": "Bearer ..." }
     }
   }
 }
 ```
 
-Key fields:
-- `npm`: `@ai-sdk/openai-compatible` for `/v1/chat/completions`, `@ai-sdk/openai` for `/v1/responses`
-- `options.baseURL`: API endpoint
-- `options.apiKey`: Can use `{env:VAR_NAME}` syntax
-- `options.headers`: Custom headers per request
-- `limit.context` / `limit.output`: Token limits for context display
+### CLI
 
-### Local Models
-
-**Ollama**:
-```json
-{
-  "provider": {
-    "ollama": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama (local)",
-      "options": { "baseURL": "http://localhost:11434/v1" },
-      "models": { "llama2": { "name": "Llama 2" } }
-    }
-  }
-}
+```bash
+opencode mcp add     # Interactive MCP server addition
+opencode mcp list    # List servers and status
+opencode mcp auth <name>   # OAuth authentication
+opencode mcp logout <name> # Remove OAuth credentials
+opencode mcp debug <name>  # Debug OAuth connection
 ```
-
-**LM Studio**:
-```json
-{
-  "provider": {
-    "lmstudio": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "LM Studio (local)",
-      "options": { "baseURL": "http://127.0.0.1:1234/v1" },
-      "models": { "google/gemma-3n-e4b": { "name": "Gemma 3n-e4b (local)" } }
-    }
-  }
-}
-```
-
-### Troubleshooting
-
-1. `opencode auth list` to check stored credentials
-2. Verify provider ID matches between `/connect` and `opencode.json`
-3. Use correct npm package (`@ai-sdk/cerebras` for Cerebras, `@ai-sdk/openai-compatible` for others)
-4. Check `options.baseURL` is correct
 
 ---
 
-## Cached Pages
+## Session Management
 
-| Page | URL | Status |
-|------|-----|--------|
-| Main docs | https://opencode.ai/docs | OK |
-| Configuration | https://opencode.ai/docs/configuration | 403 (blocked) |
-| Agents | https://opencode.ai/docs/agents | OK |
-| Providers | https://opencode.ai/docs/providers | OK (bonus) |
+| Command | Description |
+|---------|-------------|
+| `opencode --continue` / `-c` | Resume last session |
+| `opencode --session <id>` | Resume specific session |
+| `opencode --fork` | Fork a session |
+| `opencode session list` | List sessions |
+| `opencode session delete` | Delete a session |
+| `opencode export` | Export session as JSON |
+| `opencode import` | Import session from JSON |
+| `opencode serve` | Headless server |
+| `opencode web` | Server + web UI |
+| `opencode run --format json` | JSON event stream |
+
+---
+
+## Other Features
+
+| Feature | Description |
+|---------|-------------|
+| `opencode stats` | Token usage, cost, tool breakdowns |
+| `opencode agent create` | Interactive agent creation |
+| `opencode pr <number>` | Fetch + checkout PR, then run |
+| `opencode db` | Interactive SQLite shell |
+| `/undo` | Undo last change |
+| `/redo` | Redo undone change |
+| `/share` | Generate shareable link |
+| LSP | goToDefinition, findReferences, hover, etc. |
+
+---
+
+## Annotations
+
+> Recent agent notes from working with OpenCode
+
+- [Configuration](annotations/2026-04-07-config.md) - Full config schema, providers, agents, commands
+- [Provider Setup](annotations/2026-04-07-providers.md) - OpenRouter, Anthropic, Z.AI, custom providers
