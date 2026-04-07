@@ -1,67 +1,58 @@
-# OneShot v2 Redesign — Conduct Session
+# OpenCode Adapter — Conduct Session
 
-**Date**: 2026-04-04
-**Phase**: Intake → Plan
-**Research basis**: `docs/research/oneshot-v2-redesign.md`
+**Date**: 2026-04-07
+**Plan**: `1shot/OPENCODE_ADAPTER_PLAN.md`
+**Previous session**: v2 redesign complete (2026-04-04)
 
 ## Goal
 
-Plan all 10 redesign items from the v2 research report. Implement items 1-7. Defer 8-10 with clear handoff notes.
+Make OpenCode a universal harness for OneShot. Same AGENTS.md, same routing, same dispatch. When Claude tokens run out, switch to OpenCode and keep working.
 
-## Deliverables (items 1-7)
+## Deliverables (all 7 phases)
 
-1. **Risk field on Task + autonomy gating** — Add `risk_level` to task schema, use alongside lane routing to gate autonomy
-2. **Mandatory verification gate** — Non-optional verify step in /conduct and /full operators
-3. **TASK_SPEC.md template** — Standardized task spec template for complex tasks
-4. **Session-end → repo feedback loop** — Extend /handoff to propose CLAUDE.md/instruction updates
-5. **Exploration artifact (JSON)** — Structured explore output persisted to 1shot/
-6. **Scope creep detection** — Compare git diff --stat against planned file list in build loop
-7. **Machine-readable plan schema** — JSON plan schema alongside ROADMAP.md
-
-## Deferred (items 8-10)
-
-8. Parallel exploration wiring — wire existing dispatch runner into exploration phase
-9. Formal adapter interface (AgentHarness) — defer until more harnesses added
-10. Evaluation framework — defer until oneshot is more mature
+1. Phase 0: Provider bootstrap + AGENTS.md fix + smoke test
+2. Phase 1: Foundation fixes (argus_client config, research.md, cheap-worker bounded)
+3. Phase 2: Command translations (/short, /conduct, /handoff, /restore, /freesearch, /doc)
+4. Phase 3: Persistent task tracking shim (tasks.json + scripts/tasks.py)
+5. Phase 4: Janitor cron (update janitor-cron.sh + systemd timer)
+6. Phase 5: OpenCode agent definitions (oneshot primary agent)
+7. Phase 6: MCP integration evaluation (Argus as MCP server)
 
 ## Acceptance Criteria
 
-- All 7 items implemented with code + tests
-- `ci.sh` passes
-- Existing skills (/short, /full, /conduct) still work
-- `/handoff` proposes CLAUDE.md updates
-- `/conduct` produces structured exploration artifact
-- `/conduct` enforces verification gate
-- `/conduct` detects scope creep
-- Demo run of /conduct showing new features
-- ROADMAP.md covers all 10 items (with defer notes for 8-10)
-- Updated docs/instructions/ where needed
+- [ ] `opencode` reads AGENTS.md and understands the operating contract
+- [ ] `/short` command works in OpenCode
+- [ ] `/conduct` command works in OpenCode
+- [ ] `python -m core.router.resolve --class implement_small` returns correct routing
+- [ ] `python -m core.dispatch.run` dispatches to workers
+- [ ] Argus search works via `/freesearch` in OpenCode
+- [ ] Task tracking survives session end (tasks.json persists)
+- [ ] Janitor runs via cron, outputs to `.janitor/`
+- [ ] Claude Code still works exactly as before (no regressions)
 
 ## Scope (IN)
 
-- `core/` Python modules (task_schema, router, new schemas)
-- `.claude/skills/` operator prompts (conduct, full, short, handoff)
-- `docs/instructions/` documentation
-- `templates/` new templates (TASK_SPEC)
-- `scripts/` ci.sh enhancements
-- `config/` policy files
+- `.opencode/` directory (config, agents, commands)
+- `core/search/argus_client.py` (read config)
+- `scripts/tasks.py` (new persistent task CLI)
+- `scripts/janitor-cron.sh` (update, not deprecated)
+- `~/.config/systemd/user/oneshot-janitor.*` (new timer)
 
 ## Scope (OUT)
 
-- TypeScript rewrite of core
-- New harness adapters (OpenCode, etc.)
-- Changes to community-starter template
-- Changes to secrets/ system
-- UI/visual components
+- All `.claude/` files — no changes to Claude Code config
+- `core/router/`, `core/task_schema.py` — CLI-agnostic, no changes
+- `config/lanes.yaml`, `config/workers.yaml` — no changes
+- AGENTS.md — neutral contract stays as-is
+- SSH dispatch, OpenCode as MCP server, plugin SDK
 
 ## Constraints
 
-- Python only for new code (no TypeScript)
-- Don't break existing routing/lane system — extend it
-- Keep it simple — JSON schemas, not full frameworks
-- Subagent optimization: push heavy work (file reads, research, exploration) into subagents to keep main context lean
-- Strict scope discipline — this session is about items 1-7 only
+- No breaking changes to Claude Code
+- Python only for new code
+- OpenCode commands use `agent: build` for dispatch capability
+- Subagents stay bounded — no dispatch authority
 
-## Riskiest / Most Uncertain
+## Riskiest Part
 
-**Scope creep of this very task.** Mitigation: strict task list, circuit breaker, no "while we're at it" additions.
+MCP integration (not drop-in between CLIs). Mitigated by treating as optional, testing individually.

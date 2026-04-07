@@ -1,13 +1,27 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "model": "openrouter/google/gemini-2.5-flash",
+  "default_agent": "oneshot",
   "provider": {
     "anthropic": {
       "options": {
-        "apiKey": "{env:ANTHROPIC_API_KEY}"
+        "apiKey": "{env:ANTROPIC_API_KEY}"
+      }
+    },
+    "openrouter": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://openrouter.ai/api/v1",
+        "apiKey": "{env:OPENROUTER_API_KEY}"
+      }
+    },
+    "openai": {
+      "options": {
+        "apiKey": "{env:OPENAI_API_KEY}"
       }
     }
   },
   "instructions": [
-    "AGENTS.md"
+    "../AGENTS.md"
   ]
 }

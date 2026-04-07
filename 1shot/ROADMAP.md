@@ -1,53 +1,54 @@
-# OneShot v2 Redesign — Roadmap
+# OpenCode Adapter — Roadmap
 
-**Session**: 2026-04-04
-**Research**: `docs/research/oneshot-v2-redesign.md`
+**Date**: 2026-04-07
+**Plan**: `1shot/OPENCODE_ADAPTER_PLAN.md`
 
-## Phases
+## Execution Order
 
-### Phase A: Foundations (parallel, no dependencies)
+Based on Codex review corrections: config/agents before commands, providers first.
 
-- **A1. Risk field** — Add `RiskLevel` to task schema, autonomy rules to lane policy
-- **A2. Verify gate** — Make verification non-optional in /conduct and /full
-- **A3. TASK_SPEC template** — Create standardized task spec template
-- **A4. Feedback loop** — Extend /handoff to propose CLAUDE.md updates
+### Phase 0: Provider + Config Bootstrap
+- 0A: Add openrouter/openai/google providers to opencode.json
+- 0B: Fix AGENTS.md reference (direct path, not indirection)
+- 0C: Smoke test — verify providers respond
 
-### Phase B: Integration (depends on A3)
+### Phase 5A: OneShot Primary Agent
+- Define `.opencode/agents/oneshot.md` with dispatch capability via bash
 
-- **B1. Explore artifact** — Structured exploration output to `1shot/explore.json`
-- **B2. Scope guard** — Detect scope creep by comparing diff to planned files
+### Phase 1: Foundation Fixes
+- 1A: argus_client.py reads config/search.yaml
+- 1B: research.md uses argus_client instead of raw curl
+- 1D: cheap-worker.md — keep bash:false, document as bounded-only
 
-### Phase C: Schema (depends on A1, A3)
+### Phase 2: Command Translations
+- 2A: /short command
+- 2B: /conduct command (rewrite)
+- 2C: /handoff command
+- 2D: /restore command
+- 2E: /freesearch command
+- 2F: /doc command
 
-- **C1. Plan schema** — Machine-readable plan alongside ROADMAP.md
+### Phase 3: Persistent Task Tracking
+- 3A: scripts/tasks.py CLI
+- 3B: 1shot/tasks.json format + session start loading
 
-### Phase D: Docs + Demo
+### Phase 4: Janitor Cron
+- 4A: Update janitor-cron.sh (remove DEPRECATED, wire pure-compute jobs)
+- 4B: systemd timer
 
-- **D1. Update instructions** — task-classes.md, workflow.md, oneshot.md
-- **D2. Demo run** — Run /conduct with new features, verify everything works
+### Phase 6: MCP Integration
+- 6A: Evaluate Argus as MCP server
+- 6B: Add if viable, skip if not
 
-## Deferred (items 8-10)
+## Dependencies
 
-- **8. Parallel exploration** — Wire dispatch into explore phase
-- **9. Adapter interface** — Formal AgentHarness TS interface
-- **10. Evaluation framework** — Benchmark matrix + metrics
-
-These are documented in ROADMAP for future sessions. No code changes needed now.
-
-## Subagent Strategy
-
-Throughout implementation:
-- **Explore subagents**: Push all file reading, codebase exploration into subagents
-- **Main context**: Stay lean — coordination, decisions, task tracking only
-- **Each subagent returns**: Compact summary, not full file contents
-- **Pattern**: Hub-and-spoke — main agent delegates, subagents execute and report back
+```
+Phase 0 (providers, AGENTS.md) → Phase 5A (oneshot agent) → Phase 1 (foundation) → Phase 2 (commands)
+Phase 3 (tasks.py) — independent, can run anytime after Phase 0
+Phase 4 (janitor) — independent
+Phase 6 (MCP) — last, after everything works
+```
 
 ## Success Criteria
 
-- All 7 items have working code
-- `ci.sh` passes
-- Existing skills (/short, /full, /conduct) still work
-- `/handoff` proposes CLAUDE.md updates
-- `/conduct` produces `explore.json`, enforces verify, detects scope creep
-- `1shot/plan.json` is valid against schema
-- Demo run completes successfully
+See PROJECT.md.

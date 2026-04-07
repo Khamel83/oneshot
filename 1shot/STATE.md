@@ -1,47 +1,50 @@
 # OneShot Conduct State
 
-**Session**: 2026-04-04 v2-redesign
+**Session**: 2026-04-07 opencode-adapter
 **Phase**: complete
 **Loop**: 1
 **Blockers**: 0
 
 ## Progress
 
-- [x] Provider detection: codex, gemini (no argus)
-- [x] Intake questions answered
+- [x] Provider detection: codex (yes), gemini (yes), opencode (v1.3.13), argus (up)
+- [x] Plan reviewed: `1shot/OPENCODE_ADAPTER_PLAN.md` (Codex-reviewed v2)
+- [x] Intake confirmed: all 7 phases, argus up
 - [x] PROJECT.md written
 - [x] ROADMAP.md written
-- [x] Tasks created (9 tasks, all completed)
-- [x] Phase A: Risk field, verify gate, TASK_SPEC, handoff feedback (4 parallel)
-- [x] Phase B+C: Explore artifact, scope guard, plan schema (3 parallel)
-- [x] Phase D: Docs updated
-- [x] Verify: Python compiles, imports work, risk inference passes, plan schema serializes, lane policy routes with risk
-- [x] Challenge: No blockers found, all changes are clean
-- [x] Session-end learning: No corrections given 2+ times
+- [x] 13 tasks created with dependencies
+- [x] All 13 tasks completed
+- [x] Verify: argus_client reads config, tasks.py works, router resolves, OpenCode loads with oneshot agent
+- [x] No Claude Code regressions (no .claude/ files touched)
+- [x] Phase 6 (MCP): Argus is REST API only, no MCP interface. Deferred.
 
 ## Files Changed
 
-### New Files (5)
-- `core/plan_schema.py` — Machine-readable plan schema
-- `templates/TASK_SPEC.md` — Standardized task spec template
-- `docs/research/oneshot-v2-redesign.md` — Research report (saved for reference)
-- `1shot/PROJECT.md`, `1shot/ROADMAP.md`, `1shot/STATE.md` — Session artifacts
+### New Files (7)
+- `.opencode/agents/oneshot.md` — Primary agent with dispatch capability
+- `.opencode/commands/short.md` — /short command
+- `.opencode/commands/handoff.md` — /handoff command
+- `.opencode/commands/restore.md` — /restore command
+- `.opencode/commands/freesearch.md` — /freesearch command
+- `.opencode/commands/doc.md` — /doc command
+- `scripts/tasks.py` — Persistent task tracking CLI
 
-### Modified Files (9)
-- `core/task_schema.py` — RiskLevel enum, RISK_AUTONOMY, infer_risk()
-- `core/router/lane_policy.py` — Risk-aware routing
-- `.claude/skills/conduct/SKILL.md` — Explore artifact, TASK_SPEC, plan.json, scope check, verify gate
-- `.claude/skills/full/SKILL.md` — Mandatory verification gate
-- `.claude/skills/handoff/SKILL.md` — Learnings & suggested updates feedback loop
-- `docs/instructions/task-classes.md` — Risk classification section
-- `docs/instructions/workflow.md` — v2 features note
-- `docs/instructions/oneshot.md` — v2 capabilities section
-- `AGENTS.md` — V2 FEATURES section
+### Modified Files (6)
+- `.opencode/opencode.json` — Added 3 providers, fixed AGENTS.md reference, set default agent
+- `.opencode/commands/conduct.md` — Full rewrite with 5-phase workflow
+- `.opencode/commands/research.md` — Uses argus_client instead of raw curl
+- `.opencode/agents/cheap-worker.md` — Documented as bounded-only, no dispatch authority
+- `core/search/argus_client.py` — Reads config/search.yaml for base_url
+- `scripts/janitor-cron.sh` — Updated to run pure-compute jobs, sources API key for onboarding
 
-## Deferred (items 8-10)
+### Systemd (new, not tracked)
+- `~/.config/systemd/user/oneshot-janitor.service`
+- `~/.config/systemd/user/oneshot-janitor.timer`
 
-- 8. Parallel exploration wiring
-- 9. Formal adapter interface
-- 10. Evaluation framework
+## Notes
 
-Documented in ROADMAP.md for future sessions.
+- OpenRouter provider verified working via smoke test
+- OpenAI provider: quota exceeded (no credits on API key account, same as codex)
+- Google/Gemini provider: GEMINI_API_KEY not in vault, needs to be added
+- Argus `cheap` mode no longer exists (available: discovery, grounding, recovery, research)
+- Janitor timer created but NOT enabled (needs `systemctl --user enable oneshot-janitor.timer`)

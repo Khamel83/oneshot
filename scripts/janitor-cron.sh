@@ -1,86 +1,78 @@
 #!/bin/bash
-# Janitor cron — legacy fallback for background intelligence.
+# Janitor cron — periodic background intelligence for OneShot projects.
 #
-# DEPRECATED: Hooks now handle everything automatically:
-#   - SessionStart: pure-compute jobs (test gaps, code smells, etc.)
-#   - SessionEnd: LLM jobs (summarization, patterns, onboarding)
-#   - PostToolUse: event recording
-#   - PreCompact: pre-compaction summaries
+# Runs pure-compute analysis jobs on a schedule via systemd timer.
+# Claude Code hooks still handle event recording and session-end tasks.
 #
-# This script is kept as a safety net for projects that accumulated events
-# but didn't get a clean SessionEnd (e.g., crash, force-kill).
+# Jobs run:
+#   - detect_test_gaps: source files with no tests
+#   - scan_code_smells: oversized files/functions
+#   - detect_config_drift: uncommitted config changes
+#   - build_dependency_map: import graph
+#   - generate_onboarding: regenerate CLAUDE.local.md (if events exist)
 #
-# INSTALL (optional): crontab -e
-#   */15 * * * * /home/ubuntu/github/oneshot/scripts/janitor-cron.sh >> /tmp/janitor-cron.log 2>&1
+# INSTALL: Already installed via systemd user unit (oneshot-janitor.timer)
+# MANUAL: bash scripts/janitor-cron.sh
 
 set -euo pipefail
 
-REPO_BASE="${HOME}/github"
-JANITOR_LOG="${REPO_BASE}/oneshot/.janitor/cron-runs.log"
+REPO_BASE="${HOME}/github/oneshot"
+JANITOR_DIR="${REPO_BASE}/.janitor"
+JANITOR_LOG="${JANITOR_DIR}/cron-runs.log"
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 log() {
   echo "[$TIMESTAMP] $*" >> "$JANITOR_LOG"
 }
 
-# Find projects with .janitor/events.jsonl that have unprocessed events
-find_projects() {
-  find "$REPO_BASE" -maxdepth 3 -name "events.jsonl" -path "*/.janitor/*" 2>/dev/null | while read events_file; do
-    project_dir=$(dirname "$(dirname "$events_file")")
-    # Only process if no recent session_end marker (means SessionEnd hook didn't fire)
-    if ! tail -20 "$events_file" 2>/dev/null | grep -q '"type":"session_end"'; then
-      echo "$project_dir"
-    fi
-  done
-}
+cd "$REPO_BASE" || { log "ERROR: Cannot cd to $REPO_BASE"; exit 1; }
 
-process_project() {
-  local project_dir="$1"
-  local last_processed="$project_dir/.janitor/last-cron-processed"
+mkdir -p "$JANITOR_DIR"
 
-  # Skip if processed within last 30 minutes
-  if [ -f "$last_processed" ]; then
-    last_time=$(stat -c %Y "$last_processed" 2>/dev/null || echo 0)
-    now=$(date +%s)
-    age=$((now - last_time))
-    if [ "$age" -lt 1800 ]; then
-      return 0
-    fi
-  fi
+log "--- Janitor cron start ---"
 
-  log "Catching up: $project_dir (no clean session_end found)"
-  cd "$project_dir" 2>/dev/null || return 0
-
-  python3 -c "
-import sys, os, time
-from pathlib import Path
+# Pure-compute jobs (no LLM needed)
+python3 -c "
+import sys, os
 sys.path.insert(0, os.getcwd())
 try:
-    from core.janitor.jobs import run_session_end
-    run_session_end('$project_dir')
-    print('LLM jobs completed')
-except ImportError as e:
-    print(f'SKIP: {e}')
+    from core.janitor.jobs import detect_test_gaps, scan_code_smells, detect_config_drift, build_dependency_map
+
+    print('detect_test_gaps...')
+    detect_test_gaps()
+    print('scan_code_smells...')
+    scan_code_smells()
+    print('detect_config_drift...')
+    detect_config_drift()
+    print('build_dependency_map...')
+    build_dependency_map()
+    print('All pure-compute jobs completed')
 except Exception as e:
     print(f'ERROR: {e}')
+    sys.exit(1)
 " 2>&1 | while read line; do
-    log "  $line"
-  done
+  log "  $line"
+done
 
-  # Mark processed
-  echo "$TIMESTAMP" > "$last_processed"
-}
-
-# Main
-log "--- Janitor cron start (fallback mode) ---"
-
-projects=$(find_projects)
-if [ -z "$projects" ]; then
-  log "All projects have clean session_end markers — nothing to do"
-else
-  for project in $projects; do
-    process_project "$project"
-  done
+# Onboarding generation (lightweight, needs LLM for summarization)
+if [ -f "${JANITOR_DIR}/events.jsonl" ]; then
+  export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null)" || true
+  if [ -n "$OPENROUTER_API_KEY" ]; then
+    python3 -c "
+import sys, os
+sys.path.insert(0, os.getcwd())
+try:
+    from core.janitor.jobs import generate_onboarding
+    generate_onboarding()
+    print('Onboarding updated')
+except Exception as e:
+    print(f'ONBOARDING_SKIP: {e}')
+" 2>&1 | while read line; do
+      log "  $line"
+    done
+  else
+    log "  ONBOARDING_SKIP: No OPENROUTER_API_KEY available"
+  fi
 fi
 
 log "--- Janitor cron end ---"
