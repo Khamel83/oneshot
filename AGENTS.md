@@ -85,6 +85,8 @@ Auto-expiry: `glm_claude` worker checks `plan_expires` from `config/workers.yaml
 | `/doc` | Cache external documentation |
 | `/vision` | Image/website analysis |
 | `/secrets` | SOPS/Age secrets management |
+| `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
+| `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
 
 ## TERMINAL ENTRY POINTS
 

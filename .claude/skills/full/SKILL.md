@@ -86,12 +86,22 @@ When invoked:
 
 ### Phase 3: Execution
 
-1. **Milestone Tracking**
+1. **Methodology Selection** (per milestone — automatic)
+   For each milestone task, inspect the task description and apply the right protocol:
+   - **Bug fix** (fix, bug, broken, error, crash, failing, wrong, unexpected, regression,
+     investigate, troubleshoot, not working, incorrect) → follow the `/debug` protocol:
+     investigate → analyze → hypothesize → fix. Phases 1-3 are read-only before any code.
+   - **New feature / implementation** (implement, add, create, build, new endpoint, new function)
+     → follow the `/tdd` protocol: RED-GREEN-REFACTOR. No production code without a failing
+     test shown first.
+   - **Doc edit, config change, refactor**: no special methodology needed.
+
+2. **Milestone Tracking**
    - Work through tasks in order
    - Commit after each milestone
    - Update `1shot/STATE.md` with progress
 
-2. **Dispatch Non-Premium Tasks**
+3. **Dispatch Non-Premium Tasks**
    - For each milestone task, classify using task-classes.md and determine category
    - **Follow the dispatch protocol** (see `~/.claude/skills/_shared/dispatch.md`):
      - Premium tasks (planning, review, integration) → Claude handles inline
@@ -100,11 +110,11 @@ When invoked:
      - Write manifests to `1shot/dispatch/`
    - Review dispatch output, validate against acceptance criteria, commit
 
-3. **Burn-Down Mode**
+4. **Burn-Down Mode**
    - Complete one milestone fully before starting next
    - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
 
-4. **Context Checkpoints**
+5. **Context Checkpoints**
    - At 50% context: suggest /handoff
    - At 70% context: auto-create handoff
 
@@ -118,17 +128,17 @@ When invoked:
    - If codex unavailable: Claude performs adversarial review inline
    - New issues found → fix, then re-verify
 
-2. **Verification (MANDATORY — non-negotiable)**
+2. **Verification (MANDATORY — evidence required)**
 
-   **No verification, no completion. This is non-negotiable.**
+   **No verification, no completion. Assertions don't count — show the output.**
 
-   Every milestone must pass through this checklist before it can be marked completed:
+   Every milestone must pass this checklist. Each step requires actual command output.
 
-   1. **Run targeted tests** — if test files exist for the changed files, run them
-   2. **Run lint/static analysis** — shellcheck, prettier, ruff, or whatever the project uses
-   3. **Run type check** — tsc, pyright, or equivalent
-   4. **Check acceptance criteria** — verify each criterion from `1shot/PROJECT.md` or the task's description
-   5. **Review diff against plan** — confirm changed files match what was scoped in ROADMAP.md; flag out-of-scope changes
+   1. **Run targeted tests** — if test files exist, run them. Show output.
+   2. **Run lint/static analysis** — show output (or lack of errors). No linter? State what was tried.
+   3. **Run type check** — show output.
+   4. **Check acceptance criteria** — go through each criterion one by one. Cite evidence.
+   5. **Review diff against plan** — confirm changed files match ROADMAP.md scope.
 
    If any check fails:
    - Do not proceed to the summary — go back and fix the issue

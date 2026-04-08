@@ -53,6 +53,8 @@ Instructions load based on project type:
 | `/doc` | Cache external documentation |
 | `/vision` | Image/website visual analysis |
 | `/secrets` | SOPS/Age secrets management |
+| `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
+| `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
 
 ## v2 Capabilities
 

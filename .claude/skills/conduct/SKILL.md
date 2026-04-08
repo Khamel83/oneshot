@@ -98,7 +98,15 @@ Repeat until no unblocked tasks remain:
 
 1. Pick next unblocked task (`TaskList` → lowest ID pending)
 2. `TaskUpdate` → in_progress
-3. **Classify and dispatch**:
+3. **Select methodology** (automatic — based on task description):
+   - **Bug fix** (fix, bug, broken, error, crash, failing, wrong, unexpected, regression,
+     investigate, troubleshoot, not working, incorrect) → apply `/debug` protocol:
+     investigate → analyze → hypothesize → fix. Phases 1-3 are read-only.
+   - **New feature / implementation** (implement, add, create, build, new endpoint,
+     new function, new behavior) → apply `/tdd` protocol: RED-GREEN-REFACTOR.
+     No production code without a failing test shown first.
+   - **Doc edit, config change, refactor, review**: no special methodology needed.
+4. **Classify and dispatch**:
    - Determine task class (see task-classes.md)
    - Resolve lane: `python -m core.router.resolve --class <class>`
    - **Follow the dispatch protocol** (see `~/.claude/skills/_shared/dispatch.md`):
@@ -111,8 +119,8 @@ Repeat until no unblocked tasks remain:
      The Agent tool spawns full Claude Code sessions — only use Agent tool for
      complex multi-step reasoning that the dispatch runner can't handle.
      For batch file processing, extraction, summarization → always use `core.dispatch.run`.
-4. **Review**: If task requires review, dispatch review to reviewer (see dispatch.md Step 7)
-5. **Scope check** — Before verification, compare actual changes against plan:
+5. **Review**: If task requires review, dispatch review to reviewer (see dispatch.md Step 7)
+6. **Scope check** — Before verification, compare actual changes against plan:
    ```bash
    # Get files actually changed
    git diff --name-only
@@ -125,41 +133,67 @@ Repeat until no unblocked tasks remain:
    - If changes are within plan → continue to verification
 
    This prevents the common pattern where a "small fix" grows to touch unrelated subsystems.
-6. **Verify**: Run the Phase 3 verification checklist (see below) — all checks must pass before marking completed
-7. `TaskUpdate` → completed (only after verification passes)
-8. Update `1shot/STATE.md`: increment loop count, log action
-9. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
+7. **Verify**: Run the Phase 3 verification checklist (see below) — all checks must pass before marking completed
+8. `TaskUpdate` → completed (only after verification passes)
+9. Update `1shot/STATE.md`: increment loop count, log action
+10. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
 
 If 3 consecutive tasks hit circuit breaker → stop, surface to user.
 
-### Phase 3: Verify (MANDATORY — non-negotiable)
+### Phase 3: Verify (MANDATORY — evidence required)
 
-**No verification, no completion. This is non-negotiable.**
+**No verification, no completion. Assertions don't count — show the output.**
 
-Every task must pass through this phase before it can be marked completed. There are no exceptions — even if the change is "trivial," "just a doc edit," or "obviously correct."
+Every task must pass this checklist before it can be marked completed. No exceptions —
+"trivial," "just a doc edit," and "obviously correct" all get verified.
 
-For each completed task, run this checklist in order:
+For each completed task, run this checklist. **Each step requires showing actual command
+output.** "I checked it" or "tests pass" without output = verification not done.
 
-1. **Run targeted tests** — if test files exist for the changed files, run them
-2. **Run lint/static analysis** — shellcheck, prettier, ruff, or whatever the project uses
-3. **Run type check** — tsc, pyright, or equivalent
-4. **Check acceptance criteria** — verify each criterion from `1shot/PROJECT.md` or the task's description
-5. **Review diff against plan** — confirm changed files match what was scoped in the plan; flag out-of-scope changes
+1. **Run targeted tests** — if test files exist for the changed files, run them.
+   Show the output. If no test files exist, state explicitly: "No test files found for
+   {files changed}." This is not a pass — it's a gap.
+2. **Run lint/static analysis** — shellcheck, prettier, ruff, or whatever the project uses.
+   Show the output (or lack of errors). If no linter is configured, state what was tried.
+3. **Run type check** — tsc, pyright, or equivalent. Show the output.
+4. **Check acceptance criteria** — go through each criterion from `1shot/PROJECT.md` or the
+   task description one by one. For each: state the criterion, then cite the evidence
+   (file changed, output shown, behavior confirmed). A criterion without evidence is unverified.
+5. **Review diff** — `git diff` and confirm changed files match the plan scope.
+   Flag anything out of scope.
 
 If any check fails:
 - `TaskUpdate` back to **pending** — never mark as completed with failing checks
 - Loop back to Phase 2 with the specific failure as context
 - Document what failed in `1shot/BLOCKERS.md` if it was not resolved in one retry
 
-### Phase 4: Challenge (adversarial pass)
+### Phase 4: Challenge (two-stage review)
+
+Two-stage adversarial review. Stage A must pass before Stage B runs.
+
+#### Stage A: Spec Compliance
+
+Did we build what PROJECT.md asked for?
+
+1. Re-read `1shot/PROJECT.md` — every acceptance criterion, scope constraint, and goal
+2. For each acceptance criterion: cite the evidence (file changed, test output, behavior confirmed)
+3. Check scope: are there changes to files that were explicitly out of scope?
+4. **If any criterion has no evidence** → fail Stage A, create tasks to address gaps, loop to Phase 2
+5. **If scope was violated** → fail Stage A, flag for human review
+
+**Stage A pass** → proceed to Stage B. **Stage A fail** → do not run Stage B.
+
+#### Stage B: Code Quality
+
+Is the implementation well-built?
 
 1. `git diff $(git merge-base HEAD main)..HEAD` — full diff since conduct started
 2. If Codex available:
    ```bash
-   unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access -o /tmp/conduct-challenge.json "Review this diff: (1) what could break, (2) what was missed, (3) edge cases. Diff: [content]"
+   unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access -o /tmp/conduct-challenge.json "Review this diff for code quality: (1) what could break in production, (2) what edge cases are unhandled, (3) are there any security concerns, (4) does it follow the repo's existing patterns. Diff: [content]"
    ```
    Parse: `jq 'select(.type=="item.completed") | .item.text' /tmp/conduct-challenge.json`
-   If Codex unavailable: Claude performs adversarial review inline.
+   If Codex unavailable: Claude performs code quality review inline.
 3. New issues → create Tasks → loop to Phase 2
 4. Clean pass → update STATE.md: phase = "complete"
 

@@ -51,7 +51,17 @@ When invoked:
    - General tasks (write tests, fix bug, refactor): skip search, proceed
    - Specialized domains (security, blockchain, ML, infra, specific parsers): search
 
-6. **Execute in Burn-Down Mode**
+6. **Methodology Selection** (automatic)
+   Inspect the task description. Apply the right protocol automatically:
+   - **Bug fix** (fix, bug, broken, error, crash, failing, wrong, unexpected, regression,
+     investigate, troubleshoot, not working, incorrect) → follow the `/debug` protocol:
+     investigate → analyze → hypothesize → fix. Phases 1-3 are read-only.
+   - **New feature / implementation** (implement, add, create, build, new endpoint, new function,
+     new behavior) → follow the `/tdd` protocol: RED-GREEN-REFACTOR. No production code
+     without a failing test shown first.
+   - **Doc edit, config change, refactor**: no special methodology needed, execute directly.
+
+7. **Execute in Burn-Down Mode**
    - Complete one task fully before starting next
    - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
    - No "pending review" — either done or blocked
@@ -60,7 +70,7 @@ When invoked:
      (see `~/.claude/skills/_shared/dispatch.md`)
    - If codex unavailable → Claude handles review inline
 
-7. **Show Summary on Completion**
+8. **Show Summary on Completion**
    ```
    📊 Session Summary
    ├─ Tasks completed: X

@@ -51,7 +51,14 @@ Classifies tasks by type, routes to lanes, dispatches to workers, reviews. Loops
 Repeat until no unblocked tasks remain:
 
 1. Pick next unblocked task (lowest ID)
-2. **Classify and dispatch**:
+2. **Select methodology** (automatic — based on task description):
+   - **Bug fix** (fix, bug, broken, error, crash, failing, wrong, unexpected, regression,
+     investigate, troubleshoot, not working, incorrect) → apply `/debug` protocol: investigate →
+     analyze → hypothesize → fix. Phases 1-3 are read-only.
+   - **New feature / implementation** (implement, add, create, build, new endpoint,
+     new function) → apply `/tdd` protocol: RED-GREEN-REFACTOR.
+     No production code without a failing test shown first.
+3. **Classify and dispatch**:
    ```bash
    python3 -m core.router.resolve --class <task_class>
    python3 -m core.dispatch.run --class <task_class> --prompt "task description"
@@ -69,20 +76,37 @@ Repeat until no unblocked tasks remain:
 
 If 3 consecutive tasks hit circuit breaker → stop and surface to user.
 
-### Phase 3: Verify
+### Phase 3: Verify (MANDATORY — evidence required)
+
+**Assertions don't count — show the output.** No exceptions. Each step requires actual command output as evidence.
 
 For each completed task:
-1. Run targeted tests
-2. Run lint/typecheck
-3. Check acceptance criteria from PROJECT.md
-4. Review diff against plan
+1. Run targeted tests — show the output. No test files? State explicitly.
+2. Run lint/typecheck — show the output (or lack of errors). No linter? State what was tried.
+3. Check acceptance criteria — go through each criterion from PROJECT.md one by one.
+   Cite evidence (file changed, output shown) for each. No evidence = unverified.
+4. Review diff against plan — confirm changed files match scope
 
-### Phase 4: Challenge (adversarial pass)
+If any check fails → loop back to Phase 2. Never mark completed with failing checks.
+
+### Phase 4: Challenge (two-stage review)
+
+Stage A (spec compliance) must pass before Stage B (code quality) runs.
+
+#### Stage A: Spec Compliance
+
+Did we build what PROJECT.md asked for?
+1. Re-read PROJECT.md — every acceptance criterion and scope constraint
+2. For each criterion: cite evidence (file changed, test output, behavior confirmed)
+3. Check scope: any changes to out-of-scope files?
+4. Fail → create tasks, loop to Phase 2. Do not run Stage B.
+
+#### Stage B: Code Quality
 
 1. Full diff: `git diff $(git merge-base HEAD main)..HEAD`
 2. If codex available:
    ```bash
-   unset OPENAI_API_KEY && codex exec --sandbox danger-full-access "Review this diff: (1) what could break, (2) what was missed, (3) edge cases. Diff: [content]"
+   unset OPENAI_API_KEY && codex exec --sandbox danger-full-access "Review this diff for code quality: (1) what could break in production, (2) edge cases, (3) security concerns, (4) pattern adherence. Diff: [content]"
    ```
 3. New issues → create tasks → loop to Phase 2
 4. Clean pass → update STATE.md: phase = "complete"

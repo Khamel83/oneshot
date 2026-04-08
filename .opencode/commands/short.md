@@ -53,14 +53,24 @@ cat ~/github/docs-cache/docs/cache/.index.md
 
 If the tool is missing, fetch and cache it first. Use cached docs as source of truth.
 
-### 5. Execute in Burn-Down Mode
+### 5. Methodology Selection (automatic)
+
+Inspect the task description. Apply the right protocol:
+- **Bug fix** (fix, bug, broken, error, crash, failing, wrong, unexpected, regression,
+  investigate, troubleshoot, not working, incorrect) → apply `/debug` protocol: investigate →
+  analyze → hypothesize → fix. Phases 1-3 are read-only.
+- **New feature / implementation** (implement, add, create, build, new endpoint, new function)
+  → apply `/tdd` protocol: RED-GREEN-REFACTOR. No production code without a failing test.
+- **Doc edit, config change, refactor**: no special methodology.
+
+### 6. Execute in Burn-Down Mode
 
 - Complete one task fully before starting next
 - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip
 - After significant changes, dispatch a review (see dispatch protocol below)
 - Don't create todowrite items for every little thing — just do the work
 
-### 6. Dispatch Protocol
+### 7. Dispatch Protocol
 
 For worker dispatch:
 ```bash
@@ -71,7 +81,7 @@ python3 -m core.router.resolve --class <task_class>
 python3 -m core.dispatch.run --class <task_class> --prompt "task description"
 ```
 
-### 7. Session Summary
+### 8. Session Summary
 
 On completion, show:
 ```
