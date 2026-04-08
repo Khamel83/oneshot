@@ -394,6 +394,218 @@ def enrich_commits(project_dir: Optional[str] = None, commits_back: int = 3) -> 
     return {"enriched_count": len(new_enrichments), "total_enriched": len(existing)}
 
 
+# --- Task Sufficiency Evaluator ---
+
+EVAL_THRESHOLD = 0.75
+EVAL_CONTEXT_BUDGET = 18000  # chars, leaving room for system prompt
+
+
+def _parse_eval_result(raw_result: dict) -> dict:
+    """Parse evaluation result with fallbacks for unreliable free model output."""
+    if "score" in raw_result:
+        try:
+            score = float(raw_result["score"])
+        except (ValueError, TypeError):
+            score = 0.5
+        score = max(0.0, min(1.0, score))
+        return {
+            "score": score,
+            "feedback": raw_result.get("feedback", "")[:500],
+            "issues": raw_result.get("issues", []),
+            "status": "parsed",
+        }
+
+    # Fallback: try to extract score from unstructured text
+    text = raw_result.get("raw", "")
+    if not text:
+        return {"score": 0.5, "feedback": "Evaluation returned empty", "issues": [], "status": "empty"}
+
+    # Try common patterns: "score: 0.7", "7/10", "70%"
+    score = 0.5
+    m = re.search(r'(?:score|rating|confidence)[:\s]+(\d+\.?\d*)', text, re.I)
+    if m:
+        val = float(m.group(1))
+        score = min(val / 10.0, 1.0) if val > 1.0 else val
+    else:
+        frac = re.search(r'(\d+)/10', text)
+        if frac:
+            score = float(frac.group(1)) / 10.0
+        pct = re.search(r'(\d+)\s*%', text)
+        if pct:
+            score = float(pct.group(1)) / 100.0
+
+    return {
+        "score": max(0.0, min(1.0, score)),
+        "feedback": text[:500],
+        "issues": [],
+        "status": "fallback_parse",
+    }
+
+
+def evaluate_task_sufficiency(project_dir: Optional[str] = None) -> dict:
+    """Evaluate whether completed work in the session was sufficient. 1 LLM call."""
+    from core.janitor.worker import extract_structured
+
+    project_dir = project_dir or os.getcwd()
+    janitor_dir = _janitor_dir(project_dir)
+    events_path = janitor_dir / "events.jsonl"
+
+    if not events_path.exists():
+        return {"status": "no_events"}
+
+    # Collect current session events (file_written + commit)
+    session_events = []
+    files_changed: set[str] = set()
+    commit_messages: list[str] = []
+
+    with open(events_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if e["type"] in ("file_written", "commit", "action_taken"):
+                session_events.append(e)
+                if e["type"] == "file_written":
+                    for fp in e.get("files", []):
+                        files_changed.add(fp)
+                elif e["type"] == "commit":
+                    commit_messages.append(e["content"])
+
+    if not session_events:
+        return {"status": "no_work_done"}
+
+    # Only use recent events (last 60) to stay in budget
+    session_events = session_events[-60:]
+
+    # 1. Session activity text
+    activity_lines = []
+    for e in session_events:
+        activity_lines.append(f"  ({e['type']}) {e['content'][:150]}")
+    session_activity = "\n".join(activity_lines)
+
+    # 2. Git diff for changed files
+    diff_budget = EVAL_CONTEXT_BUDGET - len(session_activity) - 4000  # reserve for state + rubric
+    diff_text = ""
+    if files_changed and diff_budget > 2000:
+        # Determine how many commits back to look
+        commits_back = min(len(commit_messages) + 1, 5)
+        if commits_back < 2:
+            commits_back = 2
+        changed_list = list(files_changed)[:15]
+        diff = _run_git("diff", f"HEAD~{commits_back}", "--", *changed_list,
+                        project_dir=project_dir, timeout=10)
+        if len(diff) > diff_budget:
+            keep = diff_budget // 2
+            diff_text = diff[:keep] + "\n... [truncated] ...\n" + diff[-keep:]
+        else:
+            diff_text = diff
+
+    # 3. Project context (test gaps, code smells, session summary)
+    context_parts = []
+    tg = _read_json("test-gaps.json", project_dir)
+    if tg and tg.get("gap_count", 0) > 0:
+        files = [g["source_file"] for g in tg["gaps"][:8]]
+        context_parts.append(f"Test gaps ({tg['gap_count']}): {', '.join(files)}")
+
+    cs = _read_json("code-smells.json", project_dir)
+    if cs:
+        items = []
+        for f in cs.get("oversized_files", [])[:3]:
+            items.append(f"{f['path']} ({f['lines']}L)")
+        for fn in cs.get("oversized_functions", [])[:3]:
+            items.append(f"{fn['function']}() in {fn['path']} ({fn['lines']}L)")
+        if items:
+            context_parts.append(f"Code smells: {', '.join(items)}")
+
+    summary = _read_json("last-summary.json", project_dir)
+    if summary:
+        summary_parts = []
+        if summary.get("decisions"):
+            summary_parts.append("Decisions: " + "; ".join(d.get("what", "")[:80] for d in summary["decisions"][:3]))
+        if summary.get("blockers"):
+            summary_parts.append("Blockers: " + "; ".join(b.get("what", "")[:80] for b in summary["blockers"][:3]))
+        if summary_parts:
+            context_parts.append("Session summary: " + " | ".join(summary_parts))
+
+    project_context = "\n".join(context_parts) if context_parts else "No known issues."
+
+    # Build the prompt
+    chars_used = len(session_activity) + len(diff_text) + len(project_context)
+    prompt = (
+        "## Session Activity\n"
+        f"{session_activity}\n\n"
+        "## Code Changes\n"
+        f"{diff_text or '(no diff available)'}\n\n"
+        "## Project Context\n"
+        f"{project_context}\n\n"
+        "## Scoring Rubric\n"
+        "- 1.0: Fully complete. All requirements met, tests pass, no regressions.\n"
+        "- 0.8: Minor gaps. Works but missing edge case handling or docs.\n"
+        "- 0.6: Significant gaps. Core functionality works but important aspects missing.\n"
+        "- 0.4: Partial. Some work done but major requirements unmet.\n"
+        "- 0.2: Minimal. Barely started or mostly wrong approach.\n"
+        "- 0.0: Nothing useful produced.\n\n"
+        "Evaluate the above work. Consider:\n"
+        "1. Does the implementation match the apparent intent?\n"
+        "2. Are edge cases handled?\n"
+        "3. Is there test coverage for new code?\n"
+        "4. Are there obvious bugs or regressions?\n"
+        "5. Does it follow existing code patterns in the project?"
+    )
+
+    result = extract_structured(
+        prompt,
+        system="You are a code review evaluator. Given session activity and code changes, "
+               "score whether the work was completed sufficiently. Be critical but fair.",
+        schema_hint='{"score": float, "feedback": str, "issues": [str]}',
+    )
+
+    parsed = _parse_eval_result(result)
+    parsed["chars_used"] = chars_used
+    parsed["session"] = session_events[0].get("session", "unknown") if session_events else "unknown"
+    parsed["ts"] = datetime.now(timezone.utc).isoformat()
+
+    # Extract model from usage log (last entry)
+    usage_path = janitor_dir / "usage.jsonl"
+    if usage_path.exists():
+        try:
+            last_usage_line = usage_path.read_text().strip().split("\n")[-1]
+            last_usage = json.loads(last_usage_line)
+            parsed["model"] = last_usage.get("model", "unknown")
+        except (json.JSONDecodeError, IndexError):
+            parsed["model"] = "unknown"
+
+    # Write to eval log (always)
+    eval_log = janitor_dir / "task-evals.jsonl"
+    with open(eval_log, "a") as f:
+        f.write(json.dumps(parsed, separators=(",", ":")) + "\n")
+
+    # Write to redo queue if below threshold
+    if parsed["score"] < EVAL_THRESHOLD:
+        redo_path = janitor_dir / "redo-queue.json"
+        existing = []
+        if redo_path.exists():
+            try:
+                existing = json.loads(redo_path.read_text())
+            except json.JSONDecodeError:
+                existing = []
+        existing.append({
+            "ts": parsed["ts"],
+            "session": parsed["session"],
+            "score": parsed["score"],
+            "task_summary": f"{len(files_changed)} files changed, {len(commit_messages)} commits",
+            "feedback": parsed["feedback"],
+            "issues": parsed.get("issues", []),
+        })
+        redo_path.write_text(json.dumps(existing, indent=2))
+
+    return parsed
+
+
 # --- Event Stats ---
 
 def event_stats(project_dir: Optional[str] = None) -> dict:
@@ -480,6 +692,32 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
             if patterns and patterns.get("patterns"):
                 parts.append(f"patterns: {'; '.join(p.get('description', '')[:60] for p in patterns['patterns'][:3])}")
 
+    # Last eval score (from previous session)
+    evals_path = _janitor_dir(project_dir) / "task-evals.jsonl"
+    if evals_path.exists():
+        try:
+            last_line = evals_path.read_text().strip().split("\n")[-1]
+            last_eval = json.loads(last_line)
+            score = last_eval.get("score", "?")
+            session = last_eval.get("session", "?")
+            parts.append(f"last eval: score={score} (session {session})")
+        except (json.JSONDecodeError, IndexError):
+            pass
+
+    # Redo signals (from evaluator, if score was below threshold)
+    redo_path = _janitor_dir(project_dir) / "redo-queue.json"
+    if redo_path.exists():
+        try:
+            redo_items = json.loads(redo_path.read_text())
+            if redo_items:
+                for item in redo_items[:3]:
+                    score = item.get("score", "?")
+                    feedback = item.get("feedback", "")[:200]
+                    parts.append(f"REDO: score={score} — {feedback}")
+                redo_path.write_text("[]")  # clear after reading
+        except json.JSONDecodeError:
+            pass
+
     if not parts:
         return ""
 
@@ -515,6 +753,12 @@ def run_session_end(project_dir: Optional[str] = None) -> None:
         summary = summarize_session(project_dir)
         if summary.get("decisions") or summary.get("blockers"):
             janitor_dir.joinpath("last-summary.json").write_text(json.dumps(summary, indent=2))
+
+        # Evaluate task sufficiency (NEW)
+        try:
+            evaluate_task_sufficiency(project_dir)
+        except Exception:
+            pass  # non-critical
 
         # Enrich commits
         try:

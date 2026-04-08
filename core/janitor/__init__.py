@@ -7,6 +7,7 @@ from core.janitor.jobs import (
     scan_code_smells,
     detect_config_drift,
     build_dependency_map,
+    evaluate_task_sufficiency,
 )
 from core.janitor.worker import call_free, extract_structured
 
@@ -17,6 +18,7 @@ __all__ = [
     "scan_code_smells",
     "detect_config_drift",
     "build_dependency_map",
+    "evaluate_task_sufficiency",
     "call_free",
     "extract_structured",
 ]
