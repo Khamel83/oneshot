@@ -44,22 +44,43 @@ Config: `config/lanes.yaml`, `config/models.yaml`
 
 ### Janitor — Background Intelligence
 
-Janitor runs automatically via Claude Code hooks — no setup or cron needed. It provides session-aware project intelligence:
+Janitor runs automatically via Claude Code hooks — no setup or cron needed. It provides session-aware project intelligence that adapts to your repo type:
+
+**Project types** — auto-detected on every session start:
+- **code** — Python/JS/Go/etc. repos with build markers
+- **document** — Markdown, text, data dumps (e.g. personal tracking repos)
+- **hybrid** — Mixed code + docs (most real projects)
 
 | Hook | What runs | Cost |
 |------|-----------|------|
-| SessionStart | Test gaps, code smells, config drift, dependency map | $0 (pure compute) |
+| SessionStart | Project type detection + type-appropriate signals (see below) | $0 (pure compute) |
 | PostToolUse | Records file reads/writes, commits, dead-ends to `.janitor/events.jsonl` | $0 |
 | SessionEnd | Session summary, commit enrichment, pattern mining, onboarding generation | $0 (openrouter/free) |
 | PreCompact | Summarizes decisions/blockers before context compaction | $0 (openrouter/free) |
 
-Output lives in `.janitor/` per project:
-- `events.jsonl` — append-only event log
-- `test-gaps.json`, `code-smells.json`, `config-drift.json`, `dep-graph.json` — computed fresh each session
-- `patterns.json`, `onboarding.md` — LLM-generated daily
-- `CLAUDE.local.md` — auto-generated onboarding summary (survives without janitor)
+**Code signals** (run for `code` and `hybrid` projects):
+- `test-gaps.json` — files changed recently but lacking tests
+- `code-smells.json` — oversized files and long functions
+- `dep-graph.json` — import dependency map with impact ranking
 
-Requires `OPENROUTER_API_KEY` for LLM jobs (free tier). Pure-compute jobs work without it.
+**Document signals** (run for `document` and `hybrid` projects):
+- `doc-staleness.json` — documents not modified in 30+ days
+- `doc-orphans.json` — documents not linked from any other file
+- `doc-clusters.json` — document groups by directory/topic
+- `doc-size-outliers.json` — unusually large files
+- `doc-recent-activity.json` — recent document changes with authors
+- `doc-crossrefs.json` — which documents link to which
+
+**Universal signals** (all project types):
+- `config-drift.json` — uncommitted config changes
+- `recent-focus.json` — files and commands from recent sessions
+- `critical-files.json` — high-touch files across many sessions
+- `knowledge-risk.json` — files with single contributors (bus factor)
+- `blockers.json`, `dead-ends.json` — unresolved blockers and failed searches
+
+**Output** lives in `.janitor/` per project. `CLAUDE.local.md` is auto-generated with a project-type-aware onboarding summary and a source index linking to all signal files.
+
+Requires `OPENROUTER_API_KEY` for LLM jobs (onboarding generation, session summaries). Pure-compute signals work without it.
 
 ### Dispatch Protocol
 

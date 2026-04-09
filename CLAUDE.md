@@ -48,12 +48,21 @@ Need to understand what's been happening? Start here:
 | Question | Look at |
 |----------|---------|
 | What's the current state of the project? | `CLAUDE.local.md` (auto-generated onboarding summary) |
+| What type is this project? | `.janitor/project-type.json` (code, document, or hybrid) |
 | What files were changed recently? | `.janitor/events.jsonl` — grep for `file_written` or `commit` |
 | What decisions were made? | `.janitor/events.jsonl` — grep for `decision` |
 | What's broken or stuck? | `.janitor/events.jsonl` — grep for `blocker` or `dead_end` |
 | What approaches already failed? | `.janitor/events.jsonl` — grep for `dead_end` |
-| What files have no tests? | `.janitor/test-gaps.json` |
-| What files are too big? | `.janitor/code-smells.json` |
+| What files have no tests? | `.janitor/test-gaps.json` (code/hybrid) |
+| What files are too big? | `.janitor/code-smells.json` (code/hybrid) |
 | What config is uncommitted? | `.janitor/config-drift.json` |
-| What files have the most dependents? | `.janitor/dep-graph.json` |
+| What files have the most dependents? | `.janitor/dep-graph.json` (code/hybrid) |
 | What patterns repeat across sessions? | `.janitor/patterns.json` |
+| What documents are stale? | `.janitor/doc-staleness.json` (document/hybrid) |
+| What documents are orphaned? | `.janitor/doc-orphans.json` (document/hybrid) |
+| What documents link to what? | `.janitor/doc-crossrefs.json` (document/hybrid) |
+| What documents changed recently? | `.janitor/doc-recent-activity.json` (document/hybrid) |
+| What are the document clusters? | `.janitor/doc-clusters.json` (document/hybrid) |
+| What files are unusually large? | `.janitor/doc-size-outliers.json` (all types) |
+| What files are touched most? | `.janitor/critical-files.json` (all types) |
+| What files have bus-factor risk? | `.janitor/knowledge-risk.json` (all types) |

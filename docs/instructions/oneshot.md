@@ -71,11 +71,17 @@ Any code assistant (Claude, OpenCode, etc.) can read it directly.
 
 ## Janitor System
 
-Background intelligence layer (`core/janitor/`) that runs automatically:
-- Records session events (file reads/writes/edits) via PostToolUse hook
-- Processes events with openrouter/free ($0) via system cron (every 15 min)
-- Produces structured decisions, blockers, discoveries, session digests
-- Storage: `.oneshot/events.jsonl` (append-only), `.oneshot/intelligence.db` (SQLite index)
+Background intelligence layer (`core/janitor/`) that runs automatically via Claude Code hooks (global `~/.claude/settings.json` — all projects get it):
+
+- **Project type detection**: classifies repos as `code`, `document`, or `hybrid` on every session start
+- **Code signals** (code/hybrid): test gaps, code smells, dependency map
+- **Document signals** (document/hybrid): staleness, orphans, clusters, size outliers, recent activity, cross-references
+- **Universal signals** (all types): config drift, recent focus, critical files, knowledge risk, blockers, dead ends
+- **Session recording**: file reads/writes/edits via PostToolUse hook → `.janitor/events.jsonl`
+- **Onboarding generation**: project-type-aware summary → `CLAUDE.local.md` (runs at session end via openrouter/free)
+- **Staleness gating**: signals are only regenerated when underlying data changes
+
+Storage: `.janitor/` per project (events.jsonl, signal JSON files, onboarding-state.json).
 
 The janitor lane (`janitor` task classes) routes exclusively to the `free` worker.
 No review needed — these are housekeeping tasks.
