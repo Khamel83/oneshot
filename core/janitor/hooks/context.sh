@@ -11,17 +11,19 @@ done
 
 ONESHOT_DIR="$HOME/github/oneshot"
 result=$(python3 -c "
-import sys, os
+import sys, os, json
 sys.path.insert(0, '$ONESHOT_DIR')
 try:
     from core.janitor.jobs import run_session_start
-    print(run_session_start('$project_dir'))
+    text = run_session_start('$project_dir')
+    if text:
+        print(json.dumps({'hookSpecificOutput': {'additionalContext': 'JANITOR_CONTEXT:' + text}}))
 except Exception:
     pass
 " 2>/dev/null)
 
 if [ -n "$result" ]; then
-  echo "{\"hookSpecificOutput\":{\"additionalContext\":\"JANITOR_CONTEXT:${result//\"/\\\"}\"}}"
+  echo "$result"
 fi
 
 exit 0
