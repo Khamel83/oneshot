@@ -1,58 +1,37 @@
-# OpenCode Adapter — Conduct Session
-
-**Date**: 2026-04-07
-**Plan**: `1shot/OPENCODE_ADAPTER_PLAN.md`
-**Previous session**: v2 redesign complete (2026-04-04)
+# Project: Document Intelligence Mode for Janitor
 
 ## Goal
-
-Make OpenCode a universal harness for OneShot. Same AGENTS.md, same routing, same dispatch. When Claude tokens run out, switch to OpenCode and keep working.
-
-## Deliverables (all 7 phases)
-
-1. Phase 0: Provider bootstrap + AGENTS.md fix + smoke test
-2. Phase 1: Foundation fixes (argus_client config, research.md, cheap-worker bounded)
-3. Phase 2: Command translations (/short, /conduct, /handoff, /restore, /freesearch, /doc)
-4. Phase 3: Persistent task tracking shim (tasks.json + scripts/tasks.py)
-5. Phase 4: Janitor cron (update janitor-cron.sh + systemd timer)
-6. Phase 5: OpenCode agent definitions (oneshot primary agent)
-7. Phase 6: MCP integration evaluation (Argus as MCP server)
+Add a document/non-code project type to janitor that provides actionable intelligence for repos containing documents, data, markdown, PDFs, emails, etc. — not just Python code.
 
 ## Acceptance Criteria
+- Janitor auto-detects project type (code vs document) based on repo contents
+- Code projects continue running all existing signals unchanged
+- Document projects run document-specific signals instead of code signals
+- CLAUDE.local.md and onboarding.md show actionable, file-referenced intelligence for both types
+- Each file processed once, only re-processed when it changes (staleness gating)
+- OpenCode/AGENTS.md templates updated for document project type
+- Cron job works for both project types
 
-- [ ] `opencode` reads AGENTS.md and understands the operating contract
-- [ ] `/short` command works in OpenCode
-- [ ] `/conduct` command works in OpenCode
-- [ ] `python -m core.router.resolve --class implement_small` returns correct routing
-- [ ] `python -m core.dispatch.run` dispatches to workers
-- [ ] Argus search works via `/freesearch` in OpenCode
-- [ ] Task tracking survives session end (tasks.json persists)
-- [ ] Janitor runs via cron, outputs to `.janitor/`
-- [ ] Claude Code still works exactly as before (no regressions)
+## Scope
+In:
+- Research best practices for non-code project intelligence
+- New document signal functions (staleness, orphans, cross-references, size outliers, etc.)
+- Updated onboarding prompt for document projects
+- Project type auto-detection
+- Full pipeline: signals → onboarding → CLAUDE.local.md → hooks
 
-## Scope (IN)
+Out:
+- Multi-language code support (still Python-only for code signals)
+- UI changes
+- New hooks
+- Processing binary files (PDFs, images) — only metadata and filenames
 
-- `.opencode/` directory (config, agents, commands)
-- `core/search/argus_client.py` (read config)
-- `scripts/tasks.py` (new persistent task CLI)
-- `scripts/janitor-cron.sh` (update, not deprecated)
-- `~/.config/systemd/user/oneshot-janitor.*` (new timer)
-
-## Scope (OUT)
-
-- All `.claude/` files — no changes to Claude Code config
-- `core/router/`, `core/task_schema.py` — CLI-agnostic, no changes
-- `config/lanes.yaml`, `config/workers.yaml` — no changes
-- AGENTS.md — neutral contract stays as-is
-- SSH dispatch, OpenCode as MCP server, plugin SDK
+## Riskiest Parts
+- What signals actually matter for document repos
+- Prompt quality for non-code onboarding summaries
+- Performance on large document repos (mitigated by staleness gating)
 
 ## Constraints
-
-- No breaking changes to Claude Code
-- Python only for new code
-- OpenCode commands use `agent: build` for dispatch capability
-- Subagents stay bounded — no dispatch authority
-
-## Riskiest Part
-
-MCP integration (not drop-in between CLIs). Mitigated by treating as optional, testing individually.
+- Must not break existing code project signals
+- Must follow existing patterns in jobs.py
+- Zero additional API cost — pure-compute signals only

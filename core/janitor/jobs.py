@@ -61,6 +61,79 @@ def _write_json(name: str, data: dict, project_dir: str):
 
 
 # --- Pure-Compute Jobs ---
+def detect_project_type(project_dir: Optional[str] = None) -> str:
+    """Classify project as 'code', 'document', or 'hybrid' based on repo contents."""
+    project_dir = project_dir or os.getcwd()
+    p = Path(project_dir)
+
+    code_exts = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java", ".rb", ".c", ".cpp", ".h"}
+    doc_exts = {".md", ".txt", ".rst", ".csv", ".json", ".yaml", ".yml", ".toml", ".org", ".html"}
+    build_markers = {"pyproject.toml", "setup.py", "package.json", "Cargo.toml", "go.mod",
+                     "vercel.json", "Makefile", "CMakeLists.txt", "tsconfig.json"}
+
+    all_files = _run_git("ls-files", project_dir=project_dir)
+    if not all_files:
+        return "document"
+
+    code_files = doc_files = 0
+    has_build = False
+
+    for f in all_files.split("\n"):
+        if not f:
+            continue
+        ext = Path(f).suffix.lower()
+        basename = Path(f).name
+        if ext in code_exts:
+            code_files += 1
+        if ext in doc_exts:
+            doc_files += 1
+        if basename in build_markers:
+            has_build = True
+
+    if code_files > 5 and has_build:
+        return "hybrid" if doc_files > code_files * 2 else "code"
+    if code_files >= 3 and has_build:
+        return "code"
+    if code_files > 0 and doc_files > 0:
+        return "hybrid" if code_files >= 3 else "document"
+    if code_files >= 3:
+        return "code"
+    return "document"
+
+
+def _data_hash(sections: dict) -> str:
+    import hashlib
+    blob = json.dumps(sections, sort_keys=True)
+    return hashlib.md5(blob.encode()).hexdigest()[:12]
+
+
+def _onboarding_is_fresh(project_dir: str, state_hash: str, max_age_hours: int = 1) -> bool:
+    state_path = _janitor_dir(project_dir) / "onboarding-state.json"
+    if not state_path.exists():
+        return False
+    try:
+        state = json.loads(state_path.read_text())
+    except (json.JSONDecodeError, OSError):
+        return False
+    if state.get("hash") != state_hash:
+        return False
+    last_gen = state.get("ts", 0)
+    events_path = _janitor_dir(project_dir) / "events.jsonl"
+    if events_path.exists():
+        with open(events_path) as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    evt = json.loads(line)
+                    evt_ts = evt.get("ts", "")
+                    if evt_ts and evt_ts > time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(last_gen)):
+                        return False
+                except (json.JSONDecodeError, ValueError):
+                    continue
+    return (time.time() - last_gen) < (max_age_hours * 3600)
+
+
 
 def detect_test_gaps(project_dir: Optional[str] = None, commits_back: int = 5) -> dict:
     changed = _run_git("diff", f"HEAD~{commits_back}", "--name-only", project_dir=project_dir or os.getcwd())
@@ -181,6 +254,221 @@ def build_dependency_map(project_dir: Optional[str] = None) -> dict:
     return {"files_with_imports": len(graph), "impact_ranking": impact_ranking}
 
 
+
+# --- Pure-Compute Jobs: Document Signals ---
+
+
+def detect_document_staleness(project_dir: Optional[str] = None, stale_days: int = 30) -> dict:
+    """Find documents not modified in N days, ranked by staleness."""
+    project_dir = project_dir or os.getcwd()
+    doc_exts = {".md", ".txt", ".rst", ".csv", ".json", ".yaml", ".yml", ".org", ".html"}
+    cutoff = time.time() - (stale_days * 86400)
+
+    all_files = _run_git("ls-files", project_dir=project_dir)
+    stale = []
+    fresh = 0
+
+    for f in all_files.split("\n"):
+        if not f or Path(f).suffix.lower() not in doc_exts:
+            continue
+        full_path = Path(project_dir) / f
+        if not full_path.exists():
+            continue
+        try:
+            mtime = full_path.stat().st_mtime
+        except OSError:
+            continue
+        if mtime < cutoff:
+            days_ago = int((time.time() - mtime) / 86400)
+            stale.append({"file": f, "days_since_edit": days_ago, "last_modified": datetime.fromtimestamp(mtime).isoformat()[:10]})
+        else:
+            fresh += 1
+
+    stale.sort(key=lambda x: x["days_since_edit"], reverse=True)
+    return {"stale_count": len(stale), "fresh_count": fresh, "stale_threshold_days": stale_days, "stale_files": stale[:20]}
+
+
+def detect_orphan_documents(project_dir: Optional[str] = None) -> dict:
+    """Find documents not referenced/linked from any other file."""
+    project_dir = project_dir or os.getcwd()
+    doc_exts = {".md", ".txt", ".rst", ".org", ".html"}
+    all_files = _run_git("ls-files", project_dir=project_dir)
+
+    referenced = set()
+    link_pattern = re.compile(r'(?:\[[^\]]*\]\(([^)]+)\)|\[\[([^\]]+)\]\]|include\s+["\']([^"\']+)["\'])', re.IGNORECASE)
+
+    doc_files = [f for f in all_files.split("\n") if f and Path(f).suffix.lower() in doc_exts]
+    non_binary = [f for f in all_files.split("\n") if f and Path(f).suffix.lower() not in {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".zip", ".gz"}]
+
+    for f in non_binary:
+        full_path = Path(project_dir) / f
+        if not full_path.exists():
+            continue
+        try:
+            content = full_path.read_text()
+        except (OSError, UnicodeDecodeError):
+            continue
+        for match in link_pattern.finditer(content):
+            ref = match.group(1) or match.group(2) or match.group(3) or ""
+            ref_clean = Path(ref).stem.lower() if ref else ""
+            if ref_clean:
+                referenced.add(ref_clean)
+
+    orphans = []
+    for f in doc_files:
+        stem = Path(f).stem.lower()
+        if stem in {"readme", "index", "license", "licence"}:
+            continue
+        if stem not in referenced:
+            orphans.append(f)
+
+    return {"orphan_count": len(orphans), "orphan_files": orphans[:20], "total_documents": len(doc_files)}
+
+
+def detect_document_clusters(project_dir: Optional[str] = None) -> dict:
+    """Group documents by directory structure to identify topic clusters."""
+    project_dir = project_dir or os.getcwd()
+    doc_exts = {".md", ".txt", ".rst", ".csv", ".json", ".yaml", ".yml", ".org", ".html"}
+
+    all_files = _run_git("ls-files", project_dir=project_dir)
+    clusters: dict[str, list[str]] = {}
+
+    for f in all_files.split("\n"):
+        if not f or Path(f).suffix.lower() not in doc_exts:
+            continue
+        parts = Path(f).parts
+        top_dir = parts[0] if len(parts) > 1 else "(root)"
+        clusters.setdefault(top_dir, []).append(f)
+
+    sorted_clusters = sorted(clusters.items(), key=lambda x: len(x[1]), reverse=True)
+    cluster_list = [{"directory": d, "file_count": len(files), "files": files[:5]} for d, files in sorted_clusters[:10]]
+
+    return {"cluster_count": len(clusters), "total_documents": sum(len(v) for v in clusters.values()), "clusters": cluster_list}
+
+
+def detect_size_outliers(project_dir: Optional[str] = None, threshold_kb: int = 100) -> dict:
+    """Find unusually large files that may need splitting or attention."""
+    project_dir = project_dir or os.getcwd()
+    threshold_bytes = threshold_kb * 1024
+
+    all_files = _run_git("ls-files", project_dir=project_dir)
+    outliers = []
+
+    for f in all_files.split("\n"):
+        if not f:
+            continue
+        full_path = Path(project_dir) / f
+        if not full_path.exists():
+            continue
+        try:
+            size = full_path.stat().st_size
+        except OSError:
+            continue
+        if size > threshold_bytes:
+            try:
+                with open(full_path, "rb") as fh:
+                    is_binary = b"\x00" in fh.read(8192)
+            except OSError:
+                is_binary = True
+            outliers.append({"file": f, "size_kb": round(size / 1024, 1), "type": "binary" if is_binary else "text"})
+
+    outliers.sort(key=lambda x: x["size_kb"], reverse=True)
+    return {"outlier_count": len(outliers), "threshold_kb": threshold_kb, "outliers": outliers[:20]}
+
+
+def detect_recent_document_activity(project_dir: Optional[str] = None, days: int = 7) -> dict:
+    """Track recent document changes with who changed what."""
+    project_dir = project_dir or os.getcwd()
+    doc_exts = {".md", ".txt", ".rst", ".csv", ".json", ".yaml", ".yml", ".org", ".html"}
+    since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+
+    log = _run_git("log", f"--since={since}", "--name-only", "--format=%H %an", project_dir=project_dir)
+    if not log:
+        return {"changes_count": 0, "recent_changes": []}
+
+    changes = []
+    current_author = None
+    files_in_commit = []
+
+    for line in log.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if not any(line.endswith(ext) for ext in doc_exts):
+            if files_in_commit:
+                changes.append({"files": files_in_commit, "author": current_author})
+            parts = line.split(" ", 1)
+            current_author = parts[1] if len(parts) > 1 else "unknown"
+            files_in_commit = []
+        else:
+            files_in_commit.append(line)
+
+    if files_in_commit:
+        changes.append({"files": files_in_commit, "author": current_author})
+
+    file_activity: dict[str, dict] = {}
+    for change in changes:
+        for f in change["files"]:
+            if Path(f).suffix.lower() in doc_exts:
+                if f not in file_activity:
+                    file_activity[f] = {"file": f, "change_count": 0, "authors": set()}
+                file_activity[f]["change_count"] += 1
+                file_activity[f]["authors"].add(change["author"])
+
+    sorted_activity = sorted(
+        [{"file": k, "change_count": v["change_count"], "authors": list(v["authors"])}
+         for k, v in file_activity.items()],
+        key=lambda x: x["change_count"],
+        reverse=True,
+    )
+
+    return {"changes_count": len(sorted_activity), "time_window_days": days, "recent_changes": sorted_activity[:20]}
+
+
+def detect_cross_references(project_dir: Optional[str] = None) -> dict:
+    """Find which documents link to other documents in the repo."""
+    project_dir = project_dir or os.getcwd()
+    doc_exts = {".md", ".txt", ".rst", ".org", ".html"}
+    link_pattern = re.compile(r'(?:\]\(([^)]+)\)|\[\[([^\]]+)\]\])')
+
+    all_files = _run_git("ls-files", project_dir=project_dir)
+    doc_files = [f for f in all_files.split("\n") if f and Path(f).suffix.lower() in doc_exts]
+    references: list[dict] = []
+
+    for f in doc_files:
+        full_path = Path(project_dir) / f
+        if not full_path.exists():
+            continue
+        try:
+            content = full_path.read_text()
+        except (OSError, UnicodeDecodeError):
+            continue
+
+        links = []
+        for match in link_pattern.finditer(content):
+            target = match.group(1) or match.group(2) or ""
+            target = target.split("#")[0].strip()
+            if target and not target.startswith(("http://", "https://", "mailto:")):
+                links.append(target)
+
+        if links:
+            references.append({"file": f, "total_links": len(links), "_all_targets": links, "targets": links[:10]})
+
+    ref_count: dict[str, int] = {}
+    for ref in references:
+        # Count all links for accuracy, not just the truncated preview
+        for target in ref.get("_all_targets", ref["targets"]):
+            ref_count[target] = ref_count.get(target, 0) + 1
+
+    most_referenced = sorted(ref_count.items(), key=lambda x: x[1], reverse=True)[:10]
+
+    return {
+        "documents_with_links": len(references),
+        "total_references": sum(len(r["targets"]) for r in references),
+        "most_referenced": [{"file": f, "references": c} for f, c in most_referenced],
+        "details": references[:20],
+    }
+
 # --- LLM Jobs (require OPENROUTER_API_KEY) ---
 
 def summarize_session(project_dir: Optional[str] = None) -> dict:
@@ -297,68 +585,230 @@ def mine_patterns(project_dir: Optional[str] = None, days_back: int = 7) -> dict
 
 
 def generate_onboarding(project_dir: Optional[str] = None) -> dict:
-    """Generate 'state of the project' summary from all janitor data. 1 LLM call."""
+    """Generate 'state of the project' summary from all janitor data. 1 LLM call.
+
+    Branches on project type (code/document/hybrid) to use appropriate signals and prompt.
+    """
     from core.janitor.worker import call_free
 
     project_dir = project_dir or os.getcwd()
+    project_dir_path = Path(project_dir)
+    project_name = project_dir_path.name
+    project_type = detect_project_type(project_dir)
     sections: dict[str, str] = {}
 
-    # Event stats
+    # Event stats (universal)
     events_path = _janitor_dir(project_dir) / "events.jsonl"
     if events_path.exists():
-        total = decisions = blockers = 0
+        total = decisions = blockers = discoveries = 0
+        recent_decisions = []
         with open(events_path) as f:
             for line in f:
-                if '"type":"decision"' in line:
+                if not line.strip():
+                    continue
+                try:
+                    evt = json.loads(line)
+                    evt_type = evt.get("type", "")
+                except json.JSONDecodeError:
+                    evt_type = ""
+                if evt_type == "decision":
                     decisions += 1
-                elif '"type":"blocker"' in line:
+                    recent_decisions.append(evt.get("content", "")[:100])
+                elif evt_type == "blocker":
                     blockers += 1
-                elif line.strip():
+                elif evt_type == "discovery":
+                    discoveries += 1
+                else:
                     total += 1
-        if total:
-            sections["events"] = f"{total} events, {decisions} decisions, {blockers} blockers"
+        if total or decisions or blockers:
+            sections["events"] = f"{total} events, {decisions} decisions, {blockers} blockers, {discoveries} discoveries"
+        if recent_decisions:
+            sections["recent_decisions"] = "; ".join(recent_decisions[-5:])
 
-    # Gather pre-computed data
-    for key, name in [("test_gaps", "test-gaps.json"), ("code_smells", "code-smells.json"),
-                       ("config_drift", "config-drift.json"), ("dep_graph", "dep-graph.json")]:
+    # Code-only signals
+    if project_type in ("code", "hybrid"):
+        for key, name in [("test_gaps", "test-gaps.json"), ("code_smells", "code-smells.json"),
+                           ("dep_graph", "dep-graph.json")]:
+            data = _read_json(name, project_dir)
+            if not data:
+                continue
+            if key == "test_gaps" and data.get("gap_count", 0) > 0:
+                sections[key] = f"{data['gap_count']} gaps: " + ", ".join(g["source_file"] for g in data["gaps"][:5])
+            elif key == "code_smells" and (data.get("oversized_file_count", 0) > 0 or data.get("oversized_function_count", 0) > 0):
+                parts = []
+                for ff in data["oversized_files"][:3]:
+                    parts.append(f"{ff['path']} ({ff['lines']} lines)")
+                for fn in data["oversized_functions"][:3]:
+                    parts.append(f"{fn['path']}:{fn['function']} ({fn['lines']} lines)")
+                sections[key] = "; ".join(parts) if parts else ""
+            elif key == "dep_graph" and data.get("impact_ranking"):
+                sections[key] = ", ".join(f'{t["file"]} ({t["downstream_count"]} deps)' for t in data["impact_ranking"][:3])
+            if not sections.get(key):
+                sections.pop(key, None)
+
+    # Document-only signals
+    if project_type in ("document", "hybrid"):
+        for key, name in [("doc_staleness", "doc-staleness.json"), ("doc_orphans", "doc-orphans.json"),
+                           ("doc_clusters", "doc-clusters.json"), ("doc_size_outliers", "doc-size-outliers.json"),
+                           ("doc_crossrefs", "doc-crossrefs.json"), ("doc_recent_activity", "doc-recent-activity.json")]:
+            data = _read_json(name, project_dir)
+            if not data:
+                continue
+            if key == "doc_staleness" and data.get("stale_count", 0) > 0:
+                sections[key] = "; ".join(f'{s["file"]} ({s["days_since_edit"]}d stale)' for s in data["stale_files"][:5])
+            elif key == "doc_orphans" and data.get("orphan_count", 0) > 0:
+                sections[key] = f"{data['orphan_count']}/{data['total_documents']} orphaned: " + ", ".join(data["orphan_files"][:5])
+            elif key == "doc_clusters" and data.get("cluster_count", 0) > 0:
+                sections[key] = "; ".join(f'{c["directory"]} ({c["file_count"]} docs)' for c in data["clusters"][:5])
+            elif key == "doc_size_outliers" and data.get("outlier_count", 0) > 0:
+                sections[key] = "; ".join(f'{o["file"]} ({o["size_kb"]}KB, {o["type"]})' for o in data["outliers"][:5])
+            elif key == "doc_crossrefs" and data.get("most_referenced"):
+                sections[key] = "; ".join(f'{r["file"]} ({r["references"]} refs)' for r in data["most_referenced"][:5])
+            elif key == "doc_recent_activity" and data.get("recent_changes"):
+                sections[key] = "; ".join(f'{a["file"]} ({a["change_count"]}x by {a["authors"][0]})' for a in data["recent_changes"][:5])
+            if not sections.get(key):
+                sections.pop(key, None)
+
+    # Universal signals (all project types)
+    for key, name in [("config_drift", "config-drift.json"), ("patterns", "patterns.json"),
+                       ("recent_focus", "recent-focus.json"), ("dead_ends", "dead-ends.json"),
+                       ("blockers", "blockers.json"), ("critical_files", "critical-files.json"),
+                       ("knowledge_risk", "knowledge-risk.json")]:
         data = _read_json(name, project_dir)
         if not data:
             continue
-        if key == "test_gaps" and data.get("gap_count", 0) > 0:
-            sections[key] = f"{data['gap_count']} gaps: " + ", ".join(g["source_file"] for g in data["gaps"][:5])
-        elif key == "code_smells" and (data.get("oversized_file_count", 0) > 0 or data.get("oversized_function_count", 0) > 0):
-            sections[key] = f"{data['oversized_file_count']} oversized files, {data['oversized_function_count']} long functions"
-        elif key == "config_drift" and data.get("drift_count", 0) > 0:
+        if key == "config_drift" and data.get("drift_count", 0) > 0:
             sections[key] = "Drifted: " + ", ".join(data["drifted_file_names"])
-        elif key == "dep_graph" and data.get("impact_ranking"):
-            sections[key] = ", ".join(f'{t["file"]} ({t["downstream_count"]} deps)' for t in data["impact_ranking"][:3])
-
-    # Previous patterns
-    patterns = _read_json("patterns.json", project_dir)
-    if patterns and patterns.get("patterns"):
-        sections["patterns"] = "; ".join(p.get("description", "")[:80] for p in patterns["patterns"][:3])
+        elif key == "patterns" and data.get("patterns"):
+            sections[key] = "; ".join(p.get("description", "")[:100] for p in data["patterns"][:3])
+        elif key == "recent_focus" and data.get("files"):
+            sections[key] = ", ".join(data["files"][-5:])
+        elif key == "dead_ends" and data.get("dead_ends"):
+            sections[key] = "; ".join(f'{d["query"]} ({d["count"]}x)' for d in data["dead_ends"][:3])
+        elif key == "blockers" and data.get("blockers"):
+            sections[key] = "; ".join(b.get("content", "")[:100] for b in data["blockers"][:5])
+        elif key == "critical_files" and data.get("critical_files"):
+            sections[key] = "; ".join(f'{c["file"]} ({c["sessions"]} sessions, {c["downstream_deps"]} deps)' for c in data["critical_files"][:3])
+        elif key == "knowledge_risk" and data.get("at_risk"):
+            sections[key] = "; ".join(f'{r["file"]} (sole contributor: {r["contributors"][0]}, {r["edit_count"]} edits)' for r in data["at_risk"][:3])
+        if not sections.get(key):
+            sections.pop(key, None)
 
     context_text = "\n".join(f"## {k}\n{v}" for k, v in sections.items())
     if not context_text.strip():
-        return {"status": "no_data"}
+        return {"status": "no_data", "project_type": project_type}
 
-    summary = call_free(
-        f"Generate a concise 'state of the project' onboarding summary:\n\n{context_text}\n\n"
-        "Output markdown with: Project Status, Active Blockers, Recent Activity, "
-        "Attention Items, Patterns, Recommended Next Steps. 200 words max.",
-        system="You are a project onboarding assistant. Generate clear, actionable summaries.",
-        max_tokens=2048,
+    # Staleness gate
+    state_hash = _data_hash(sections)
+    if _onboarding_is_fresh(project_dir, state_hash):
+        return {"status": "fresh", "reason": "no new data since last onboarding", "project_type": project_type}
+
+    # Branch prompt by project type
+    if project_type == "document":
+        summary = call_free(
+            f"Project: {project_name} (type: document repository)\n\n"
+            f"Raw signals collected by background analysis:\n\n{context_text}\n\n"
+            "Generate an onboarding summary for an AI agent starting a session on this document repository.\n\n"
+            "RULES:\n"
+            "- Every finding MUST include a file path. No vague references.\n"
+            "- Prefer specific numbers: '3 stale docs (45+ days)' not 'some old files'.\n"
+            "- Skip any section where there is nothing to report.\n"
+            "- Do NOT invent findings. Only report what the signals above show.\n"
+            "- This is a DOCUMENT repository, not a codebase. Focus on content health.\n\n"
+            "OUTPUT FORMAT (use exactly these headers, skip empty ones):\n"
+            "# Document Status\n1-2 sentences: what is this repo and what state is it in?\n\n"
+            "# Stale Content\nDocuments not updated in a long time. Why this matters.\n\n"
+            "# Orphan Documents\nDocuments not linked/referenced from anywhere.\n\n"
+            "# Recent Activity\nWhat was worked on last. Include file paths and who changed them.\n\n"
+            "# Attention Items\nRanked by urgency: stale docs, orphans, size outliers, knowledge risk.\n\n"
+            "# Recommended Next Steps\nNumbered, most actionable first. Reference specific files.\n\n"
+            "MAX 400 words. Be dense -- every sentence should contain a file path or a number.",
+            system=(
+                "You are a project intelligence analyst specializing in document repositories. "
+                "Convert raw signals into a concise, actionable briefing. "
+                "The agent needs to know: what's stale, what's orphaned, what changed recently, "
+                "and what to do next -- all with specific file references. "
+                "Never pad with generic advice. Never say 'consider reviewing' without saying WHAT file and WHY."
+            ),
+            max_tokens=2048,
+        )
+    else:
+        code_sub = "python package"
+        if (project_dir_path / "vercel.json").exists() or (project_dir_path / "supabase").is_dir():
+            code_sub = "web app"
+        elif list(project_dir_path.glob("*.service")):
+            code_sub = "service"
+        summary = call_free(
+            f"Project: {project_name} (type: {code_sub})\n\n"
+            f"Raw signals collected by background analysis:\n\n{context_text}\n\n"
+            "Generate an onboarding summary for an AI coding agent starting a session on this project.\n\n"
+            "RULES:\n"
+            "- Every finding MUST include a file path (e.g. core/auth.py). No vague references.\n"
+            "- Prefer specific numbers over vague descriptions. '3 files, 0 tests' not 'some files need tests'.\n"
+            "- Skip any section where there is nothing to report.\n"
+            "- Do NOT invent findings. Only report what the signals above show.\n\n"
+            "OUTPUT FORMAT (use exactly these headers, skip empty ones):\n"
+            "# Project Status\n1-2 sentences: what state is this project in?\n\n"
+            "# Active Blockers\nList each blocker with the file or decision that's stuck.\n\n"
+            "# Recent Activity\nWhat was worked on last. Include file paths.\n\n"
+            "# Attention Items\nRanked by urgency: test gaps, knowledge risk, oversized files, config drift.\n\n"
+            "# Recommended Next Steps\nNumbered, most actionable first. Reference specific files.\n\n"
+            "MAX 400 words. Be dense -- every sentence should contain a file path or a number.",
+            system=(
+                "You are a project intelligence analyst. Your job is to convert raw codebase signals "
+                "into a concise, actionable briefing for an AI coding agent. "
+                "The agent needs to know: what's broken, what's risky, what was just worked on, "
+                "and what to do next -- all with specific file references. "
+                "Never pad with generic advice. Never say 'consider reviewing' without saying WHAT to review and WHERE."
+            ),
+            max_tokens=2048,
+        )
+
+    # Save onboarding + staleness state
+    _janitor_dir(project_dir).joinpath("onboarding.md").write_text(summary)
+    _janitor_dir(project_dir).joinpath("onboarding-state.json").write_text(
+        json.dumps({"hash": state_hash, "ts": time.time()})
     )
 
-    # Save to .janitor/onboarding.md
-    _janitor_dir(project_dir).joinpath("onboarding.md").write_text(summary)
+    # Build source index
+    janitor = _janitor_dir(project_dir)
+    sources = []
+    source_labels = {
+        "test-gaps.json": "untested files",
+        "code-smells.json": "oversized files/functions",
+        "dep-graph.json": "dependency impact ranking",
+        "doc-staleness.json": "stale documents",
+        "doc-orphans.json": "orphan/unlinked documents",
+        "doc-clusters.json": "document topic clusters",
+        "doc-size-outliers.json": "unusually large files",
+        "doc-crossrefs.json": "cross-reference map",
+        "doc-recent-activity.json": "recent document changes",
+        "config-drift.json": "uncommitted config changes",
+        "patterns.json": "recurring patterns",
+        "recent-focus.json": "last session's focus",
+        "dead-ends.json": "recurring failed searches",
+        "blockers.json": "unresolved blockers",
+        "critical-files.json": "high-touch x high-impact files",
+        "knowledge-risk.json": "low bus factor files",
+        "onboarding.md": "full onboarding summary",
+        "events.jsonl": "raw event log",
+    }
+    for fname, label in source_labels.items():
+        path = janitor / fname
+        if path.exists() and path.stat().st_size > 2:
+            sources.append(f"- `.janitor/{fname}` -- {label}")
 
-    # Auto-export to CLAUDE.local.md so context survives without janitor
+    # Auto-export to CLAUDE.local.md
     claude_local = Path(project_dir) / "CLAUDE.local.md"
-    header = "<!-- Auto-generated by janitor. Edit freely — janitor overwrites daily. -->\n\n"
-    claude_local.write_text(header + summary)
+    header = "<!-- Auto-generated by janitor. Edit freely -- janitor overwrites daily. -->\n\n"
+    if sources:
+        source_block = "\n\n## Project Intelligence Sources\n\nRead these files for details on demand:\n\n" + "\n".join(sources)
+    else:
+        source_block = ""
+    claude_local.write_text(header + summary + source_block)
 
-    return {"status": "ok", "summary_length": len(summary)}
+    return {"status": "ok", "summary_length": len(summary), "project_type": project_type}
+
 
 
 def enrich_commits(project_dir: Optional[str] = None, commits_back: int = 3) -> dict:
@@ -627,6 +1077,193 @@ def event_stats(project_dir: Optional[str] = None) -> dict:
     return {"total": total, "decisions": decisions, "blockers": blockers}
 
 
+def _ensure_opencode_config(project_dir: str) -> None:
+    """Ensure .opencode/opencode.json exists with instructions pointing to CLAUDE.local.md."""
+    import json
+    oc_dir = Path(project_dir) / ".opencode"
+    oc_file = oc_dir / "opencode.json"
+    if oc_file.exists():
+        return
+    oc_dir.mkdir(parents=True, exist_ok=True)
+    config = {
+        "$schema": "https://opencode.ai/config.json",
+        "instructions": ["../AGENTS.md", "../CLAUDE.local.md"],
+    }
+    oc_file.write_text(json.dumps(config, indent=2) + "\n")
+
+
+def detect_recent_focus(project_dir: Optional[str] = None, max_files: int = 10) -> dict:
+    """Find recently-accessed files and commands from events.jsonl."""
+    project_dir = project_dir or os.getcwd()
+    jd = _janitor_dir(project_dir)
+    events = jd / "events.jsonl"
+    if not events.exists():
+        return {"files": [], "commands": [], "session_count": 0}
+    files = []
+    commands = []
+    sessions = set()
+    cutoff = (datetime.now() - timedelta(days=3)).isoformat() + "Z"
+    with open(events) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            sessions.add(e.get("session", ""))
+            if e.get("ts", "") < cutoff:
+                continue
+            if e.get("type") == "file_read" and e.get("files"):
+                for fp in e["files"]:
+                    short = fp.replace(project_dir + "/", "") if project_dir else fp
+                    files.append(short)
+            elif e.get("type") == "file_written" and e.get("files"):
+                for fp in e["files"]:
+                    short = fp.replace(project_dir + "/", "") if project_dir else fp
+                    files.append(short)
+            elif e.get("type") == "action_taken":
+                content = e.get("content", "")
+                if content and len(content) < 200:
+                    commands.append(content)
+    return {"files": files[-max_files:], "commands": commands[-max_files:], "session_count": len(sessions)}
+
+
+def detect_recurring_dead_ends(project_dir: Optional[str] = None) -> dict:
+    """Find queries that led to dead ends multiple times."""
+    project_dir = project_dir or os.getcwd()
+    jd = _janitor_dir(project_dir)
+    events = jd / "events.jsonl"
+    result_file = jd / "dead-ends.json"
+    # If we already have LLM-computed dead ends, just return those
+    if result_file.exists():
+        try:
+            return json.loads(result_file.read_text())
+        except (json.JSONDecodeError, OSError):
+            pass
+    # Pure-compute fallback: look for blocker events
+    blockers = {}
+    if not events.exists():
+        return {"dead_ends": []}
+    with open(events) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if e.get("type") == "blocker":
+                content = e.get("content", "")[:100]
+                if content:
+                    blockers[content] = blockers.get(content, 0) + 1
+    dead_ends = [{"query": q, "count": c} for q, c in sorted(blockers.items(), key=lambda x: -x[1]) if c > 1]
+    return {"dead_ends": dead_ends}
+
+
+def detect_unresolved_blockers(project_dir: Optional[str] = None) -> dict:
+    """Find unresolved blockers from events."""
+    project_dir = project_dir or os.getcwd()
+    jd = _janitor_dir(project_dir)
+    result_file = jd / "blockers.json"
+    if result_file.exists():
+        try:
+            return json.loads(result_file.read_text())
+        except (json.JSONDecodeError, OSError):
+            pass
+    if not (jd / "events.jsonl").exists():
+        return {"blockers": []}
+    blockers = []
+    with open(jd / "events.jsonl") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if e.get("type") == "blocker":
+                blockers.append({"content": e.get("content", ""), "ts": e.get("ts", ""), "session": e.get("session", "")})
+    return {"blockers": blockers[-10:]}
+
+
+def detect_critical_files(project_dir: Optional[str] = None, top_n: int = 5) -> dict:
+    """Find files touched across the most sessions (high bus-factor risk)."""
+    project_dir = project_dir or os.getcwd()
+    jd = _janitor_dir(project_dir)
+    events = jd / "events.jsonl"
+    if not events.exists():
+        return {"critical_files": []}
+    file_sessions = {}  # file -> set of sessions
+    with open(events) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            session = e.get("session", "")
+            for fp in e.get("files", []):
+                short = fp.replace(project_dir + "/", "") if project_dir else fp
+                if short not in file_sessions:
+                    file_sessions[short] = set()
+                file_sessions[short].add(session)
+    # Check deps for downstream count
+    deps_data = _read_json("dep-graph.json", project_dir)
+    dep_counts = {}
+    if deps_data:
+        # New shape: {"nodes": [...]}
+        if "nodes" in deps_data:
+            for node in deps_data["nodes"]:
+                dep_counts[node.get("file", node.get("name", ""))] = node.get("downstream_count", 0)
+        # Old shape: {"impact_ranking": [{"file": ..., "downstream_deps": ...}]}
+        elif "impact_ranking" in deps_data:
+            for item in deps_data["impact_ranking"]:
+                dep_counts[item.get("file", "")] = item.get("downstream_deps", 0)
+    ranked = sorted(file_sessions.items(), key=lambda x: -len(x[1]))
+    result = []
+    for file, sessions in ranked[:top_n]:
+        result.append({
+            "file": file,
+            "sessions": len(sessions),
+            "downstream_deps": dep_counts.get(file, 0),
+        })
+    return {"critical_files": result}
+
+
+def detect_knowledge_risk(project_dir: Optional[str] = None, top_n: int = 5) -> dict:
+    """Find files with few contributors (bus factor risk) using git blame."""
+    result = []
+    pd = project_dir or "."
+    # Get list of tracked files (non-binary, non-generated)
+    files_output = _run_git("ls-files", project_dir=pd)
+    if not files_output.strip():
+        return {"at_risk": []}
+    files = [f for f in files_output.strip().split("\n") if f]
+    # Filter to interesting files (docs, code, config — not .janitor)
+    skip = {".janitor/", "node_modules/", ".git/", "__pycache__/"}
+    files = [f for f in files if not any(f.startswith(s) for s in skip)]
+    # For each file, get unique authors via git log
+    file_authors = {}
+    for fp in files[:100]:  # limit to avoid slow runs
+        log_output = _run_git("log", "--format=%an", "--follow", "--", fp, project_dir=pd)
+        authors = set(a.strip() for a in log_output.strip().split("\n") if a.strip())
+        if authors:
+            edit_count = len(log_output.strip().split("\n"))
+            file_authors[fp] = {"contributors": sorted(authors), "edit_count": edit_count}
+    # Risk = sole contributor + high edit count
+    at_risk = sorted(
+        [(f, d) for f, d in file_authors.items() if len(d["contributors"]) <= 1 and d["edit_count"] >= 5],
+        key=lambda x: -x[1]["edit_count"],
+    )
+    return {"at_risk": [{"file": f, "contributors": d["contributors"], "edit_count": d["edit_count"]} for f, d in at_risk[:top_n]]}
+
+
 # --- SessionStart: run pure-compute + inject results ---
 
 def run_session_start(project_dir: Optional[str] = None) -> str:
@@ -634,10 +1271,18 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
 
     Called by context.sh at SessionStart. Reads any pre-computed LLM results.
     Returns a string for Claude's context, or empty string if nothing to report.
+    Dispatches code signals for code/hybrid projects, document signals for document/hybrid projects.
     """
     project_dir = project_dir or os.getcwd()
     if not (Path(project_dir) / ".git").exists():
         return ""
+
+    # Detect project type and persist for downstream use
+    project_type = detect_project_type(project_dir)
+    _write_json("project-type.json", {"type": project_type}, project_dir)
+
+    # Ensure OpenCode can read project intelligence
+    _ensure_opencode_config(project_dir)
 
     parts = []
 
@@ -649,7 +1294,7 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
             preview = onboarding_path.read_text()[:500].replace("\n", " ")
             parts.append(f"ONBOARDING: {preview}")
 
-    # Event stats
+    # Event stats (universal)
     stats = event_stats(project_dir)
     if stats["total"] > 0:
         detail = []
@@ -659,40 +1304,118 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
             detail.append(f"{stats['blockers']} blockers")
         parts.append(f"{stats['total']} events" + (f" ({', '.join(detail)})" if detail else ""))
 
-    # Pure-compute jobs (always run, always fresh)
-    tg = detect_test_gaps(project_dir)
-    _write_json("test-gaps.json", tg, project_dir)
-    if tg["gap_count"] > 0:
-        files = [g["source_file"] for g in tg["gaps"][:5]]
-        parts.append(f"test gaps: {tg['gap_count']} — {', '.join(files)}")
+    # --- Code signals (code and hybrid) ---
+    if project_type in ("code", "hybrid"):
+        tg = detect_test_gaps(project_dir)
+        _write_json("test-gaps.json", tg, project_dir)
+        if tg["gap_count"] > 0:
+            files = [g["source_file"] for g in tg["gaps"][:5]]
+            parts.append(f"test gaps: {tg['gap_count']} -- {', '.join(files)}")
 
-    cs = scan_code_smells(project_dir)
-    _write_json("code-smells.json", cs, project_dir)
-    if cs["oversized_file_count"] > 0 or cs["oversized_function_count"] > 0:
-        parts.append(f"{cs['oversized_file_count']} oversized files, {cs['oversized_function_count']} long functions")
+        cs = scan_code_smells(project_dir)
+        _write_json("code-smells.json", cs, project_dir)
+        if cs["oversized_file_count"] > 0 or cs["oversized_function_count"] > 0:
+            parts.append(f"{cs['oversized_file_count']} oversized files, {cs['oversized_function_count']} long functions")
 
+        dg = build_dependency_map(project_dir)
+        _write_json("dep-graph.json", dg, project_dir)
+        if dg["impact_ranking"]:
+            top = dg["impact_ranking"][:3]
+            impact_str = ", ".join(f'{t["file"]} ({t["downstream_count"]} deps)' for t in top)
+            parts.append(f"high-impact: {impact_str}")
+
+    # --- Document signals (document and hybrid) ---
+    if project_type in ("document", "hybrid"):
+        ds = detect_document_staleness(project_dir)
+        _write_json("doc-staleness.json", ds, project_dir)
+        if ds["stale_count"] > 0:
+            top_stale = ds["stale_files"][:3]
+            stale_str = ", ".join(f'{s["file"]} ({s["days_since_edit"]}d)' for s in top_stale)
+            parts.append(f"stale docs: {ds['stale_count']} -- {stale_str}")
+
+        od = detect_orphan_documents(project_dir)
+        _write_json("doc-orphans.json", od, project_dir)
+        if od["orphan_count"] > 0:
+            parts.append(f"orphan docs: {od['orphan_count']}/{od['total_documents']}")
+            for o in od["orphan_files"][:3]:
+                parts.append(f"  - {o}")
+
+        dc = detect_document_clusters(project_dir)
+        _write_json("doc-clusters.json", dc, project_dir)
+        if dc["cluster_count"] > 1:
+            top_clusters = dc["clusters"][:3]
+            cluster_str = ", ".join(f'{c["directory"]} ({c["file_count"]} files)' for c in top_clusters)
+            parts.append(f"doc clusters: {cluster_str}")
+
+        so = detect_size_outliers(project_dir)
+        _write_json("doc-size-outliers.json", so, project_dir)
+        if so["outlier_count"] > 0:
+            parts.append(f"size outliers: {so['outlier_count']} files over {so['threshold_kb']}KB")
+
+        cr = detect_cross_references(project_dir)
+        _write_json("doc-crossrefs.json", cr, project_dir)
+        if cr["most_referenced"]:
+            top_ref = cr["most_referenced"][:3]
+            ref_str = ", ".join(f'{r["file"]} ({r["references"]} refs)' for r in top_ref)
+            parts.append(f"most referenced: {ref_str}")
+
+        rda = detect_recent_document_activity(project_dir)
+        _write_json("doc-recent-activity.json", rda, project_dir)
+        if rda["recent_changes"]:
+            top_active = rda["recent_changes"][:3]
+            active_str = ", ".join(f'{a["file"]} ({a["change_count"]}x by {a["authors"][0]})' for a in top_active)
+            parts.append(f"recent doc activity: {active_str}")
+
+    # --- Universal signals (all project types) ---
     cd = detect_config_drift(project_dir)
     _write_json("config-drift.json", cd, project_dir)
     if cd["drift_count"] > 0:
         parts.append(f"config drift: {', '.join(cd['drifted_file_names'][:5])}")
 
-    dg = build_dependency_map(project_dir)
-    _write_json("dep-graph.json", dg, project_dir)
-    if dg["impact_ranking"]:
-        top = dg["impact_ranking"][:3]
-        impact_str = ", ".join(f'{t["file"]} ({t["downstream_count"]} deps)' for t in top)
-        parts.append(f"high-impact: {impact_str}")
+    rf = detect_recent_focus(project_dir)
+    _write_json("recent-focus.json", rf, project_dir)
+    if rf["files"]:
+        parts.append(f"recent: {', '.join(rf['files'][-5:])}")
+
+    de = detect_recurring_dead_ends(project_dir)
+    _write_json("dead-ends.json", de, project_dir)
+    if de["dead_ends"]:
+        dead_str = "; ".join(f'{d["query"]} ({d["count"]}x)' for d in de["dead_ends"][:3])
+        parts.append(f"recurring dead ends: {dead_str}")
+
+    ub = detect_unresolved_blockers(project_dir)
+    _write_json("blockers.json", ub, project_dir)
+    if ub["blockers"]:
+        parts.append(f"unresolved blockers: {len(ub['blockers'])}")
+
+    cf = detect_critical_files(project_dir)
+    _write_json("critical-files.json", cf, project_dir)
+    if cf["critical_files"]:
+        crit_str = ", ".join(
+            f'{c["file"]} ({c["sessions"]} sessions, {c["downstream_deps"]} deps)'
+            for c in cf["critical_files"][:3]
+        )
+        parts.append(f"critical files: {crit_str}")
+
+    kr = detect_knowledge_risk(project_dir)
+    _write_json("knowledge-risk.json", kr, project_dir)
+    if kr["at_risk"]:
+        risk_str = "; ".join(
+            f'{r["file"]} ({r["contributors"][0]}, {r["edit_count"]} edits)'
+            for r in kr["at_risk"][:3]
+        )
+        parts.append(f"knowledge risk: {risk_str}")
 
     # Patterns (from previous LLM run, if exists and fresh)
     patterns_path = _janitor_dir(project_dir) / "patterns.json"
     if patterns_path.exists():
         age = time.time() - patterns_path.stat().st_mtime
-        if age < 86400:  # stale after 24h
+        if age < 86400:
             patterns = _read_json("patterns.json", project_dir)
             if patterns and patterns.get("patterns"):
                 parts.append(f"patterns: {'; '.join(p.get('description', '')[:60] for p in patterns['patterns'][:3])}")
 
-    # Last eval score (from previous session)
+    # Last eval score
     evals_path = _janitor_dir(project_dir) / "task-evals.jsonl"
     if evals_path.exists():
         try:
@@ -704,7 +1427,7 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
         except (json.JSONDecodeError, IndexError):
             pass
 
-    # Redo signals (from evaluator, if score was below threshold)
+    # Redo queue
     redo_path = _janitor_dir(project_dir) / "redo-queue.json"
     if redo_path.exists():
         try:
@@ -713,8 +1436,8 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
                 for item in redo_items[:3]:
                     score = item.get("score", "?")
                     feedback = item.get("feedback", "")[:200]
-                    parts.append(f"REDO: score={score} — {feedback}")
-                redo_path.write_text("[]")  # clear after reading
+                    parts.append(f"REDO: score={score} -- {feedback}")
+                redo_path.write_text("[]")
         except json.JSONDecodeError:
             pass
 
@@ -724,7 +1447,6 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
     return "JANITOR: " + " | ".join(parts)
 
 
-# --- SessionEnd: run LLM jobs ---
 
 def run_session_end(project_dir: Optional[str] = None) -> None:
     """Run LLM jobs at session end. Requires OPENROUTER_API_KEY.

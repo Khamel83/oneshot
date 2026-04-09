@@ -21,9 +21,11 @@ printf '{"ts":"%s","session":"%s","type":"session_end","content":"Session ended"
   "$timestamp" "$session_id" >> "$events_file"
 
 # Run LLM jobs in background (don't block session end)
+ONESHOT_DIR="$HOME/github/oneshot"
+export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null)" || true
 python3 -c "
 import sys, os
-sys.path.insert(0, '$project_dir')
+sys.path.insert(0, '$ONESHOT_DIR')
 try:
     from core.janitor.jobs import run_session_end
     run_session_end('$project_dir')

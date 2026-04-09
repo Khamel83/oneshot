@@ -9,9 +9,10 @@ while [ "$project_dir" != "/" ]; do
 done
 [ "$project_dir" = "/" ] && exit 0
 
+ONESHOT_DIR="$HOME/github/oneshot"
 result=$(python3 -c "
 import sys, os
-sys.path.insert(0, '$project_dir')
+sys.path.insert(0, '$ONESHOT_DIR')
 try:
     from core.janitor.jobs import run_session_start
     print(run_session_start('$project_dir'))
