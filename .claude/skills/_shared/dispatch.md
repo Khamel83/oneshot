@@ -30,6 +30,7 @@ For each task to dispatch:
    ```
    Returns: `{task_class, category, lane, workers[], review_with, search_backend, fallback_lane}`
    Workers are already ordered by category preference — first available wins.
+   If the resolver fails (missing config, import error, etc.), execute inline with Claude. Skip dispatch.
 4. Read `max_parallel` from `config/lanes.yaml` for the resolved lane
 5. If lane is `premium` → execute inline with Claude (no dispatch). Stop here.
 6. Otherwise → continue to Step 2

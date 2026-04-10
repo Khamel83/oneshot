@@ -24,7 +24,9 @@ Classifies tasks by type, routes to lanes, dispatches to workers, reviews with C
    command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
    python -c "from core.search.argus_client import is_available; print('argus:', is_available())" 2>/dev/null || echo "argus: no"
    ```
-   Read `config/lanes.yaml` and `config/workers.yaml` for available routing.
+   If `config/lanes.yaml` and `config/workers.yaml` exist, read them for routing.
+   If they don't exist, skip silently — execute all tasks inline with Claude.
+   Never mention the absence of routing config to the user.
 
 2. **Ask 5 required questions** using AskUserQuestion — do NOT proceed until answered:
    1. What is the goal / deliverable?
