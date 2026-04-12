@@ -1,0 +1,79 @@
+# Janitor provider pool — free intelligence sources for background jobs.
+#
+# Providers are tried in priority order (lowest number first).
+# A provider is skipped if:
+#   - its env_key is missing from the environment
+#   - it has hit its daily or minute rate limit
+#   - budget.daily_limit_usd is 0 and cost_per_1k_tokens > 0
+#
+# Budget defaults to $0 (free-only). Set daily_limit_usd > 0 to allow
+# paid fallbacks when free providers are exhausted.
+
+providers:
+  openrouter_free:
+    endpoint: https://openrouter.ai/api/v1/chat/completions
+    model: openrouter/free
+    cost_per_1k_tokens: 0.0
+    daily_limit: 1000
+    minute_limit: 20
+    env_key: OPENROUTER_API_KEY
+    priority: 1
+    notes: "Random free model from OpenRouter pool. Fastest to set up."
+
+  qwen_studio:
+    endpoint: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+    model: qwen3-235b-a22b
+    cost_per_1k_tokens: 0.0
+    daily_limit: 1000
+    minute_limit: 60
+    env_key: QWEN_API_KEY
+    priority: 2
+    notes: "Alibaba Qwen Studio free tier. Strong reasoning. Get key at dashscope.aliyun.com."
+
+  gemini_api:
+    endpoint: https://generativelanguage.googleapis.com/v1beta/openai/
+    model: gemini-2.0-flash
+    cost_per_1k_tokens: 0.0
+    daily_limit: 1500
+    minute_limit: 15
+    env_key: GEMINI_API_KEY
+    priority: 3
+    notes: "Google Gemini free tier via OpenAI-compatible endpoint. Get key at aistudio.google.com."
+
+  codex:
+    harness: codex_cli
+    # subprocess dispatch — not HTTP. Uses ChatGPT Plus subscription.
+    cost_per_1k_tokens: 0.0
+    daily_limit: null           # no hard cap; subscription covers it
+    minute_limit: 5             # conservative — Codex CLI is slow to start
+    env_key: OPENAI_API_KEY
+    priority: 4
+    notes: "OpenAI Codex CLI. Sunk cost ($20/mo ChatGPT Plus). Slowest option."
+
+# Budget configuration.
+# When daily_limit_usd is 0, only cost_per_1k_tokens: 0.0 providers are used.
+# Raise daily_limit_usd to enable paid fallbacks from paid_providers list.
+budget:
+  daily_limit_usd: 0.00
+  monthly_limit_usd: 0.00
+  alert_at_pct: 80            # log a warning when this % of daily budget is spent
+
+  # Paid fallbacks (only active when daily_limit_usd > 0 and free pool is exhausted)
+  paid_providers:
+    - name: openrouter_deepseek
+      endpoint: https://openrouter.ai/api/v1/chat/completions
+      model: deepseek/deepseek-v3.2
+      cost_per_1k_tokens_in: 0.00026
+      cost_per_1k_tokens_out: 0.00038
+      env_key: OPENROUTER_API_KEY
+      priority: 10
+      notes: "Best value paid option. $0.26/$0.38 per 1M tokens."
+
+    - name: openrouter_gemini_flash_lite
+      endpoint: https://openrouter.ai/api/v1/chat/completions
+      model: google/gemini-2.5-flash-lite
+      cost_per_1k_tokens_in: 0.00010
+      cost_per_1k_tokens_out: 0.00040
+      env_key: OPENROUTER_API_KEY
+      priority: 11
+      notes: "Cheapest paid option. $0.10/$0.40 per 1M tokens."

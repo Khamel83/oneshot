@@ -5,15 +5,18 @@ Pure-compute jobs (zero API calls, zero cost):
   - scan_code_smells: oversized files and long functions
   - detect_config_drift: uncommitted config changes
   - build_dependency_map: import graph ranked by impact
+  - analyze_dispatch_traces: aggregate eval/traces/ into worker stats
+  - monitor_provider_health: check remaining quota per provider
 
-LLM jobs (free via openrouter/free, requires OPENROUTER_API_KEY):
+LLM jobs (via provider pool — openrouter/free + qwen_studio + gemini_api + codex):
   - summarize_session: extract decisions/blockers from events
   - mine_patterns: recurring files, errors, decisions across sessions
   - generate_onboarding: "state of the project" summary
   - enrich_commits: semantic tags for recent commits
+  - generate_improvement_suggestions: routing improvements from trace stats
 
-All jobs run at session boundaries via hooks. No cron needed.
-Pure-compute runs at SessionStart. LLM jobs run at SessionEnd.
+All jobs run at session boundaries via hooks AND via cron (core.janitor.cron).
+Pure-compute runs at SessionStart. LLM jobs run at SessionEnd and on cron schedule.
 """
 
 import json
@@ -1264,6 +1267,240 @@ def detect_knowledge_risk(project_dir: Optional[str] = None, top_n: int = 5) -> 
     return {"at_risk": [{"file": f, "contributors": d["contributors"], "edit_count": d["edit_count"]} for f, d in at_risk[:top_n]]}
 
 
+# --- Continuous Intelligence Jobs ---
+
+
+def analyze_dispatch_traces(project_dir: Optional[str] = None) -> dict:
+    """Aggregate eval/traces/ into per-worker success stats. Pure-compute, no LLM.
+
+    Reads trace.json from every dispatch bundle and computes:
+      - success rate per worker per category
+      - average latency per worker
+      - retry and escalation rates
+
+    Writes results to .janitor/worker-stats.json.
+    Returns immediately with {"status": "no_traces"} if no traces exist yet.
+    """
+    project_dir = project_dir or os.getcwd()
+    traces_root = Path(project_dir) / "eval" / "traces"
+    if not traces_root.exists():
+        return {"status": "no_traces", "traces_analyzed": 0}
+
+    trace_files = list(traces_root.rglob("trace.json"))
+    if not trace_files:
+        return {"status": "no_traces", "traces_analyzed": 0}
+
+    # worker → category → {dispatches, successes, total_latency, retries, escalations}
+    stats: dict[str, dict[str, dict]] = {}
+    total = 0
+
+    for tf in trace_files:
+        try:
+            data = json.loads(tf.read_text())
+        except (json.JSONDecodeError, OSError):
+            continue
+
+        worker = (data.get("execution") or {}).get("worker") or (data.get("routing") or {}).get("selected_worker")
+        category = (data.get("classification") or {}).get("category", "unknown")
+        if not worker:
+            continue
+
+        succeeded = (data.get("validation") or {}).get("passed", False)
+        duration = (data.get("execution") or {}).get("duration_seconds") or 0
+        retry_attempt = (data.get("retry") or {}).get("attempt", 1)
+        escalated = (data.get("retry") or {}).get("escalated", False)
+
+        w = stats.setdefault(worker, {})
+        c = w.setdefault(category, {
+            "dispatches": 0, "successes": 0, "total_latency": 0.0,
+            "retries": 0, "escalations": 0,
+        })
+        c["dispatches"] += 1
+        if succeeded:
+            c["successes"] += 1
+        c["total_latency"] += float(duration)
+        if retry_attempt > 1:
+            c["retries"] += 1
+        if escalated:
+            c["escalations"] += 1
+        total += 1
+
+    # Build summary rows
+    rows = []
+    for worker, cats in stats.items():
+        for category, s in cats.items():
+            d = s["dispatches"]
+            rows.append({
+                "worker": worker,
+                "category": category,
+                "dispatches": d,
+                "success_rate": round(s["successes"] / d, 3) if d else 0,
+                "avg_latency_s": round(s["total_latency"] / d, 1) if d else 0,
+                "retry_rate": round(s["retries"] / d, 3) if d else 0,
+                "escalation_rate": round(s["escalations"] / d, 3) if d else 0,
+            })
+
+    rows.sort(key=lambda r: (r["worker"], r["category"]))
+    result = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "traces_analyzed": total,
+        "rows": rows,
+    }
+    _write_json("worker-stats.json", result, project_dir)
+    return result
+
+
+def monitor_provider_health(project_dir: Optional[str] = None) -> dict:
+    """Check remaining quota for each configured provider. Pure-compute.
+
+    Reads .janitor/usage.jsonl and config/janitor_providers.yaml.
+    Writes .janitor/provider-health.json with remaining daily calls per provider.
+    """
+    project_dir = project_dir or os.getcwd()
+
+    # Read provider config limits
+    from core.janitor.provider_pool import _load_config
+    cfg = _load_config()
+    provider_cfgs = cfg.get("providers", {})
+
+    # Count today's calls per provider from usage log
+    usage_path = _janitor_dir(project_dir) / "usage.jsonl"
+    now = time.time()
+    day_ago = now - 86400
+    calls_today: dict[str, int] = {}
+
+    if usage_path.exists():
+        with open(usage_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    ts = entry.get("ts", 0)
+                    if ts < day_ago:
+                        continue
+                    prov = entry.get("provider", "openrouter_free")
+                    calls_today[prov] = calls_today.get(prov, 0) + 1
+                except (json.JSONDecodeError, ValueError):
+                    continue
+
+    health = {}
+    for name, pcfg in provider_cfgs.items():
+        if not isinstance(pcfg, dict):
+            continue
+        used = calls_today.get(name, 0)
+        limit = pcfg.get("daily_limit")  # None = unlimited
+        env_key = pcfg.get("env_key", "")
+        has_key = bool(os.environ.get(env_key, ""))
+        remaining = (limit - used) if (limit is not None) else None
+
+        if not has_key:
+            status = "no_key"
+        elif remaining is not None and remaining <= 0:
+            status = "exhausted"
+        elif remaining is not None and remaining < (limit * 0.1 if limit else 0):
+            status = "low"
+        else:
+            status = "ok"
+
+        health[name] = {
+            "status": status,
+            "calls_today": used,
+            "daily_limit": limit,
+            "remaining": remaining,
+            "has_key": has_key,
+            "priority": pcfg.get("priority", 99),
+        }
+
+    result = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "providers": health,
+        "available_count": sum(1 for v in health.values() if v["status"] == "ok"),
+    }
+    _write_json("provider-health.json", result, project_dir)
+    return result
+
+
+def generate_improvement_suggestions(project_dir: Optional[str] = None, min_traces: int = 20) -> dict:
+    """Synthesize worker stats into plain-language improvement suggestions. 1 LLM call.
+
+    Requires analyze_dispatch_traces() to have run first (needs worker-stats.json).
+    Requires at least min_traces total dispatches for meaningful statistics.
+
+    Writes .janitor/suggestions.json with structured suggestions.
+    Returns {"status": "insufficient_data"} if not enough traces yet.
+    """
+    from core.janitor.worker import extract_structured_janitor
+
+    project_dir = project_dir or os.getcwd()
+    stats = _read_json("worker-stats.json", project_dir)
+    if not stats:
+        return {"status": "no_stats", "message": "Run analyze_dispatch_traces() first"}
+
+    total_traces = stats.get("traces_analyzed", 0)
+    if total_traces < min_traces:
+        return {
+            "status": "insufficient_data",
+            "traces_analyzed": total_traces,
+            "min_required": min_traces,
+            "message": f"Need {min_traces - total_traces} more traces for reliable suggestions",
+        }
+
+    rows = stats.get("rows", [])
+    if not rows:
+        return {"status": "no_rows"}
+
+    # Build a compact summary table for the LLM
+    table_lines = ["Worker | Category | Dispatches | SuccessRate | AvgLatency | RetryRate"]
+    table_lines.append("-" * 75)
+    for r in rows:
+        table_lines.append(
+            f"{r['worker']:<18} | {r['category']:<12} | {r['dispatches']:>10} | "
+            f"{r['success_rate']:>11.0%} | {r['avg_latency_s']:>9.0f}s | {r['retry_rate']:>9.0%}"
+        )
+
+    table = "\n".join(table_lines)
+
+    result = extract_structured_janitor(
+        f"Analyze this dispatch trace data ({total_traces} total dispatches) and suggest "
+        f"routing improvements for the OneShot harness:\n\n{table}\n\n"
+        "The harness routes tasks through lanes. Each lane has an ordered worker pool.\n"
+        "Identify patterns like:\n"
+        "  - Workers with very low success rate for a category (< 70%) → move to lower priority\n"
+        "  - Workers with high success + low latency for a category → move to higher priority\n"
+        "  - High retry rates → possible worker reliability issues\n"
+        "  - Missing workers for a category → consider adding one\n\n"
+        "Only suggest changes backed by the data. Minimum 5 dispatches per worker/category pair.",
+        system=(
+            "You are a harness optimization analyst for an AI orchestration system. "
+            "Convert dispatch trace statistics into concrete, actionable routing improvements. "
+            "Each suggestion must reference specific worker names, category names, and success rates. "
+            "Be concise. Do not suggest changes without statistical backing."
+        ),
+        schema_hint=(
+            '{"suggestions": [{'
+            '"type": "lane_preference|worker_remove|worker_add|reliability_flag", '
+            '"worker": str, "category": str, "confidence": float, '
+            '"description": str, "evidence": str, '
+            '"proposed_change": str, "file": str'
+            '}]}'
+        ),
+    )
+
+    if "suggestions" not in result:
+        return {"status": "parse_failed", "raw": result.get("raw", ""), "traces_analyzed": total_traces}
+
+    output = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "traces_analyzed": total_traces,
+        "rows_analyzed": len(rows),
+        "suggestions": result["suggestions"],
+    }
+    _write_json("suggestions.json", output, project_dir)
+    return output
+
+
 # --- SessionStart: run pure-compute + inject results ---
 
 def run_session_start(project_dir: Optional[str] = None) -> str:
@@ -1406,6 +1643,26 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
         )
         parts.append(f"knowledge risk: {risk_str}")
 
+    # Provider health (from previous cron run, if exists)
+    ph = _read_json("provider-health.json", project_dir)
+    if ph:
+        avail = ph.get("available_count", 0)
+        total_providers = len(ph.get("providers", {}))
+        if avail < total_providers:
+            exhausted = [n for n, v in ph.get("providers", {}).items() if v.get("status") == "exhausted"]
+            if exhausted:
+                parts.append(f"providers exhausted: {', '.join(exhausted)}")
+
+    # Improvement suggestions (advisory, from latest cron run)
+    sugg = _read_json("suggestions.json", project_dir)
+    if sugg and sugg.get("suggestions"):
+        age = 0
+        sugg_path = _janitor_dir(project_dir) / "suggestions.json"
+        if sugg_path.exists():
+            age = time.time() - sugg_path.stat().st_mtime
+        if age < 86400 * 7:  # only show if < 1 week old
+            parts.append(f"routing suggestions: {len(sugg['suggestions'])} (see .janitor/suggestions.json)")
+
     # Patterns (from previous LLM run, if exists and fresh)
     patterns_path = _janitor_dir(project_dir) / "patterns.json"
     if patterns_path.exists():
@@ -1466,9 +1723,27 @@ def run_session_end(project_dir: Optional[str] = None) -> None:
     if not events_path.exists():
         return
 
-    # Check for API key
-    if not os.environ.get("OPENROUTER_API_KEY"):
-        return  # silently skip — pure-compute already ran at session start
+    # Provider health (pure-compute, always run)
+    try:
+        monitor_provider_health(project_dir)
+    except Exception:
+        pass
+
+    # Trace analysis (pure-compute, always run if traces exist)
+    try:
+        analyze_dispatch_traces(project_dir)
+    except Exception:
+        pass
+
+    # Check for any LLM provider key
+    has_llm_key = any([
+        os.environ.get("OPENROUTER_API_KEY"),
+        os.environ.get("QWEN_API_KEY"),
+        os.environ.get("GEMINI_API_KEY"),
+        os.environ.get("OPENAI_API_KEY"),
+    ])
+    if not has_llm_key:
+        return  # silently skip — pure-compute already ran
 
     try:
         # Summarize session
@@ -1502,6 +1777,20 @@ def run_session_end(project_dir: Optional[str] = None) -> None:
 
                 generate_onboarding(project_dir)
                 daily_gate.write_text(str(time.time()))
+            except Exception:
+                pass  # non-critical
+
+        # Weekly gate for suggestion generation (requires ≥20 traces)
+        weekly_gate = janitor_dir / "last-weekly-run"
+        skip_weekly = False
+        if weekly_gate.exists() and (time.time() - weekly_gate.stat().st_mtime) < 86400 * 7:
+            skip_weekly = True
+
+        if not skip_weekly:
+            try:
+                result = generate_improvement_suggestions(project_dir)
+                if result.get("status") == "ok" or result.get("suggestions"):
+                    weekly_gate.write_text(str(time.time()))
             except Exception:
                 pass  # non-critical
 
