@@ -28,3 +28,5 @@
 [2026-04-07T22:15:09Z]   All pure-compute jobs completed
 [2026-04-07T22:15:09Z]   Onboarding updated
 [2026-04-07T22:15:09Z] --- Janitor cron end ---
+2026-04-12T22:10:46.544434+00:00 ran=9 skipped=2
+2026-04-12T22:12:59.840800+00:00 ran=8 skipped=3

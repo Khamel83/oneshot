@@ -1,5 +1,5 @@
 {
-  "files_with_imports": 9,
+  "files_with_imports": 10,
   "impact_ranking": [
     {
       "file": "core/task_schema.py",
@@ -11,6 +11,10 @@
     },
     {
       "file": "core/janitor/worker.py",
+      "downstream_count": 2
+    },
+    {
+      "file": "core/janitor/provider_pool.py",
       "downstream_count": 2
     },
     {
