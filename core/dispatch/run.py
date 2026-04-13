@@ -11,6 +11,12 @@ Trace writing:
       prompt.md      — rendered prompt sent to worker
       output.raw     — raw worker output
       manifest.md    — human-readable summary (derived from trace.json)
+
+New capabilities:
+    --localize      Pre-dispatch LLM call to inject relevant file paths into prompt
+    --verify CMD    Run verification command after dispatch; rollback if it fails
+    --retry N       Multi-turn retry: feed error output back to worker (default: 1)
+    --remote HOST   Dispatch to remote host via SSH (must be in config/workers.yaml)
 """
 
 import argparse
@@ -128,6 +134,45 @@ def glm_claude_command(prompt: str, output_file: str, model: str = "glm-5-turbo"
         f"{json.dumps(prompt)} "
         f"> {output_file} 2>/dev/null"
     ]
+
+
+def ssh_wrap(host: str, cmd: list[str]) -> list[str]:
+    """Wrap a local worker command to run on a remote host via SSH.
+
+    Args:
+        host: SSH host alias (must be resolvable, e.g. via ~/.ssh/config or Tailscale).
+        cmd: Local command list (e.g. ["bash", "-c", "codex exec ..."]).
+
+    The command is passed as-is to the remote shell. File paths in the inner
+    bash -c string must be absolute — the caller is responsible for this when
+    targeting remote machines.
+    """
+    # SSH BatchMode=yes: fail immediately instead of prompting for password.
+    # ConnectTimeout=10: don't hang forever on unreachable hosts.
+    return [
+        "ssh",
+        "-o", "BatchMode=yes",
+        "-o", "ConnectTimeout=10",
+        "-o", "StrictHostKeyChecking=accept-new",
+        host,
+    ] + cmd
+
+
+def load_workers_config() -> dict:
+    """Load config/workers.yaml. Returns empty dict on any error."""
+    try:
+        return load_yaml(str(REPO_ROOT / "config" / "workers.yaml"))
+    except Exception:
+        return {}
+
+
+def worker_ssh_host(worker_name: str) -> str | None:
+    """Return the SSH host for a named worker entry, or None if not SSH transport."""
+    cfg = load_workers_config()
+    entry = cfg.get("workers", {}).get(worker_name, {})
+    if entry.get("transport") == "ssh":
+        return entry.get("host")
+    return None
 
 
 def worker_available(worker: str) -> bool:
@@ -405,9 +450,14 @@ def write_trace(result: dict, prompt: str, task_class: str, category: str,
             "message_preview": (result.get("message", "") or "")[:200]
         },
         "retry": {
-            "attempt": 1,
-            "previous_traces": [],
-            "escalated": False
+            "attempt": result.get("attempt", 1),
+            "previous_traces": result.get("previous_traces", []),
+            "escalated": False,
+        },
+        "verification": {
+            "passed": result.get("verification_passed"),
+            "output": result.get("verification_output", ""),
+            "rolled_back": result.get("rolled_back", False),
         },
         "cost": {
             "estimated_cost_usd": 0,
@@ -438,71 +488,155 @@ def write_trace(result: dict, prompt: str, task_class: str, category: str,
     return trace_dir
 
 
-def dispatch_single(task: dict, output_dir: str) -> dict:
-    """Dispatch a single task to the appropriate worker and return result."""
-    worker = task["worker"]
-    prompt = task["prompt"]
-    task_id = task["id"]
-    output_file = os.path.join(output_dir, f"dispatch-{task_id}.json")
-    started = datetime.now(timezone.utc)
-
-    # Build command
+def _build_worker_command(worker: str, prompt: str, output_file: str, model: str = "") -> list | None:
+    """Build the command list for a worker. Returns None for unknown workers."""
     if worker == "codex":
-        cmd = codex_command(prompt, output_file)
+        return codex_command(prompt, output_file)
     elif worker == "gemini_cli":
-        cmd = gemini_command(prompt, output_file)
+        return gemini_command(prompt, output_file)
     elif worker == "claw_code":
-        model = task.get("model", os.environ.get("OPENAI_MODEL", ""))
-        cmd = claw_code_command(prompt, output_file, model=model)
+        return claw_code_command(prompt, output_file, model=model)
     elif worker == "glm_claude":
-        model = task.get("model", "glm-5-turbo")
-        cmd = glm_claude_command(prompt, output_file, model=model)
-    else:
-        return {"task_id": task_id, "worker": worker, "status": "failed",
-                "error": f"Unknown worker: {worker}"}
+        return glm_claude_command(prompt, output_file, model=model or "glm-5-turbo")
+    return None
 
-    # Execute
+
+def _run_attempt(cmd: list, env: dict, remote_host: str | None = None) -> tuple[int, str]:
+    """Execute a command (optionally over SSH). Returns (exit_code, stderr)."""
+    effective_cmd = ssh_wrap(remote_host, cmd) if remote_host else cmd
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300,
-                             env=clean_env())
-        exit_code = proc.returncode
-        stderr = proc.stderr.strip() if proc.stderr else ""
+        proc = subprocess.run(
+            effective_cmd, capture_output=True, text=True, timeout=300, env=env
+        )
+        return proc.returncode, (proc.stderr.strip() if proc.stderr else "")
     except subprocess.TimeoutExpired:
-        exit_code = -1
-        stderr = "Timeout (300s)"
+        return -1, "Timeout (300s)"
     except Exception as e:
-        exit_code = -1
-        stderr = str(e)
+        return -1, str(e)
 
-    completed = datetime.now(timezone.utc)
-    duration = (completed - started).total_seconds()
 
-    # Parse output
-    if worker == "codex":
-        parsed = parse_codex_output(output_file)
-    elif worker in ("claw_code", "glm_claude"):
-        parsed = parse_claw_code_output(output_file)
+def dispatch_single(task: dict, output_dir: str) -> dict:
+    """Dispatch a single task to the appropriate worker and return result.
+
+    Supports:
+    - max_attempts: retry with error feedback (default 1 = single-shot)
+    - verify_commands: list of shell cmds run after success; rollback stash if any fail
+    - stash_ref: pre-existing stash from stash_before(); popped on verification failure
+    - remote_host: SSH host to route the command to
+    - localize: if True, inject relevant files into the prompt before dispatch
+    """
+    worker = task["worker"]
+    original_prompt = task["prompt"]
+    task_id = task["id"]
+    model = task.get("model", os.environ.get("OPENAI_MODEL", ""))
+    max_attempts = int(task.get("max_attempts", 1))
+    verify_commands = task.get("verify_commands") or []
+    stash_ref = task.get("stash_ref")
+    remote_host = task.get("remote_host")
+    project_dir = task.get("project_dir", os.getcwd())
+
+    # File localization: inject relevant files into the prompt (one cheap LLM call)
+    if task.get("localize"):
+        try:
+            from core.dispatch.localize import inject_file_context
+            prompt = inject_file_context(original_prompt, project_dir=project_dir)
+        except Exception:
+            prompt = original_prompt
     else:
-        parsed = parse_gemini_output(output_file)
+        prompt = original_prompt
 
-    # Determine status
-    status = "succeeded" if exit_code == 0 and not parsed["errors"] else "failed"
-    last_message = parsed["messages"][-1] if parsed["messages"] else ""
+    started = datetime.now(timezone.utc)
+    previous_trace_ids: list[str] = []
+    attempt = 0
+    result: dict = {}
 
-    return {
-        "task_id": task_id,
-        "worker": worker,
-        "status": status,
-        "exit_code": exit_code,
-        "stderr": stderr,
-        "started": started.isoformat(),
-        "completed": completed.isoformat(),
-        "duration": round(duration, 1),
-        "output_file": output_file,
-        "message": last_message,
-        "errors": parsed["errors"],
-        "usage": parsed["usage"],
-    }
+    for attempt in range(1, max_attempts + 1):
+        output_file = os.path.join(output_dir, f"dispatch-{task_id}-a{attempt}.json")
+
+        # On retry, append error context from previous attempt
+        attempt_prompt = prompt
+        if attempt > 1 and result:
+            prev_errors = result.get("errors", [])
+            prev_stderr = result.get("stderr", "")
+            error_ctx = "\n".join(filter(None, prev_errors + [prev_stderr]))
+            if error_ctx:
+                attempt_prompt = (
+                    f"{prompt}\n\n## Previous Attempt Failed\n\n"
+                    f"Attempt {attempt - 1} produced these errors — please fix them:\n\n"
+                    f"```\n{error_ctx[:1000]}\n```\n"
+                )
+
+        cmd = _build_worker_command(worker, attempt_prompt, output_file, model=model)
+        if cmd is None:
+            return {
+                "task_id": task_id, "worker": worker, "status": "failed",
+                "error": f"Unknown worker: {worker}",
+                "started": started.isoformat(),
+                "completed": started.isoformat(),
+                "duration": 0, "exit_code": -1, "stderr": "",
+                "output_file": output_file, "message": "", "errors": [], "usage": None,
+                "attempt": 1, "previous_traces": [],
+            }
+
+        exit_code, stderr = _run_attempt(cmd, clean_env(), remote_host=remote_host)
+        completed_dt = datetime.now(timezone.utc)
+
+        # Parse output
+        if worker == "codex":
+            parsed = parse_codex_output(output_file)
+        elif worker in ("claw_code", "glm_claude"):
+            parsed = parse_claw_code_output(output_file)
+        else:
+            parsed = parse_gemini_output(output_file)
+
+        status = "succeeded" if exit_code == 0 and not parsed["errors"] else "failed"
+        last_message = parsed["messages"][-1] if parsed["messages"] else ""
+
+        result = {
+            "task_id": task_id,
+            "worker": worker,
+            "status": status,
+            "exit_code": exit_code,
+            "stderr": stderr,
+            "started": started.isoformat(),
+            "completed": completed_dt.isoformat(),
+            "duration": round((completed_dt - started).total_seconds(), 1),
+            "output_file": output_file,
+            "message": last_message,
+            "errors": parsed["errors"],
+            "usage": parsed["usage"],
+            "attempt": attempt,
+            "previous_traces": list(previous_trace_ids),
+        }
+
+        if status == "succeeded":
+            break
+
+        previous_trace_ids.append(f"{task_id}-a{attempt}")
+
+    # Verification gate: run post-dispatch commands to confirm correctness
+    if result.get("status") == "succeeded" and verify_commands:
+        try:
+            from core.dispatch.safety import run_verification
+            passed, verify_output = run_verification(verify_commands, project_dir)
+            result["verification_passed"] = passed
+            result["verification_output"] = verify_output
+            if not passed:
+                result["status"] = "failed"
+                result["errors"] = result.get("errors", []) + [f"Verification failed:\n{verify_output[:500]}"]
+                # Rollback if we have a stash
+                if stash_ref is not None:
+                    try:
+                        from core.dispatch.safety import rollback
+                        rolled_back = rollback(project_dir, stash_ref)
+                        result["rolled_back"] = rolled_back
+                    except Exception:
+                        result["rolled_back"] = False
+        except Exception as e:
+            result["verification_passed"] = None
+            result["verification_error"] = str(e)
+
+    return result
 
 
 def write_manifest(result: dict, manifest_dir: str):
@@ -608,6 +742,16 @@ def main():
                         help="JSON file with array of {id, prompt} for batch mode")
     parser.add_argument("--dry-run", action="store_true",
                         help="Show what would be dispatched without running")
+    parser.add_argument("--localize", action="store_true",
+                        help="Pre-dispatch LLM call to inject relevant file paths into prompt")
+    parser.add_argument("--verify", default=None, metavar="CMD",
+                        help="Shell command to run after dispatch; rollback on failure")
+    parser.add_argument("--retry", type=int, default=1, metavar="N",
+                        help="Max dispatch attempts with error feedback (default: 1)")
+    parser.add_argument("--remote", default=None, metavar="HOST",
+                        help="Dispatch to remote SSH host (must be in config/workers.yaml)")
+    parser.add_argument("--stash", action="store_true",
+                        help="Auto-stash before high-risk dispatch; rollback on verification failure")
     args = parser.parse_args()
 
     if not args.prompt and not args.prompts_file:
@@ -638,6 +782,20 @@ def main():
             worker = resolution["workers"][0]  # try anyway, may fail gracefully
     task_id = f"{args.task_class}-{int(time.time())}"
 
+    # Auto-stash if --stash and high-risk task class
+    stash_ref = None
+    if args.stash:
+        try:
+            from core.dispatch.safety import stash_before, is_high_risk
+            if is_high_risk(args.task_class):
+                stash_ref = stash_before(os.getcwd())
+                if stash_ref:
+                    print(f"[dispatch] Stashed working changes: {stash_ref}", file=sys.stderr)
+        except Exception as e:
+            print(f"[dispatch] Stash failed (non-fatal): {e}", file=sys.stderr)
+
+    verify_commands = [args.verify] if args.verify else []
+
     tasks = []
     model = args.model or ""
     if args.prompts_file:
@@ -646,9 +804,19 @@ def main():
         for i, p in enumerate(prompts):
             w = p.get("worker", worker)
             m = p.get("model", model)
-            tasks.append({"id": f"{w}-{i}-{task_id}", "worker": w, "prompt": p["prompt"], "model": m})
+            tasks.append({
+                "id": f"{w}-{i}-{task_id}", "worker": w, "prompt": p["prompt"], "model": m,
+                "max_attempts": args.retry, "localize": args.localize,
+                "verify_commands": verify_commands, "stash_ref": stash_ref,
+                "remote_host": args.remote, "project_dir": os.getcwd(),
+            })
     else:
-        tasks.append({"id": task_id, "worker": worker, "prompt": args.prompt, "model": model})
+        tasks.append({
+            "id": task_id, "worker": worker, "prompt": args.prompt, "model": model,
+            "max_attempts": args.retry, "localize": args.localize,
+            "verify_commands": verify_commands, "stash_ref": stash_ref,
+            "remote_host": args.remote, "project_dir": os.getcwd(),
+        })
 
     max_p = min(args.parallel, resolution.get("max_parallel", 3))
     results = dispatch_parallel(tasks, max_parallel=max_p,

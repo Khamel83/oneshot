@@ -14,6 +14,7 @@ Config read from config/janitor_providers.yaml (relative to git root).
 Falls back to openrouter/free behaviour if config file is missing.
 """
 
+import fcntl
 import json
 import os
 import re
@@ -219,8 +220,18 @@ class UsageTracker:
             "tokens_out": tokens_out,
             "cost_usd": cost_usd,
         }
-        with open(self._path, "a") as f:
-            f.write(json.dumps(entry, separators=(",", ":")) + "\n")
+        line = json.dumps(entry, separators=(",", ":")) + "\n"
+        # Use an exclusive lock so concurrent cron + session-end writes stay safe.
+        # flock is advisory but sufficient for single-machine, single-user use.
+        try:
+            with open(self._path, "a") as f:
+                fcntl.flock(f, fcntl.LOCK_EX)
+                try:
+                    f.write(line)
+                finally:
+                    fcntl.flock(f, fcntl.LOCK_UN)
+        except OSError:
+            pass
         # Invalidate cache
         self._cache_ts = 0
 

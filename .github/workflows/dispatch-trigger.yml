@@ -1,0 +1,244 @@
+# Dispatch Trigger — respond to GitHub issue/PR labels to fire a janitor job.
+#
+# How to use:
+#   Add label "janitor:run" to any issue or PR to trigger a cron pass on that
+#   project. The workflow posts the result as a comment on the issue/PR.
+#
+# Supported labels:
+#   janitor:run       — run one full cron pass (pure-compute + LLM if keys available)
+#   janitor:suggest   — run improvement suggestion generation from worker stats
+#   janitor:stats     — post worker_stats.py table as a comment
+#   dispatch:dry-run  — resolve routing for task class in issue body, post result
+
+name: Dispatch Trigger
+
+on:
+  issues:
+    types: [labeled]
+  pull_request:
+    types: [labeled]
+
+jobs:
+  # -----------------------------------------------------------------------
+  # janitor:run — full cron pass
+  # -----------------------------------------------------------------------
+  janitor-run:
+    name: Run janitor cron pass
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'janitor:run'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed for git log in janitor jobs
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Run janitor cron
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python3 -m core.janitor.cron --once --verbose 2>&1 | tee /tmp/cron-output.txt
+          echo "EXIT_CODE=${PIPESTATUS[0]}" >> $GITHUB_ENV
+
+      - name: Post comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('/tmp/cron-output.txt', 'utf8').trim();
+            const truncated = output.length > 3000
+              ? output.slice(0, 3000) + '\n\n...(truncated)'
+              : output;
+            const body = `### Janitor cron pass\n\n\`\`\`\n${truncated}\n\`\`\`\n\n> Triggered by \`janitor:run\` label`;
+            const isPR = context.eventName === 'pull_request';
+            if (isPR) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                body,
+              });
+            }
+
+  # -----------------------------------------------------------------------
+  # janitor:stats — post worker stats table
+  # -----------------------------------------------------------------------
+  janitor-stats:
+    name: Post worker stats
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'janitor:stats'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Generate worker stats
+        run: |
+          python3 eval/scripts/worker_stats.py --since 30d 2>&1 | tee /tmp/stats-output.txt || true
+
+      - name: Post comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('/tmp/stats-output.txt', 'utf8').trim();
+            const body = output
+              ? `### Worker stats (last 30 days)\n\n\`\`\`\n${output}\n\`\`\`\n\n> Triggered by \`janitor:stats\` label`
+              : '### Worker stats\n\nNo trace data yet — run some dispatches first.';
+            const isPR = context.eventName === 'pull_request';
+            const number = isPR
+              ? context.payload.pull_request.number
+              : context.payload.issue.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: number,
+              body,
+            });
+
+  # -----------------------------------------------------------------------
+  # janitor:suggest — run improvement suggestion generation
+  # -----------------------------------------------------------------------
+  janitor-suggest:
+    name: Generate improvement suggestions
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'janitor:suggest'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Generate suggestions
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python3 -c "
+          import sys, json
+          sys.path.insert(0, '.')
+          from core.janitor.jobs import generate_improvement_suggestions
+          result = generate_improvement_suggestions('.')
+          print(json.dumps(result, indent=2))
+          " 2>&1 | tee /tmp/suggest-output.txt || true
+
+      - name: Post comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let output = fs.readFileSync('/tmp/suggest-output.txt', 'utf8').trim();
+            let body;
+            try {
+              const data = JSON.parse(output);
+              const suggestions = data.suggestions || [];
+              if (suggestions.length === 0) {
+                body = `### Improvement suggestions\n\nNo suggestions yet — need ≥20 traces. Run more dispatches first.\n\n> Triggered by \`janitor:suggest\` label`;
+              } else {
+                const lines = suggestions.map((s, i) =>
+                  `**${i+1}. ${s.type}** (confidence: ${(s.confidence*100).toFixed(0)}%)\n${s.description}\n> ${s.proposed_change}`
+                ).join('\n\n');
+                body = `### Improvement suggestions (${suggestions.length})\n\n${lines}\n\n> Triggered by \`janitor:suggest\` label`;
+              }
+            } catch(e) {
+              body = `### Improvement suggestions\n\nFailed to generate: ${output.slice(0, 500)}\n\n> Triggered by \`janitor:suggest\` label`;
+            }
+            const isPR = context.eventName === 'pull_request';
+            const number = isPR ? context.payload.pull_request.number : context.payload.issue.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: number, body,
+            });
+
+  # -----------------------------------------------------------------------
+  # dispatch:dry-run — resolve routing for task class in issue body
+  # -----------------------------------------------------------------------
+  dispatch-dry-run:
+    name: Resolve routing (dry run)
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'dispatch:dry-run'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Extract task class from issue body
+        uses: actions/github-script@v7
+        id: parse
+        with:
+          script: |
+            const isPR = context.eventName === 'pull_request';
+            const body = isPR
+              ? context.payload.pull_request.body || ''
+              : context.payload.issue.body || '';
+            // Look for "task_class: implement_small" pattern
+            const match = body.match(/task[_\s]class:\s*(\w+)/i);
+            const taskClass = match ? match[1] : 'implement_small';
+            core.setOutput('task_class', taskClass);
+
+      - name: Resolve routing
+        run: |
+          python3 -m core.dispatch.run \
+            --class "${{ steps.parse.outputs.task_class }}" \
+            --prompt "dry run" \
+            --dry-run 2>&1 | tee /tmp/routing-output.txt
+
+      - name: Post comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('/tmp/routing-output.txt', 'utf8').trim();
+            const taskClass = '${{ steps.parse.outputs.task_class }}';
+            const body = `### Routing resolution for \`${taskClass}\`\n\n\`\`\`json\n${output}\n\`\`\`\n\n> Triggered by \`dispatch:dry-run\` label`;
+            const isPR = context.eventName === 'pull_request';
+            const number = isPR ? context.payload.pull_request.number : context.payload.issue.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: number, body,
+            });

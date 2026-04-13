@@ -12,16 +12,20 @@ workers:
     harness: claude_code
 
   macmini:
-    host: macmini
+    host: macmini                        # SSH host alias (100.113.216.27 or ~/.ssh/config alias)
     transport: ssh
     role: worker
     harness: opencode
+    remote_path: ~/github/oneshot        # abs or ~ path on the remote machine
+    ssh_opts: "-o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new"
 
   homelab:
-    host: homelab
+    host: homelab                        # SSH host alias (100.112.130.100 or ~/.ssh/config alias)
     transport: ssh
     role: worker
     harness: opencode
+    remote_path: ~/github/oneshot        # abs or ~ path on the remote machine
+    ssh_opts: "-o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new"
 
   claw:
     host: localhost
