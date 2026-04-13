@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-04-12T22:12:59.926501+00:00",
+  "providers": {
+    "openrouter_free": {
+      "status": "no_key",
+      "calls_today": 0,
+      "daily_limit": 1000,
+      "remaining": 1000,
+      "has_key": false,
+      "priority": 1
+    },
+    "qwen_studio": {
+      "status": "no_key",
+      "calls_today": 0,
+      "daily_limit": 1000,
+      "remaining": 1000,
+      "has_key": false,
+      "priority": 2
+    },
+    "gemini_api": {
+      "status": "no_key",
+      "calls_today": 0,
+      "daily_limit": 1500,
+      "remaining": 1500,
+      "has_key": false,
+      "priority": 3
+    },
+    "codex": {
+      "status": "no_key",
+      "calls_today": 0,
+      "daily_limit": null,
+      "remaining": null,
+      "has_key": false,
+      "priority": 4
+    }
+  },
+  "available_count": 0
+}
