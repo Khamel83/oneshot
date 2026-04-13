@@ -9,7 +9,9 @@ while [ "$project_dir" != "/" ]; do
 done
 [ "$project_dir" = "/" ] && exit 0
 
-ONESHOT_DIR="$HOME/github/oneshot"
+# Load ONESHOT_DIR from central config (set by scripts/setup-global.sh)
+[ -f "$HOME/.config/oneshot/env.sh" ] && source "$HOME/.config/oneshot/env.sh"
+ONESHOT_DIR="${ONESHOT_DIR:-$HOME/github/oneshot}"
 result=$(python3 -c "
 import sys, os, json
 sys.path.insert(0, '$ONESHOT_DIR')

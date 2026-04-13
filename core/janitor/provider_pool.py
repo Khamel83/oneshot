@@ -85,8 +85,10 @@ def _load_config() -> dict:
 
     Falls back to openrouter/free only if file is missing.
     """
+    # Central config wins over per-project config
+    central = Path.home() / ".config" / "oneshot" / "janitor_providers.yaml"
     root = _find_git_root()
-    cfg_path = root / "config" / "janitor_providers.yaml"
+    cfg_path = central if central.exists() else (root / "config" / "janitor_providers.yaml")
     if not cfg_path.exists():
         return {
             "providers": {

@@ -271,7 +271,26 @@ def run_once(project_dir: str, verbose: bool = False) -> dict:
     else:
         summary["skipped"].append("daily_llm (< 24h since last run)")
 
-    # 5. Weekly suggestions
+    # 5. Weekly harvest (aggregate usage from all registered projects)
+    # Only runs from the oneshot repo itself
+    oneshot_marker = Path(project_dir) / "config" / "janitor_providers.yaml"
+    if oneshot_marker.exists() and _should_run("weekly_harvest", WEEK, state):
+        if verbose:
+            _log("Running cross-project usage harvest...")
+        try:
+            from core.janitor.harvest import harvest
+            h = harvest()
+            if verbose:
+                _log(f"Harvest: {h['projects_active']} projects, {h['total_calls']} calls")
+            summary["ran"].append(f"harvest: {h['projects_active']} projects")
+            _mark_ran("weekly_harvest", state)
+        except Exception as e:
+            if verbose:
+                _log(f"Harvest error: {e}")
+    elif not oneshot_marker.exists():
+        summary["skipped"].append("weekly_harvest (not oneshot repo)")
+
+    # 6. Weekly suggestions
     if _should_run("weekly_suggestions", WEEK, state):
         if verbose:
             _log("Running improvement suggestion generation...")

@@ -1514,6 +1514,13 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
     if not (Path(project_dir) / ".git").exists():
         return ""
 
+    # Auto-register this project in the central registry (~/.config/oneshot/projects.json)
+    try:
+        from core.janitor.registry import auto_register
+        auto_register(project_dir)
+    except Exception:
+        pass  # never block session start
+
     # Detect project type and persist for downstream use
     project_type = detect_project_type(project_dir)
     _write_json("project-type.json", {"type": project_type}, project_dir)
