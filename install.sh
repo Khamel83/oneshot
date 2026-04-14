@@ -7,6 +7,31 @@ set -euo pipefail
 
 ONESHOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BIN_DIR="${HOME}/.local/bin"
+HOOKS_DIR="${HOME}/.claude/hooks"
+
+# Sync hooks from repo to ~/.claude/hooks/ (won't overwrite existing files)
+install_hooks() {
+    local src="$ONESHOT_DIR/.claude/hooks"
+    [ -d "$src" ] || return 0
+
+    mkdir -p "$HOOKS_DIR"
+    local count=0
+    for f in "$src"/*.sh; do
+        [ -f "$f" ] || continue
+        local name=$(basename "$f")
+        if [ -f "$HOOKS_DIR/$name" ]; then
+            echo "  $name (exists, skipped)"
+        else
+            cp "$f" "$HOOKS_DIR/$name"
+            chmod +x "$HOOKS_DIR/$name"
+            echo "  $name (installed)"
+            count=$((count + 1))
+        fi
+    done
+    if [ "$count" -gt 0 ]; then
+        echo "  $count hook(s) installed"
+    fi
+}
 
 # Read version from AGENTS.md
 VERSION=$(grep -m1 "ONE_SHOT v" "$ONESHOT_DIR/AGENTS.md" 2>/dev/null | grep -oP 'v[\d.]+' || echo "unknown")
@@ -35,6 +60,12 @@ if [ -d "$ONESHOT_DIR/.claude/skills" ]; then
     echo "Syncing skills to ~/.claude/skills/..."
     cp -r "$ONESHOT_DIR/.claude/skills/"* "${HOME}/.claude/skills/" 2>/dev/null || true
     echo "  10+1 skills synced"
+fi
+
+# Sync hooks to ~/.claude/hooks/ (won't overwrite existing)
+if [ -d "$ONESHOT_DIR/.claude/hooks" ]; then
+    echo "Syncing hooks to ~/.claude/hooks/..."
+    install_hooks
 fi
 
 echo ""

@@ -101,6 +101,22 @@ do_update() {
         done
         log "Updated command symlinks in $COMMANDS_DIR"
 
+        # Sync hooks (install new ones, skip existing)
+        HOOKS_SRC="$ONESHOT_DIR/.claude/hooks"
+        HOOKS_DST="$HOME/.claude/hooks"
+        if [ -d "$HOOKS_SRC" ]; then
+            mkdir -p "$HOOKS_DST"
+            for f in "$HOOKS_SRC"/*.sh; do
+                [ -f "$f" ] || continue
+                name=$(basename "$f")
+                if [ ! -f "$HOOKS_DST/$name" ]; then
+                    cp "$f" "$HOOKS_DST/$name"
+                    chmod +x "$HOOKS_DST/$name"
+                    log "Installed hook: $name"
+                fi
+            done
+        fi
+
         echo "UPDATED"
         return 0
     else
