@@ -34,7 +34,7 @@ install_hooks() {
 }
 
 # Read version from AGENTS.md
-VERSION=$(grep -m1 "ONE_SHOT v" "$ONESHOT_DIR/AGENTS.md" 2>/dev/null | grep -oP 'v[\d.]+' || echo "unknown")
+VERSION=$(grep -m1 "ONE_SHOT v" "$ONESHOT_DIR/AGENTS.md" 2>/dev/null | sed 's/.*\(v[0-9.]*\).*/\1/' || echo "unknown")
 
 echo "Installing ONE_SHOT $VERSION..."
 
