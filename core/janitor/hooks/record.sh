@@ -1,13 +1,12 @@
 #!/bin/bash
 # PostToolUse hook: records tool calls to .janitor/events.jsonl
 # Fires AFTER every tool call during a Claude Code session.
-# Optimized: uses printf instead of jq (one process instead of 3-4).
 #
 # INSTALL: Add to ~/.claude/settings.json under PostToolUse hooks
 
 input=$(cat)
 
-# Fast field extraction with parameter expansion (no jq needed for simple fields)
+# Fast tool_name extraction (this field never contains escaped quotes)
 tool_name="${input#*\"tool_name\":\"}"
 tool_name="${tool_name%%\"*}"
 
@@ -33,18 +32,26 @@ mkdir -p "$janitor_dir"
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 session_id="${CLAUDE_CODE_SESSION_ID:-$(date +%Y%m%d-%H%M%S)}"
 
-# Extract file_path from tool_input (works for Read/Write/Edit which have file_path field)
-# Simple string extraction: find "file_path":"..." and take value up to next "
+# Extract a JSON field value safely using Python (handles escaped quotes correctly)
+# Returns JSON-escaped value (safe to embed in printf JSON template)
+json_get() {
+  python3 -c "
+import json, sys
+d = json.loads(sys.stdin.read())
+val = str(d.get('$1', {}).get('$2', ''))[:200]
+print(json.dumps(val)[1:-1])
+" <<< "$input" 2>/dev/null || true
+}
+
+# Extract file_path for Read/Write/Edit
 file_path=""
 case "$tool_name" in
   Read|Write|Edit)
-    file_path="${input#*\"file_path\":\"}"
-    file_path="${file_path%%\"*}"
+    file_path=$(json_get tool_input file_path)
     ;;
 esac
 
 # Extract tool_output for dead-end detection (lightweight: just check for failure signals)
-# Strip backslash escapes then check for non-zero exit code
 has_failed_output=0
 if echo "$input" | tr -d '\\' | grep -qE '"exit_code"\s*:\s*[1-9]'; then
     has_failed_output=1
@@ -53,24 +60,18 @@ fi
 # Build event based on tool type
 case "$tool_name" in
   Glob|Grep)
-    # Dead-end detection: check if results indicate no matches
-    # Extract the pattern/query for context
-    query="${input#*\"pattern\":\"}"
-    query="${query%%\"*}"
-    [ -z "$query" ] && query="${input#*\"glob_pattern\":\"}"
-    query="${query%%\"*}"
-    [ -z "$query" ] && query="${input#*\"query\":\"}"
-    query="${query%%\"*}"
+    query=$(json_get tool_input pattern)
+    [ -z "$query" ] && query=$(json_get tool_input glob_pattern)
+    [ -z "$query" ] && query=$(json_get tool_input query)
     query="${query:0:100}"
 
-    # Check for no results in the raw input (no output content after tool_output)
+    # Check for no results in the raw input
     is_empty=0
     case "$input" in
       *"\"tool_output\":\"\""*|*"\"tool_output\":\"\[\"]"*)
         is_empty=1
         ;;
     esac
-    # Also check for common "no results" messages in output
     if echo "$input" | grep -qE '"tool_output":"[^"]*([Nn]o (matches|results)|0 results|found 0|empty)'; then
       is_empty=1
     fi
@@ -97,9 +98,7 @@ case "$tool_name" in
       "$timestamp" "$session_id" "$file_path" "$file_path" >> "$events_file"
     ;;
   Bash)
-    # Extract command from tool_input
-    cmd="${input#*\"command\":\"}"
-    cmd="${cmd%%\"*}"
+    cmd=$(json_get tool_input command)
     cmd="${cmd:0:200}"
     # Dead-end detection: failed commands (non-zero exit code)
     if [ "$has_failed_output" -eq 1 ]; then

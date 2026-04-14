@@ -71,7 +71,7 @@ Any code assistant (Claude, OpenCode, etc.) can read it directly.
 
 ## Janitor System
 
-Background intelligence layer (`core/janitor/`) that runs automatically via Claude Code hooks (global `~/.claude/settings.json` — all projects get it):
+Background intelligence layer (`core/janitor/`) that runs automatically via Claude Code hooks (global `~/.claude/settings.json` — all projects get it). Hooks live at `~/.claude/hooks/janitor-*.sh` (not in the oneshot repo — they must work across all machines and projects without requiring the repo at a specific path).
 
 - **Project type detection**: classifies repos as `code`, `document`, or `hybrid` on every session start
 - **Code signals** (code/hybrid): test gaps, code smells, dependency map
