@@ -24,6 +24,25 @@ ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 DAILY_LIMIT = 1000
 MINUTE_LIMIT = 20
 
+# Model tiers. OpenRouter's `models` array tries each in order, falling through
+# on error/rate-limit/refusal. First healthy model wins. OpenRouter caps the
+# array at 3 entries — last slot is always "openrouter/free" as a last-resort
+# random fallback so we never hard-fail while ANY free model exists.
+#
+# Retune these lists based on .janitor/tier-health.json from the weekly smoke test.
+MODEL_TIERS: dict[str, list[str]] = {
+    "smart": [
+        "openai/gpt-oss-120b:free",
+        "qwen/qwen3-coder-480b-a35b-07-25:free",
+        "nvidia/nemotron-3-super-120b-a12b-20230311:free",
+    ],
+    "cheap": [
+        "nvidia/nemotron-3-nano-30b-a3b:free",
+        "openai/gpt-oss-20b:free",
+        "openrouter/free",
+    ],
+}
+
 _cached_api_key: str | None = None
 
 
@@ -169,12 +188,19 @@ def call_free(
     system: str | None = None,
     max_tokens: int = 1024,
     timeout: int = 30,
+    quality: str = "cheap",
 ) -> str:
-    """Send a prompt to openrouter/free and return the response text."""
+    """Send a prompt to a free model tier and return the response text.
+
+    quality:
+      "cheap" — small/fast models (default; routine janitor signals)
+      "smart" — large reasoning-capable models first (digests, onboarding)
+    """
     if not _check_rate_limit():
         raise RuntimeError("Rate limit reached. Wait before retrying.")
 
     api_key = _get_api_key()
+    tier = MODEL_TIERS.get(quality, MODEL_TIERS["cheap"])
 
     messages = []
     if system:
@@ -182,7 +208,8 @@ def call_free(
     messages.append({"role": "user", "content": prompt})
 
     payload = json.dumps({
-        "model": "openrouter/free",
+        "model": tier[0],
+        "models": tier,
         "messages": messages,
         "max_tokens": max_tokens,
         "temperature": 0.1,
@@ -242,6 +269,7 @@ def extract_structured(
     prompt: str,
     system: str | None = None,
     schema_hint: str | None = None,
+    quality: str = "cheap",
 ) -> dict:
     """Call free model and parse JSON response.
 
@@ -252,7 +280,7 @@ def extract_structured(
         prompt += f"\n\nRespond with valid JSON only. No explanation. Expected shape: {schema_hint}"
 
     try:
-        raw = call_free(prompt, system=system, max_tokens=2048, timeout=30)
+        raw = call_free(prompt, system=system, max_tokens=2048, timeout=30, quality=quality)
     except RuntimeError as e:
         return {"raw": str(e), "status": "failed"}
 

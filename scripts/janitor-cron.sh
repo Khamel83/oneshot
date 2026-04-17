@@ -82,5 +82,44 @@ except Exception as e:
     fi
   fi
 
+  # Daily digest (gated internally by .janitor/last-digest date stamp)
+  if [ -n "$OPENROUTER_API_KEY" ]; then
+    python3 -c "
+import sys
+sys.path.insert(0, '$ONESHOT_DIR')
+try:
+    from core.janitor.digest import generate_digest
+    result = generate_digest('$project_dir')
+    status = result.get('status', '')
+    if status == 'fresh':
+        print('Digest fresh (already ran today)')
+    elif status == 'no_data':
+        print('Digest skipped (no 24h activity)')
+    elif status == 'ran':
+        print(f\"Digest written: {result.get('events_seen', 0)} events, {result.get('files_changed', 0)} files, {result.get('commits', 0)} commits\")
+    else:
+        print(f'Digest: {status} - {result.get(\"reason\", \"\")}')
+except Exception as e:
+    print(f'DIGEST_SKIP: {e}')
+" 2>&1 | while read line; do
+      log "  $line"
+    done
+  fi
+
   log "--- Janitor cron end ---"
 done
+
+# Cross-project INBOX aggregation (once per outer run, not per project).
+# Log to oneshot's own log since it's the controller.
+INBOX_LOG="${ONESHOT_DIR}/.janitor/cron-runs.log"
+INBOX_OUT=$(python3 -c "
+import sys
+sys.path.insert(0, '$ONESHOT_DIR')
+try:
+    from core.janitor.inbox import generate_inbox
+    result = generate_inbox()
+    print(f\"INBOX: {result.get('status')} ({result.get('projects_included', 0)} projects)\")
+except Exception as e:
+    print(f'INBOX_SKIP: {e}')
+" 2>&1)
+echo "[$TIMESTAMP] inbox: $INBOX_OUT" >> "$INBOX_LOG"
