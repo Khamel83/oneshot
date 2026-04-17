@@ -9,6 +9,10 @@
 
 set -euo pipefail
 
+# Ensure user-local bins are on PATH (cron/launchd start with minimal PATH).
+# Without this, `secrets` is not found and the LLM enrichment is silently skipped.
+export PATH="${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+
 ONESHOT_DIR="${HOME}/github/oneshot"
 REPO_BASE="${HOME}/github"
 export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null)" || true
@@ -60,8 +64,14 @@ import sys, os
 sys.path.insert(0, '$ONESHOT_DIR')
 try:
     from core.janitor.jobs import generate_onboarding
-    generate_onboarding(project_dir='$project_dir')
-    print('Onboarding updated')
+    result = generate_onboarding(project_dir='$project_dir')
+    status = result.get('status', '') if isinstance(result, dict) else ''
+    if status == 'fresh':
+        print('Onboarding fresh (no regeneration needed)')
+    elif status == 'no_data':
+        print('Onboarding skipped (no data)')
+    else:
+        print('Onboarding updated')
 except Exception as e:
     print(f'ONBOARDING_SKIP: {e}')
 " 2>&1 | while read line; do

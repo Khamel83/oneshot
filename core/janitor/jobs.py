@@ -107,7 +107,7 @@ def _data_hash(sections: dict) -> str:
     return hashlib.md5(blob.encode()).hexdigest()[:12]
 
 
-def _onboarding_is_fresh(project_dir: str, state_hash: str, max_age_hours: int = 1) -> bool:
+def _onboarding_is_fresh(project_dir: str, state_hash: str, max_age_hours: int = 24) -> bool:
     state_path = _janitor_dir(project_dir) / "onboarding-state.json"
     if not state_path.exists():
         return False
@@ -118,19 +118,24 @@ def _onboarding_is_fresh(project_dir: str, state_hash: str, max_age_hours: int =
     if state.get("hash") != state_hash:
         return False
     last_gen = state.get("ts", 0)
+    # Only invalidate on high-signal events (decisions/blockers/discoveries),
+    # not raw session/file-touch events. The hash already covers structural changes.
     events_path = _janitor_dir(project_dir) / "events.jsonl"
     if events_path.exists():
+        cutoff = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(last_gen))
         with open(events_path) as f:
             for line in f:
                 if not line.strip():
                     continue
                 try:
                     evt = json.loads(line)
-                    evt_ts = evt.get("ts", "")
-                    if evt_ts and evt_ts > time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(last_gen)):
-                        return False
-                except (json.JSONDecodeError, ValueError):
+                except json.JSONDecodeError:
                     continue
+                if evt.get("type") not in ("decision", "blocker", "discovery"):
+                    continue
+                evt_ts = evt.get("ts", "")
+                if evt_ts and evt_ts > cutoff:
+                    return False
     return (time.time() - last_gen) < (max_age_hours * 3600)
 
 
@@ -356,6 +361,10 @@ def detect_size_outliers(project_dir: Optional[str] = None, threshold_kb: int = 
 
     for f in all_files.split("\n"):
         if not f:
+            continue
+        # Exclude janitor's own output — these files always grow and would
+        # constantly flip the onboarding hash, defeating the freshness gate.
+        if f.startswith(".janitor/"):
             continue
         full_path = Path(project_dir) / f
         if not full_path.exists():
@@ -621,7 +630,11 @@ def generate_onboarding(project_dir: Optional[str] = None) -> dict:
                 else:
                     total += 1
         if total or decisions or blockers:
-            sections["events"] = f"{total} events, {decisions} decisions, {blockers} blockers, {discoveries} discoveries"
+            # Bucket raw event count to nearest 100 so small increments don't flip the hash
+            # (which would cause regeneration every 15 min on active projects).
+            # Decisions/blockers/discoveries stay exact — they're high-signal.
+            bucket = (total // 100) * 100
+            sections["events"] = f"~{bucket}+ events, {decisions} decisions, {blockers} blockers, {discoveries} discoveries"
         if recent_decisions:
             sections["recent_decisions"] = "; ".join(recent_decisions[-5:])
 
