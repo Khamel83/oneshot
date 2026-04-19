@@ -1,0 +1,30 @@
+# .sops.yaml - SOPS configuration for encrypted secrets
+#
+# SETUP INSTRUCTIONS:
+# 1. Copy this to .sops.yaml:  cp .sops.yaml.example .sops.yaml
+# 2. Get your age public key:  grep 'public key' ~/.config/sops/age/keys.txt
+# 3. Replace 'YOUR_AGE_PUBLIC_KEY_HERE' below with your actual key
+# 4. Commit .sops.yaml to git (it only contains the public key, which is safe)
+#
+# If you don't have an age key yet:
+#   mkdir -p ~/.config/sops/age
+#   age-keygen -o ~/.config/sops/age/keys.txt
+
+creation_rules:
+  # Encrypt .env.encrypted files
+  - path_regex: \.env\.encrypted$
+    age: YOUR_AGE_PUBLIC_KEY_HERE
+
+  # Encrypt files in secrets/ directory
+  - path_regex: secrets/.*\.yaml$
+    age: YOUR_AGE_PUBLIC_KEY_HERE
+  - path_regex: secrets/.*\.json$
+    age: YOUR_AGE_PUBLIC_KEY_HERE
+
+# For team projects with multiple developers, use multiple keys:
+# creation_rules:
+#   - path_regex: \.env\.encrypted$
+#     age: >-
+#       age1alice...,
+#       age1bob...,
+#       age1charlie...

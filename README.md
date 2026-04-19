@@ -1,244 +1,405 @@
-# ONE_SHOT v14
+# ONE_SHOT: AI-Powered Autonomous Project Builder
 
-**Control plane for Claude-first orchestration.** Lane-based routing, parallel dispatch, Argus search.
-
-**[Quick Start](#quick-start)** | **[Skills](#skills)** | **[Architecture](#architecture)**
-
----
-
-## Quick Start
-
-```bash
-cd your-project
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
-claude .
-```
-
-Then use `/short` for quick iteration, `/full` for structured work, or `/conduct` to orchestrate across models.
+**Version**: 1.6
+**Philosophy**: Ask everything upfront, then execute autonomously
+**Security**: SOPS-encrypted secrets (never commit plaintext)
 
 ---
 
-## Architecture
+## 🎯 What This Is
 
-OneShot is a portable orchestration layer:
+ONE_SHOT is a **single-file specification** for building projects with AI coding agents (Claude Code, Cursor, etc.). It captures the complete philosophy, patterns, and workflows learned from 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs).
 
-- **Control plane**: YAML config + Python schemas + Markdown instructions
-- **Planner**: Claude Code (planning, review, repo synthesis)
-- **Workers**: Codex and Gemini execute tasks via parallel dispatch
-- **Search**: Argus broker (SearXNG, Brave, Serper, Tavily, Exa)
-- **Dispatch**: Self-contained prompts → parallel workers → structured output → manifest trail
-- **Instructions**: Single source of truth at `docs/instructions/`
+**The Contract**: Answer questions once → Generate PRD → Autonomous build
 
-### Lane-Based Routing
+---
 
-Tasks are classified, then routed to lanes:
+## 🚀 Quick Start (5 Minutes)
 
-| Lane | Use Case | Workers | Max Parallel |
-|------|----------|---------|-------------|
-| premium | Planning, review | Claude (inline) | 2 |
-| balanced | Medium implementation | Codex, Gemini | 3 |
-| cheap | Small tasks, docs, tests | Gemini, Codex | 3 |
-| research | Search-heavy tasks | Gemini, Codex + Argus | 3 |
-
-Config: `config/lanes.yaml`, `config/models.yaml`
-
-### Janitor — Background Intelligence
-
-Janitor runs automatically via Claude Code hooks — no setup or cron needed. It provides session-aware project intelligence that adapts to your repo type:
-
-**Project types** — auto-detected on every session start:
-- **code** — Python/JS/Go/etc. repos with build markers
-- **document** — Markdown, text, data dumps (e.g. personal tracking repos)
-- **hybrid** — Mixed code + docs (most real projects)
-
-| Hook | What runs | Cost |
-|------|-----------|------|
-| SessionStart | Project type detection + type-appropriate signals (see below) | $0 (pure compute) |
-| PostToolUse | Records file reads/writes, commits, dead-ends to `.janitor/events.jsonl` | $0 |
-| SessionEnd | Session summary, commit enrichment, pattern mining, onboarding generation | $0 (openrouter/free) |
-| PreCompact | Summarizes decisions/blockers before context compaction | $0 (openrouter/free) |
-
-**Code signals** (run for `code` and `hybrid` projects):
-- `test-gaps.json` — files changed recently but lacking tests
-- `code-smells.json` — oversized files and long functions
-- `dep-graph.json` — import dependency map with impact ranking
-
-**Document signals** (run for `document` and `hybrid` projects):
-- `doc-staleness.json` — documents not modified in 30+ days
-- `doc-orphans.json` — documents not linked from any other file
-- `doc-clusters.json` — document groups by directory/topic
-- `doc-size-outliers.json` — unusually large files
-- `doc-recent-activity.json` — recent document changes with authors
-- `doc-crossrefs.json` — which documents link to which
-
-**Universal signals** (all project types):
-- `config-drift.json` — uncommitted config changes
-- `recent-focus.json` — files and commands from recent sessions
-- `critical-files.json` — high-touch files across many sessions
-- `knowledge-risk.json` — files with single contributors (bus factor)
-- `blockers.json`, `dead-ends.json` — unresolved blockers and failed searches
-
-**Output** lives in `.janitor/` per project. `CLAUDE.local.md` is auto-generated with a project-type-aware onboarding summary and a source index linking to all signal files.
-
-Requires `OPENROUTER_API_KEY` for LLM jobs (onboarding generation, session summaries). Pure-compute signals work without it.
-
-### Dispatch Protocol
-
-Claude thinks, Codex and Gemini execute. The dispatch protocol (`_shared/dispatch.md`) handles:
-
-1. Classify task → resolve lane
-2. Build self-contained prompt (files, criteria, patterns, output format)
-3. Dispatch to Codex/Gemini in parallel (up to `max_parallel`)
-4. Capture structured output (JSON from both)
-5. Validate against acceptance criteria
-6. Write manifest to `1shot/dispatch/{id}.md`
-7. Retry or escalate on failure
+### 1. Setup Central Secrets (One-Time - REQUIRED)
 
 ```bash
-# Single dispatch
-python3 -m core.dispatch.run --class implement_small --prompt "Fix auth bug"
+# Install SOPS and age
+brew install sops age  # Mac
+# OR for Linux:
+sudo apt install age
+wget https://github.com/getsops/sops/releases/latest/download/sops-v3.8.1.linux.amd64 -O /usr/local/bin/sops && chmod +x /usr/local/bin/sops
 
-# Parallel batch
-python3 -m core.dispatch.run --class implement_small --prompts-file batch.json --parallel 3
+# Generate encryption key
+mkdir -p ~/.config/sops/age
+age-keygen -o ~/.config/sops/age/keys.txt
 
-# Dry run (show routing without executing)
-python3 -m core.dispatch.run --class implement_small --prompt "..." --dry-run
+# CRITICAL: Back up this key to 1Password NOW
+# (You can't decrypt secrets without it)
+
+# Create central secrets repo
+mkdir -p ~/secrets-vault && cd ~/secrets-vault
+
+# Create SOPS config (replace age1xxx with your public key)
+cat > .sops.yaml << 'EOF'
+creation_rules:
+  - path_regex: .*\.env\.encrypted$
+    age: YOUR_AGE_PUBLIC_KEY_HERE
+EOF
+
+# Create your secrets
+cat > secrets.env << 'EOF'
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+GITHUB_TOKEN=ghp_your-token-here
+FIRECRAWL_API_KEY=fc-your-key-here
+EOF
+
+# Encrypt and push
+sops --encrypt secrets.env > secrets.env.encrypted
+rm secrets.env
+echo "*.env" > .gitignore
+echo "!*.env.encrypted" >> .gitignore
+git init && git add . && git commit -m "Central secrets"
+gh repo create secrets-vault --private --source=. --push
 ```
 
-### CLI Resolver
+**Why Central Secrets?** ONE place for ALL your secrets (OpenRouter, GitHub, Firecrawl, etc.). Update once, every project gets it. Never duplicate secrets again.
+
+See [CENTRAL_SECRETS.md](CENTRAL_SECRETS.md) for details.
+
+### 2. Use ONE_SHOT in Your Project
 
 ```bash
-python3 -m core.router.resolve --class implement_small
-# → {"task_class": "implement_small", "lane": "cheap", "workers": [...]}
+# 1. Create new project directory
+mkdir my-project && cd my-project
+
+# 2. Copy ONE_SHOT.md to your project
+cp /path/to/oneshot/one_shot.md ONE_SHOT.md
+
+# 3. Open in your AI coding agent (Claude Code, Cursor, etc.)
+# Tell it:
+#   "Use ONE_SHOT.md as the spec. Ask me all Core Questions (Section 2) first.
+#    Don't write code until I say 'PRD approved. Execute autonomous build.'"
+
+# 4. Answer questions once
+# 5. Review generated PRD
+# 6. Say: "PRD approved. Execute autonomous build."
+# 7. Watch it build autonomously
 ```
 
 ---
 
-## Skills
-
-### Operators
-
-| Skill | Description |
-|-------|-------------|
-| `/short` | Quick iteration — load context, ask, execute |
-| `/full` | Structured work — new projects, refactors |
-| `/conduct` | Multi-model orchestration — lane-based routing, loops until done |
-
-### Context
-
-| Skill | Description |
-|-------|-------------|
-| `/handoff` | Save checkpoint before `/clear` |
-| `/restore` | Resume from handoff |
-
-### Research & Docs
-
-| Skill | Description |
-|-------|-------------|
-| `/research` | Background research via Argus (Gemini CLI fallback) |
-| `/freesearch` | Zero-token search via Argus cheap mode |
-| `/doc` | Cache external docs locally |
-
-### Utilities
-
-| Skill | Description |
-|-------|-------------|
-| `/vision` | Image/website analysis |
-| `/secrets` | SOPS/Age secret management |
-
----
-
-## Project Structure
+## 📁 What's in This Repo
 
 ```
 oneshot/
-├── config/              # YAML routing policy
-│   ├── lanes.yaml       # Lane definitions, worker pools, max_parallel
-│   ├── models.yaml      # Model capabilities and costs
-│   ├── workers.yaml     # Machine placement
-│   ├── search.yaml      # Argus search modes
-│   └── providers.yaml   # Environment variable mapping
-├── core/                # Python schemas and utilities
-│   ├── task_schema.py   # Task class definitions
-│   ├── router/          # Lane policy, model registry, CLI resolver
-│   ├── dispatch/        # Parallel dispatch runner, output capture, manifests
-│   └── janitor/         # Background intelligence (hooks + jobs + recorder)
-├── docs/instructions/   # Neutral instruction source (authoritative)
-├── .claude/rules/       # Thin imports to docs/instructions/
-├── .claude/skills/      # Operator and utility skill prompts
-├── .opencode/           # OpenCode adapter (installed, pending auth)
-├── templates/           # Jinja2 templates for CLAUDE.md/AGENTS.md
-└── secrets/             # SOPS/Age encrypted vault
+├── one_shot.md              # Main spec (use this in your projects)
+├── how_to_improve_one_shot.md  # Lessons from 8 real projects
+├── CENTRAL_SECRETS.md       # Central secrets guide (THE way)
+├── .env.example             # Reference (not used, everything from central)
+├── .gitignore.example       # Git ignore patterns
+└── scripts/
+    ├── setup_secrets.sh     # Pull secrets from central repo
+    └── update_secrets.sh    # Edit central secrets
 ```
 
 ---
 
-## Prerequisites
+## 🔑 Core Philosophy
 
-Required:
-```bash
-# Claude Code
-# Already installed if you're reading this
+### 1. Central Secrets (NEW in v1.6)
+- ONE private GitHub repo for ALL secrets (OpenRouter, GitHub token, etc.)
+- SOPS-encrypted, safe to push
+- Every project pulls from central repo (no duplication)
+- One age key in 1Password unlocks everything
+- Update once, all projects get it
+
+### 2. Ownership & FOSS
+- 100% free & open-source stack
+- No vendor lock-in
+- Runs on OCI Always Free OR homelab
+- Cost: $0/month infra (AI optional at $1-3/month)
+
+### 3. Simplicity First
+- Start with simplest thing (files → SQLite → PostgreSQL)
+- Build only what you need NOW
+- Document upgrade triggers
+- Real problems only, no imaginary users
+
+### 4. Local-First
+- Own your data
+- Works offline
+- Cloud is optional
+
+### 5. Cost-Conscious AI
+- Default: Gemini 2.5 Flash Lite (~$0.10-0.30/M tokens)
+- Upgrade only when necessary
+- Track costs in SQLite
+- Typical: $1-3/month
+
+### 6. Documentation as Code
+- WHY documentation for decisions
+- README with Quick Start ≤5 commands
+- Status scripts for observability
+- Future-you friendly
+
+---
+
+## 🏗️ Canonical Stack
+
 ```
-
-Workers (at least one recommended):
-```bash
-# Codex CLI (worker — uses ChatGPT Plus OAuth, no API cost)
-npm install -g @openai/codex && codex login
-
-# Gemini CLI (worker — uses Google Sign-in, no API cost)
-npm install -g @google/gemini-cli && gemini auth login
-```
-
-Optional:
-```bash
-# Argus (search broker — recommended)
-# See https://github.com/Khamel83/argus
-
-# OpenCode (additional worker — requires API keys, costs money)
-curl -fsSL https://opencode.ai/install | bash
+Application:   Python / Node / Go / Rust
+Web:          FastAPI, Flask, Express
+DB:           SQLite → PostgreSQL (upgrade when needed)
+Web server:   Nginx Proxy Manager OR Caddy
+DNS:          Cloudflare (free tier)
+OS:           Ubuntu Server 24.04 LTS
+Network:      Tailscale (zero-config VPN)
+VC:           Git + GitHub (or Gitea)
+Containers:   Docker + Docker Compose
+Secrets:      SOPS + age (THIS IS NON-NEGOTIABLE)
 ```
 
 ---
 
-## Stack Defaults
+## 📊 Validated By Real Projects
 
-| Project Type | Stack |
-|--------------|-------|
-| Web apps | Vercel + Supabase + Python |
-| CLIs | Python + Click + SQLite |
-| Services | Python + systemd → oci-dev |
+ONE_SHOT v1.6 patterns validated by:
 
-Web apps use a single deployment — all sites share one Vercel project and one Supabase project.
+1. **Divorce** - Legal discovery (135K records, SQLite, web RAG)
+2. **Homelab** - 29 services, Docker Compose, Nginx PM
+3. **Atlas** - Podcast transcripts (750 transcripts, status scripts)
+4. **TrojanHorse** - Note processing (local-first, AI classification)
+5. **Frugalos/Hermes** - AI router (cost tracking, local→cloud)
+6. **Atlas-voice** - Voice analysis (privacy-first, 104M chars)
+7. **Tablo** - TV automation (dual mode, AI identification)
+8. **VDD/OOS** - Dev framework (27.5% code reduction)
 
-### First-time setup (per repo)
-
-```bash
-mkdir my-project && cd my-project && git init
-oneshot.sh --web <slug> --admin-email <email>
-git add -A && git commit && git push -u origin master
-# Then import repo into Vercel and add these env vars (from the vault):
-#   SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
-# After that: git push auto-deploys
-```
-
-### Adding more sites (after first-time setup)
-
-```bash
-scripts/new-site.sh <slug> "<name>" --admin-email <email>
-git add -A && git commit && git push
-```
-
-`oneshot.sh --web <slug>` copies the scaffold from `templates/community-starter/`, pulls Supabase credentials from the vault, and creates the site. All env vars come from the encrypted vault at `secrets/deployments.env.encrypted`.
+**Results**:
+- ✅ $0-3/month total cost (AI included)
+- ✅ Sub-second queries on 135K records (SQLite)
+- ✅ 29 services on single machine (homelab)
+- ✅ Months of uptime with systemd
+- ✅ ZERO secrets leaks (SOPS since day 1 on new projects)
 
 ---
 
-## Updating
+## 🎓 How to Use ONE_SHOT
 
-```bash
-curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/scripts/oneshot-update.sh | bash
-```
+### For New Projects
+
+1. Copy `one_shot.md` to your project as `ONE_SHOT.md`
+2. Open in AI agent (Claude Code, Cursor)
+3. Tell agent: "Use ONE_SHOT.md as spec. Ask Core Questions."
+4. Answer questions once
+5. Review PRD
+6. Say: "PRD approved. Execute autonomous build."
+
+### For Existing Projects
+
+Use ONE_SHOT patterns piecemeal:
+- **Secrets**: Add SOPS encryption
+- **Docs**: Add WHY documentation
+- **Ops**: Add status scripts, health endpoints
+- **Data**: Follow data-first implementation order
+- **AI**: Add cost tracking
+
+### For Learning
+
+Read in order:
+1. `one_shot.md` - Main spec (complete reference)
+2. `CENTRAL_SECRETS.md` - Setup central secrets (5 minutes)
+3. `how_to_improve_one_shot.md` - Real-world lessons from 8 projects
 
 ---
 
-**v14.3** | Janitor intelligence | Lane routing | Parallel dispatch | [Source](https://github.com/Khamel83/oneshot) | [Issues](https://github.com/Khamel83/oneshot/issues)
+## 🔒 Central Secrets: The Secret Sauce
+
+**Problem**: How do you manage secrets across multiple projects without duplication?
+
+**Old way** (BAD):
+```
+project-a/.env (OpenRouter key)
+project-b/.env (OpenRouter key again)
+project-c/.env (OpenRouter key again)
+# Update key? Change in 3 places
+# Lost .env file? Secrets gone
+```
+
+**ONE_SHOT way** (GOOD):
+```
+github.com/you/secrets-vault
+├── secrets.env.encrypted  (ONE place for ALL secrets)
+└── .sops.yaml
+
+All projects pull from here!
+```
+
+**How it works**:
+1. You have ONE age key in 1Password (decrypts everything)
+2. ONE private repo with ALL your secrets (encrypted)
+3. Every project: `./scripts/setup_secrets.sh` (pulls from central, decrypts)
+4. Update secrets: Edit central repo, all projects get update
+
+**Result**: One OpenRouter key, one GitHub token, one place for everything. Update once, all projects work.
+
+See [CENTRAL_SECRETS.md](CENTRAL_SECRETS.md) for 5-minute setup.
+
+---
+
+## 🆚 ONE_SHOT vs Other Approaches
+
+### vs Project Templates (Cookiecutter, etc.)
+- ONE_SHOT: Complete philosophy + automation (not just file structure)
+- Templates: Static snapshots (no upgrade path, no AI integration)
+
+### vs Frameworks (Rails, Django, etc.)
+- ONE_SHOT: Language-agnostic, pick your tools
+- Frameworks: Opinionated about language/stack
+
+### vs "Just Ask AI"
+- ONE_SHOT: Consistent patterns across projects
+- Ad-hoc: Every project different, no learnings captured
+
+### vs Manual Setup
+- ONE_SHOT: Questions → PRD → Autonomous build
+- Manual: Repeat decisions for every project
+
+---
+
+## 🛠️ Archon Principles (Non-Negotiable)
+
+Every ONE_SHOT project MUST have:
+
+1. **Never Commit Plaintext Secrets** - SOPS-encrypted, always
+2. **Validate Before Create** - Check environment first
+3. **WHY Documentation** - Explain decisions, not just commands
+4. **Systematic Debugging** - Health checks, logs, status scripts
+5. **Health First** - Every service has `/health` endpoint
+6. **Future-You Documentation** - Understandable in 6 months
+
+---
+
+## 📈 Version History
+
+- **v1.6** (2024-11-29)
+  - **BREAKING**: SOPS now MANDATORY (non-negotiable)
+  - Added Q14 (SOPS Setup) to Core Questions
+  - SOPS validation in environment checks
+  - SOPS setup automated in Phase 0
+  - Complete SOPS integration (scripts, docs, templates)
+  - Updated Archon Principles (Never Commit Plaintext Secrets)
+
+- **v1.5** (2024-11-26)
+  - Integrated patterns from 8 real-world projects
+  - Added Reality Check questions (Q2.5)
+  - Added Upgrade Path Principle
+  - Data-first implementation order
+  - Required automation scripts
+  - AI cost management
+  - Anti-patterns section
+
+- **v1.4** (2024-11-26)
+  - Single-file layout
+  - Clear Core Questions vs Advanced
+  - Unified AI section
+
+- **v1.0-1.3** (2024-11-21)
+  - Initial framework
+  - Archon integration
+  - AI/Agent patterns
+
+---
+
+## 💡 Philosophy in Practice
+
+### "Works on My Machine" is Good
+- Ubuntu 24.04 LTS (homelab standard)
+- Mac (development)
+- OCI Always Free (cloud)
+- No wasted effort on unused platforms
+
+### The Upgrade Path
+```
+Files → SQLite → PostgreSQL
+Local script → systemd → Docker Compose → (not Kubernetes)
+```
+
+### The Reality Check
+Before building, ask:
+1. Do I have this problem RIGHT NOW?
+2. What's my current painful workaround?
+3. What's the simplest thing that helps?
+4. How will I know it's working?
+
+If you can't answer these, **don't build it**.
+
+---
+
+## 🎯 Success Metrics
+
+A ONE_SHOT project is successful when:
+
+- ✅ You USE it (daily/weekly/monthly)
+- ✅ Setup takes ≤5 commands
+- ✅ Works 6 months later without remembering details
+- ✅ Secrets never leaked (SOPS-encrypted)
+- ✅ Costs ≤$3/month (AI included)
+- ✅ Runs unattended (cron, systemd)
+- ✅ Observable (status scripts, health checks)
+
+---
+
+## 🚀 Next Steps
+
+1. **Setup SOPS** (5 minutes, one-time):
+   ```bash
+   brew install sops age
+   mkdir -p ~/.config/sops/age
+   age-keygen -o ~/.config/sops/age/keys.txt
+   # Back up to 1Password!
+   ```
+
+2. **Start a new project**:
+   - Copy `one_shot.md` to `ONE_SHOT.md`
+   - Open in Claude Code / Cursor
+   - Answer Core Questions
+   - Build autonomously
+
+3. **Retrofit existing project**:
+   - Add SOPS: `cp scripts/*.sh your-project/scripts/`
+   - Encrypt secrets: `./scripts/encrypt_secrets.sh`
+   - Add docs: README with Quick Start
+   - Add observability: status script
+
+---
+
+## 📚 Additional Resources
+
+- **SOPS GitHub**: https://github.com/getsops/sops
+- **age encryption**: https://age-encryption.org
+- **OpenRouter** (AI): https://openrouter.ai
+- **Tailscale**: https://tailscale.com
+
+---
+
+## 🤝 Contributing
+
+ONE_SHOT is a living document. Improvements come from real project usage.
+
+**To contribute**:
+1. Use ONE_SHOT on a real project
+2. Document what worked / what didn't
+3. Submit patterns that improved your workflow
+
+**Do NOT**:
+- Add complexity without real-world validation
+- Suggest patterns you haven't used yourself
+- Recommend paid services (unless truly better + documented tradeoff)
+
+---
+
+## 📄 License
+
+MIT License - Use freely, modify, share. Credit appreciated but not required.
+
+---
+
+**ONE_SHOT: One file. One workflow. Infinite possibilities.**
+
+**100% Free & Open-Source** • **Deploy Anywhere** • **No Vendor Lock-in** • **Secrets Always Encrypted**
