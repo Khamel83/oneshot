@@ -86,6 +86,36 @@ Storage: `.janitor/` per project (events.jsonl, signal JSON files, onboarding-st
 The janitor lane (`janitor` task classes) routes exclusively to the `free` worker.
 No review needed — these are housekeeping tasks.
 
+## Shared Memory
+
+Cross-agent knowledge surface at `.claude/memory/`. All agents (Claude, Codex, Gemini, OpenCode) read and write to the same files, so learnings from one agent benefit all others.
+
+**Structure:**
+```
+.claude/memory/
+  memory.md           # Index — entry point, read at session start
+  learnings.md        # Cross-agent dated discoveries
+  tools/
+    gemini.md         # Gemini CLI usage, quotas, cost
+    other-agents.md   # OpenCode, Cursor, etc.
+```
+
+**How it works:**
+1. Claude reads `.claude/memory/memory.md` at session start (via `.claude/rules/core.md`)
+2. Dispatch prompts tell Codex/Gemini to read it before starting tasks (via `_shared/dispatch.md`)
+3. Any agent that discovers something useful appends a dated entry: `YYYY-MM-DD — [agent] — finding`
+4. AGENTS.md references it as the shared memory location
+
+**What goes here:** Operational learnings, gotchas, quirks — descriptive knowledge that agents discover during sessions.
+
+**What does NOT go here:** Rules, instructions, config (those stay in `docs/instructions/`, `.claude/rules/`, and YAML configs).
+
+**Maintenance:**
+- Entries are date-stamped so stale ones are visible
+- Git-tracked — easy to see changes and revert
+- Periodically prune entries older than 90 days or summarize into rules
+- If a file exceeds ~100 lines, summarize and reset
+
 ## Secrets
 
 SOPS/Age encrypted vault at `secrets/`. Use the `secrets` CLI:

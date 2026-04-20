@@ -80,6 +80,7 @@ End with a summary of what you changed and any concerns.
 - **Never reference conversation history** — the prompt must stand alone
 - **Keep under 4000 words** — context window limits on cheaper models
 - **If the task needs files changed, say which ones and what to change**
+- **Include shared memory instruction** — prepend: "Read `.claude/memory/memory.md` for shared learnings from past sessions. If you discover something notable, append a dated entry."
 
 ---
 

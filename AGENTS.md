@@ -147,6 +147,11 @@ Background intelligence layer that runs automatically — no manual action neede
 
 **Cron install (all machines):** Already installed on oci-dev, homelab, macmini.
 
+## SHARED MEMORY
+
+Read `.claude/memory/memory.md` at session start for cross-agent learnings.
+When you discover something useful for other agents, append a dated entry to the relevant file.
+
 ## VERSION
 
 v14.3 | Janitor lane | Background intelligence | openrouter/free worker | Session recording
