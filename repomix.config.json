@@ -1,0 +1,45 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "docs/LLM-OVERVIEW.md",
+    "style": "markdown",
+    "compress": true,
+    "removeComments": true,
+    "removeEmptyLines": true,
+    "topFilesLength": 20,
+    "fileSummary": true,
+    "directoryStructure": true,
+    "files": true,
+    "parsableStyle": true
+  },
+  "include": ["**/*"],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      ".janitor/",
+      "secrets/",
+      "*.encrypted",
+      "*.env",
+      "*.env.tmp",
+      "*.key",
+      "*.age",
+      "eval/traces/",
+      "archive/",
+      ".cache/",
+      ".agent/",
+      ".beads/",
+      ".oneshot/",
+      "dispatch/",
+      ".claude/skills/the-audit/SOURCE_DOCS/",
+      ".opencode/",
+      ".claude/memory/",
+      ".claude/plans/",
+      ".claude/tasks/",
+      ".claude/delegation-log.jsonl"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

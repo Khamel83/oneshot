@@ -27,6 +27,10 @@ if [ ${#PROJECTS[@]} -eq 0 ]; then
   exit 0
 fi
 
+# Repo-pack: generate LLM-OVERVIEW.md for all active repos (cross-repo, once per run).
+# Uses repomix with tree-sitter compression. Outputs docs/LLM-OVERVIEW.md + .janitor/repo-pack.json.
+bash "${ONESHOT_DIR}/scripts/repo-pack.sh" >> "${ONESHOT_DIR}/.janitor/cron-runs.log" 2>&1 || true
+
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 for project_dir in "${PROJECTS[@]}"; do
