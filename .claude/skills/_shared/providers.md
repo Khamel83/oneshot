@@ -158,7 +158,7 @@ See `config/models.yaml` `claw_code` section for supported models.
 
 **Argus** (search):
 ```bash
-curl -s -X POST http://localhost:8005/api/search \
+curl -s -X POST http://100.126.13.70:8005/api/search \
   -H "Content-Type: application/json" \
   -d '{"query": "QUERY", "mode": "discovery"}'
 ```

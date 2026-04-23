@@ -20,7 +20,7 @@ Run deep research in a background sub-agent. Argus handles search provider selec
    ```
    Or simply:
    ```bash
-   curl -s http://localhost:8005/api/health >/dev/null 2>&1 && echo "argus: yes" || echo "argus: no"
+   curl -s http://100.126.13.70:8005/api/health >/dev/null 2>&1 && echo "argus: yes" || echo "argus: no"
    ```
 
 3. **Mode 1: Argus (Primary)**
@@ -34,11 +34,11 @@ Run deep research in a background sub-agent. Argus handles search provider selec
        Use Argus to research: [topic]
        
        1. Query Argus in research mode:
-          curl -s -X POST http://localhost:8005/api/search \
+          curl -s -X POST http://100.126.13.70:8005/api/search \
             -d '{"query": "[research query]", "mode": "research"}'
        
        2. For key results, extract full content:
-          curl -s -X POST http://localhost:8005/api/extract \
+          curl -s -X POST http://100.126.13.70:8005/api/extract \
             -d '{"url": "RESULT_URL"}'
        
        3. Write findings to: docs/research/[slug]/research.md

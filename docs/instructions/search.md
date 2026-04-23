@@ -32,7 +32,7 @@ results = search("fastapi best practices", mode="discovery")
 
 **From CLI**: Use curl or the Argus CLI.
 ```bash
-curl -X POST http://localhost:8005/api/search \
+curl -X POST http://100.126.13.70:8005/api/search \
   -d '{"query": "...", "mode": "discovery"}'
 ```
 
