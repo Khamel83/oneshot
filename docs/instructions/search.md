@@ -2,7 +2,11 @@
 
 ## Search Plane: Argus
 
-All web search goes through Argus, the unified search broker running on port 8005.
+All web search goes through a **single Argus instance running on OCI** (`100.126.13.70`).
+Do not run Argus locally on other machines — point everything at OCI.
+
+- **HTTP API**: `http://100.126.13.70:8005` — used by skills and Python client
+- **MCP server**: `http://100.126.13.70:8001/sse` — registered in `~/.claude/settings.json` on all machines
 
 **Argus supports**: SearXNG, Brave, Serper, Tavily, Exa — with automatic
 provider selection, fallback, ranking (RRF), and budget enforcement.
@@ -18,30 +22,44 @@ provider selection, fallback, ranking (RRF), and budget enforcement.
 
 Config: `config/search.yaml`
 
-### Using Argus
+### How to Use Argus
 
-**From skills**: Route search tasks to Argus via the config.
-The search mode is determined by the task class (see `task-classes.md`).
+**Natural language (preferred)** — just ask Claude to search. The `mcp__argus__search_web`
+MCP tool is available in every Claude Code session on every machine. No special command needed:
+> "Search for recent fastapi performance tips"
+> "Look up the Tailscale ACL syntax"
 
-**From code**: Use the Python client.
+Claude will call `mcp__argus__search_web` automatically. This costs zero Claude tokens
+for the search itself.
+
+**`/freesearch [topic]`** — explicit zero-token search via Argus cheap mode (SearXNG).
+Use when you want to be explicit or are in a non-Claude session.
+
+**`/research [topic]`** — deep multi-source research spawned as a background agent.
+Use for comprehensive research across multiple providers.
+
+**From code**: Use the Python client (reads `config/search.yaml` for the OCI URL).
 ```python
 from core.search.argus_client import search, health, is_available
 
 results = search("fastapi best practices", mode="discovery")
 ```
 
-**From CLI**: Use curl or the Argus CLI.
+**From CLI**: Direct curl to OCI.
 ```bash
-curl -X POST http://100.126.13.70:8005/api/search \
+curl -s -X POST http://100.126.13.70:8005/api/search \
+  -H "Content-Type: application/json" \
   -d '{"query": "...", "mode": "discovery"}'
 ```
 
 ### Fallback
 
-If Argus is unreachable:
+If Argus is unreachable (OCI down):
 1. Check `config/search.yaml` for the mode's provider list
 2. Call the first available provider directly
 3. Never hardcode provider logic in skill prompts — always read from config
+
+Gemini CLI is the last-resort fallback for `/research` only.
 
 ## /research Skill
 
@@ -51,7 +69,7 @@ Background research uses Argus as the primary backend:
 3. Use a cheap model to summarize findings
 4. Optional: Claude final synthesis for complex topics
 
-Legacy fallback: Gemini CLI is available as a secondary research tool.
+Fallback to Gemini CLI only if OCI Argus is unreachable.
 
 ## /freesearch Skill
 
