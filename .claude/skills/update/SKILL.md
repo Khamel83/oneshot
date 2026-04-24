@@ -1,18 +1,18 @@
 ---
 name: update
-description: Pull latest oneshot from GitHub and sync skills/agents to all downstream projects, or just the current one.
+description: Pull latest oneshot from GitHub and sync skills/agents to the current project, or all projects with --all.
 ---
 
-# /update — Sync OneShot to All Projects
+# /update — Sync OneShot to Current Project
 
-Pull the latest oneshot and propagate skills, agents, and AGENTS.md to downstream projects.
+Pull the latest oneshot and propagate skills, agents, and AGENTS.md to the current project.
 
 ## Usage
 
 ```
-/update           # pull + sync all projects
-/update --here    # pull + sync current project only
-/update --dry-run # preview what would change without touching anything
+/update           # pull + sync current project only
+/update --all     # pull + sync all projects
+/update --dry-run # preview what would change without touching anything (--all only)
 /update --self    # pull oneshot only, skip project sync
 ```
 
@@ -29,13 +29,13 @@ Pull the latest oneshot and propagate skills, agents, and AGENTS.md to downstrea
 
 2. **Sync**
 
-   **`--here` (current project only)**:
+   **Default (current project only)**:
    ```bash
    bash ~/github/oneshot/scripts/oneshot-update.sh sync $(pwd)
    ```
    Then commit and push the result:
    ```bash
-   cd $(pwd) && git add .claude/ AGENTS.md 2>/dev/null || true
+   git add .claude/ AGENTS.md 2>/dev/null || true
    git diff --cached --quiet || git commit -m "chore: sync oneshot framework (skills, agents, AGENTS.md)"
    git push
    ```
@@ -44,7 +44,7 @@ Pull the latest oneshot and propagate skills, agents, and AGENTS.md to downstrea
    git stash && git pull --rebase && git push && git stash pop
    ```
 
-   **Default (all projects)**:
+   **`--all` (every project under ~/github/)**:
    ```bash
    bash ~/github/oneshot/scripts/sync-all-projects.sh
    ```
@@ -53,7 +53,7 @@ Pull the latest oneshot and propagate skills, agents, and AGENTS.md to downstrea
    bash ~/github/oneshot/scripts/sync-all-projects.sh --dry-run
    ```
 
-3. **Fix any push failures** (all-projects mode)
+3. **Fix any push failures** (--all mode)
    For each failed project, the likely cause is remote ahead of local. Fix with:
    ```bash
    cd ~/github/<project>
