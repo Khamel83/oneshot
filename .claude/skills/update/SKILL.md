@@ -1,16 +1,17 @@
 ---
 name: update
-description: Pull latest oneshot from GitHub and sync skills/agents to all downstream projects.
+description: Pull latest oneshot from GitHub and sync skills/agents to all downstream projects, or just the current one.
 ---
 
 # /update — Sync OneShot to All Projects
 
-Pull the latest oneshot and propagate skills, agents, and AGENTS.md to every downstream project.
+Pull the latest oneshot and propagate skills, agents, and AGENTS.md to downstream projects.
 
 ## Usage
 
 ```
 /update           # pull + sync all projects
+/update --here    # pull + sync current project only
 /update --dry-run # preview what would change without touching anything
 /update --self    # pull oneshot only, skip project sync
 ```
@@ -26,7 +27,24 @@ Pull the latest oneshot and propagate skills, agents, and AGENTS.md to every dow
    git stash && git pull --rebase && git stash pop
    ```
 
-2. **Sync to all projects** (skip if `--self`)
+2. **Sync**
+
+   **`--here` (current project only)**:
+   ```bash
+   bash ~/github/oneshot/scripts/oneshot-update.sh sync $(pwd)
+   ```
+   Then commit and push the result:
+   ```bash
+   cd $(pwd) && git add .claude/ AGENTS.md 2>/dev/null || true
+   git diff --cached --quiet || git commit -m "chore: sync oneshot framework (skills, agents, AGENTS.md)"
+   git push
+   ```
+   If push fails (remote ahead), fix with:
+   ```bash
+   git stash && git pull --rebase && git push && git stash pop
+   ```
+
+   **Default (all projects)**:
    ```bash
    bash ~/github/oneshot/scripts/sync-all-projects.sh
    ```
@@ -35,7 +53,7 @@ Pull the latest oneshot and propagate skills, agents, and AGENTS.md to every dow
    bash ~/github/oneshot/scripts/sync-all-projects.sh --dry-run
    ```
 
-3. **Fix any push failures**
+3. **Fix any push failures** (all-projects mode)
    For each failed project, the likely cause is remote ahead of local. Fix with:
    ```bash
    cd ~/github/<project>
