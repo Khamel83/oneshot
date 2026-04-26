@@ -1,6 +1,6 @@
 search:
   default_backend: argus
-  base_url: http://100.126.13.70:8005
+  base_url: http://100.112.130.100:8270
   modes:
     discovery:
       providers: [searxng, brave, exa]

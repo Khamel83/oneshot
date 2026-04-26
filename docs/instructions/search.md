@@ -2,11 +2,11 @@
 
 ## Search Plane: Argus
 
-All web search goes through a **single Argus instance running on OCI** (`100.126.13.70`).
-Do not run Argus locally on other machines — point everything at OCI.
+All web search goes through a **single Argus instance running on homelab** (`100.112.130.100`).
+Do not run Argus locally on other machines — point everything at homelab.
 
-- **HTTP API**: `http://100.126.13.70:8005` — used by skills and Python client
-- **MCP server**: `http://100.126.13.70:8001/sse` — registered in `~/.claude/settings.json` on all machines
+- **HTTP API**: `http://100.112.130.100:8270` — used by skills and Python client
+- **MCP server**: `http://100.112.130.100:8271/sse` — registered in `~/.claude/settings.json` on all machines
 
 **Argus supports**: SearXNG, Brave, Serper, Tavily, Exa — with automatic
 provider selection, fallback, ranking (RRF), and budget enforcement.
@@ -38,23 +38,23 @@ Use when you want to be explicit or are in a non-Claude session.
 **`/research [topic]`** — deep multi-source research spawned as a background agent.
 Use for comprehensive research across multiple providers.
 
-**From code**: Use the Python client (reads `config/search.yaml` for the OCI URL).
+**From code**: Use the Python client (reads `config/search.yaml` for the homelab URL).
 ```python
 from core.search.argus_client import search, health, is_available
 
 results = search("fastapi best practices", mode="discovery")
 ```
 
-**From CLI**: Direct curl to OCI.
+**From CLI**: Direct curl to homelab.
 ```bash
-curl -s -X POST http://100.126.13.70:8005/api/search \
+curl -s -X POST http://100.112.130.100:8270/api/search \
   -H "Content-Type: application/json" \
   -d '{"query": "...", "mode": "discovery"}'
 ```
 
 ### Fallback
 
-If Argus is unreachable (OCI down):
+If Argus is unreachable (homelab down):
 1. Check `config/search.yaml` for the mode's provider list
 2. Call the first available provider directly
 3. Never hardcode provider logic in skill prompts — always read from config
@@ -69,7 +69,7 @@ Background research uses Argus as the primary backend:
 3. Use a cheap model to summarize findings
 4. Optional: Claude final synthesis for complex topics
 
-Fallback to Gemini CLI only if OCI Argus is unreachable.
+Fallback to Gemini CLI only if homelab Argus is unreachable.
 
 ## /freesearch Skill
 
