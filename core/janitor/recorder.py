@@ -27,7 +27,7 @@ def _project_dir() -> Path:
     return cwd
 
 
-def _janitor_dir(project_dir: Path | None = None) -> Path:
+def _janitor_dir(project_dir: "Path | None" = None) -> Path:
     """Get/create .janitor directory in project root."""
     d = Path(project_dir) / ".janitor" if project_dir else _project_dir() / ".janitor"
     d.mkdir(exist_ok=True)
@@ -78,7 +78,7 @@ class SessionRecorder:
         content: str,
         metadata: Optional[dict] = None,
         files: Optional[list[str]] = None,
-    ) -> dict:
+    ) -> "dict":
         """Record an event to the append-only JSONL log."""
         self._turn_count += 1
         event = {
@@ -97,7 +97,7 @@ class SessionRecorder:
     def record_user_request(self, what: str):
         return self.record("user_request", what)
 
-    def record_action(self, what: str, tool: str = "", files: list[str] | None = None):
+    def record_action(self, what: str, tool: str = "", files: "list[str] | None" = None):
         return self.record("action_taken", what, metadata={"tool": tool}, files=files)
 
     def record_file_read(self, path: str):
@@ -106,7 +106,7 @@ class SessionRecorder:
     def record_file_written(self, path: str, action: str = "edited"):
         return self.record("file_written", f"{action} {path}", files=[path])
 
-    def record_decision(self, decision: str, alternatives: list[str] | None = None):
+    def record_decision(self, decision: str, alternatives: "list[str] | None" = None):
         return self.record("decision", decision, metadata={"alternatives": alternatives or []})
 
     def record_blocker(self, what: str, reason: str = ""):
@@ -115,7 +115,7 @@ class SessionRecorder:
     def record_discovery(self, what: str):
         return self.record("discovery", what)
 
-    def record_commit(self, message: str, files: list[str] | None = None):
+    def record_commit(self, message: str, files: "list[str] | None" = None):
         return self.record("commit", message, files=files)
 
     def record_error(self, what: str, context: str = ""):
@@ -124,7 +124,7 @@ class SessionRecorder:
     def record_summary(self, summary: str, source: str = "janitor"):
         return self.record("summary", summary, metadata={"source": source})
 
-    def get_recent_events(self, n: int = 20) -> list[dict]:
+    def get_recent_events(self, n: int = 20) -> "list[dict]":
         """Get the last N events. Uses tail for O(1) reads."""
         if not self._events_path.exists():
             return []
@@ -147,12 +147,12 @@ class SessionRecorder:
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return []
 
-    def get_events_by_type(self, event_type: str, limit: int = 50) -> list[dict]:
+    def get_events_by_type(self, event_type: str, limit: int = 50) -> "list[dict]":
         """Get events of a specific type from recent history."""
         recent = self.get_recent_events(min(limit * 3, 500))
         return [e for e in recent if e.get("type") == event_type][:limit]
 
-    def get_events_by_session(self, session_id: str) -> list[dict]:
+    def get_events_by_session(self, session_id: str) -> "list[dict]":
         """Get all events from a specific session."""
         if not self._events_path.exists():
             return []
@@ -175,7 +175,7 @@ class SessionRecorder:
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return []
 
-    def get_events_since(self, cutoff_iso: str) -> list[dict]:
+    def get_events_since(self, cutoff_iso: str) -> "list[dict]":
         """Get events with timestamp >= cutoff_iso."""
         if not self._events_path.exists():
             return []
@@ -198,13 +198,13 @@ class SessionRecorder:
         except (OSError, FileNotFoundError):
             return []
 
-    def get_decisions(self) -> list[dict]:
+    def get_decisions(self) -> "list[dict]":
         return self.get_events_by_type("decision")
 
-    def get_blockers(self) -> list[dict]:
+    def get_blockers(self) -> "list[dict]":
         return self.get_events_by_type("blocker")
 
-    def get_files_touched(self) -> dict[str, list[str]]:
+    def get_files_touched(self) -> "dict[str, list[str]]":
         result: dict[str, list[str]] = {"read": [], "written": [], "committed": []}
         for event in self.get_recent_events(200):
             t = event.get("type")
@@ -312,7 +312,7 @@ class SessionRecorder:
         conn.close()
         return count
 
-    def query(self, sql: str, params: tuple = ()) -> list[dict]:
+    def query(self, sql: str, params: tuple = ()) -> "list[dict]":
         """Run a read-only query against the SQLite index."""
         conn = self._get_db()
         conn.row_factory = sqlite3.Row
@@ -322,7 +322,7 @@ class SessionRecorder:
         finally:
             conn.close()
 
-    def stats(self) -> dict:
+    def stats(self) -> "dict":
         if not self._events_path.exists():
             return {"total_events": 0, "sessions": 0, "file_size_bytes": 0}
 

@@ -30,7 +30,7 @@ MINUTE_LIMIT = 20
 # random fallback so we never hard-fail while ANY free model exists.
 #
 # Retune these lists based on .janitor/tier-health.json from the weekly smoke test.
-MODEL_TIERS: dict[str, list[str]] = {
+MODEL_TIERS: "dict[str, list[str]]" = {
     "smart": [
         "openai/gpt-oss-120b:free",
         "qwen/qwen3-coder-480b-a35b-07-25:free",
@@ -43,7 +43,7 @@ MODEL_TIERS: dict[str, list[str]] = {
     ],
 }
 
-_cached_api_key: str | None = None
+_cached_api_key = None  # type: ignore[assignment]
 
 
 def _get_api_key() -> str:
@@ -185,7 +185,7 @@ def get_usage_stats() -> dict:
 
 def call_free(
     prompt: str,
-    system: str | None = None,
+    system: "str | None" = None,
     max_tokens: int = 1024,
     timeout: int = 30,
     quality: str = "cheap",
@@ -267,8 +267,8 @@ def call_free(
 
 def extract_structured(
     prompt: str,
-    system: str | None = None,
-    schema_hint: str | None = None,
+    system: "str | None" = None,
+    schema_hint: "str | None" = None,
     quality: str = "cheap",
 ) -> dict:
     """Call free model and parse JSON response.
