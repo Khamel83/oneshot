@@ -159,7 +159,9 @@ Unmodified output from the worker CLI. JSONL for codex, JSON for gemini, plain t
     "routing_correct": true,
     "latency_seconds": 143.2,
     "retry_count": 0,
-    "escalated": false
+    "escalated": false,
+    "one_shot": true,
+    "attempt_count": 1
   },
   "human_rating": null,
   "notes": null

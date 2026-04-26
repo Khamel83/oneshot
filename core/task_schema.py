@@ -33,6 +33,7 @@ class TaskClass(str, Enum):
     implement_medium = "implement_medium"
     test_write = "test_write"
     review_diff = "review_diff"
+    adversarial_review = "adversarial_review"
     doc_draft = "doc_draft"
     summarize_findings = "summarize_findings"
     # Janitor class — background maintenance, always routes to free lane
@@ -63,6 +64,7 @@ LANE_ASSIGNMENTS = {
     TaskClass.implement_medium: "balanced",
     TaskClass.test_write: "cheap",
     TaskClass.review_diff: "premium",
+    TaskClass.adversarial_review: "balanced",
     TaskClass.doc_draft: "cheap",
     TaskClass.summarize_findings: "cheap",
     # Janitor tasks always go to free lane
@@ -132,6 +134,7 @@ CATEGORY_ASSIGNMENTS = {
     TaskClass.implement_medium: TaskCategory.coding,
     TaskClass.test_write: TaskCategory.coding,
     TaskClass.review_diff: TaskCategory.review,
+    TaskClass.adversarial_review: TaskCategory.review,
     TaskClass.doc_draft: TaskCategory.writing,
     TaskClass.summarize_findings: TaskCategory.writing,
     # Janitor tasks are always general

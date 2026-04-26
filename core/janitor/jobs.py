@@ -478,6 +478,35 @@ def detect_cross_references(project_dir: Optional[str] = None) -> dict:
         "details": references[:20],
     }
 
+def detect_missing_frontmatter(project_dir: Optional[str] = None, search_dirs: Optional[list] = None) -> dict:
+    """Find markdown files in research/knowledge dirs that lack YAML frontmatter."""
+    project_dir = project_dir or os.getcwd()
+    if search_dirs is None:
+        search_dirs = ["docs/research", "docs/decisions", "docs/learnings"]
+
+    all_files = _run_git("ls-files", project_dir=project_dir)
+    missing = []
+    checked = 0
+
+    for f in all_files.split("\n"):
+        if not f or not f.endswith(".md"):
+            continue
+        if not any(f.startswith(d) for d in search_dirs):
+            continue
+        full_path = Path(project_dir) / f
+        if not full_path.exists():
+            continue
+        checked += 1
+        try:
+            first_bytes = full_path.read_text(encoding="utf-8", errors="replace")[:4]
+        except OSError:
+            continue
+        if not first_bytes.startswith("---"):
+            missing.append(f)
+
+    return {"missing_count": len(missing), "checked_count": checked, "missing_files": missing[:20]}
+
+
 # --- LLM Jobs (require OPENROUTER_API_KEY) ---
 
 def summarize_session(project_dir: Optional[str] = None) -> dict:
@@ -1355,6 +1384,13 @@ def generate_pending_tasks(project_dir: Optional[str] = None) -> dict:
                     f"**[low]** Add a second contributor to {r['file']} (sole author: {contributors[0]}, {r['edit_count']} edits)"
                 )
 
+    # LOW: Missing frontmatter in research docs
+    mf = _read_json("doc-missing-frontmatter.json", project_dir)
+    if isinstance(mf, dict) and mf.get("missing_count", 0) > 0:
+        files_str = ", ".join(mf["missing_files"][:3])
+        suffix = f" (+{mf['missing_count'] - 3} more)" if mf["missing_count"] > 3 else ""
+        tasks.append(f"**[low]** Add frontmatter to {mf['missing_count']} research docs: {files_str}{suffix}")
+
     # LOW: Stale docs (>60 days, skip archive/)
     ds = _read_json("doc-staleness.json", project_dir)
     if isinstance(ds, dict):
@@ -1624,6 +1660,11 @@ def run_session_start(project_dir: Optional[str] = None) -> str:
             top_active = rda["recent_changes"][:3]
             active_str = ", ".join(f'{a["file"]} ({a["change_count"]}x by {a["authors"][0]})' for a in top_active)
             parts.append(f"recent doc activity: {active_str}")
+
+        mf = detect_missing_frontmatter(project_dir)
+        _write_json("doc-missing-frontmatter.json", mf, project_dir)
+        if mf["missing_count"] > 0:
+            parts.append(f"missing frontmatter: {mf['missing_count']}/{mf['checked_count']} research docs")
 
     # --- Universal signals (all project types) ---
     cd = detect_config_drift(project_dir)
