@@ -8,7 +8,13 @@ secrets/*.env
 # Agent working directories (local only)
 .agent/
 .beads/
-.oneshot/  # Legacy janitor runtime data (migrated to .janitor/)
+.oneshot/
+# But DO track config and task scaffolding
+!.oneshot/config/
+!.oneshot/config/*.yaml
+!.oneshot/tasks/
+!.oneshot/tasks/.gitkeep
+!.oneshot/TASKS.md
 .janitor/  # Janitor runtime data (events.jsonl, intelligence.db, usage.jsonl)
 
 # Output directories (runtime generated, not source)

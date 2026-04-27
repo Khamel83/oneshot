@@ -1,0 +1,197 @@
+# Delegation Harness — provider, lane, and runner configuration.
+#
+# This is a separate routing layer from config/lanes.yaml (which powers the
+# /short, /full, /conduct skills). Don't merge them yet.
+#
+# Lifecycle:
+#   - "current_*" fields point to the active provider/model used today.
+#   - "future_*"  fields point to where a lane will move once OpenCode Go is enabled.
+#   - To migrate a lane, change current_provider/current_model — runner_templates stay put.
+
+providers:
+  zai:
+    enabled: true
+    kind: cli_or_proxy
+    description: "Active GLM coding plan provider. Routed via OpenCode by default; claude-CLI fallback available."
+    auth_env: ZAI_API_KEY     # name only, never rendered into worker.log
+    notes:
+      - "Plan expires 2026-05-02. Migrate lanes to opencode_go before then."
+    models:
+      glm_4_7_flash: { id: "glm-4.7-flash", role: cheap_fast }
+      glm_4_5_air:   { id: "glm-4.5-air",   role: cheap_summary }
+      glm_4_7:       { id: "glm-4.7",       role: routine_coder }
+      glm_5:         { id: "glm-5",         role: strong_reasoning }
+      glm_5_1:       { id: "glm-5.1",       role: premium_reasoning }
+      glm_5_turbo:   { id: "glm-5-turbo",   role: premium_fast }
+
+  opencode_go:
+    enabled: false
+    kind: opencode_go
+    base_url: "https://opencode.ai/zen/go/v1"
+    auth_env: OPENCODE_GO_API_KEY
+    notes:
+      - "OpenCode Go is in beta; limits may change."
+      - "Usage limits: $12 / 5h window, $30 / week, $60 / month."
+      - "Cheap/high-volume models (deepseek_v4_flash, qwen) for routine work."
+      - "Premium models (glm_5_1, kimi_k2_6) only on escalation."
+    models:
+      deepseek_v4_flash: { id: "opencode-go/deepseek-v4-flash", role: cheap_fast }
+      qwen_3_5_plus:     { id: "opencode-go/qwen3.5-plus",      role: cheap_fast }
+      qwen_3_6_plus:     { id: "opencode-go/qwen3.6-plus",      role: cheap_summary }
+      minimax_m2_5:      { id: "opencode-go/minimax-m2.5",      role: routine_coder }
+      minimax_m2_7:      { id: "opencode-go/minimax-m2.7",      role: routine_coder }
+      kimi_k2_5:         { id: "opencode-go/kimi-k2.5",         role: strong_reasoning }
+      kimi_k2_6:         { id: "opencode-go/kimi-k2.6",         role: strong_reasoning }
+      deepseek_v4_pro:   { id: "opencode-go/deepseek-v4-pro",   role: strong_reasoning }
+      glm_5:             { id: "opencode-go/glm-5",             role: strong_reasoning }
+      glm_5_1:           { id: "opencode-go/glm-5.1",           role: premium_reasoning }
+
+  gemini:
+    enabled: false
+    kind: cli
+    description: "Optional. Documentation, tests, summaries."
+    auth_env: GEMINI_API_KEY
+
+  codex:
+    enabled: false
+    kind: cli
+    description: "Optional. Alternate worker or reviewer."
+    auth_env: null    # ChatGPT Plus OAuth in ~/.codex/auth.json; OPENAI_API_KEY must be unset.
+
+  claude_review:
+    enabled: true
+    kind: manual
+    description: "Claude Code itself, planner/reviewer only. Never used as a routine implementation worker."
+
+# ---------------------------------------------------------------------------
+# Lanes — the routing decision Claude makes when calling `oneshot dispatch`.
+#
+# Default policy (don't override casually):
+#   - cheap_fast       -- mechanical work, formatting, lint fixes
+#   - cheap_summary    -- summaries, extractions, low-risk transforms
+#   - routine_coder    -- DEFAULT for normal bounded implementation
+#   - strong_reasoning -- harder refactors, ambiguous failures, cross-file
+#   - premium_reasoning-- escalation only; failed-twice or design-sensitive
+#   - review_only      -- Claude reviews but does not implement
+#
+# Use premium_reasoning sparingly. It's the escape hatch, not the default.
+# ---------------------------------------------------------------------------
+lanes:
+  cheap_fast:
+    description: "Tiny fixes, lint, formatting, simple tests, trivial docs."
+    current_provider: zai
+    current_model: glm_4_7_flash
+    future_provider: opencode_go
+    future_model: deepseek_v4_flash
+    max_diff_lines: 150
+    max_files: 5
+    allow_architecture_changes: false
+
+  cheap_summary:
+    description: "Summaries, notes, extraction, low-risk transforms."
+    current_provider: zai
+    current_model: glm_4_5_air
+    future_provider: opencode_go
+    future_model: qwen_3_5_plus
+    max_diff_lines: 100
+    max_files: 5
+    allow_architecture_changes: false
+
+  routine_coder:
+    description: "Normal bounded implementation and tests. Default lane."
+    current_provider: zai
+    current_model: glm_4_7
+    future_provider: opencode_go
+    future_model: minimax_m2_7
+    max_diff_lines: 500
+    max_files: 12
+    allow_architecture_changes: false
+
+  strong_reasoning:
+    description: "Harder refactors, ambiguous failures, cross-file reasoning."
+    current_provider: zai
+    current_model: glm_5
+    future_provider: opencode_go
+    future_model: kimi_k2_6
+    max_diff_lines: 800
+    max_files: 20
+    allow_architecture_changes: true
+
+  premium_reasoning:
+    description: "Use sparingly. Failed worker recovery or design-sensitive changes."
+    current_provider: zai
+    current_model: glm_5_1
+    future_provider: opencode_go
+    future_model: deepseek_v4_pro
+    max_diff_lines: 1000
+    max_files: 25
+    allow_architecture_changes: true
+
+  review_only:
+    description: "Claude Code reviews but does not implement. No worker dispatched."
+    current_provider: claude_review
+    current_model: manual
+    future_provider: claude_review
+    future_model: manual
+    max_diff_lines: null
+    max_files: null
+    allow_architecture_changes: true
+
+# ---------------------------------------------------------------------------
+# Runner templates — shell command shapes used to invoke each provider.
+#
+# {model_id}      -> resolved from providers.<provider>.models.<model>.id
+# {task_file}     -> absolute path to .oneshot/tasks/<id>/worker.md
+# {worktree_path} -> absolute path to ../oneshot-worktrees/<id>
+# {auth_env}      -> NAME of the env var (never the value). The runner sets the
+#                    env var from `secrets get` or the shell at invocation time.
+#
+# IMPORTANT: in the MVP these are dry-run templates. dispatch writes the
+# rendered command into worker.log; it does NOT execute it. Real runner
+# execution lands in a follow-up milestone.
+# ---------------------------------------------------------------------------
+runner_templates:
+  zai:
+    command: "opencode run --model zai/{model_id} --prompt-file {task_file}"
+    cwd: "{worktree_path}"
+    auth_env: ZAI_API_KEY
+    requires:
+      - "OpenCode CLI installed"
+      - "ZAI provider configured in opencode.json"
+  zai_claude_cli:
+    # One-week fallback for the remaining ZAI plan if OpenCode-with-ZAI isn't wired up.
+    # Renders ${ZAI_API_KEY} as a shell variable reference; the value is never written.
+    command: 'ANTHROPIC_AUTH_TOKEN="${ZAI_API_KEY}" ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic claude --print --dangerously-skip-permissions --model {model_id} --prompt-file {task_file}'
+    cwd: "{worktree_path}"
+    auth_env: ZAI_API_KEY
+  opencode_go:
+    command: "opencode run --model opencode-go/{model_id} --prompt-file {task_file}"
+    cwd: "{worktree_path}"
+    auth_env: OPENCODE_GO_API_KEY
+  gemini:
+    command: "gemini -p @{task_file} --output-format json --approval-mode yolo"
+    cwd: "{worktree_path}"
+    auth_env: GEMINI_API_KEY
+  codex:
+    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access --prompt-file {task_file}"
+    cwd: "{worktree_path}"
+    auth_env: null
+
+# ---------------------------------------------------------------------------
+# Search policy — see docs/SEARCH_POLICY.md for the full rules.
+# ---------------------------------------------------------------------------
+search:
+  preferred: argus
+  argus:
+    enabled: false
+    mcp_server_name: argus
+    cli_command: "argus search"
+  fallback_web_search:
+    enabled: false
+
+# ---------------------------------------------------------------------------
+# Verification — what `oneshot collect` runs after the worker.
+# Set test_command to e.g. "bash scripts/ci.sh" once you trust the harness.
+# ---------------------------------------------------------------------------
+verification:
+  test_command: null
