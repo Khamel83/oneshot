@@ -1,6 +1,6 @@
 {
-  "documents_with_links": 10,
-  "total_references": 64,
+  "documents_with_links": 9,
+  "total_references": 62,
   "most_referenced": [
     {
       "file": "file",
@@ -35,11 +35,11 @@
       "references": 5
     },
     {
-      "file": "CENTRAL_SECRETS.md",
+      "file": "-n \"${ZSH_VERSION:-}\"",
       "references": 4
     },
     {
-      "file": "-n \"${ZSH_VERSION:-}\"",
+      "file": "! -f \"$claude_md\"",
       "references": 4
     }
   ],
@@ -56,18 +56,6 @@
         "learnings.md",
         "tools/gemini.md",
         "tools/other-agents.md"
-      ]
-    },
-    {
-      "file": "README.md",
-      "total_links": 2,
-      "_all_targets": [
-        "CENTRAL_SECRETS.md",
-        "CENTRAL_SECRETS.md"
-      ],
-      "targets": [
-        "CENTRAL_SECRETS.md",
-        "CENTRAL_SECRETS.md"
       ]
     },
     {

@@ -1,5 +1,5 @@
 {
-  "orphan_count": 75,
+  "orphan_count": 77,
   "orphan_files": [
     ".claude/memory/memory.md",
     ".claude/skills/SKILLS_REFERENCE.md",
@@ -7,6 +7,8 @@
     ".claude/skills/conduct/templates/ROADMAP.md",
     ".claude/skills/conduct/templates/STATE.md",
     ".janitor/onboarding.md",
+    ".janitor/pending-tasks-prev.md",
+    ".janitor/pending-tasks.md",
     ".oneshot/onboarding-summary.md",
     ".opencode/agents/cheap-worker.md",
     ".opencode/agents/reviewer.md",
@@ -18,9 +20,7 @@
     ".opencode/commands/research.md",
     ".opencode/commands/restore.md",
     ".opencode/commands/short.md",
-    ".opencode/commands/tdd.md",
-    "1shot/OPENCODE_ADAPTER_PLAN.md",
-    "1shot/PROJECT.md"
+    ".opencode/commands/tdd.md"
   ],
-  "total_documents": 160
+  "total_documents": 163
 }

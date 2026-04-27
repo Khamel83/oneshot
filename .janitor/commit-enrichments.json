@@ -115,5 +115,79 @@
       ],
       "category": "security"
     }
+  },
+  "b3f3cb9b376f0bf866083229f94895258feb88d5": {
+    "hash": "b3f3cb9b376f",
+    "message": "docs: add secrets.md, fix install.sh, migrate vault from secrets-vault",
+    "enriched": {
+      "summary": "Adds a new secrets documentation page, updates the install script, and migrates the vault configuration from secrets-vault to the new secrets system, with extensive documentation and configuration file updates.",
+      "tags": [
+        "documentation",
+        "security",
+        "migration",
+        "configuration",
+        "onboarding",
+        "cleanup"
+      ],
+      "category": "documentation"
+    }
+  },
+  "09ca61977b1a9e03911c3c8f18654387255fa62d": {
+    "hash": "09ca61977b1a",
+    "message": "docs: add secrets section to AGENTS.md for OpenCode visibility",
+    "enriched": {
+      "summary": "Add a new 'secrets' section to AGENTS.md to improve OpenCode visibility.",
+      "tags": [
+        "docs",
+        "secrets",
+        "AGENTS.md",
+        "OpenCode",
+        "visibility"
+      ],
+      "category": "documentation"
+    }
+  },
+  "014d4f609ea05bf2bc7899c2442d4a0de501a982": {
+    "hash": "014d4f609ea0",
+    "message": "feat: AGENTS.md v14.4 \u2014 self-contained cross-project operating contract",
+    "enriched": {
+      "summary": "Introduce self-contained cross-project operating contract in AGENTS.md version 14.4",
+      "tags": [
+        "feature",
+        "documentation",
+        "contract",
+        "AGENTS"
+      ],
+      "category": "documentation"
+    }
+  },
+  "e1e34e13c6598a2ebedabcb55e0c585b4f925636": {
+    "hash": "e1e34e13c659",
+    "message": "fix: replace mapfile with while-read loop for bash 3.2 compat (macOS)",
+    "enriched": {
+      "summary": "Replace mapfile with while-read loop to ensure compatibility with Bash 3.2 on macOS",
+      "tags": [
+        "bash",
+        "macOS",
+        "compatibility",
+        "script",
+        "refactor"
+      ],
+      "category": "refactor"
+    }
+  },
+  "d4453bda5ef4d69c7390f9959d683416874ee034": {
+    "hash": "d4453bda5ef4",
+    "message": "docs: update machine table to all 6 machines with accurate Tailscale aliases/IPs",
+    "enriched": {
+      "summary": "Update the machine table documentation to include accurate Tailscale aliases and IPs for all six machines.",
+      "tags": [
+        "docs",
+        "tailscale",
+        "machine-table",
+        "updates"
+      ],
+      "category": "documentation"
+    }
   }
 }

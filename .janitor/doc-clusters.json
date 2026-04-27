@@ -1,10 +1,10 @@
 {
   "cluster_count": 13,
-  "total_documents": 235,
+  "total_documents": 254,
   "clusters": [
     {
       "directory": "docs",
-      "file_count": 57,
+      "file_count": 58,
       "files": [
         "docs/LLM-OVERVIEW.md",
         "docs/SKILLS.md",
@@ -33,6 +33,17 @@
         ".claude/memory/memory.md",
         ".claude/memory/tools/gemini.md",
         ".claude/memory/tools/other-agents.md"
+      ]
+    },
+    {
+      "directory": ".janitor",
+      "file_count": 25,
+      "files": [
+        ".janitor/blockers.json",
+        ".janitor/code-smells.json",
+        ".janitor/commit-enrichments.json",
+        ".janitor/config-drift.json",
+        ".janitor/critical-files.json"
       ]
     },
     {
@@ -88,17 +99,6 @@
         "templates/community-starter/.github/workflows/scheduled-jobs.yml",
         "templates/community-starter/.github/workflows/tests.yml",
         "templates/community-starter/ARCHITECTURE.md"
-      ]
-    },
-    {
-      "directory": ".janitor",
-      "file_count": 7,
-      "files": [
-        ".janitor/code-smells.json",
-        ".janitor/config-drift.json",
-        ".janitor/dep-graph.json",
-        ".janitor/onboarding.md",
-        ".janitor/redo-queue.json"
       ]
     },
     {

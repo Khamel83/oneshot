@@ -1,36 +1,33 @@
 {
   "decisions": [
     {
-      "what": "Created systemd unit files (service and timer) for oneshot-janitor",
-      "why": "To schedule periodic execution of the janitor cron script"
+      "what": "Created systemd user service and timer for janitor",
+      "why": "To automate periodic execution of janitor tasks"
     },
     {
-      "what": "Edited janitor-cron.sh to include health checks for Argus endpoints and router resolve",
-      "why": "To verify system components are operational before running tasks"
+      "what": "Made janitor-cron.sh executable and ran it",
+      "why": "To verify the script works and can be scheduled"
     },
     {
-      "what": "Ran curl and python router resolve commands to validate endpoint and routing functionality",
-      "why": "To ensure dependent services are reachable and correctly configured"
+      "what": "Performed curl check against Argus MCP endpoints",
+      "why": "To confirm the service is reachable and functional"
     },
     {
-      "what": "Executed git diff and git ls-files commands to review changes and untracked files",
-      "why": "To audit modifications and clean up stray files before finalizing state"
+      "what": "Ran git diff and git ls-files to inspect changes",
+      "why": "To understand what files have been modified or are untracked"
     },
     {
-      "what": "Created STATE.md to capture current operational state",
-      "why": "To document findings for later reference"
+      "what": "Created STATE.md to capture project state",
+      "why": "To document current status for future reference"
     }
   ],
-  "blockers": [
-    {
-      "what": "Deletion of tasks.json",
-      "reason": "Potential loss of configuration needed for subsequent steps"
-    }
-  ],
+  "blockers": [],
   "discoveries": [
-    "Argus MCP-related endpoints responded successfully",
-    "Router resolve command executed without error",
-    "Untracked git files listed",
-    "STATE.md file created documenting current state"
+    "janitor-cron.sh script exists and was executed successfully",
+    "systemd user service and timer were generated in ~/.config/systemd/user/",
+    "git diff showed modifications and untracked files were listed",
+    "opencode.json was read and later recreated, indicating configuration persistence",
+    "curl check returned HTTP response confirming Argus MCP endpoint availability",
+    "python router resolve command executed without error"
   ]
 }
