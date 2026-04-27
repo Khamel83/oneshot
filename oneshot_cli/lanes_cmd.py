@@ -1,3 +1,4 @@
+# lanes table renderer
 """oneshot lanes — print lane routing table."""
 from __future__ import annotations
 
