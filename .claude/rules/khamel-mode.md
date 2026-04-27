@@ -4,11 +4,14 @@ When building ANYTHING for this user, assume these defaults without asking.
 
 ## Infrastructure
 
-| Machine | Tailscale IP | Role |
-|---------|--------------|------|
-| **oci-dev** | 100.126.13.70 | Primary dev, services, Postgres, Claude Code |
-| **homelab** | 100.112.130.100 | Personal local infra, 26TB storage |
-| **macmini** | 100.113.216.27 | Apple Silicon GPU, tasks needing throughput |
+| Machine | Tailscale alias | Tailscale IP | User | Role |
+|---|---|---|---|---|
+| **MBA** (local) | — | 100.64.121.72 | khamel83 | Primary dev machine |
+| **homelab** | `homelab-ts` | 100.112.130.100 | khamel83 | Linux server, 26TB, all Docker |
+| **macmini** | `macmini-ts` | 100.113.216.27 | macmini | Mac Mini M1, Apple Silicon GPU |
+| **oci-dev** | `oci-ts` | 100.126.13.70 | ubuntu | Cloud VM, services/Postgres/Claude Code |
+| **rpi4** | `rpi4` | 100.97.236.22 | RPI3 | Raspberry Pi 4 (currently offline) |
+| **work-mbp** | `mbp-ts` | 100.120.127.32 | hr-svp-mac12 | Work MBP (currently offline) |
 
 - **Networking**: All machines on Tailscale (deer-panga.ts.net)
 - **Public access**: Tailscale Funnel + poytz (NOT nginx/traefik)
