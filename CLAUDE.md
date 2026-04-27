@@ -40,6 +40,30 @@ When you ask Claude to change `core/task_schema.py` keywords, `config/lanes.yaml
 - See `docs/meta-harness/refactor_plan.md` for full ranked list
 - See `docs/meta-harness/outer_loop_plan.md` for self-improvement loop designs
 
+## My Active Projects
+
+| Project | What it does | Where | Status |
+|---------|-------------|-------|--------|
+| **oneshot** | Orchestration control plane — Claude + workers, skills, routing | MBA | Active dev |
+| **atlas** | Knowledge ingestion: podcasts, articles, Gmail → 440K searchable chunks | oci-dev, 13 timers | Production |
+| **penny** | Voice memo → classify → route (Telegram, Keep, TrojanHorse…) | oci-dev | Production |
+| **poytz** | URL routing: khamel.com/* → homelab services | Cloudflare Workers | Live |
+| **homelab** | All Docker infra, Makefile ops, 26TB storage | homelab server | Running |
+| **argus** | Search plane: SearXNG+Brave+Exa+Tavily, MCP+HTTP | homelab:8270 | Running |
+| **n8n** | Workflow automation | homelab / khamel.com/workflows | Running |
+| **networth** | Tennis ladder platform | Vercel + Supabase | Production |
+| **ralex** | Multi-model chat: Claude + 10 OpenRouter models | local | Active |
+| **kid-friendly-ai** | Kids voice assistant (ElevenLabs) | buddy.khamel.com | Production |
+| **docs-cache** | Local cached docs for offline/fast Claude access | `~/github/docs-cache` | Active |
+| **archon** | RAG knowledge base + MCP server | local | MVP |
+| **atlas-voice** | Writing-style model from Atlas corpus | local | Active |
+| **oos** | Dev workflow context optimizer | local | Active |
+| **dada** | Family comms: video/audio → Telegram | local | Planned |
+| **divorce** | SB 1427 joint petition tooling | local | Personal |
+
+Dormant (keep): `atlas_researcher`, `vig`, `WFM`
+Full services catalog: `~/github/homelab/docs/SERVICES.md`
+
 ## Tool-Specific (Claude Code)
 See @.claude/rules/khamel-mode.md
 See @.claude/rules/codex.md
