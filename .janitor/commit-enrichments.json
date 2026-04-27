@@ -1,0 +1,119 @@
+{
+  "7d80c7e3cbd17cdbdbf7fdfc3ba9c0ae80c9698d": {
+    "hash": "7d80c7e3cbd1",
+    "message": "fix: Python 3.9 compat \u2014 quote str|None and dict[x] annotations in worker/recorder",
+    "enriched": {
+      "summary": "Updated type annotations for Python\u202f3.9 compatibility by quoting union types and dictionary key annotations in recorder and worker modules.",
+      "tags": [
+        "python",
+        "compatibility",
+        "type-annotations",
+        "recorder",
+        "worker"
+      ],
+      "category": "bugfix"
+    }
+  },
+  "2a6b95cae5c3c6809eaa063af3397b495193a74e": {
+    "hash": "2a6b95cae5c3",
+    "message": "feat: add adversarial-review skill, frontmatter enforcement, enhanced handoff structure",
+    "enriched": {
+      "summary": "Add adversarial-review skill, enforce frontmatter, and improve handoff structure across core jobs, task schema, and documentation.",
+      "tags": [
+        "adversarial-review",
+        "frontmatter-enforcement",
+        "handoff-structure",
+        "feature"
+      ],
+      "category": "feature"
+    }
+  },
+  "a5aac96e454028808b0a4dc52bb0586de16e05fa": {
+    "hash": "a5aac96e4540",
+    "message": "secrets: add argus.env with Brave key and remote extract config",
+    "enriched": {
+      "summary": "Added encrypted Argus environment file containing Brave key and remote extraction configuration",
+      "tags": [
+        "secrets",
+        "argus",
+        "env",
+        "encryption",
+        "config"
+      ],
+      "category": "security"
+    }
+  },
+  "9e729ac6e551581b0ecb97913d10592a94a236b4": {
+    "hash": "9e729ac6e551",
+    "message": "fix: point Argus at homelab (100.112.130.100) \u2014 not OCI",
+    "enriched": {
+      "summary": "Updated Argus configuration to point to the homelab IP (100.112.130.100) instead of OCI, adjusting search settings accordingly.",
+      "tags": [
+        "config",
+        "search",
+        "argus",
+        "homelab"
+      ],
+      "category": "bugfix"
+    }
+  },
+  "feded48e95dc2d02ae24a5841bfc84b40ddee69f": {
+    "hash": "feded48e95dc",
+    "message": "docs: rewrite README for v14.3 \u2014 accurate orchestration control plane description",
+    "enriched": {
+      "summary": "Rewrite README for version 14.3 to provide an accurate description of the orchestration control plane.",
+      "tags": [
+        "docs",
+        "README",
+        "v14.3",
+        "orchestration",
+        "control-plane",
+        "documentation"
+      ],
+      "category": "documentation"
+    }
+  },
+  "bcff97872f9456252614677628d869ceaa95f5da": {
+    "hash": "bcff97872f94",
+    "message": "security: remove plaintext ZAI API key from claude-shell-setup.sh",
+    "enriched": {
+      "summary": "Removed plaintext ZAI API key from scripts/claude-shell-setup.sh to improve security.",
+      "tags": [
+        "security",
+        "secret",
+        "key",
+        "removal",
+        "cleanup"
+      ],
+      "category": "security"
+    }
+  },
+  "623c56e05928f0aaf289a5b2a5d0ab1ff8cd1e05": {
+    "hash": "623c56e05928",
+    "message": "fix: sync GLM_MODEL to glm-5-turbo in claude-shell-setup.sh",
+    "enriched": {
+      "summary": "Synchronize GLM_MODEL to glm-5-turbo in claude-shell-setup.sh",
+      "tags": [
+        "fix",
+        "script",
+        "glm",
+        "sync"
+      ],
+      "category": "bugfix"
+    }
+  },
+  "0a139705f3b5cf195152f01c2de5189476758d85": {
+    "hash": "0a139705f3b5",
+    "message": "fix: wire secrets vault into claude-shell-setup, add key index, clean vault",
+    "enriched": {
+      "summary": "Integrate secrets vault into claude-shell-setup, add key index, and clean up secret files.",
+      "tags": [
+        "security",
+        "refactor",
+        "cleanup",
+        "vault"
+      ],
+      "category": "security"
+    }
+  }
+}

@@ -48,6 +48,10 @@ rm -f "$BIN_DIR/oneshot" "$BIN_DIR/oneshot-build" "$BIN_DIR/oneshot-resilient" 2
 ln -sf "$ONESHOT_DIR/scripts/oneshot-update.sh" "$BIN_DIR/oneshot-update"
 echo "  oneshot-update    - Update ONE_SHOT from GitHub"
 
+# Create secrets symlink (vault CLI, used by all projects)
+ln -sf "$ONESHOT_DIR/scripts/secrets" "$BIN_DIR/secrets"
+echo "  secrets           - SOPS/Age vault CLI"
+
 # Install docs-link for documentation cache management (if it exists)
 if [ -f "$ONESHOT_DIR/scripts/docs-link" ]; then
     ln -sf "$ONESHOT_DIR/scripts/docs-link" "$BIN_DIR/docs-link"

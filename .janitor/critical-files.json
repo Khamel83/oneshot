@@ -1,0 +1,29 @@
+{
+  "critical_files": [
+    {
+      "file": "/home/ubuntu/github/oneshot/.opencode/opencode.json",
+      "sessions": 14,
+      "downstream_deps": 0
+    },
+    {
+      "file": "/home/ubuntu/github/oneshot/1shot/OPENCODE_ADAPTER_PLAN.md",
+      "sessions": 11,
+      "downstream_deps": 0
+    },
+    {
+      "file": "/home/ubuntu/github/oneshot/scripts/janitor-cron.sh",
+      "sessions": 7,
+      "downstream_deps": 0
+    },
+    {
+      "file": "/home/ubuntu/github/oneshot/.opencode/agents/cheap-worker.md",
+      "sessions": 6,
+      "downstream_deps": 0
+    },
+    {
+      "file": "/home/ubuntu/github/oneshot/core/search/argus_client.py",
+      "sessions": 6,
+      "downstream_deps": 0
+    }
+  ]
+}

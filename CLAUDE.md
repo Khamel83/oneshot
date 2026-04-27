@@ -6,6 +6,7 @@ See @docs/instructions/workflow.md
 See @docs/instructions/coding.md
 See @docs/instructions/search.md
 See @docs/instructions/review.md
+See @docs/instructions/secrets.md
 
 ## Project-Specific
 See @docs/instructions/oneshot.md

@@ -1,0 +1,78 @@
+{
+  "changes_count": 10,
+  "time_window_days": 7,
+  "recent_changes": [
+    {
+      "file": "docs/instructions/search.md",
+      "change_count": 3,
+      "authors": [
+        "Test User",
+        "Khamel83"
+      ]
+    },
+    {
+      "file": ".claude/skills/update/SKILL.md",
+      "change_count": 3,
+      "authors": [
+        "Test User"
+      ]
+    },
+    {
+      "file": "config/search.yaml",
+      "change_count": 2,
+      "authors": [
+        "Test User",
+        "Khamel83"
+      ]
+    },
+    {
+      "file": "docs/meta-harness/trace_architecture.md",
+      "change_count": 1,
+      "authors": [
+        "unknown"
+      ]
+    },
+    {
+      "file": ".claude/skills/_shared/providers.md",
+      "change_count": 1,
+      "authors": [
+        "Test User"
+      ]
+    },
+    {
+      "file": ".claude/skills/freesearch/SKILL.md",
+      "change_count": 1,
+      "authors": [
+        "Test User"
+      ]
+    },
+    {
+      "file": ".claude/skills/research/SKILL.md",
+      "change_count": 1,
+      "authors": [
+        "Test User"
+      ]
+    },
+    {
+      "file": ".janitor/repo-pack.json",
+      "change_count": 1,
+      "authors": [
+        "Test User"
+      ]
+    },
+    {
+      "file": "docs/LLM-OVERVIEW.md",
+      "change_count": 1,
+      "authors": [
+        "Test User"
+      ]
+    },
+    {
+      "file": "repomix.config.json",
+      "change_count": 1,
+      "authors": [
+        "Test User"
+      ]
+    }
+  ]
+}

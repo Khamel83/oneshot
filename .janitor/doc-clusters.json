@@ -1,0 +1,116 @@
+{
+  "cluster_count": 13,
+  "total_documents": 235,
+  "clusters": [
+    {
+      "directory": "docs",
+      "file_count": 57,
+      "files": [
+        "docs/LLM-OVERVIEW.md",
+        "docs/SKILLS.md",
+        "docs/external/.index.md",
+        "docs/external/codex/.index.md",
+        "docs/external/codex/CODEX_AGENTS.md"
+      ]
+    },
+    {
+      "directory": "eval",
+      "file_count": 50,
+      "files": [
+        "eval/benchmarks/classification/holdout/cls-h01.json",
+        "eval/benchmarks/classification/holdout/cls-h02.json",
+        "eval/benchmarks/classification/holdout/cls-h03.json",
+        "eval/benchmarks/classification/holdout/cls-h04.json",
+        "eval/benchmarks/classification/holdout/cls-h05.json"
+      ]
+    },
+    {
+      "directory": ".claude",
+      "file_count": 35,
+      "files": [
+        ".claude/infrastructure/STACK.md",
+        ".claude/memory/learnings.md",
+        ".claude/memory/memory.md",
+        ".claude/memory/tools/gemini.md",
+        ".claude/memory/tools/other-agents.md"
+      ]
+    },
+    {
+      "directory": "plans",
+      "file_count": 18,
+      "files": [
+        "plans/community-starter/ALTERNATIVES.md",
+        "plans/community-starter/BLOCKERS.md",
+        "plans/community-starter/CONTEXT7_AUDIT.md",
+        "plans/community-starter/DELTA_ANALYSIS.md",
+        "plans/community-starter/DOC_AUDIT.md"
+      ]
+    },
+    {
+      "directory": ".opencode",
+      "file_count": 14,
+      "files": [
+        ".opencode/AGENTS.md",
+        ".opencode/agents/cheap-worker.md",
+        ".opencode/agents/oneshot.md",
+        ".opencode/agents/reviewer.md",
+        ".opencode/commands/conduct.md"
+      ]
+    },
+    {
+      "directory": "(root)",
+      "file_count": 13,
+      "files": [
+        ".sops.yaml",
+        "AGENTS.md",
+        "CENTRAL_SECRETS.md",
+        "CHANGELOG.md",
+        "CLAUDE.local.md"
+      ]
+    },
+    {
+      "directory": "archive",
+      "file_count": 12,
+      "files": [
+        "archive/SKILL_LOG.md",
+        "archive/handoffs/.handoff-ONE_SHOT-starred-repos.md",
+        "archive/handoffs/.handoff-ONE_SHOT-v11-planning.md",
+        "archive/v7-high-token/README.md",
+        "archive/v7/SPEC.md"
+      ]
+    },
+    {
+      "directory": "templates",
+      "file_count": 12,
+      "files": [
+        "templates/LLM-OVERVIEW.md",
+        "templates/TASK_SPEC.md",
+        "templates/community-starter/.github/workflows/scheduled-jobs.yml",
+        "templates/community-starter/.github/workflows/tests.yml",
+        "templates/community-starter/ARCHITECTURE.md"
+      ]
+    },
+    {
+      "directory": ".janitor",
+      "file_count": 7,
+      "files": [
+        ".janitor/code-smells.json",
+        ".janitor/config-drift.json",
+        ".janitor/dep-graph.json",
+        ".janitor/onboarding.md",
+        ".janitor/redo-queue.json"
+      ]
+    },
+    {
+      "directory": ".oneshot",
+      "file_count": 7,
+      "files": [
+        ".oneshot/code-smells.json",
+        ".oneshot/commit-enrichments.json",
+        ".oneshot/config-drift.json",
+        ".oneshot/dep-graph.json",
+        ".oneshot/onboarding-summary.md"
+      ]
+    }
+  ]
+}

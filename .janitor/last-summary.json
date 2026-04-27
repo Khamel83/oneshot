@@ -1,0 +1,36 @@
+{
+  "decisions": [
+    {
+      "what": "Created systemd unit files (service and timer) for oneshot-janitor",
+      "why": "To schedule periodic execution of the janitor cron script"
+    },
+    {
+      "what": "Edited janitor-cron.sh to include health checks for Argus endpoints and router resolve",
+      "why": "To verify system components are operational before running tasks"
+    },
+    {
+      "what": "Ran curl and python router resolve commands to validate endpoint and routing functionality",
+      "why": "To ensure dependent services are reachable and correctly configured"
+    },
+    {
+      "what": "Executed git diff and git ls-files commands to review changes and untracked files",
+      "why": "To audit modifications and clean up stray files before finalizing state"
+    },
+    {
+      "what": "Created STATE.md to capture current operational state",
+      "why": "To document findings for later reference"
+    }
+  ],
+  "blockers": [
+    {
+      "what": "Deletion of tasks.json",
+      "reason": "Potential loss of configuration needed for subsequent steps"
+    }
+  ],
+  "discoveries": [
+    "Argus MCP-related endpoints responded successfully",
+    "Router resolve command executed without error",
+    "Untracked git files listed",
+    "STATE.md file created documenting current state"
+  ]
+}

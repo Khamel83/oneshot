@@ -1,19 +1,44 @@
 {
   "oversized_files": [
     {
-      "path": "core/dispatch/run.py",
-      "lines": 675
+      "path": "core/janitor/jobs.py",
+      "lines": 1834
     },
     {
-      "path": "core/janitor/jobs.py",
-      "lines": 544
+      "path": "core/dispatch/run.py",
+      "lines": 675
     }
   ],
   "oversized_functions": [
     {
+      "path": "core/janitor/jobs.py",
+      "function": "generate_onboarding",
+      "lines": 242
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "run_session_start",
+      "lines": 202
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "evaluate_task_sufficiency",
+      "lines": 166
+    },
+    {
       "path": "core/janitor/worker.py",
       "function": "get_usage_stats",
-      "lines": 157
+      "lines": 166
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "generate_pending_tasks",
+      "lines": 126
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "review_pending_tasks",
+      "lines": 118
     },
     {
       "path": "core/dispatch/run.py",
@@ -22,5 +47,5 @@
     }
   ],
   "oversized_file_count": 2,
-  "oversized_function_count": 2
+  "oversized_function_count": 7
 }

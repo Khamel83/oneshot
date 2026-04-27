@@ -1,0 +1,39 @@
+{
+  "at_risk": [
+    {
+      "file": ".claude/skills/conduct/SKILL.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 9
+    },
+    {
+      "file": ".claude/skills/full/SKILL.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 9
+    },
+    {
+      "file": ".claude/skills/_shared/providers.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 8
+    },
+    {
+      "file": ".claude/skills/short/SKILL.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 7
+    },
+    {
+      "file": ".claude/skills/_shared/dispatch.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 5
+    }
+  ]
+}
