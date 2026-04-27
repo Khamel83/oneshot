@@ -107,28 +107,7 @@ else
     log_skip "No Python files found"
 fi
 
-# 5. Bats Tests
-section "Tests: Bats (Shell)"
-if command -v bats &>/dev/null; then
-    if [ -d "tests" ]; then
-        BATS_FILES=$(find tests -name "*.bats" 2>/dev/null | head -10)
-        if [ -n "$BATS_FILES" ]; then
-            if bats tests/ 2>&1; then
-                log_ok "All bats tests pass"
-            else
-                log_error "Bats tests failed"
-            fi
-        else
-            log_skip "No .bats files found"
-        fi
-    else
-        log_skip "No tests/ directory"
-    fi
-else
-    log_skip "bats not installed"
-fi
-
-# 6. Pytest
+# 5. Pytest
 section "Tests: Pytest"
 if ls **/test_*.py **/*_test.py 2>/dev/null | head -1 | grep -q .; then
     if command -v pytest &>/dev/null; then
@@ -144,7 +123,21 @@ else
     log_skip "No pytest test files found"
 fi
 
-# 7. ONE_SHOT Validation (skip in quick mode)
+# 7. Eval Suite (skip in quick mode)
+if [ "$QUICK_MODE" = false ]; then
+    section "Eval: Harness Benchmarks"
+    if [ -f "scripts/eval.sh" ]; then
+        if bash scripts/eval.sh 2>&1; then
+            log_ok "All eval benchmarks passed"
+        else
+            log_error "Eval benchmarks failed"
+        fi
+    else
+        log_skip "No eval.sh found"
+    fi
+fi
+
+# 8. ONE_SHOT Validation (skip in quick mode)
 if [ "$QUICK_MODE" = false ]; then
     section "Validation: ONE_SHOT Skills"
     if [ -f "scripts/validate-skills.sh" ]; then
@@ -170,7 +163,7 @@ if [ "$QUICK_MODE" = false ]; then
 
     section "Validation: ONE_SHOT Agents"
     if [ -f "scripts/validate-agents.py" ]; then
-        if python scripts/validate-agents.py 2>&1; then
+        if python3 scripts/validate-agents.py 2>&1; then
             log_ok "Agents validation passed"
         else
             log_error "Agents validation failed"

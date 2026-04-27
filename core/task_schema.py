@@ -154,7 +154,7 @@ CODING_KEYWORDS = [
 RESEARCH_KEYWORDS = [
     "research", "investigate", "explore", "search", "find", "look up",
     "discover", "understand", "learn about", "compare", "evaluate",
-    "benchmark", "profile", "analyze", "discover",
+    "benchmark", "profile", "analyze",
 ]
 
 WRITING_KEYWORDS = [

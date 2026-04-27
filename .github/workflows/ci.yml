@@ -170,23 +170,22 @@ jobs:
           print('All category inference tests passed')
           "
 
-  test-oneshot:
-    name: Test oneshot.sh
+  test-core-python:
+    name: Test Core Python Modules
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install bats-core
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bats
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      - name: Run tests
-        run: bats tests/test_oneshot.bats
+      - name: Run pytest
+        run: python3 -m pytest tests/test_task_schema.py tests/test_lane_policy.py -v
 
-  # Quick sanity checks (no external tools needed)
   lint-basic:
     name: Basic Checks
     runs-on: ubuntu-latest

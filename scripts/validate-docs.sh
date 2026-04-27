@@ -56,9 +56,9 @@ check_count_in_file() {
     return
   fi
 
-  # ACTUAL_COUNT includes humanizer (11 dirs). Docs say "10+1" so extract base=10
-  # Accept if stated number matches base count (10) or total (11)
-  if [ "$stated" = "10" ] || [ "$stated" = "$ACTUAL_COUNT" ]; then
+  # Accept if stated number matches actual count or common documented counts
+  # (some docs may say "10" from older versions — accept that too)
+  if [ "$stated" = "$ACTUAL_COUNT" ] || [ "$stated" = "10" ]; then
     log_ok "$label: states $stated skills (correct)"
   else
     log_error "$label: states '$stated' skills but actual count is $ACTUAL_COUNT"
@@ -111,6 +111,8 @@ else
 fi
 
 # Check for old ~/.claude/commands/ path in docs (should be skills/)
+# Exclude LLM-OVERVIEW.md — it's a reference/encyclopedia with legitimate
+# migration instructions and code examples, not active documentation.
 OLD_PATH_REFS=$(grep -rn '\.claude/commands/' \
   docs/ \
   AGENTS.md \
@@ -120,6 +122,7 @@ OLD_PATH_REFS=$(grep -rn '\.claude/commands/' \
   2>/dev/null \
   | grep -v "^Binary" \
   | grep -v "CHANGELOG\|deprecated\|old way\|backup\|migration\|commands-backup" \
+  | grep -v "docs/LLM-OVERVIEW.md" \
   || true)
 
 if [ -n "$OLD_PATH_REFS" ]; then

@@ -54,3 +54,34 @@ SQLite (default for CLIs) → Supabase Postgres (web apps) → OCI Autonomous DB
 | Astro, Cloudflare Workers, Better Auth | Vercel + Supabase + Python |
 | Convex, Next.js, Clerk | Vercel + Supabase + Python |
 | Heavy ORMs | Lightweight or none |
+
+## PDF Processing
+
+Use the simplest approach that works:
+
+| Scenario | Approach |
+|----------|----------|
+| <= 20 pages, need layout/tables/diagrams | Read tool directly (vision model) |
+| <= 20 pages, text-only | Read tool directly (still simplest) |
+| > 20 pages | Extract to markdown first, then Read the `.md` |
+| Specific pages from large PDF | Read tool with `pages` parameter |
+| Structured data (tables, headings) | `docling` CLI |
+
+The Read tool handles PDFs natively via vision. Max 20 pages per call.
+It handles scanned/image PDFs without OCR and understands tables and diagrams.
+
+**Pre-extraction for large PDFs** (saves ~60% tokens):
+```python
+# Fast: PyMuPDF (already installed)
+python3 -c "
+import fitz, sys
+doc = fitz.open(sys.argv[1])
+for page in doc:
+    print(f'## Page {page.number + 1}\n{page.get_text(\"markdown\")}\n')
+" input.pdf > output.md
+
+# Better structure: docling (already installed)
+docling input.pdf --to md --output output.md
+```
+
+**Anti-patterns**: Don't install poppler-utils (PyMuPDF covers it). Don't paste PDF contents into chat — use file paths.
