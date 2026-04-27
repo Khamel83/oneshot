@@ -16,6 +16,29 @@
 # VAULT: ~/github/oneshot/secrets/ (master)
 # PROJECT: secrets/ in current project (optional local override)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# KEY INDEX — which file holds which key (run `secrets list` for full dump)
+# ─────────────────────────────────────────────────────────────────────────────
+# api.env            JINA_API_KEY
+# arb.env            POLYMARKET_PRIVATE_KEY DUNE_API_KEY UPSTASH_REDIS_REST_TOKEN NORDVPN_PRIVATE_KEY DISCORD_WEBHOOK_URL
+# argus.env          ARGUS_BRAVE_API_KEY ARGUS_REMOTE_EXTRACT_KEY ARGUS_REMOTE_EXTRACT_URL
+# argus_auth.env     NYTIMES/WSJ/BLOOMBERG/ESPN/LATIMES email+password pairs
+# cloudflare.env     CLOUDFLARE_HYPERDRIVE_ID
+# convex.env         CONVEX_TEAM_ACCESS_TOKEN CONVEX_TEAM_ID
+# convex_deploy.env  CONVEX_DEPLOY_KEY CONVEX_DEPLOYMENT_URL
+# coparent.env       TWILIO_* GOOGLE_CALENDAR_* GOOGLE_OAUTH_* OPENROUTER_API_KEY TELEGRAM_BOT_TOKEN
+# deployments.env    VERCEL_TOKEN SUPABASE_* STRIPE_* NEXTAUTH_SECRET CRON_SECRET GOOGLE_MAPS_API_KEY
+# gmail.env          GMAIL_CREDENTIALS_B64 GMAIL_TOKEN_B64 GMAIL_PROJECT GMAIL_ACCOUNT
+# homelab_backup.env All homelab service keys (radarr/sonarr/authentik/cloudflare/tailscale/etc.)
+# openclaw.env       BRAVE_API_KEY GEMINI_API_KEY OPENROUTER_API_KEY TELEGRAM_TOKEN_* HOMELAB_RPC_TOKEN
+# penny.env          OPENROUTER_API_KEY TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID
+# pypi.env           PYPI_API_TOKEN
+# research_keys.env  EXA_API_KEY APIFY_TOKEN TAVILY_API_KEY ZAI_API_KEY OPENAI_API_KEY SERPER_API_KEY WOLFRAM_APP_ID ARGUS_DB_URL CRON_SECRET
+# secrets.env        CLOUDFLARE_API_TOKEN CLOUDFLARE_ZONE_ID_* GITHUB_PAT DB_* JWT_SECRET EMAIL_* STRIPE_KEY REDIS_URL
+# services.env       PERPLEXITY_API_KEY DEEPSEEK_API_KEY GAMMA_API_KEY DROPBOX_ACCESS_TOKEN ATLAS_API_KEY POYTZ_API_KEY OPENROUTER_API_KEY TELEGRAM_BOT_TOKEN_*
+# skillsmp.env       SKILLSMP_API_KEY
+# ─────────────────────────────────────────────────────────────────────────────
+
 ONESHOT_VAULT="${ONESHOT_VAULT:-$HOME/github/oneshot/secrets}"
 AGE_KEY_FILE="${SOPS_AGE_KEY_FILE:-$HOME/.age/key.txt}"
 AGE_RECIPIENT="age1kwu32vl7x3tx7dqphzykcf5cahgm4ejztm865f22fkwe5j6hwalqh0rau8"
