@@ -18,10 +18,8 @@ providers:
       - "Plan expires 2026-05-02. Migrate lanes to opencode_go before then."
     models:
       glm_4_5_air:   { id: "glm-4.5-air",   role: cheap_fast }
-      glm_4_7:       { id: "glm-4.7",       role: cheap_summary }
-      glm_4_7_pro:   { id: "glm-4.7-pro",   role: routine_coder }
-      glm_5_1:       { id: "glm-5.1",       role: strong_reasoning }
-      glm_5_turbo:   { id: "glm-5-turbo",   role: premium_reasoning }
+      glm_5_1:       { id: "glm-5.1",       role: routine_coder }
+      glm_5_turbo:   { id: "glm-5-turbo",   role: strong_reasoning }
 
   opencode_go:
     enabled: false
@@ -89,7 +87,7 @@ lanes:
   cheap_summary:
     description: "Summaries, notes, extraction, low-risk transforms."
     current_provider: zai
-    current_model: glm_4_7
+    current_model: glm_4_5_air
     future_provider: opencode_go
     future_model: qwen_3_5_plus
     max_diff_lines: 100
@@ -99,7 +97,7 @@ lanes:
   routine_coder:
     description: "Normal bounded implementation and tests. Default lane."
     current_provider: zai
-    current_model: glm_4_7_pro
+    current_model: glm_5_1
     future_provider: opencode_go
     future_model: minimax_m2_7
     max_diff_lines: 500
@@ -109,7 +107,7 @@ lanes:
   strong_reasoning:
     description: "Harder refactors, ambiguous failures, cross-file reasoning."
     current_provider: zai
-    current_model: glm_5_1
+    current_model: glm_5_turbo
     future_provider: opencode_go
     future_model: kimi_k2_6
     max_diff_lines: 800
@@ -117,7 +115,7 @@ lanes:
     allow_architecture_changes: true
 
   premium_reasoning:
-    description: "Use sparingly. Failed worker recovery or design-sensitive changes."
+    description: "Escalation only. Failed worker recovery or design-sensitive changes."
     current_provider: zai
     current_model: glm_5_turbo
     future_provider: opencode_go
@@ -145,24 +143,19 @@ lanes:
 # {auth_env}      -> NAME of the env var (never the value). The runner sets the
 #                    env var from `secrets get` or the shell at invocation time.
 #
-# IMPORTANT: in the MVP these are dry-run templates. dispatch writes the
-# rendered command into worker.log; it does NOT execute it. Real runner
-# execution lands in a follow-up milestone.
 # ---------------------------------------------------------------------------
 runner_templates:
   zai:
-    command: "opencode run --format json -m zai-coding-plan/{model_id} -f {task_file} --dir {worktree_path} 'Execute the task described in the attached file. Make changes in the current directory.'"
+    command: "claude -p --dangerously-skip-permissions --model {model_id} \"$(cat {task_file})\""
     cwd: "{worktree_path}"
     auth_env: ZAI_API_KEY
-    requires:
-      - "OpenCode CLI installed"
-      - "ZAI provider configured in opencode.json"
-  zai_claude_cli:
-    # One-week fallback for the remaining ZAI plan if OpenCode-with-ZAI isn't wired up.
-    # Renders ${ZAI_API_KEY} as a shell variable reference; the value is never written.
-    command: 'ANTHROPIC_AUTH_TOKEN="${ZAI_API_KEY}" ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic claude --print --dangerously-skip-permissions --model {model_id} --prompt-file {task_file}'
-    cwd: "{worktree_path}"
-    auth_env: ZAI_API_KEY
+    env:
+      ANTHROPIC_BASE_URL: "https://api.z.ai/api/anthropic"
+      ANTHROPIC_AUTH_TOKEN: "{auth_value}"
+      ANTHROPIC_API_KEY: ""
+    notes:
+      - "Uses ANTHROPIC_AUTH_TOKEN (not API_KEY) for ZAI proxy auth"
+      - "claude -p gives full tool access with --dangerously-skip-permissions"
   opencode_go:
     command: "opencode run --model opencode-go/{model_id} --prompt-file {task_file}"
     cwd: "{worktree_path}"

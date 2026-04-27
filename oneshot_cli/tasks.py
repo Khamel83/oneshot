@@ -159,34 +159,32 @@ def dispatch(
         f"Model: {model_id}\n"
         f"Base SHA: {base_sha}\n"
         f"Worktree: {wp}\n\n"
-        "You are executing a bounded task in an isolated git worktree.\n"
-        "Make your changes in the worktree. Do not modify files outside it.\n"
-        "Write a summary of your changes to result.md in the task directory.\n\n"
+        "You are a code implementation worker. Your job is to make the changes described below.\n"
+        "Read the relevant files, edit them, and commit your changes. Do not plan or delegate — just do it.\n\n"
         "---\n\n"
     )
     _write_file(task_id, "worker.md", preamble + task_md)
 
-    # Resolve runner template and write dry-run command to worker.log
+    # Resolve runner template
     if runner is None:
         runner = provider_key
     tmpl = get_runner_template(cfg, runner)
 
     task_file_path = str(wp / "worker.md")
-    command = tmpl["command"].format(
-        model_id=model_id,
-        task_file=task_file_path,
-        worktree_path=str(wp),
-    )
-    cwd_path = tmpl.get("cwd", str(wp)).format(worktree_path=str(wp))
 
-    # Copy worker.md into the worktree so the runner can find it via -f
+    # Copy worker.md into the worktree so the runner can find it
     import shutil
     wt_worker_md = wp / "worker.md"
     shutil.copy2(task_dir(task_id) / "worker.md", wt_worker_md)
 
-    # Resolve auth env var
+    # Remove AGENTS.md from the worktree so the model acts as a worker, not orchestrator
+    agents_md = wp / "AGENTS.md"
+    if agents_md.exists():
+        agents_md.unlink()
+
+    # Resolve auth BEFORE formatting command (template may reference {auth_value})
     auth_env_name = tmpl.get("auth_env")
-    run_env = None
+    auth_val = None
     if auth_env_name:
         auth_val = os.environ.get(auth_env_name)
         if not auth_val:
@@ -197,8 +195,24 @@ def dispatch(
                 ).strip()
             except (subprocess.CalledProcessError, FileNotFoundError):
                 pass
-        if auth_val:
-            run_env = {**os.environ, auth_env_name: auth_val}
+
+    # Format command and cwd with all available variables
+    fmt_kwargs = dict(
+        model_id=model_id,
+        task_file=task_file_path,
+        worktree_path=str(wp),
+        auth_value=auth_val or "",
+    )
+    command = tmpl["command"].format(**fmt_kwargs)
+    cwd_path = tmpl.get("cwd", str(wp)).format(**fmt_kwargs)
+
+    # Build env dict
+    extra_env = tmpl.get("env", {})
+    run_env = {**os.environ}
+    if auth_val and auth_env_name:
+        run_env[auth_env_name] = auth_val
+    for key, val in extra_env.items():
+        run_env[key] = val.format(**fmt_kwargs) if isinstance(val, str) and "{" in val else val
 
     # Execute the runner
     log_lines = [
