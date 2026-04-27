@@ -177,24 +177,72 @@ def dispatch(
         task_file=task_file_path,
         worktree_path=str(wp),
     )
-    cwd_note = tmpl.get("cwd", str(wp)).format(worktree_path=str(wp))
+    cwd_path = tmpl.get("cwd", str(wp)).format(worktree_path=str(wp))
 
-    log_content = (
-        f"# Dry-run command (MVP — not executed)\n\n"
-        f"Runner: {runner}\n"
-        f"Command: {command}\n"
-        f"CWD: {cwd_note}\n"
-    )
-    _write_file(task_id, "worker.log", log_content)
+    # Copy worker.md into the worktree so the runner can find it via -f
+    import shutil
+    wt_worker_md = wp / "worker.md"
+    shutil.copy2(task_dir(task_id) / "worker.md", wt_worker_md)
+
+    # Resolve auth env var
+    auth_env_name = tmpl.get("auth_env")
+    run_env = None
+    if auth_env_name:
+        auth_val = os.environ.get(auth_env_name)
+        if not auth_val:
+            try:
+                auth_val = subprocess.check_output(
+                    ["secrets", "get", auth_env_name],
+                    text=True, stderr=subprocess.DEVNULL,
+                ).strip()
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                pass
+        if auth_val:
+            run_env = {**os.environ, auth_env_name: auth_val}
+
+    # Execute the runner
+    log_lines = [
+        f"# Runner execution\n",
+        f"Runner: {runner}\n",
+        f"Command: {command}\n",
+        f"CWD: {cwd_path}\n",
+        f"Auth env: {auth_env_name or '(none)'}\n",
+        "",
+    ]
 
     print(f"Dispatched task: {task_id}")
     print(f"  Lane:       {lane}")
     print(f"  Provider:   {provider_key}/{model_id}")
     print(f"  Worktree:   {wp}")
     print(f"  Branch:     {branch_name(task_id)}")
+    print(f"  Running...")
+
+    try:
+        result = subprocess.run(
+            command, shell=True, cwd=cwd_path, env=run_env,
+            capture_output=True, text=True, timeout=600,
+        )
+        log_lines.append(f"Exit code: {result.returncode}\n")
+        log_lines.append(f"\n--- stdout ---\n{result.stdout}\n")
+        if result.stderr:
+            log_lines.append(f"\n--- stderr ---\n{result.stderr}\n")
+
+        status_data["status"] = "completed" if result.returncode == 0 else "failed"
+    except subprocess.TimeoutExpired:
+        log_lines.append("Timeout: killed after 600s\n")
+        status_data["status"] = "timeout"
+    except Exception as e:
+        log_lines.append(f"Error: {e}\n")
+        status_data["status"] = "error"
+
+    _write_file(task_id, "worker.log", "".join(log_lines))
+    status_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    _write_status(task_id, status_data)
+
+    print(f"  Status:     {status_data['status']}")
     print()
     print(f"Next: ./bin/oneshot status {task_id}")
-    print(f"      ./bin/oneshot review {task_id}  (after worktree changes)")
+    print(f"      ./bin/oneshot collect {task_id}")
 
     return task_id
 
