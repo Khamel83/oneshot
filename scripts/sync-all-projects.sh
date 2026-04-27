@@ -139,7 +139,10 @@ log "oneshot sync $(date '+%Y-%m-%d %H:%M')"
 $DRY_RUN && log "  [DRY RUN]"
 
 # Auto-discover projects with .claude/ dirs (top-level only)
-mapfile -t PROJECTS < <(
+PROJECTS=()
+while IFS= read -r d; do
+  PROJECTS+=("$d")
+done < <(
   for d in "$GITHUB_DIR"/*/; do
     [ -d "$d/.claude" ] && echo "$d"
   done 2>/dev/null | sort
