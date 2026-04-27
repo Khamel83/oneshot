@@ -67,6 +67,7 @@ Full services catalog: `~/github/homelab/docs/SERVICES.md`
 ## Tool-Specific (Claude Code)
 See @.claude/rules/khamel-mode.md
 See @.claude/rules/codex.md
+- For code-change requests, dispatch via /dispatch — see @.claude/rules/delegation-enforcement.md
 
 ## Project Intelligence
 Need to understand what's been happening? Start here:
