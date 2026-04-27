@@ -1,33 +1,33 @@
 {
   "decisions": [
     {
-      "what": "Created systemd user service and timer for janitor",
-      "why": "To automate periodic execution of janitor tasks"
+      "what": "Created systemd user service and timer for janitor-cron",
+      "why": "to schedule automated cleanup tasks via systemd timer"
     },
     {
-      "what": "Made janitor-cron.sh executable and ran it",
-      "why": "To verify the script works and can be scheduled"
+      "what": "Edited janitor-cron.sh script and made it executable",
+      "why": "to ensure the script can be run by systemd and incorporate necessary logic"
     },
     {
-      "what": "Performed curl check against Argus MCP endpoints",
-      "why": "To confirm the service is reachable and functional"
+      "what": "Used curl to check Argus MCP endpoints and python router resolve to verify functionality",
+      "why": "to validate that required services are reachable and classes resolvable before proceeding"
     },
     {
-      "what": "Ran git diff and git ls-files to inspect changes",
-      "why": "To understand what files have been modified or are untracked"
-    },
-    {
-      "what": "Created STATE.md to capture project state",
-      "why": "To document current status for future reference"
+      "what": "Ran git diff and git ls-files to monitor repository changes and untracked files",
+      "why": "to track modifications and identify any new files that may need attention"
     }
   ],
-  "blockers": [],
+  "blockers": [
+    {
+      "what": "Unclear if Argus service is running; curl command may fail if endpoint not available",
+      "reason": "requires the service to be active, and its absence could block subsequent steps"
+    }
+  ],
   "discoveries": [
-    "janitor-cron.sh script exists and was executed successfully",
-    "systemd user service and timer were generated in ~/.config/systemd/user/",
-    "git diff showed modifications and untracked files were listed",
-    "opencode.json was read and later recreated, indicating configuration persistence",
-    "curl check returned HTTP response confirming Argus MCP endpoint availability",
-    "python router resolve command executed without error"
+    "Untracked files detected in repository via git ls-files",
+    "Router resolve command successfully returned output for implement_small",
+    "Janitor-cron.sh executed and produced log entries, indicating it runs",
+    "Systemd user service and timer were created successfully",
+    "STATE.md file created to capture current state"
   ]
 }

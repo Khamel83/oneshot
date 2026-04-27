@@ -189,5 +189,33 @@
       ],
       "category": "documentation"
     }
+  },
+  "6d0ed02df8a50ba0be2cb7d0348a41ae7d96fb9d": {
+    "hash": "6d0ed02df8a5",
+    "message": "chore: update janitor state and cache",
+    "enriched": {
+      "summary": "Updated janitor's state and cache files, adjusting various JSON and markdown files to reflect new state, pending tasks, and usage metrics.",
+      "tags": [
+        "janitor",
+        "state",
+        "cache",
+        "maintenance",
+        "chore"
+      ],
+      "category": "chore"
+    }
+  },
+  "04aa54809a9d36cc82214aa4c9f3c6dcc34a6d03": {
+    "hash": "04aa54809a9d",
+    "message": "docs: move active projects table to oneshot CLAUDE.md, trim global",
+    "enriched": {
+      "summary": "Moved the active projects table to CLAUDE.md and trimmed the global documentation.",
+      "tags": [
+        "documentation",
+        "refactor",
+        "cleanup"
+      ],
+      "category": "docs"
+    }
   }
 }
