@@ -1,4 +1,5 @@
 """Task IO, dispatch, status, collect, review, escalate."""
+
 from __future__ import annotations
 
 import json
@@ -10,7 +11,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from oneshot_cli.config import (
-    load_config, get_lane, resolve_provider_model, get_runner_template,
+    load_config,
+    get_lane,
+    resolve_provider_model,
+    get_runner_template,
 )
 from oneshot_cli.worktree import create, remove, worktree_path, branch_name
 
@@ -22,6 +26,7 @@ TASKS_DIR = REPO_ROOT / ".oneshot" / "tasks"
 # Task ID generation
 # ---------------------------------------------------------------------------
 
+
 def _generate_task_id(lane: str) -> str:
     now = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     rand4 = "".join(random.choices(string.ascii_lowercase + string.digits, k=4))
@@ -31,6 +36,7 @@ def _generate_task_id(lane: str) -> str:
 # ---------------------------------------------------------------------------
 # Task directory helpers
 # ---------------------------------------------------------------------------
+
 
 def task_dir(task_id: str) -> Path:
     return TASKS_DIR / task_id
@@ -65,14 +71,26 @@ def _write_file(task_id: str, name: str, content: str) -> None:
     p.write_text(content)
 
 
+def _redact_auth_value(
+    text: str, auth_env_name: str | None, auth_val: str | None
+) -> str:
+    if not text or not auth_env_name or not auth_val:
+        return text
+    return text.replace(auth_val, f"${auth_env_name}")
+
+
 # ---------------------------------------------------------------------------
 # Base SHA capture
 # ---------------------------------------------------------------------------
 
+
 def _get_base_sha() -> str:
     result = subprocess.run(
         ["git", "rev-parse", "HEAD"],
-        capture_output=True, text=True, check=True, cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=REPO_ROOT,
     )
     return result.stdout.strip()
 
@@ -81,10 +99,13 @@ def _get_base_sha() -> str:
 # Dirty tree check
 # ---------------------------------------------------------------------------
 
+
 def _is_tree_dirty() -> bool:
     result = subprocess.run(
         ["git", "status", "--porcelain"],
-        capture_output=True, text=True, cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
     )
     return bool(result.stdout.strip())
 
@@ -92,6 +113,7 @@ def _is_tree_dirty() -> bool:
 # ---------------------------------------------------------------------------
 # DISPATCH
 # ---------------------------------------------------------------------------
+
 
 def dispatch(
     lane: str,
@@ -174,6 +196,7 @@ def dispatch(
 
     # Copy worker.md into the worktree so the runner can find it
     import shutil
+
     wt_worker_md = wp / "worker.md"
     shutil.copy2(task_dir(task_id) / "worker.md", wt_worker_md)
 
@@ -191,7 +214,8 @@ def dispatch(
             try:
                 auth_val = subprocess.check_output(
                     ["secrets", "get", auth_env_name],
-                    text=True, stderr=subprocess.DEVNULL,
+                    text=True,
+                    stderr=subprocess.DEVNULL,
                 ).strip()
             except (subprocess.CalledProcessError, FileNotFoundError):
                 pass
@@ -212,13 +236,17 @@ def dispatch(
     if auth_val and auth_env_name:
         run_env[auth_env_name] = auth_val
     for key, val in extra_env.items():
-        run_env[key] = val.format(**fmt_kwargs) if isinstance(val, str) and "{" in val else val
+        run_env[key] = (
+            val.format(**fmt_kwargs) if isinstance(val, str) and "{" in val else val
+        )
 
     # Execute the runner
+    safe_command = _redact_auth_value(command, auth_env_name, auth_val)
+
     log_lines = [
         f"# Runner execution\n",
         f"Runner: {runner}\n",
-        f"Command: {command}\n",
+        f"Command: {safe_command}\n",
         f"CWD: {cwd_path}\n",
         f"Auth env: {auth_env_name or '(none)'}\n",
         "",
@@ -233,8 +261,13 @@ def dispatch(
 
     try:
         result = subprocess.run(
-            command, shell=True, cwd=cwd_path, env=run_env,
-            capture_output=True, text=True, timeout=600,
+            command,
+            shell=True,
+            cwd=cwd_path,
+            env=run_env,
+            capture_output=True,
+            text=True,
+            timeout=600,
         )
         log_lines.append(f"Exit code: {result.returncode}\n")
         log_lines.append(f"\n--- stdout ---\n{result.stdout}\n")
@@ -264,6 +297,7 @@ def dispatch(
 # ---------------------------------------------------------------------------
 # STATUS
 # ---------------------------------------------------------------------------
+
 
 def status(task_id: str | None = None) -> None:
     if task_id:
@@ -306,6 +340,7 @@ def _print_single_status(task_id: str) -> None:
 # COLLECT
 # ---------------------------------------------------------------------------
 
+
 def collect(task_id: str) -> None:
     if not _task_exists(task_id):
         raise SystemExit(f"Task not found: {task_id}")
@@ -320,21 +355,28 @@ def collect(task_id: str) -> None:
     # Get head SHA from worktree
     result = subprocess.run(
         ["git", "rev-parse", "HEAD"],
-        capture_output=True, text=True, check=True, cwd=wp,
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=wp,
     )
     head_sha = result.stdout.strip()
 
     # Generate diff.patch
     diff_result = subprocess.run(
         ["git", "diff", f"{base_sha}..{head_sha}"],
-        capture_output=True, text=True, cwd=wp,
+        capture_output=True,
+        text=True,
+        cwd=wp,
     )
     _write_file(task_id, "diff.patch", diff_result.stdout)
 
     # Get changed files list
     name_status = subprocess.run(
         ["git", "diff", f"{base_sha}..{head_sha}", "--name-status"],
-        capture_output=True, text=True, cwd=wp,
+        capture_output=True,
+        text=True,
+        cwd=wp,
     )
 
     # Run test command if configured
@@ -342,7 +384,11 @@ def collect(task_id: str) -> None:
     test_cmd = cfg.get("verification", {}).get("test_command")
     if test_cmd:
         test_result = subprocess.run(
-            test_cmd, shell=True, capture_output=True, text=True, cwd=wp,
+            test_cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            cwd=wp,
         )
         test_log = f"Exit code: {test_result.returncode}\n\n{test_result.stdout}\n{test_result.stderr}"
     else:
@@ -372,13 +418,16 @@ def collect(task_id: str) -> None:
     _write_status(task_id, s)
 
     print(f"Collected {task_id}")
-    print(f"  Changed files: {len(name_status.stdout.strip().splitlines()) if name_status.stdout.strip() else 0}")
+    print(
+        f"  Changed files: {len(name_status.stdout.strip().splitlines()) if name_status.stdout.strip() else 0}"
+    )
     print(f"  Next: ./bin/oneshot review {task_id}")
 
 
 # ---------------------------------------------------------------------------
 # REVIEW
 # ---------------------------------------------------------------------------
+
 
 def review(task_id: str) -> None:
     if not _task_exists(task_id):
@@ -399,12 +448,15 @@ def review(task_id: str) -> None:
         print(f"  {path}{marker}")
 
     if not (td / "result.md").exists():
-        print(f"\nTask has not been collected yet. Run: ./bin/oneshot collect {task_id}")
+        print(
+            f"\nTask has not been collected yet. Run: ./bin/oneshot collect {task_id}"
+        )
 
 
 # ---------------------------------------------------------------------------
 # ESCALATE
 # ---------------------------------------------------------------------------
+
 
 def escalate(task_id: str, new_lane: str) -> str:
     if not _task_exists(task_id):
@@ -462,6 +514,8 @@ def escalate(task_id: str, new_lane: str) -> str:
     print(f"Created escalation task: {new_id}")
     print(f"  From: {task_id} ({parent_status['lane']})")
     print(f"  To:   {new_lane}")
-    print(f"  Next: ./bin/oneshot dispatch --lane {new_lane} --task-file {td / 'task.md'}")
+    print(
+        f"  Next: ./bin/oneshot dispatch --lane {new_lane} --task-file {td / 'task.md'}"
+    )
 
     return new_id

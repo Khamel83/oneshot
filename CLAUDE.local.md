@@ -3,51 +3,56 @@
 
 ## Tasks
 
-1. **[high]** Add tests for core/janitor/jobs.py
+1. **[high]** Add tests for oneshot_cli/__main__.py
 
-2. **[high]** Add tests for core/janitor/recorder.py
+2. **[high]** Add tests for oneshot_cli/dispatch_cmd.py
 
-3. **[high]** Add tests for core/janitor/worker.py
+3. **[high]** Add tests for oneshot_cli/tasks.py
 
-4. **[high]** Add tests for core/task_schema.py
+4. **[medium]** Refactor generate_onboarding in core/janitor/jobs.py (242 lines)
 
-5. **[medium]** Refactor generate_onboarding in core/janitor/jobs.py (242 lines)
+5. **[medium]** Refactor run_session_start in core/janitor/jobs.py (202 lines)
 
-6. **[medium]** Refactor run_session_start in core/janitor/jobs.py (202 lines)
+6. **[medium]** Split core/janitor/jobs.py (1834 lines) into smaller modules
 
-7. **[medium]** Split core/janitor/jobs.py (1834 lines) into smaller modules
+7. **[low]** Add a second contributor to .claude/skills/conduct/SKILL.md (sole author: Test User, 9 edits)
 
-8. **[low]** Add a second contributor to .claude/skills/conduct/SKILL.md (sole author: Test User, 9 edits)
+8. **[low]** Add a second contributor to .claude/skills/full/SKILL.md (sole author: Test User, 9 edits)
 
-9. **[low]** Add a second contributor to .claude/skills/full/SKILL.md (sole author: Test User, 9 edits)
+9. **[low]** Add a second contributor to .claude/skills/_shared/providers.md (sole author: Test User, 8 edits)
 
-10. **[low]** Add a second contributor to .claude/skills/_shared/providers.md (sole author: Test User, 8 edits)
+10. **[low]** Add a second contributor to .claude/skills/short/SKILL.md (sole author: Test User, 7 edits)
 
-11. **[low]** Add a second contributor to .claude/skills/short/SKILL.md (sole author: Test User, 7 edits)
+11. **[low]** Add a second contributor to .claude/skills/_shared/dispatch.md (sole author: Test User, 5 edits)
 
-12. **[low]** Add a second contributor to .claude/skills/_shared/dispatch.md (sole author: Test User, 5 edits)
+12. **[low]** Add frontmatter to 6 research docs: docs/research/2026-03-27_multi-tenant_platforms_research.md, docs/research/background-intelligence/research.md, docs/research/claude-code-non-anthropic-models/research.md (+3 more)
 
-13. **[low]** Add frontmatter to 6 research docs: docs/research/2026-03-27_multi-tenant_platforms_research.md, docs/research/background-intelligence/research.md, docs/research/claude-code-non-anthropic-models/research.md (+3 more)
+13. **[low]** Update docs/public-access.md — 101 days stale
 
-14. **[low]** Update docs/public-access.md — 84 days stale
+14. **[low]** Update docs/sessions/README.md — 78 days stale
+
+15. **[low]** Update .sops.yaml — 74 days stale
 # Project Status  
-Oneshot is a Python package with extensive core logic but suffers from several test coverage gaps and a few very large modules that hinder maintainability.
+The codebase is functional (≈800 events, 0 blockers) but suffers from several maintainability issues: huge monolithic files, stale documentation, and a drifted worker configuration.
 
 # Recent Activity  
-The most recent edits touched core/janitor/jobs.py (large function additions), core/janitor/recorder.py, core/janitor/worker.py, and core/task_schema.py (all flagged as test gaps). Documentation updates were made to .claude/skills/update/SKILL.md (3 edits) and docs/instructions/search.md (2 edits).
+- `oneshot_cli/doctor_cmd.py` and its tests `tests/test_doctor.py` were edited repeatedly (3 recent test runs).  
+- Documentation `docs/MACHINE_READINESS.md` was updated (3 edits).  
+- Model config `.oneshot/config/models.yaml` was touched 3 times by “Test User”.  
+- Janitor metadata files `.janitor/commit-enrichments.json`, `.janitor/last-summary.json`, `.janitor/pending-tasks.md` each received 3 edits (unknown author).
 
 # Attention Items  
-1. **Test Gaps (4 files)** – core/janitor/jobs.py, core/janitor/recorder.py, core/janitor/worker.py, core/task_schema.py have no associated tests.  
-2. **Knowledge Risk (3 files)** – .claude/skills/conduct/SKILL.md (9 edits, single author), .claude/skills/full/SKILL.md (9 edits, single author), .claude/skills/_shared/providers.md (8 edits, single author) are sole‑contributor and could become single points of failure.  
-3. **Oversized Files** – core/janitor/jobs.py is 1,834 lines; core/dispatch/run.py is 675 lines; core/janitor/jobs.py functions generate_onboarding (242 lines), run_session_start (202 lines), evaluate_task_sufficiency (166 lines) are each >150 lines, indicating high complexity.  
-4. **Doc Staleness** – archive/v7-high-token/README.md and docs/public-access.md have not been updated in 84 days.
+1. **Test gaps (high urgency)** – missing tests for `oneshot_cli/__main__.py`, `oneshot_cli/dispatch_cmd.py`, `oneshot_cli/tasks.py`.  
+2. **Knowledge risk (high urgency)** – sole‑author skill docs: `.claude/skills/conduct/SKILL.md` (9 edits by Test User) and `.claude/skills/full/SKILL.md` (9 edits by Test User); also `.claude/skills/_shared/providers.md` (8 edits by Test User).  
+3. **Oversized files (medium urgency)** – `core/janitor/jobs.py` (1,834 lines), `core/dispatch/run.py` (675 lines), `oneshot_cli/tasks.py` (522 lines), plus large functions: `core/janitor/jobs.py:generate_onboarding` (242 lines) and `core/janitor/jobs.py:run_session_start` (202 lines), `oneshot_cli/tasks.py:_is_tree_dirty` (199 lines).  
+4. **Config drift (medium urgency)** – `config/workers.yaml` diverges from expected defaults.
 
 # Recommended Next Steps  
-1. Add unit tests for core/janitor/jobs.py, core/janitor/recorder.py, core/janitor/worker.py, and core/task_schema.py (target ≥80% coverage).  
-2. Refactor core/janitor/jobs.py: split generate_onboarding, run_session_start, and evaluate_task_sufficiency into smaller helper modules (e.g., core/janitor/onboarding.py, core/janitor/session.py).  
-3. Review and duplicate knowledge for .claude/skills/conduct/SKILL.md, .claude/skills/full/SKILL.md, and .claude/skills/_shared/providers.md by adding a second reviewer or extracting key logic into shared libraries.  
-4. Trim core/dispatch/run.py by extracting helper functions into core/dispatch/helpers.py to reduce the 675‑line file.  
-5. Update archive/v7-high-token/README.md and docs/public-access.md to reflect current usage and APIs.
+1. Add unit tests for the three uncovered modules: create tests targeting `oneshot_cli/__main__.py`, `oneshot_cli/dispatch_cmd.py`, and `oneshot_cli/tasks.py`.  
+2. Conduct a knowledge‑transfer audit of the three sole‑author skill files; copy critical content to shared docs and add at least one reviewer to each (`.claude/skills/conduct/SKILL.md`, `.claude/skills/full/SKILL.md`, `.claude/skills/_shared/providers.md`).  
+3. Refactor the largest files: split `core/janitor/jobs.py` into logical sub‑modules (e.g., separate onboarding, session start, and cleanup), break `core/dispatch/run.py` into smaller helpers, and extract the 200+‑line functions in `core/janitor/jobs.py` and `oneshot_cli/tasks.py` into their own modules.  
+4. Align `config/workers.yaml` with the canonical configuration (run the config‑drift checker, commit the corrected file).  
+5. After refactoring, re‑run the test suite to ensure no regressions and update documentation links that may have been broken by file moves.
 
 ## Project Intelligence Sources
 

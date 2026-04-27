@@ -1,4 +1,4 @@
-# ONE_SHOT — Orchestration Control Plane for Claude Code
+# ONE_SHOT — Orchestration Control Plane for Claude Code and OpenCode
 
 **v14.3** | Claude plans. Workers execute. Argus searches. Janitor runs in the background.
 
@@ -6,10 +6,11 @@
 
 ## What It Is
 
-ONE_SHOT is a **Claude Code operator framework** — a set of skills, routing policies, and background intelligence that turns Claude Code into a multi-model orchestration system.
+ONE_SHOT is an operator framework centered on Claude Code, with OpenCode-backed delegation support in the harness layer. It combines skills, routing policies, and background intelligence into a multi-model orchestration system.
 
 - **Claude Code** is the planner and reviewer (never the doer for bounded tasks)
 - **Codex, Gemini CLI, GLM** are the workers (parallel execution, structured output)
+- **OpenCode-backed runners** are supported through `.oneshot/config/models.yaml` and `oneshot_cli/`
 - **Lane-based routing** (`config/lanes.yaml`) drives task dispatch by class and category
 - **Argus** is the search plane (SearXNG + Brave + Exa, running on homelab)
 - **Janitor** is background intelligence ($0, always on, runs via `openrouter/free`)
@@ -33,6 +34,12 @@ Installs skills to `~/.claude/skills/`, update command to `~/.local/bin/`, and w
 ```bash
 oneshot-update        # auto-update if newer version found
 oneshot-update force  # force now
+```
+
+**Readiness:**
+```bash
+./bin/oneshot doctor          # check this machine
+./bin/oneshot doctor --all-machines
 ```
 
 ---
@@ -89,9 +96,12 @@ Auto-expiry: `glm_claude` checks `plan_expires` from `config/workers.yaml` and s
 ```bash
 shot "task"    # auto-route: GLM free → OpenRouter fallback
 zai            # force GLM-5-turbo (free)
+oc             # local OpenCode wrapper, if present on this machine
 or             # force OpenRouter model
 or --code      # force Qwen3-Coder (free on OpenRouter)
 ```
+
+`oneshot doctor` checks whether the local `oc` launcher exists, but `install.sh` does not create that wrapper for you.
 
 ---
 

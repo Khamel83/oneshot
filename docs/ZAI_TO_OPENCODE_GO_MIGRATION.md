@@ -10,7 +10,7 @@ The harness currently routes all lanes through **ZAI** (GLM models) via OpenCode
 
 - **Cost:** $12/5h, $30/week, $60/month — predictable and cheap
 - **Model diversity:** DeepSeek, Qwen, MiniMax, Kimi — different strengths for different lanes
-- **Same runner shape:** `opencode run --model opencode-go/<model>` — identical invocation to ZAI
+- **Same runner shape:** `opencode run --model <resolved-model-id>` — identical invocation style across OpenCode-backed providers
 - **Rate limits:** Managed by OpenCode platform, not per-provider
 
 ## Migration Steps

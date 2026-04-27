@@ -1,7 +1,7 @@
 """Click entry point for oneshot CLI."""
 import click
 
-from oneshot_cli import lanes_cmd, dispatch_cmd, status_cmd, collect_cmd, review_cmd, escalate_cmd
+from oneshot_cli import lanes_cmd, dispatch_cmd, status_cmd, collect_cmd, review_cmd, escalate_cmd, doctor_cmd
 
 
 @click.group()
@@ -16,6 +16,7 @@ cli.add_command(status_cmd.cli, name="status")
 cli.add_command(collect_cmd.cli, name="collect")
 cli.add_command(review_cmd.cli, name="review")
 cli.add_command(escalate_cmd.cli, name="escalate")
+cli.add_command(doctor_cmd.cli, name="doctor")
 
 
 @cli.group()

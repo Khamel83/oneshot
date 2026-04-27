@@ -46,6 +46,7 @@ Git worktrees provide **filesystem-level isolation** between the planner (Claude
 - Pre-flight: checks `git status --porcelain` is empty (unless `--allow-dirty`)
 - Creates `../oneshot-worktrees/<id>` via `git worktree add`
 - Writes `task.md`, `status.json`, `worker.md`, `worker.log`
+- Resolves the selected runner template and executes it immediately in the worktree
 - Branch: `worker/<id>` from current HEAD
 
 ### 2. Work (worker)
@@ -95,6 +96,8 @@ Error: main working tree is dirty; use --allow-dirty to override
 
 This prevents dispatching from an inconsistent state. Use `--allow-dirty` only when you're sure the uncommitted changes are unrelated to the task.
 
-## MVP Note
+## Execution Note
 
-In the MVP, workers don't run automatically. The `worker.log` file contains the **dry-run command** that would be executed. To test the full flow, manually make changes in the worktree and run `collect` + `review`.
+Dispatch is a live runner, not a dry-run. The worker command is executed immediately in the worktree and `worker.log` captures the execution transcript, including the exit code and stdout/stderr.
+
+If you want to inspect or reproduce the run manually, use the task's recorded worktree path and branch from `status.json`.

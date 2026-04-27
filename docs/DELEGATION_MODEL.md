@@ -25,8 +25,9 @@ Even if Claude "helpfully" writes code for the worker, the runner still operates
 1. Claude writes a bounded task spec
 2. ./bin/oneshot dispatch --lane <lane> --task-file <spec>
    → Creates task dir, worktree, renders worker.md
-   → Writes dry-run command to worker.log (MVP)
-3. Worker executes in the worktree (future: live runner)
+   → Resolves a runner template and executes it in the worktree
+   → Captures command metadata and stdout/stderr in worker.log
+3. Worker executes in the worktree on the task branch
 4. ./bin/oneshot collect <id>
    → Gathers diff.patch, result.md, test.log
 5. ./bin/oneshot review <id>
@@ -50,7 +51,7 @@ These are the only exceptions to the dispatch-first rule:
 
 1. **Pure planning/review/research** — no code changes.
 2. **User override** — "just do it inline" / "skip dispatch".
-3. **Harness bootstrap** — changes to `oneshot_cli/`, `.oneshot/config/`, `.claude/commands/`, enforcement rule, harness docs.
+3. **Harness bootstrap** — changes to `oneshot_cli/`, `.oneshot/config/`, `.claude/skills/`, `1shot/`, enforcement rule, harness docs.
 4. **Minor review fixes** — typo in `result.md`, status updates. Not rewriting worker code.
 
 ## Cost Philosophy

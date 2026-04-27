@@ -30,27 +30,27 @@ pre_managed=$(awk '/# === OMAR SSH ALIASES \(managed\) ===/{exit} /^Host /{print
 # Check for conflicts
 conflicts=""
 for host in $new_hosts; do
-  if echo "$pre_managed" | grep -qx "$host"; then
-    conflicts="$conflicts  - $host\n"
-  fi
+	if echo "$pre_managed" | grep -qx "$host"; then
+		conflicts="$conflicts  - $host\n"
+	fi
 done
 
 if [ -n "$conflicts" ]; then
-  echo "⚠️  WARNING: Duplicate SSH aliases found in your config:"
-  echo -e "$conflicts"
-  echo ""
-  echo "You have manual entries that conflict with the managed aliases."
-  echo ""
-  echo "Options:"
-  echo "  1) Cancel and clean up manually (nano ~/.ssh/config)"
-  echo "  2) Proceed anyway (managed block will shadow manual entries)"
-  echo ""
-  read -p "Proceed? [y/N] " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Cancelled. Backup saved at $CFG.bak.$(date +%F_%H%M%S)"
-    exit 1
-  fi
+	echo "⚠️  WARNING: Duplicate SSH aliases found in your config:"
+	echo -e "$conflicts"
+	echo ""
+	echo "You have manual entries that conflict with the managed aliases."
+	echo ""
+	echo "Options:"
+	echo "  1) Cancel and clean up manually (nano ~/.ssh/config)"
+	echo "  2) Proceed anyway (managed block will shadow manual entries)"
+	echo ""
+	read -p "Proceed? [y/N] " -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		echo "Cancelled. Backup saved at $CFG.bak.$(date +%F_%H%M%S)"
+		exit 1
+	fi
 fi
 
 # === APPLY CHANGES ===
@@ -60,10 +60,10 @@ perl -0777 -i -pe '
   s/\n{3,}/\n\n/g;
 ' "$CFG"
 
-printf "\n%s\n" "$(cat "$tmp")" >> "$CFG"
+printf "\n%s\n" "$(cat "$tmp")" >>"$CFG"
 
 # Basic sanity display (won't fail if ssh -G unsupported)
-ssh -G oci 2>/dev/null | egrep 'hostname|user|identityfile' | head -n 10 || true
+ssh -G oci 2>/dev/null | grep -E 'hostname|user|identityfile' | head -n 10 || true
 
 echo "OK: SSH aliases installed/updated from $CONF_URL"
 echo "Try: ssh oci | ssh oci-ts | ssh homelab | ssh homelab-ts | ssh macmini | ssh macmini-ts"

@@ -2,6 +2,8 @@
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
+| [20260427_132406__command-name__clear__command-name_.md.age](20260427_132406__command-name__clear__command-name_.md.age) | 2026-04-27 13:24:06 | <command-name>/clear</command-name> | add, age, api, auth, bug, config, encrypt, fix, go, install, oci, python, remove, rust, test |
+| [20260427_125247_Done__The_plan_is_now_decomposed_and_parked__ready.md.age](20260427_125247_Done__The_plan_is_now_decomposed_and_parked__ready.md.age) | 2026-04-27 12:52:47 | Done. The plan is now decomposed and parked, ready... | add, age, api, auth, bug, build, config, fix, go, implement, migration, python, rust, session, sops, test, update |
 | [20260424_102222_how_do_i_update_an_existing_project_with_an_update.md.age](20260424_102222_how_do_i_update_an_existing_project_with_an_update.md.age) | 2026-04-24 10:22:22 | how do i update an existing project with an update... | add, age, bug, deploy, kubernetes, oci, update |
 | [20260407_145739__command-message_conduct__command-message_.md.age](20260407_145739__command-message_conduct__command-message_.md.age) | 2026-04-07 14:57:39 | <command-message>conduct</command-message> | age, build, go |
 | [20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age](20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age) | 2026-04-06 11:43:45 | So we added back in janitor here. I just want to m... | add, age, refactor, session, update |

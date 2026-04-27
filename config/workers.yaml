@@ -6,19 +6,19 @@ workers:
     harness: claude_code
 
   oci:
-    host: oci-dev
+    host: oci-ts
     transport: ssh
     role: planner
     harness: claude_code
 
   macmini:
-    host: macmini
+    host: macmini-ts
     transport: ssh
     role: worker
     harness: opencode
 
   homelab:
-    host: homelab
+    host: homelab-ts
     transport: ssh
     role: worker
     harness: opencode

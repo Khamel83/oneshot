@@ -19,6 +19,15 @@ oneshot-update force  # Force update now
 oneshot-update status # Show version and last check
 ```
 
+## Readiness
+
+```bash
+./bin/oneshot doctor
+./bin/oneshot doctor --all-machines
+```
+
+This verifies the local CLI toolchain, auth state, secrets access, and whether an `oc` launcher wrapper exists on the current machine.
+
 ## Skills (10 + 1 external)
 
 | Skill | What it does |
@@ -40,6 +49,12 @@ oneshot-update status # Show version and last check
 claude .          # Open Claude Code
 /short            # Load context, ask what's next, burn down tasks
 /handoff          # Save context before ending
+```
+
+If you already use the local OpenCode wrapper on your machine:
+
+```bash
+oc                # Launch OpenCode with your local wrapper defaults
 ```
 
 ## What Gets Installed

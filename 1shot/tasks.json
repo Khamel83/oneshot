@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "1",
+      "subject": "Normalize /conduct workspace files for Plan L",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-27T22:07:11Z",
+      "updated": "2026-04-27T22:07:28Z",
+      "blocked_by": []
+    },
+    {
+      "id": "2",
+      "subject": "Fix dispatch contract drift across CLI help, implementation, and tests",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-27T22:07:11Z",
+      "updated": "2026-04-27T22:09:28Z",
+      "blocked_by": []
+    },
+    {
+      "id": "3",
+      "subject": "Improve doctor reliability and add OpenCode launcher coverage",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-27T22:07:11Z",
+      "updated": "2026-04-27T22:12:45Z",
+      "blocked_by": []
+    },
+    {
+      "id": "4",
+      "subject": "Harden secret-safe runner logging and OpenCode model semantics",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-27T22:07:11Z",
+      "updated": "2026-04-27T22:12:45Z",
+      "blocked_by": []
+    },
+    {
+      "id": "5",
+      "subject": "Align operator docs with actual harness behavior",
+      "description": "",
+      "status": "done",
+      "priority": "medium",
+      "created": "2026-04-27T22:07:11Z",
+      "updated": "2026-04-27T22:14:03Z",
+      "blocked_by": []
+    },
+    {
+      "id": "6",
+      "subject": "Run full validation matrix and publish A/B/C summary",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-27T22:07:11Z",
+      "updated": "2026-04-27T22:16:37Z",
+      "blocked_by": []
+    }
+  ]
+}

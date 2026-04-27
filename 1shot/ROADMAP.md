@@ -1,54 +1,115 @@
-# OpenCode Adapter — Roadmap
+# Plan L Roadmap
 
-**Date**: 2026-04-07
-**Plan**: `1shot/OPENCODE_ADAPTER_PLAN.md`
+**Date**: 2026-04-27
+**Execution mode**: `/conduct`
+**Objective**: make the delegation harness deterministic enough to trust and farm out
 
-## Execution Order
+## Deterministic Phase Plan
 
-Based on Codex review corrections: config/agents before commands, providers first.
+### Phase 0: Intake Lock
+- Rewrite stale `1shot` artifacts for the current pass
+- Capture user answers, scope, risk, and acceptance criteria in `PROJECT.md`
+- Capture current execution state in `STATE.md`
+- Seed persistent task ledger (`1shot/tasks.json` via `scripts/tasks.py`)
+- Exit criteria:
+  - current `1shot` files reflect this pass
+  - task list exists and is classifiable
 
-### Phase 0: Provider + Config Bootstrap
-- 0A: Add openrouter/openai/google providers to opencode.json
-- 0B: Fix AGENTS.md reference (direct path, not indirection)
-- 0C: Smoke test — verify providers respond
+### Phase 1: Correctness First
+- Fix dispatch contract drift:
+  - CLI help text
+  - docs language
+  - any behavior edge cases found while aligning the contract
+- Add or update tests covering the chosen contract
+- Exit criteria:
+  - `dispatch` contract is explicit and test-backed
 
-### Phase 5A: OneShot Primary Agent
-- Define `.opencode/agents/oneshot.md` with dispatch capability via bash
+### Phase 2: Doctor Reliability
+- Improve `oneshot doctor` signal quality:
+  - add launcher coverage for `oc`
+  - reduce false-negative remote/path noise
+  - improve portability where practical
+- Add/update doctor tests
+- Exit criteria:
+  - doctor output better matches machine reality in this repo
 
-### Phase 1: Foundation Fixes
-- 1A: argus_client.py reads config/search.yaml
-- 1B: research.md uses argus_client instead of raw curl
-- 1D: cheap-worker.md — keep bash:false, document as bounded-only
+### Phase 3: OpenCode + Secret Safety
+- Fix OpenCode-specific config/runner assumptions
+- Prevent auth value leakage into command logs / rendered command text
+- Align runner/model semantics where currently ambiguous
+- Exit criteria:
+  - command logs are secret-safe
+  - OpenCode runner behavior is documented and internally consistent
 
-### Phase 2: Command Translations
-- 2A: /short command
-- 2B: /conduct command (rewrite)
-- 2C: /handoff command
-- 2D: /restore command
-- 2E: /freesearch command
-- 2F: /doc command
+### Phase 4: Docs Alignment
+- Update docs that currently lie about behavior or omit `oc`
+- Priorities:
+  - `docs/DELEGATION_MODEL.md`
+  - `docs/WORKTREE_FLOW.md`
+  - `README.md`
+  - `QUICKSTART.md`
+  - doctor docs/readiness docs as needed
+- Exit criteria:
+  - validation drift reduced
+  - main operator docs describe real behavior
 
-### Phase 3: Persistent Task Tracking
-- 3A: scripts/tasks.py CLI
-- 3B: 1shot/tasks.json format + session start loading
+### Phase 5: CI Hardening
+- Triage current `scripts/ci.sh` failures that are directly caused by avoidable harness/doc drift
+- Improve CI signal quality where small targeted fixes are enough
+- Exit criteria:
+  - validation matrix is cleaner than baseline
+  - remaining failures, if any, are understood and explicitly reported
 
-### Phase 4: Janitor Cron
-- 4A: Update janitor-cron.sh (remove DEPRECATED, wire pure-compute jobs)
-- 4B: systemd timer
+### Phase 6: Verify + Challenge + Report
+- Run the full validation matrix again
+- Check acceptance criteria one by one with evidence
+- Summarize A / B / C
+- Exit criteria:
+  - user can see what changed, what remains risky, and what can now be delegated safely
 
-### Phase 6: MCP Integration
-- 6A: Evaluate Argus as MCP server
-- 6B: Add if viable, skip if not
+## File Targets by Phase
 
-## Dependencies
+### Phase 1
+- `oneshot_cli/dispatch_cmd.py`
+- `oneshot_cli/tasks.py`
+- tests covering dispatch behavior
 
-```
-Phase 0 (providers, AGENTS.md) → Phase 5A (oneshot agent) → Phase 1 (foundation) → Phase 2 (commands)
-Phase 3 (tasks.py) — independent, can run anytime after Phase 0
-Phase 4 (janitor) — independent
-Phase 6 (MCP) — last, after everything works
-```
+### Phase 2
+- `oneshot_cli/doctor_cmd.py`
+- `oneshot_cli/__main__.py` if command wiring needs cleanup
+- `tests/test_doctor.py`
 
-## Success Criteria
+### Phase 3
+- `.oneshot/config/models.yaml`
+- `oneshot_cli/tasks.py`
+- possibly docs that define `oc` expectations
 
-See PROJECT.md.
+### Phase 4
+- `docs/DELEGATION_MODEL.md`
+- `docs/WORKTREE_FLOW.md`
+- `README.md`
+- `QUICKSTART.md`
+- `docs/MACHINE_READINESS.md` if retained
+
+### Phase 5
+- `scripts/ci.sh`
+- any directly implicated validation docs/scripts
+
+## Validation Matrix
+
+Run before final completion:
+- `bash scripts/validate-docs.sh`
+- `bash scripts/validate-skills.sh`
+- `python3 scripts/validate-agents.py`
+- `bash scripts/eval.sh`
+- `PYTHONDONTWRITEBYTECODE=1 pytest -p no:cacheprovider`
+- `bash scripts/ci.sh`
+
+## Delegation Readiness
+
+Work becomes safe to farm out once:
+- task ledger is explicit
+- dispatch contract is truthful
+- doctor checks `oc` / OpenCode deterministically enough
+- logs do not leak secrets
+- docs stop contradicting runtime behavior

@@ -153,21 +153,49 @@ runner_templates:
       ANTHROPIC_BASE_URL: "https://api.z.ai/api/anthropic"
       ANTHROPIC_AUTH_TOKEN: "{auth_value}"
       ANTHROPIC_API_KEY: ""
+    readiness:
+      - "command -v claude"
+      - "secrets get ZAI_API_KEY >/dev/null 2>&1"
     notes:
       - "Uses ANTHROPIC_AUTH_TOKEN (not API_KEY) for ZAI proxy auth"
       - "claude -p gives full tool access with --dangerously-skip-permissions"
   opencode_go:
-    command: "opencode run --model opencode-go/{model_id} --prompt-file {task_file}"
+    command: "opencode run --model {model_id} --prompt-file {task_file}"
     cwd: "{worktree_path}"
     auth_env: OPENCODE_GO_API_KEY
+    readiness:
+      - "command -v opencode"
+      - "opencode auth list"
   gemini:
     command: "gemini -p @{task_file} --output-format json --approval-mode yolo"
     cwd: "{worktree_path}"
     auth_env: GEMINI_API_KEY
+    readiness:
+      - "command -v gemini"
+      - "gemini -p 'Say READY and nothing else.'"
+  gemini_cli_direct:
+    command: "gemini -p \"$(cat {task_file})\""
+    cwd: "{worktree_path}"
+    auth_env: null
+    yolo: true
+    readiness:
+      - "gemini --version"
+      - "gemini -p 'Say READY and nothing else.'"
   codex:
     command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access --prompt-file {task_file}"
     cwd: "{worktree_path}"
     auth_env: null
+    readiness:
+      - "command -v codex"
+      - "test -s ~/.codex/auth.json"
+  codex_cli_direct:
+    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access --prompt-file {task_file}"
+    cwd: "{worktree_path}"
+    auth_env: null
+    yolo: true
+    readiness:
+      - "codex --version"
+      - "test -s ~/.codex/auth.json"
 
 # ---------------------------------------------------------------------------
 # Search policy — see docs/SEARCH_POLICY.md for the full rules.

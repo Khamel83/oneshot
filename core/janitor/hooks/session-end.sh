@@ -5,8 +5,8 @@
 
 project_dir="$PWD"
 while [ "$project_dir" != "/" ]; do
-  [ -d "$project_dir/.git" ] && break
-  project_dir=$(dirname "$project_dir")
+	[ -d "$project_dir/.git" ] && break
+	project_dir=$(dirname "$project_dir")
 done
 [ "$project_dir" = "/" ] && exit 0
 
@@ -18,11 +18,12 @@ events_file="$janitor_dir/events.jsonl"
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 session_id="${CLAUDE_CODE_SESSION_ID:-unknown}"
 printf '{"ts":"%s","session":"%s","type":"session_end","content":"Session ended","meta":{"auto":true},"files":[]}\n' \
-  "$timestamp" "$session_id" >> "$events_file"
+	"$timestamp" "$session_id" >>"$events_file"
 
 # Run LLM jobs in background (don't block session end)
 ONESHOT_DIR="$HOME/github/oneshot"
-export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null)" || true
+openrouter_api_key="$(secrets get OPENROUTER_API_KEY 2>/dev/null || true)"
+export OPENROUTER_API_KEY="$openrouter_api_key"
 python3 -c "
 import sys, os
 sys.path.insert(0, '$ONESHOT_DIR')
