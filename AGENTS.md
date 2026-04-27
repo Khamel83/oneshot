@@ -147,6 +147,20 @@ Background intelligence layer that runs automatically — no manual action neede
 
 **Cron install (all machines):** Already installed on oci-dev, homelab, macmini.
 
+## SECRETS
+
+Vault: `~/github/oneshot/secrets/` — single source of truth, synced to all machines.
+CLI: `secrets` (symlinked to `~/github/oneshot/scripts/secrets`, in `~/.local/bin/`).
+
+```bash
+secrets get KEY               # fetch one value
+secrets set FILE KEY=value    # add/update a key
+secrets init FILE             # write FILE.env → .env in current dir
+secrets list                  # show all files and key names
+```
+
+Full vault index and usage patterns: `docs/instructions/secrets.md`
+
 ## SHARED MEMORY
 
 Read `.claude/memory/memory.md` at session start for cross-agent learnings.
