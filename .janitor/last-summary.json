@@ -1,33 +1,29 @@
 {
   "decisions": [
     {
-      "what": "Created systemd user service and timer for janitor-cron",
-      "why": "to schedule automated cleanup tasks via systemd timer"
+      "what": "Add fallback handling for inline dispatch",
+      "why": "Identified missing fallback in dispatch logic via grep searches"
     },
     {
-      "what": "Edited janitor-cron.sh script and made it executable",
-      "why": "to ensure the script can be run by systemd and incorporate necessary logic"
+      "what": "Create bug report for inline-fallback issue",
+      "why": "Found bug referenced in MEMORY.md and created conduct-inline-fallback-bug.md"
     },
     {
-      "what": "Used curl to check Argus MCP endpoints and python router resolve to verify functionality",
-      "why": "to validate that required services are reachable and classes resolvable before proceeding"
-    },
-    {
-      "what": "Ran git diff and git ls-files to monitor repository changes and untracked files",
-      "why": "to track modifications and identify any new files that may need attention"
+      "what": "Commit and push changes to repository",
+      "why": "To persist fixes and updates made to dispatch, providers, and SKILL files"
     }
   ],
   "blockers": [
     {
-      "what": "Unclear if Argus service is running; curl command may fail if endpoint not available",
-      "reason": "requires the service to be active, and its absence could block subsequent steps"
+      "what": "Unresolved TODO/FIXME items remain",
+      "reason": "Grepping revealed pending TODO/FIXME entries in .claude/skills/c that have not been addressed"
     }
   ],
   "discoveries": [
-    "Untracked files detected in repository via git ls-files",
-    "Router resolve command successfully returned output for implement_small",
-    "Janitor-cron.sh executed and produced log entries, indicating it runs",
-    "Systemd user service and timer were created successfully",
-    "STATE.md file created to capture current state"
+    "fallback and inline keywords found across documentation and skill files",
+    "silent fallback pattern detected via grep",
+    "config miss and dispatch fail references indicate missing config handling",
+    "bug report created for inline-fallback issue",
+    "multiple files edited: dispatch.md, providers.md, SKILL.md"
   ]
 }

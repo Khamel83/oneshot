@@ -1,28 +1,28 @@
 {
   "critical_files": [
     {
-      "file": "/home/ubuntu/github/oneshot/.opencode/opencode.json",
-      "sessions": 14,
+      "file": ".oneshot/config/models.yaml",
+      "sessions": 36,
       "downstream_deps": 0
     },
     {
-      "file": "/home/ubuntu/github/oneshot/1shot/OPENCODE_ADAPTER_PLAN.md",
-      "sessions": 11,
+      "file": "oneshot_cli/tasks.py",
+      "sessions": 17,
       "downstream_deps": 0
     },
     {
-      "file": "/home/ubuntu/github/oneshot/scripts/janitor-cron.sh",
-      "sessions": 7,
+      "file": ".opencode/opencode.json",
+      "sessions": 15,
       "downstream_deps": 0
     },
     {
-      "file": "/home/ubuntu/github/oneshot/.opencode/agents/cheap-worker.md",
-      "sessions": 6,
+      "file": ".claude/skills/_shared/providers.md",
+      "sessions": 13,
       "downstream_deps": 0
     },
     {
-      "file": "/home/ubuntu/github/oneshot/core/search/argus_client.py",
-      "sessions": 6,
+      "file": "config/workers.yaml",
+      "sessions": 13,
       "downstream_deps": 0
     }
   ]

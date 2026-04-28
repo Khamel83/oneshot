@@ -1,0 +1,53 @@
+{
+  "trace_id": "implement_small-2026-04-28-183317-gemini_cli",
+  "schema_version": "1",
+  "timestamp": "2026-04-28T18:33:17.101044+00:00",
+  "harness_version": "14.2",
+  "classification": {
+    "description": "Respond with a single JSON object: {\"answer\": 42}. That's all.",
+    "task_class": "implement_small",
+    "category": "coding",
+    "inferred_by": "dispatch runner"
+  },
+  "routing": {
+    "lane": "cheap",
+    "workers": [
+      "codex",
+      "gemini_cli",
+      "glm_claude"
+    ],
+    "selected_worker": "gemini_cli",
+    "selection_reason": "first_available",
+    "review_with": "claude_code",
+    "fallback_lane": "balanced"
+  },
+  "prompt": {
+    "template": "dispatch_v1",
+    "word_count": 10,
+    "file_path": "prompt.md"
+  },
+  "execution": {
+    "worker": "gemini_cli",
+    "exit_code": 0,
+    "started": "2026-04-28T18:33:17.101044+00:00",
+    "completed": "2026-04-28T18:35:04.133146+00:00",
+    "duration_seconds": 107.0
+  },
+  "output": {
+    "errors": [],
+    "message_preview": ""
+  },
+  "retry": {
+    "attempt": 1,
+    "previous_traces": [],
+    "escalated": false
+  },
+  "cost": {
+    "estimated_cost_usd": 0,
+    "worker_cost_basis": "subscription"
+  },
+  "config_snapshot": {
+    "lanes_sha": "df6c236"
+  },
+  "status": "succeeded"
+}

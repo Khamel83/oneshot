@@ -1,17 +1,107 @@
 {
-  "stale_count": 2,
-  "fresh_count": 252,
+  "stale_count": 49,
+  "fresh_count": 221,
   "stale_threshold_days": 30,
   "stale_files": [
     {
-      "file": "archive/v7-high-token/README.md",
-      "days_since_edit": 85,
-      "last_modified": "2026-01-31"
+      "file": "docs/public-access.md",
+      "days_since_edit": 102,
+      "last_modified": "2026-01-16"
     },
     {
-      "file": "docs/public-access.md",
+      "file": "archive/v7-high-token/README.md",
+      "days_since_edit": 90,
+      "last_modified": "2026-01-27"
+    },
+    {
+      "file": "archive/SKILL_LOG.md",
       "days_since_edit": 85,
-      "last_modified": "2026-01-31"
+      "last_modified": "2026-02-02"
+    },
+    {
+      "file": "archive/v7/SPEC.md",
+      "days_since_edit": 85,
+      "last_modified": "2026-02-02"
+    },
+    {
+      "file": "archive/handoffs/.handoff-ONE_SHOT-starred-repos.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "archive/handoffs/.handoff-ONE_SHOT-v11-planning.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "archive/v9/AGENTS.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "archive/v9/agents/INDEX.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "archive/v9/agents/TEMPLATE.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "archive/v9/agents/background-worker.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "archive/v9/agents/deep-research.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "archive/v9/agents/multi-agent-coordinator.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "archive/v9/agents/security-auditor.md",
+      "days_since_edit": 80,
+      "last_modified": "2026-02-06"
+    },
+    {
+      "file": "docs/sessions/README.md",
+      "days_since_edit": 79,
+      "last_modified": "2026-02-07"
+    },
+    {
+      "file": ".sops.yaml",
+      "days_since_edit": 75,
+      "last_modified": "2026-02-12"
+    },
+    {
+      "file": ".claude/skills/SKILLS_REFERENCE.md",
+      "days_since_edit": 49,
+      "last_modified": "2026-03-10"
+    },
+    {
+      "file": ".claude/skills/restore/SKILL.md",
+      "days_since_edit": 49,
+      "last_modified": "2026-03-10"
+    },
+    {
+      "file": ".claude/skills/vision/SKILL.md",
+      "days_since_edit": 49,
+      "last_modified": "2026-03-10"
+    },
+    {
+      "file": ".claude/skills/conduct/templates/ROADMAP.md",
+      "days_since_edit": 38,
+      "last_modified": "2026-03-20"
+    },
+    {
+      "file": ".claude/skills/conduct/templates/STATE.md",
+      "days_since_edit": 38,
+      "last_modified": "2026-03-20"
     }
   ]
 }

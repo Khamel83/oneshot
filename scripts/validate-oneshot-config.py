@@ -17,6 +17,7 @@ WORKER_HARNESS_BRIDGE = {
     "claude_code": "claude_review",
     "glm_claude": "zai",
     "opencode": "opencode_go",
+    "direct_api": "opencode_go",
     "claw_code": "claw_code",
     "openrouter_api": "openrouter_api",
 }

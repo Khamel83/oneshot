@@ -539,8 +539,16 @@
     },
     {
       "file": "docs/sessions/index.md",
-      "total_links": 72,
+      "total_links": 80,
       "_all_targets": [
+        "20260428_142043__command-name__exit__command-name_.md.age",
+        "20260428_132533__command-name__clear__command-name_.md.age",
+        "20260428_132530_pull_from_remote_and_sync.md.age",
+        "20260428_114410_On__how_is_this_a_conduct_process___You_re_right__.md.age",
+        "20260428_112215_On__how_is_this_a_conduct_process___You_re_right__.md.age",
+        "20260427_132406__command-name__clear__command-name_.md.age",
+        "20260427_125247_Done__The_plan_is_now_decomposed_and_parked__ready.md.age",
+        "20260424_102222_how_do_i_update_an_existing_project_with_an_update.md.age",
         "20260407_145739__command-message_conduct__command-message_.md.age",
         "20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age",
         "20260405_231732__command-name__clear__command-name_.md.age",
@@ -615,16 +623,16 @@
         "20260207_153315__Request_interrupted_by_user_for_tool_use_.md.age"
       ],
       "targets": [
+        "20260428_142043__command-name__exit__command-name_.md.age",
+        "20260428_132533__command-name__clear__command-name_.md.age",
+        "20260428_132530_pull_from_remote_and_sync.md.age",
+        "20260428_114410_On__how_is_this_a_conduct_process___You_re_right__.md.age",
+        "20260428_112215_On__how_is_this_a_conduct_process___You_re_right__.md.age",
+        "20260427_132406__command-name__clear__command-name_.md.age",
+        "20260427_125247_Done__The_plan_is_now_decomposed_and_parked__ready.md.age",
+        "20260424_102222_how_do_i_update_an_existing_project_with_an_update.md.age",
         "20260407_145739__command-message_conduct__command-message_.md.age",
-        "20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age",
-        "20260405_231732__command-name__clear__command-name_.md.age",
-        "20260405_212546__command-message_conduct__command-message_.md.age",
-        "20260405_191723_We_need_to_make_sure_that_the_dispatch_skill_almos.md.age",
-        "20260404_222717__command-name__clear__command-name_.md.age",
-        "20260404_214633__command-name__clear__command-name_.md.age",
-        "20260404_213840_https___openrouter_ai_models_order_most-popular_fm.md.age",
-        "20260404_212633__command-name__model__command-name_.md.age",
-        "20260404_212622_https___openrouter_ai_models_order_most-popular_fm.md.age"
+        "20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age"
       ]
     },
     {

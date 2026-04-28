@@ -3,62 +3,92 @@
   "tasks": [
     {
       "id": "1",
-      "subject": "Normalize /conduct workspace files for Plan L",
+      "subject": "Define repo-local memory scaffold and policy declaration model",
       "description": "",
       "status": "done",
       "priority": "high",
-      "created": "2026-04-27T22:07:11Z",
-      "updated": "2026-04-27T22:07:28Z",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:08Z",
       "blocked_by": []
     },
     {
       "id": "2",
-      "subject": "Fix dispatch contract drift across CLI help, implementation, and tests",
+      "subject": "Design write, promotion, provenance, and conflict lifecycle",
       "description": "",
       "status": "done",
       "priority": "high",
-      "created": "2026-04-27T22:07:11Z",
-      "updated": "2026-04-27T22:09:28Z",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:08Z",
       "blocked_by": []
     },
     {
       "id": "3",
-      "subject": "Improve doctor reliability and add OpenCode launcher coverage",
+      "subject": "Design same-repo retrieval and cross-repo abstraction rules",
       "description": "",
       "status": "done",
       "priority": "high",
-      "created": "2026-04-27T22:07:11Z",
-      "updated": "2026-04-27T22:12:45Z",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:09Z",
       "blocked_by": []
     },
     {
       "id": "4",
-      "subject": "Harden secret-safe runner logging and OpenCode model semantics",
+      "subject": "Define review governance for high-risk memory and cross-repo changes",
       "description": "",
       "status": "done",
-      "priority": "high",
-      "created": "2026-04-27T22:07:11Z",
-      "updated": "2026-04-27T22:12:45Z",
+      "priority": "medium",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:09Z",
       "blocked_by": []
     },
     {
       "id": "5",
-      "subject": "Align operator docs with actual harness behavior",
+      "subject": "Stage external index responsibilities, degraded mode, and onboarding flow",
       "description": "",
       "status": "done",
       "priority": "medium",
-      "created": "2026-04-27T22:07:11Z",
-      "updated": "2026-04-27T22:14:03Z",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:09Z",
       "blocked_by": []
     },
     {
       "id": "6",
-      "subject": "Run full validation matrix and publish A/B/C summary",
+      "subject": "Implement cross-repo abstraction indexing beyond repo-local files",
       "description": "",
       "status": "done",
       "priority": "high",
-      "created": "2026-04-27T22:07:11Z",
-      "updated": "2026-04-27T22:16:37Z",
+      "created": "2026-04-28T22:35:09Z",
+      "updated": "2026-04-28T22:42:49Z",
+      "blocked_by": []
+    },
+    {
+      "id": "7",
+      "subject": "Implement central private index service integration and degraded-mode signaling",
+      "description": "",
+      "status": "pending",
+      "priority": "high",
+      "created": "2026-04-28T22:35:09Z",
+      "updated": "2026-04-28T22:35:09Z",
+      "blocked_by": []
+    },
+    {
+      "id": "8",
+      "subject": "Integrate high-risk review gates into memory-affecting workflows",
+      "description": "",
+      "status": "pending",
+      "priority": "medium",
+      "created": "2026-04-28T22:35:09Z",
+      "updated": "2026-04-28T22:35:09Z",
+      "blocked_by": []
+    },
+    {
+      "id": "9",
+      "subject": "Replace local SQLite abstraction index with dual-home private service integration",
+      "description": "",
+      "status": "pending",
+      "priority": "high",
+      "created": "2026-04-28T22:42:50Z",
+      "updated": "2026-04-28T22:42:50Z",
       "blocked_by": []
     }
   ]

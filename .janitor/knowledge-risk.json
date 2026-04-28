@@ -5,35 +5,35 @@
       "contributors": [
         "Test User"
       ],
-      "edit_count": 9
-    },
-    {
-      "file": ".claude/skills/full/SKILL.md",
-      "contributors": [
-        "Test User"
-      ],
-      "edit_count": 9
+      "edit_count": 11
     },
     {
       "file": ".claude/skills/_shared/providers.md",
       "contributors": [
         "Test User"
       ],
-      "edit_count": 8
+      "edit_count": 10
+    },
+    {
+      "file": ".claude/skills/full/SKILL.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 10
     },
     {
       "file": ".claude/skills/short/SKILL.md",
       "contributors": [
         "Test User"
       ],
-      "edit_count": 7
+      "edit_count": 8
     },
     {
       "file": ".claude/skills/_shared/dispatch.md",
       "contributors": [
         "Test User"
       ],
-      "edit_count": 5
+      "edit_count": 6
     }
   ]
 }

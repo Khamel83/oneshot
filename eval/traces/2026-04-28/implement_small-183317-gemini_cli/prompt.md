@@ -1,0 +1,1 @@
+Respond with a single JSON object: {"answer": 42}. That's all.

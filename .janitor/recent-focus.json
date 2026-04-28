@@ -1,5 +1,27 @@
 {
-  "files": [],
-  "commands": [],
-  "session_count": 280
+  "files": [
+    ".claude/skills/_shared/providers.md",
+    ".claude/skills/_shared/dispatch.md",
+    ".claude/skills/_shared/dispatch.md",
+    ".claude/skills/_shared/dispatch.md",
+    ".claude/skills/_shared/providers.md",
+    ".claude/skills/conduct/SKILL.md",
+    ".claude/skills/conduct/SKILL.md",
+    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/conduct-inline-fallback-bug.md",
+    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/MEMORY.md",
+    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/MEMORY.md"
+  ],
+  "commands": [
+    "Ran: python3 -m core.dispatch.run \\\n  --class implement_small \\\n  --category coding \\\n  --prompt \"",
+    "Ran: python3 -m core.dispatch.run \\\n  --class implement_small \\\n  --category coding \\\n  --prompt \"",
+    "Ran: find docs/instructions/ .claude/skills/_shared/ -type f -name \"*.md\" | head -20",
+    "Ran: grep -r -i \"degradation\\|fallback\\|inline\" docs/instructions/ .claude/skills/_shared/ --include=",
+    "Ran: find ~/.claude/projects/-home-ubuntu-github-oneshot/memory/ -name \"*.md\" -o -name \"*.txt\" | head",
+    "Ran: find .janitor -name \"*.jsonl\" -o -name \"*.json\" 2>/dev/null | head -10",
+    "Ran: grep -r \"TODO\\|FIXME\" --include=\"*.md\" --include=\"*.py\" --include=\"*.yaml\" .claude/skills/c",
+    "Ran: grep -r \"fallback\\|inline\\|config.*miss\\|dispatch.*fail\" --include=\"*.md\" --include=\"*.py\" ",
+    "Ran: grep -r \"silent.*fallback\\|silently.*fallback\" --include=\"*.md\" --include=\"*.py\" . | head -5",
+    "Ran: grep -A10 -B5 \"skip silently\" .claude/skills/_shared/providers.md"
+  ],
+  "session_count": 739
 }

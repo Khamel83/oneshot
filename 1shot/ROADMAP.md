@@ -1,115 +1,188 @@
-# Plan L Roadmap
+# Current Roadmap Pointer
 
-**Date**: 2026-04-27
-**Execution mode**: `/conduct`
-**Objective**: make the delegation harness deterministic enough to trust and farm out
+## Active Pass
+- Name: OneShot repo-first memory architecture
+- Date: 2026-04-28
+- Dated roadmap: `1shot/2026-04-28-memory-architecture-ROADMAP.md`
+- Dated project: `1shot/2026-04-28-memory-architecture-PROJECT.md`
+- Dated state: `1shot/2026-04-28-memory-architecture-STATE.md`
+- Active spec: `1shot/MEMORY_ARCHITECTURE_SPEC.md`
+- Phase-1 implementation spec: `1shot/MEMORY_PHASE1_IMPLEMENTATION_SPEC.md`
 
-## Deterministic Phase Plan
+## Live Objective
+Design and stage a repo-first memory system for OneShot without making the OneShot repo the home of project work, and make the design portable to downstream customer repos.
 
-### Phase 0: Intake Lock
-- Rewrite stale `1shot` artifacts for the current pass
-- Capture user answers, scope, risk, and acceptance criteria in `PROJECT.md`
-- Capture current execution state in `STATE.md`
-- Seed persistent task ledger (`1shot/tasks.json` via `scripts/tasks.py`)
+## Current Build Contract
+- `1shot/MEMORY_PHASE1_IMPLEMENTATION_SPEC.md` defines the first coding pass:
+  - exact repo-local files
+  - memory policy format
+  - promotion rules
+  - retrieval behavior
+  - degraded-mode contract
+
+## Implementation Progress
+- Shipped in current wave:
+  - repo scaffold and policy file creation
+  - stable memory promotion for decisions, blockers, runbooks, and session summaries
+  - provenance records
+  - same-repo retrieval ordering
+  - abstraction file generation
+  - local private SQLite-backed abstraction indexing
+  - cross-repo abstraction search with degraded-mode signaling
+- Not yet shipped:
+  - dual-home private index service integration
+  - review-gate enforcement for memory-affecting high-risk work
+
+## Phase Plan
+
+### Phase 0: Planning Reset
+- Preserve passes by date and name instead of relying only on overwritten top-level files
+- Capture current intake, scope, constraints, and risk in dated and live planning artifacts
+- Record provider availability and baseline planning state
+- Reseed the persistent task ledger for the memory program
 - Exit criteria:
-  - current `1shot` files reflect this pass
-  - task list exists and is classifiable
+  - planning files reflect the memory pass
+  - dated artifacts preserve the pass identity
+  - task ledger is reseeded for this work
 
-### Phase 1: Correctness First
-- Fix dispatch contract drift:
-  - CLI help text
-  - docs language
-  - any behavior edge cases found while aligning the contract
-- Add or update tests covering the chosen contract
+### Phase 1: Memory Contract
+- Define the repo-first memory contract
+- Lock responsibilities for:
+  - `docs/agents/`
+  - `.oneshot/`
+  - external private index/search
+- Define initial first-class memory categories:
+  - decisions
+  - session summaries
+  - important commands/runbooks
+  - blockers/resolutions
 - Exit criteria:
-  - `dispatch` contract is explicit and test-backed
+  - memory ownership and storage boundaries are explicit
 
-### Phase 2: Doctor Reliability
-- Improve `oneshot doctor` signal quality:
-  - add launcher coverage for `oc`
-  - reduce false-negative remote/path noise
-  - improve portability where practical
-- Add/update doctor tests
+### Phase 2: Lifecycle + Policy
+- Define memory lifecycle states:
+  - captured
+  - summarized
+  - promoted
+  - conflicted
+  - superseded
+  - archived
+- Define write policy:
+  - broad automatic signal capture
+  - provenance on every durable write
+  - conflict preservation instead of overwrite
+- Define per-repo policy modes:
+  - portable
+  - isolated
+  - sensitive
+  - private/no-cross-repo
 - Exit criteria:
-  - doctor output better matches machine reality in this repo
+  - write rules and repo policy modes are stable enough to implement
 
-### Phase 3: OpenCode + Secret Safety
-- Fix OpenCode-specific config/runner assumptions
-- Prevent auth value leakage into command logs / rendered command text
-- Align runner/model semantics where currently ambiguous
+### Phase 3: Retrieval + Portability
+- Define same-repo retrieval order
+- Define cross-repo retrieval order
+- Restrict cross-repo reuse to abstracted lessons by default
+- Define what is portable vs non-portable:
+  - tooling
+  - infra
+  - orchestration
+  - debugging
+  - runbook patterns
+  - not business logic or repo-bound assumptions by default
 - Exit criteria:
-  - command logs are secret-safe
-  - OpenCode runner behavior is documented and internally consistent
+  - retrieval policy can be implemented without reopening trust questions
 
-### Phase 4: Docs Alignment
-- Update docs that currently lie about behavior or omit `oc`
-- Priorities:
-  - `docs/DELEGATION_MODEL.md`
-  - `docs/WORKTREE_FLOW.md`
-  - `README.md`
-  - `QUICKSTART.md`
-  - doctor docs/readiness docs as needed
+### Phase 4: Governance + Review Gates
+- Define which work classes are high-risk
+- Lock planner vs worker vs reviewer roles for memory-related work
+- Define when cross-model quorum is required
+- Define how memory changes are reviewed and promoted
 - Exit criteria:
-  - validation drift reduced
-  - main operator docs describe real behavior
+  - important work has a clear review path that is strong without being everywhere-all-at-once
 
-### Phase 5: CI Hardening
-- Triage current `scripts/ci.sh` failures that are directly caused by avoidable harness/doc drift
-- Improve CI signal quality where small targeted fixes are enough
+### Phase 5: Infra Fit
+- Define the external index role across homelab, OCI, and Tailscale
+- Keep repo memory canonical; external index remains secondary
+- Define degraded-mode behavior when index/search is down
+- Define onboarding behavior for repos with no memory yet
 - Exit criteria:
-  - validation matrix is cleaner than baseline
-  - remaining failures, if any, are understood and explicitly reported
+  - system can fail gracefully without losing repo truth
 
-### Phase 6: Verify + Challenge + Report
-- Run the full validation matrix again
-- Check acceptance criteria one by one with evidence
-- Summarize A / B / C
+### Phase 6: Implementation Roadmap
+- Break the architecture into buildable milestones
+- Order work to reduce risk:
+  1. repo memory scaffold
+  2. repo policy modes
+  3. write/promotion rules
+  4. same-repo retrieval
+  5. cross-repo abstractions
+  6. conflict handling
+  7. review gates
+  8. central index hardening
 - Exit criteria:
-  - user can see what changed, what remains risky, and what can now be delegated safely
+  - next pass can start implementation without redesigning the system
 
-## File Targets by Phase
+## Recommended Implementation Order
 
-### Phase 1
-- `oneshot_cli/dispatch_cmd.py`
-- `oneshot_cli/tasks.py`
-- tests covering dispatch behavior
+### Milestone 1: Repo Scaffold
+- Create standard repo-local memory layout
+- Add policy declaration support
+- Add empty first-class memory documents
+- Success measure:
+  - operational fit
+  - review governance anchor points exist
 
-### Phase 2
-- `oneshot_cli/doctor_cmd.py`
-- `oneshot_cli/__main__.py` if command wiring needs cleanup
-- `tests/test_doctor.py`
+### Milestone 2: Stable Writes
+- Add checkpoint and session summary capture
+- Promote first-class durable categories into repo-local memory
+- Preserve provenance on all writes
+- Success measure:
+  - reliable repo memory exists and can be trusted
 
-### Phase 3
-- `.oneshot/config/models.yaml`
-- `oneshot_cli/tasks.py`
-- possibly docs that define `oc` expectations
+### Milestone 3: Same-Repo Retrieval
+- Retrieve canonical memory from the active repo only
+- Rank `docs/agents/` above `.oneshot/`
+- Surface conflicts and superseded entries explicitly
+- Success measure:
+  - current repo gets useful memory without cross-project contamination
 
-### Phase 4
-- `docs/DELEGATION_MODEL.md`
-- `docs/WORKTREE_FLOW.md`
-- `README.md`
-- `QUICKSTART.md`
-- `docs/MACHINE_READINESS.md` if retained
+### Milestone 4: Cross-Repo Abstractions
+- Generate abstracted lessons from repo-local memory
+- Keep a global private abstraction pool with sensitivity/trust tags
+- Default to abstracted-first cross-repo retrieval
+- Success measure:
+  - safe retrieval across repos without importing raw local assumptions first
 
-### Phase 5
-- `scripts/ci.sh`
-- any directly implicated validation docs/scripts
+### Milestone 5: Governance
+- Add high-risk review gates for memory-affecting work
+- Require planner plus cross-model quorum only for high-risk changes
+- Success measure:
+  - memory and governance changes are reviewed proportionally to risk
 
-## Validation Matrix
+### Milestone 6: Private Index Hardening
+- Add resiliency, degraded mode, and operational checks for the central index
+- Keep repo truth intact if indexing services fail
+- Success measure:
+  - system remains useful when external search is degraded
 
-Run before final completion:
-- `bash scripts/validate-docs.sh`
-- `bash scripts/validate-skills.sh`
-- `python3 scripts/validate-agents.py`
-- `bash scripts/eval.sh`
-- `PYTHONDONTWRITEBYTECODE=1 pytest -p no:cacheprovider`
-- `bash scripts/ci.sh`
+## Verification Criteria For The Next Pass
+- Every architecture element maps to a concrete file or service responsibility
+- No implementation milestone depends on unresolved ownership questions
+- Same-repo and cross-repo retrieval rules are testable as behavior, not just prose
+- Review policy clearly distinguishes normal work from high-risk work
+- Repo-local truth remains usable even if the central index is unavailable
 
-## Delegation Readiness
+## File Targets For This Planning Pass
+- `1shot/PROJECT.md`
+- `1shot/ROADMAP.md`
+- `1shot/STATE.md`
+- `1shot/MEMORY_ARCHITECTURE_SPEC.md`
+- `1shot/tasks.json`
 
-Work becomes safe to farm out once:
-- task ledger is explicit
-- dispatch contract is truthful
-- doctor checks `oc` / OpenCode deterministically enough
-- logs do not leak secrets
-- docs stop contradicting runtime behavior
+## Open Risks To Revisit During Implementation
+- Over-promotion of noisy session memory into durable repo memory
+- Conflict accumulation with no reconciliation path
+- Weak policy boundaries for sensitive repos
+- Overly broad cross-repo abstractions that become misleading
+- Operational drift between repo truth and external index state

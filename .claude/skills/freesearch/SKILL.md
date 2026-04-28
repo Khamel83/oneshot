@@ -23,7 +23,7 @@ Uses 0 Claude Code tokens. Calls Argus in cheap mode (SearXNG).
 
 3. **Search via Argus** (cheap mode = SearXNG only):
    ```bash
-   curl -s -X POST http://100.126.13.70:8005/api/search \
+   curl -s -X POST http://100.112.130.100:8270/api/search \
      -H "Content-Type: application/json" \
      -d '{"query": "[TOPIC]", "mode": "cheap"}'
    ```
@@ -62,7 +62,7 @@ Full research: docs/research/YYYY-MM-DD_{topic}_final.md
 
 If Argus is unreachable:
 ```bash
-curl -s http://100.126.13.70:8005/api/health >/dev/null 2>&1
+ssh homelab-ts "curl -s http://localhost:8270/api/health" >/dev/null 2>&1
 ```
 ...then check `config/search.yaml` for cheap mode providers and call directly.
 

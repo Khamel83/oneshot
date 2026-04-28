@@ -5,11 +5,28 @@
       "lines": 1834
     },
     {
+      "path": "oneshot_cli/doctor_cmd.py",
+      "lines": 791
+    },
+    {
       "path": "core/dispatch/run.py",
       "lines": 675
+    },
+    {
+      "path": "tests/test_doctor.py",
+      "lines": 525
+    },
+    {
+      "path": "oneshot_cli/tasks.py",
+      "lines": 522
     }
   ],
   "oversized_functions": [
+    {
+      "path": "oneshot_cli/doctor_cmd.py",
+      "function": "autofix",
+      "lines": 271
+    },
     {
       "path": "core/janitor/jobs.py",
       "function": "generate_onboarding",
@@ -19,6 +36,11 @@
       "path": "core/janitor/jobs.py",
       "function": "run_session_start",
       "lines": 202
+    },
+    {
+      "path": "oneshot_cli/tasks.py",
+      "function": "_is_tree_dirty",
+      "lines": 199
     },
     {
       "path": "core/janitor/jobs.py",
@@ -46,6 +68,6 @@
       "lines": 102
     }
   ],
-  "oversized_file_count": 2,
-  "oversized_function_count": 7
+  "oversized_file_count": 5,
+  "oversized_function_count": 9
 }

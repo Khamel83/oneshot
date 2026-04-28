@@ -1,16 +1,16 @@
 {
   "cluster_count": 13,
-  "total_documents": 254,
+  "total_documents": 270,
   "clusters": [
     {
       "directory": "docs",
-      "file_count": 58,
+      "file_count": 64,
       "files": [
+        "docs/DELEGATION_MODEL.md",
         "docs/LLM-OVERVIEW.md",
-        "docs/SKILLS.md",
-        "docs/external/.index.md",
-        "docs/external/codex/.index.md",
-        "docs/external/codex/CODEX_AGENTS.md"
+        "docs/MACHINE_READINESS.md",
+        "docs/SEARCH_POLICY.md",
+        "docs/SKILLS.md"
       ]
     },
     {
@@ -26,13 +26,13 @@
     },
     {
       "directory": ".claude",
-      "file_count": 35,
+      "file_count": 42,
       "files": [
-        ".claude/infrastructure/STACK.md",
-        ".claude/memory/learnings.md",
-        ".claude/memory/memory.md",
-        ".claude/memory/tools/gemini.md",
-        ".claude/memory/tools/other-agents.md"
+        ".claude/agents/INDEX.md",
+        ".claude/agents/TEMPLATE.md",
+        ".claude/commands/dispatch.md",
+        ".claude/commands/escalate-worker.md",
+        ".claude/commands/review-worker.md"
       ]
     },
     {
@@ -103,13 +103,13 @@
     },
     {
       "directory": ".oneshot",
-      "file_count": 7,
+      "file_count": 8,
       "files": [
         ".oneshot/code-smells.json",
         ".oneshot/commit-enrichments.json",
         ".oneshot/config-drift.json",
-        ".oneshot/dep-graph.json",
-        ".oneshot/onboarding-summary.md"
+        ".oneshot/config/models.yaml",
+        ".oneshot/dep-graph.json"
       ]
     }
   ]

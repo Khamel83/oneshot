@@ -1,7 +1,13 @@
 {
-  "orphan_count": 77,
+  "orphan_count": 89,
   "orphan_files": [
+    ".claude/agents/TEMPLATE.md",
+    ".claude/commands/dispatch.md",
+    ".claude/commands/escalate-worker.md",
+    ".claude/commands/review-worker.md",
+    ".claude/commands/status.md",
     ".claude/memory/memory.md",
+    ".claude/rules/delegation-enforcement.md",
     ".claude/skills/SKILLS_REFERENCE.md",
     ".claude/skills/_shared/dispatch.md",
     ".claude/skills/conduct/templates/ROADMAP.md",
@@ -14,13 +20,7 @@
     ".opencode/agents/reviewer.md",
     ".opencode/commands/conduct.md",
     ".opencode/commands/debug.md",
-    ".opencode/commands/doc.md",
-    ".opencode/commands/freesearch.md",
-    ".opencode/commands/handoff.md",
-    ".opencode/commands/research.md",
-    ".opencode/commands/restore.md",
-    ".opencode/commands/short.md",
-    ".opencode/commands/tdd.md"
+    ".opencode/commands/doc.md"
   ],
-  "total_documents": 163
+  "total_documents": 177
 }

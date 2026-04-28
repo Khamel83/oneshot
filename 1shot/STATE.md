@@ -1,18 +1,24 @@
-# Conduct State
+# Current State Pointer
 
-Phase: complete
-Started: 2026-04-27
+Phase: plan -> complete
+Started: 2026-04-28
 Loop: 1
-Tasks: 6/6 completed
-Current focus: verification complete, preparing A/B/C summary
-Last updated: 2026-04-27
+Tasks: 6/9 completed
+Current focus: repo-local memory and local global abstraction index shipped; next pass should tackle dual-home service integration and review gates
+Last updated: 2026-04-28
+Dated state file: `1shot/2026-04-28-memory-architecture-STATE.md`
+Dated phase-1 implementation spec: `1shot/2026-04-28-memory-phase1-implementation-SPEC.md`
+Providers:
+- codex: yes
+- gemini: yes
+- argus: yes
 Notes:
-- Replacing stale `1shot` artifacts from prior work
-- Dirty tree baseline captured before session changes
-- Validation baseline captured before session changes
-- Dispatch contract is now explicit and test-backed
-- Doctor now checks `oc` launcher and avoids fake remote path failures
-- Full validation matrix passed after CI shellcheck policy was made explicit
-- `oc` wrapper is now installable from the repo and surfaced in health checks
-- Added config bridge validation between legacy routing config and `.oneshot` harness config
-- Added dispatch failure/timeout regression coverage and explicit remote doctor fix guidance
+- Top-level state now acts as a live pointer/current summary rather than the only record of the pass
+- This pass now includes the first implementation wave: scaffold, promote, retrieve, and abstract commands
+- This pass also includes a private local SQLite-backed abstraction index and degraded-mode signaling for cross-repo search
+- Work memory belongs to target repos, not the OneShot repo
+- Durable human-facing memory will live in `docs/agents/`
+- Operational machine memory will live in `.oneshot/`
+- Cross-repo retrieval remains allowed, but abstracted-first by default
+- Stable memory is intended to be committed; transient state should usually remain local
+- Phase-1 implementation contract now exists for the first coding pass

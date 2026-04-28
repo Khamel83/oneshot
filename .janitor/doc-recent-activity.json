@@ -1,7 +1,88 @@
 {
-  "changes_count": 39,
+  "changes_count": 71,
   "time_window_days": 7,
   "recent_changes": [
+    {
+      "file": ".oneshot/config/models.yaml",
+      "change_count": 5,
+      "authors": [
+        "Test User",
+        "unknown"
+      ]
+    },
+    {
+      "file": "CLAUDE.md",
+      "change_count": 4,
+      "authors": [
+        "Test User",
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".claude/skills/_shared/providers.md",
+      "change_count": 3,
+      "authors": [
+        "Test User"
+      ]
+    },
+    {
+      "file": "docs/ZAI_TO_OPENCODE_GO_MIGRATION.md",
+      "change_count": 3,
+      "authors": [
+        "Test User",
+        "unknown"
+      ]
+    },
+    {
+      "file": "README.md",
+      "change_count": 3,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": "config/search.yaml",
+      "change_count": 3,
+      "authors": [
+        "Khamel83",
+        "Test User",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/commit-enrichments.json",
+      "change_count": 3,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/last-summary.json",
+      "change_count": 3,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/pending-tasks.md",
+      "change_count": 3,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/redo-queue.json",
+      "change_count": 3,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
     {
       "file": "docs/instructions/search.md",
       "change_count": 3,
@@ -18,128 +99,60 @@
       ]
     },
     {
-      "file": "AGENTS.md",
+      "file": ".claude/skills/conduct/SKILL.md",
       "change_count": 2,
       "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": "config/search.yaml",
-      "change_count": 2,
-      "authors": [
-        "Khamel83",
         "Test User"
       ]
     },
     {
-      "file": ".claude/rules/khamel-mode.md",
-      "change_count": 1,
+      "file": ".claude/rules/delegation-enforcement.md",
+      "change_count": 2,
       "authors": [
-        "Khamel83"
+        "Test User"
       ]
     },
     {
-      "file": ".janitor/blockers.json",
-      "change_count": 1,
+      "file": ".claude/skills/research/SKILL.md",
+      "change_count": 2,
       "authors": [
-        "Khamel83"
+        "Test User"
       ]
     },
     {
-      "file": ".janitor/code-smells.json",
-      "change_count": 1,
+      "file": "config/workers.yaml",
+      "change_count": 2,
       "authors": [
-        "Khamel83"
+        "Test User",
+        "unknown"
       ]
     },
     {
-      "file": ".janitor/commit-enrichments.json",
-      "change_count": 1,
+      "file": "CLAUDE.local.md",
+      "change_count": 2,
       "authors": [
-        "Khamel83"
+        "unknown"
       ]
     },
     {
-      "file": ".janitor/critical-files.json",
-      "change_count": 1,
+      "file": "docs/DELEGATION_MODEL.md",
+      "change_count": 2,
       "authors": [
-        "Khamel83"
+        "Test User",
+        "unknown"
       ]
     },
     {
-      "file": ".janitor/dead-ends.json",
-      "change_count": 1,
+      "file": "docs/WORKTREE_FLOW.md",
+      "change_count": 2,
       "authors": [
-        "Khamel83"
+        "Test User",
+        "unknown"
       ]
     },
     {
-      "file": ".janitor/dep-graph.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/doc-clusters.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/doc-crossrefs.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/doc-missing-frontmatter.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/doc-orphans.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/doc-recent-activity.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/doc-size-outliers.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/doc-staleness.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/knowledge-risk.json",
-      "change_count": 1,
-      "authors": [
-        "Khamel83"
-      ]
-    },
-    {
-      "file": ".janitor/last-summary.json",
-      "change_count": 1,
+      "file": "docs/sessions/index.md",
+      "change_count": 2,
       "authors": [
         "unknown"
       ]

@@ -70,7 +70,9 @@ def test_opencode_runner_template_uses_resolved_model_id_once():
 
     command = cfg["runner_templates"]["opencode_go"]["command"]
 
-    assert command == "opencode run --model {model_id} --prompt-file {task_file}"
+    assert command.count("{model_id}") == 1
+    assert command.endswith("--prompt-file {task_file}")
+    assert "opencode-go/{model_id}" in command
 
 
 def test_dispatch_worker_log_redacts_auth_value(tmp_path, monkeypatch):

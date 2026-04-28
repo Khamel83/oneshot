@@ -55,6 +55,22 @@ Full operator for new projects and complex refactors. Structured intake → phas
 ### `/conduct` — Multi-Model Orchestration
 PMO-style orchestrator. Asks clarifying questions first (blocking). Classifies tasks by class + category → routes to lane → dispatches workers in parallel → loops until goal is fully met.
 
+### `oneshot memory` — Repo-First Memory Primitives
+Customer-repo-facing memory commands for scaffolding and maintaining durable repo memory.
+
+```bash
+./bin/oneshot memory scaffold
+./bin/oneshot memory promote decision --title "Use repo memory" --summary "Stable memory lives in docs/agents." --rationale "Keeps project truth local."
+./bin/oneshot memory retrieve "repo memory"
+./bin/oneshot memory index
+./bin/oneshot memory search "portable runbook"
+./bin/oneshot memory retrieve "repo memory" --include-cross-repo
+./bin/oneshot memory abstract --title "Portable runbook pattern" --lesson "Prefer abstractions first" --category runbook
+```
+
+These commands operate on the current repo by default, not on the OneShot repo, so they can be used directly in downstream customer projects.
+The private global index currently uses a local SQLite store and reports degraded mode explicitly if cross-repo search is unavailable.
+
 ---
 
 ## Routing

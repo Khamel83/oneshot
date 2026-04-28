@@ -1,20 +1,40 @@
 {
-  "files_with_imports": 10,
+  "files_with_imports": 23,
   "impact_ranking": [
     {
       "file": "core/task_schema.py",
-      "downstream_count": 4
+      "downstream_count": 6
+    },
+    {
+      "file": "oneshot_cli/tasks.py",
+      "downstream_count": 5
     },
     {
       "file": "core/router/lane_policy.py",
-      "downstream_count": 3
+      "downstream_count": 4
     },
     {
       "file": "core/janitor/worker.py",
       "downstream_count": 3
     },
     {
+      "file": "oneshot_cli/config.py",
+      "downstream_count": 3
+    },
+    {
+      "file": "oneshot_cli/worktree.py",
+      "downstream_count": 2
+    },
+    {
       "file": "core/janitor/jobs.py",
+      "downstream_count": 1
+    },
+    {
+      "file": "oneshot_cli/__main__.py",
+      "downstream_count": 1
+    },
+    {
+      "file": "oneshot_cli/doctor_cmd.py",
       "downstream_count": 1
     }
   ]
