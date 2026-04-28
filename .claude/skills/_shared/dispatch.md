@@ -30,7 +30,8 @@ For each task to dispatch:
    ```
    Returns: `{task_class, category, lane, workers[], review_with, search_backend, fallback_lane}`
    Workers are already ordered by category preference — first available wins.
-   If the resolver fails (missing config, import error, etc.), execute inline with Claude. Skip dispatch.
+   If the resolver fails (missing config, import error, etc.), this is a BLOCKER.
+   **Do NOT execute inline.** Log to BLOCKERS.md, stop, and tell the user the routing config is missing.
 4. Read `max_parallel` from `config/lanes.yaml` for the resolved lane
 5. If lane is `premium` → execute inline with Claude (no dispatch). Stop here.
 6. Otherwise → continue to Step 2
@@ -258,7 +259,7 @@ Write a manifest file for every dispatched task:
 
 - **Attempt 1**: dispatch to lane's worker pool
 - **Attempt 2**: dispatch to fallback_lane (if configured)
-- **Attempt 3**: Claude handles inline with full context
+- **Attempt 3**: Log blocker, skip task, continue to next task. Do NOT handle inline.
 
 ### When to Retry
 

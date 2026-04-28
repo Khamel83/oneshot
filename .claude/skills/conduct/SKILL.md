@@ -41,9 +41,11 @@ Implementation tasks MUST go to codex/gemini/glm via `core.dispatch.run` or subp
    5. What is the riskiest / most uncertain part?
 
 3. **Initialize `1shot/`** in the project root (create if missing):
-   - Write intake answers to `1shot/PROJECT.md`
-   - Update `1shot/STATE.md`: phase = "intake → plan"
-   - Create `1shot/skills/` directory
+   - Create dated subdirectory: `1shot/{YYYY-MM-DD}-{session-slug}/`
+   - Write intake answers to `1shot/{session-dir}/PROJECT.md`
+   - Update `1shot/{session-dir}/STATE.md`: phase = "intake → plan"
+   - Create `1shot/{session-dir}/skills/` directory
+   - NEVER clobber an existing session directory — each /conduct run gets its own folder
 
 4. **Show PROJECT.md** to user and confirm before proceeding.
 

@@ -23,7 +23,8 @@ Within claw_code, model routing is automatic:
 
 `strategy: first_available` is implemented in `core/dispatch/run.py`.
 
-Also read `config/workers.yaml` for machine-level worker placement (if it exists — skip silently if not).
+Also read `config/workers.yaml` for machine-level worker placement.
+If config files are missing, this is a blocker — stop and tell the user. Do NOT skip silently.
 
 ---
 
