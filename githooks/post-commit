@@ -1,0 +1,35 @@
+#!/bin/bash
+# post-commit hook — push to GitHub after local commit
+# Runs AFTER commit is made, so failure here doesn't affect the commit
+
+set -uo pipefail
+
+# Skip if we're on a detached HEAD (e.g., during rebase)
+git rev-parse --abbrev-ref HEAD >/dev/null 2>&1 || exit 0
+
+BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
+REMOTE=$(git config "branch.${BRANCH}.remote" || echo "origin")
+
+# Check if remote has changes we don't have (avoid push loss)
+if git fetch "$REMOTE" "$BRANCH" >/dev/null 2>&1; then
+    LOCAL=$(git rev-parse HEAD)
+    REMOTE=$(git rev-parse "@{u}")
+
+    if [ "$LOCAL" != "$REMOTE" ]; then
+        # Remote has diverged, pull with rebase to stay linear
+        echo "[post-commit] Remote changed, pulling first..."
+        if git pull --rebase --autostash >/dev/null 2>&1; then
+            echo "[post-commit] ✓ Pulled remote changes"
+        else
+            echo "[post-commit] ⚠ Pull failed, pushing anyway"
+        fi
+    fi
+fi
+
+# Push the commit
+if git push >/dev/null 2>&1; then
+    echo "[post-commit] ✓ Pushed to $REMOTE/$BRANCH"
+else
+    echo "[post-commit] ✗ Push failed (check network/auth)"
+    exit 1
+fi
