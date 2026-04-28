@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: full
 description: Structured operator for new projects, refactors, and complex implementations.

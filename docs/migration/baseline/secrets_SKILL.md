@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: secrets
 description: Manage encrypted secrets between the master vault and projects using SOPS/Age.

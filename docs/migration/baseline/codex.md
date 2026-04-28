@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # Codex CLI — Multi-Machine Setup & Usage
 
 > **Canonical location**: `~/.claude/rules/codex.md` (global, loads in every project)

@@ -20,3 +20,25 @@ def test_worker_harness_bridge_has_expected_aliases():
 
 def test_repo_config_bridge_is_currently_valid():
     assert MODULE.validate() == []
+
+
+def test_opencode_config_exists():
+    assert MODULE.OPENCODE_CONFIG.is_file()
+
+
+def test_opencode_agents_dir_exists():
+    assert MODULE.OPENCODE_AGENTS_DIR.is_dir()
+    agent_files = list(MODULE.OPENCODE_AGENTS_DIR.glob("*.md"))
+    assert len(agent_files) >= 1
+
+
+def test_cheap_worker_has_bash_false():
+    agent_file = MODULE.OPENCODE_AGENTS_DIR / "cheap-worker.md"
+    content = agent_file.read_text()
+    assert "bash: false" in content or "bash:false" in content
+
+
+def test_reviewer_has_bash_false():
+    agent_file = MODULE.OPENCODE_AGENTS_DIR / "reviewer.md"
+    content = agent_file.read_text()
+    assert "bash: false" in content or "bash:false" in content

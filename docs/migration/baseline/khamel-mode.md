@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # KHAMEL MODE Rules
 
 When building ANYTHING for this user, assume these defaults without asking.

@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # Delegation Rules (v12.2)
 
 Informed by:

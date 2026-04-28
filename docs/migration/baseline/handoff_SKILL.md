@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: handoff
 description: Create a structured handoff document to preserve context before /clear or /compact.

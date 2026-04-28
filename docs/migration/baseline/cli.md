@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # CLI Rules (Python + Click + SQLite)
 
 ## Default Stack

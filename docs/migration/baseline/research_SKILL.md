@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: research
 description: Run deep research in a background sub-agent using Gemini CLI or free search APIs.

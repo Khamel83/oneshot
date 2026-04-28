@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: conduct
 description: Multi-model PMO orchestrator. Asks clarifying questions first, creates a structured plan, routes work across Claude + Codex + Gemini, and loops until the goal is actually met. Use when the task is non-trivial and you want it to run until done without stopping early. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, run it, conduct.

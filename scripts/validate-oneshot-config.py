@@ -12,6 +12,8 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ONESHOT_CONFIG = REPO_ROOT / ".oneshot" / "config" / "models.yaml"
 WORKERS_CONFIG = REPO_ROOT / "config" / "workers.yaml"
+OPENCODE_CONFIG = REPO_ROOT / ".opencode" / "opencode.json"
+OPENCODE_AGENTS_DIR = REPO_ROOT / ".opencode" / "agents"
 
 WORKER_HARNESS_BRIDGE = {
     "claude_code": "claude_review",
@@ -30,6 +32,27 @@ def load_yaml(path: Path) -> dict:
 
 def validate() -> list[str]:
     errors: list[str] = []
+
+    # OpenCode adapter presence checks
+    if not OPENCODE_CONFIG.is_file():
+        errors.append(f"missing {OPENCODE_CONFIG.relative_to(REPO_ROOT)}")
+    if not OPENCODE_AGENTS_DIR.is_dir():
+        errors.append(f"missing {OPENCODE_AGENTS_DIR.relative_to(REPO_ROOT)}")
+    else:
+        agent_files = list(OPENCODE_AGENTS_DIR.glob("*.md"))
+        if not agent_files:
+            errors.append("no agent files found in .opencode/agents/")
+
+    # Cheap-worker and reviewer must have bash: false
+    for agent_name in ("cheap-worker", "reviewer"):
+        agent_file = OPENCODE_AGENTS_DIR / f"{agent_name}.md"
+        if agent_file.is_file():
+            content = agent_file.read_text()
+            if "bash: false" not in content and "bash:false" not in content:
+                errors.append(
+                    f".opencode/agents/{agent_name}.md should have bash: false"
+                )
+
     oneshot = load_yaml(ONESHOT_CONFIG)
     workers = load_yaml(WORKERS_CONFIG)
 

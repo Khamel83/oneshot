@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # CLAUDE.md - ONE_SHOT Project Configuration
 
 **This is the ONE_SHOT project's CLAUDE.md.** For your own projects, use a minimal version.

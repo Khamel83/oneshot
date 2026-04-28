@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: vision
 description: Smart visual analysis for websites and images using Playwright screenshots and AI vision.

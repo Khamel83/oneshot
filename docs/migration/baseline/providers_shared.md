@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # Shared Provider Routing Module
 
 Reference this module from any skill that needs multi-model delegation.

@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # Private Site Generator Rules (Vercel + Supabase + Python + Resend)
 
 ## What It Is

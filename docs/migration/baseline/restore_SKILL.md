@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: restore
 description: Restore context from a handoff document and continue work.

@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # Service/API Rules (Python + systemd)
 
 ## Default Stack

@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: freesearch
 description: Zero-token research using Exa API directly via curl. Saves Claude tokens.

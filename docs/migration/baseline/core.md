@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # ONE_SHOT Core Rules
 
 These rules load for every project.

@@ -617,13 +617,26 @@ def main():
     resolution = resolve_lane(args.task_class, category=args.category)
 
     if args.dry_run:
+        selected_worker = args.worker
+        availability = {}
+        for w in resolution["workers"]:
+            avail = worker_available(w)
+            availability[w] = avail
+            if not selected_worker and avail:
+                selected_worker = w
+        if not selected_worker:
+            selected_worker = resolution["workers"][0] if resolution["workers"] else None
         print(json.dumps({
             "task_class": args.task_class,
             "lane": resolution["lane"],
             "workers": resolution["workers"],
+            "worker_availability": availability,
+            "selected_worker": selected_worker,
             "review_with": resolution["review_with"],
+            "fallback_lane": resolution.get("fallback_lane"),
             "max_parallel": resolution.get("max_parallel", 3),
             "prompt_preview": args.prompt[:200],
+            "would_dispatch": True,
         }, indent=2))
         return
 

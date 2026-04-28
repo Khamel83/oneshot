@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Persistent task tracking CLI — JSON-backed, survives session end.
+"""Standalone JSON-backed task tracking (lightweight, no dispatch).
+
+For lane-based dispatch and worktree orchestration, use:
+    python3 -m oneshot_cli.tasks
 
 Usage:
     python3 scripts/tasks.py list
     python3 scripts/tasks.py add "Fix auth bug" --priority high
     python3 scripts/tasks.py update 1 done
-    python3 scripts/tasks.py update 1 in_progress
     python3 scripts/tasks.py blocked-by 1 2
     python3 scripts/tasks.py show 1
     python3 scripts/tasks.py clear-done
@@ -13,11 +15,12 @@ Usage:
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-TASKS_FILE = Path(__file__).resolve().parent.parent / "1shot" / "tasks.json"
+TASKS_FILE = Path(os.environ.get("TASKS_FILE", "")) if os.environ.get("TASKS_FILE") else Path(__file__).resolve().parent.parent / "1shot" / "tasks.json"
 
 
 def load_tasks() -> dict:

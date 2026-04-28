@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: doc
 description: Cache external documentation locally. Use when user says '/doc', 'cache docs', 'download docs', 'save documentation', 'fetch docs', or asks to reference external documentation.

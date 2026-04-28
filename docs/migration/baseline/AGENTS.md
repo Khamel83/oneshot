@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 <!-- FOR CLAUDE - NOT FOR HUMANS -->
 
 # ONE_SHOT v13 — Operator Framework

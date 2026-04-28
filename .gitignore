@@ -16,6 +16,7 @@ secrets/*.env
 !.oneshot/tasks/.gitkeep
 !.oneshot/TASKS.md
 .janitor/  # Janitor runtime data (events.jsonl, intelligence.db, usage.jsonl)
+1shot/tasks.json  # Runtime task state (scripts/tasks.py)
 
 # Output directories (runtime generated, not source)
 dispatch/

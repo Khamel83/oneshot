@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 # OneShot Baseline State — pre-router-refactor
 
 Tagged: `pre-router-refactor`

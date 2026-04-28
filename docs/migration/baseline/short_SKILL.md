@@ -1,3 +1,4 @@
+> **Historical baseline only.** Do not load as active instruction source.
 ---
 name: short
 description: Quick iterations on existing projects. Load context, ask what's next, execute in burn-down mode.
