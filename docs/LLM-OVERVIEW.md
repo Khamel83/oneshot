@@ -1,48 +1,14 @@
-This file is a merged representation of a subset of the codebase, containing specifically included files and files not matching ignore patterns, combined into a single document by Repomix.
-The content has been processed where comments have been removed, empty lines have been removed, content has been formatted for parsing in markdown style, content has been compressed (code blocks are separated by ⋮---- delimiter), security check has been disabled.
-
-# File Summary
-
-## Purpose
-This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
-It is designed to be easily consumable by AI systems for analysis, code review,
-or other automated processes.
-
-## File Format
-The content is organized as follows:
-1. This summary section
-2. Repository information
-3. Directory structure
-4. Repository files (if enabled)
-5. Multiple file entries, each consisting of:
-  a. A header with the file path (## File: path/to/file)
-  b. The full contents of the file in a code block
-
-## Usage Guidelines
-- This file should be treated as read-only. Any changes should be made to the
-  original repository files, not this packed version.
-- When processing this file, use the file path to distinguish
-  between different files in the repository.
-- Be aware that this file may contain sensitive information. Handle it with
-  the same level of security as you would the original repository.
-
-## Notes
-- Some files may have been excluded based on .gitignore rules and Repomix's configuration
-- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
-- Only files matching these patterns are included: **/*
-- Files matching these patterns are excluded: .janitor/, secrets/, *.encrypted, *.env, *.env.tmp, *.key, *.age, eval/traces/, archive/, .cache/, .agent/, .beads/, .oneshot/, dispatch/, .claude/skills/the-audit/SOURCE_DOCS/, .opencode/, .claude/memory/, .claude/plans/, .claude/tasks/, .claude/delegation-log.jsonl
-- Files matching patterns in .gitignore are excluded
-- Files matching default ignore patterns are excluded
-- Code comments have been removed from supported file types
-- Empty lines have been removed from all files
-- Content has been formatted for parsing in markdown style
-- Content has been compressed - code blocks are separated by ⋮---- delimiter
-- Security check has been disabled - content may contain sensitive information
-- Files are sorted by Git change count (files with more changes are at the bottom)
-
 # Directory Structure
 ```
 .claude/
+  agents/
+    INDEX.md
+    TEMPLATE.md
+  commands/
+    dispatch.md
+    escalate-worker.md
+    review-worker.md
+    status.md
   hooks/
     auto-handoff.sh
     delegation-log-hook.sh
@@ -57,6 +23,7 @@ The content is organized as follows:
     codex.md
     community.md
     core.md
+    delegation-enforcement.md
     delegation.md
     khamel-mode.md
     README.md
@@ -82,53 +49,6 @@ The content is organized as follows:
       SKILL.md
     handoff/
       SKILL.md
-    humanizer/
-      .git/
-        hooks/
-          applypatch-msg.sample
-          commit-msg.sample
-          fsmonitor-watchman.sample
-          post-update.sample
-          pre-applypatch.sample
-          pre-commit.sample
-          pre-merge-commit.sample
-          pre-push.sample
-          pre-rebase.sample
-          pre-receive.sample
-          prepare-commit-msg.sample
-          push-to-checkout.sample
-          sendemail-validate.sample
-          update.sample
-        info/
-          exclude
-        logs/
-          refs/
-            heads/
-              main
-            remotes/
-              origin/
-                HEAD
-          HEAD
-        objects/
-          pack/
-            pack-15053bc0d473b52923165bb6e6aa0c80a492e413.idx
-            pack-15053bc0d473b52923165bb6e6aa0c80a492e413.pack
-            pack-15053bc0d473b52923165bb6e6aa0c80a492e413.rev
-        refs/
-          heads/
-            main
-          remotes/
-            origin/
-              HEAD
-        config
-        description
-        HEAD
-        index
-        packed-refs
-      LICENSE
-      README.md
-      SKILL.md
-      WARP.md
     janitor/
       SKILL.md
     research/
@@ -141,6 +61,8 @@ The content is organized as follows:
       SKILL.md
     tdd/
       SKILL.md
+    update/
+      SKILL.md
     vision/
       SKILL.md
     INDEX.md
@@ -152,10 +74,25 @@ The content is organized as follows:
   dispatch/
     .gitkeep
   .gitignore
+  2026-04-27-plan-l-hardening-PROJECT.md
+  2026-04-27-plan-l-hardening-ROADMAP.md
+  2026-04-27-plan-l-hardening-STATE.md
+  2026-04-28-memory-architecture-PROJECT.md
+  2026-04-28-memory-architecture-ROADMAP.md
+  2026-04-28-memory-architecture-SPEC.md
+  2026-04-28-memory-architecture-STATE.md
+  2026-04-28-memory-phase1-implementation-SPEC.md
+  BLOCKERS.md
+  INDEX.md
+  MEMORY_ARCHITECTURE_SPEC.md
+  MEMORY_PHASE1_IMPLEMENTATION_SPEC.md
   OPENCODE_ADAPTER_PLAN.md
   PROJECT.md
   ROADMAP.md
   STATE.md
+  tasks.json
+bin/
+  oneshot
 config/
   lanes.yaml
   models.yaml
@@ -165,6 +102,7 @@ config/
 core/
   dispatch/
     __init__.py
+    direct_api.py
     run.py
   janitor/
     hooks/
@@ -212,6 +150,7 @@ docs/
     oneshot.md
     review.md
     search.md
+    secrets.md
     task-classes.md
     workflow.md
   meta-harness/
@@ -259,8 +198,14 @@ docs/
   sessions/
     index.md
     README.md
+  DELEGATION_MODEL.md
+  MACHINE_READINESS.md
   public-access.md
+  SEARCH_POLICY.md
   SKILLS.md
+  WORKER_LANES.md
+  WORKTREE_FLOW.md
+  ZAI_TO_OPENCODE_GO_MIGRATION.md
 eval/
   benchmarks/
     classification/
@@ -324,6 +269,8 @@ eval/
     run_classification.py
     run_config_check.py
     run_routing.py
+githooks/
+  post-commit
 hooks/
   janitor/
     context.sh
@@ -331,6 +278,21 @@ hooks/
     pre-compact.sh
     record.sh
     session-end.sh
+oneshot_cli/
+  __init__.py
+  __main__.py
+  collect_cmd.py
+  config.py
+  dispatch_cmd.py
+  doctor_cmd.py
+  escalate_cmd.py
+  lanes_cmd.py
+  memory_cmd.py
+  memory.py
+  review_cmd.py
+  status_cmd.py
+  tasks.py
+  worktree.py
 plans/
   community-starter/
     ALTERNATIVES.md
@@ -375,6 +337,7 @@ scripts/
   janitor-cron.sh
   janitor-tier-health.sh
   new-site.sh
+  oc
   oneshot-build
   oneshot-check.sh
   oneshot-update.sh
@@ -390,7 +353,9 @@ scripts/
   tasks.py
   test-community-starter.sh
   update_secrets.sh
+  validate-agents.py
   validate-docs.sh
+  validate-oneshot-config.py
   validate-skills.sh
 ssh/
   aliases.conf
@@ -444,11 +409,19 @@ templates/
   LLM-OVERVIEW.md
   TASK_SPEC.md
 tests/
+  test_argus_client.py
+  test_dispatch_cmd.py
+  test_doctor.py
+  test_lane_policy.py
+  test_memory_cmd.py
   test_oneshot.bats
+  test_task_schema.py
+  test_validate_oneshot_config.py
   test_workflow.bats
 .env.example
 .gitignore
 .gitignore.example
+.repomixignore
 .sops.yaml
 .sops.yaml.example
 AGENTS.md
@@ -468,112 +441,6 @@ SOPS_STANDALONE.md
 ```
 
 # Files
-
-## File: .claude/hooks/docs-check.sh
-````bash
-set -euo pipefail
-CACHE_BASE="${DOCS_CACHE:-$HOME/github/docs-cache/docs/cache}"
-CACHE_INDEX="$CACHE_BASE/.index.md"
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
-EXTERNAL_DIR="$PROJECT_ROOT/docs/external"
-BLUE='\033[0;34m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m'
-if [[ ! -f "$CACHE_INDEX" ]]; then
-    exit 0
-fi
-get_cached_names() {
-    grep -E '^\|' "$CACHE_INDEX" | tail -n +3 | grep -v '^|--' | \
-        while IFS='|' read -r _ name _; do
-            echo "$name" | xargs | tr '[:upper:]' '[:lower:]'
-        done
-}
-CACHED_NAMES=$(get_cached_names)
-detect_deps() {
-    local deps=""
-    # Node.js - dependencies + devDependencies
-    if [[ -f package.json ]]; then
-        deps="$deps "$(jq -r '.dependencies + .devDependencies | keys[]?' package.json 2>/dev/null | tr '[:upper:]' '[:lower:]' || true)
-        # Extract from @types/ packages too
-        deps="$deps "$(jq -r '.devDependencies | keys[]? | select(startswith("@types/")) | sub("^@types/"; "")' package.json 2>/dev/null | tr '[:upper:]' '[:lower:]' || true)
-    fi
-    # Python - requirements.txt
-    if [[ -f requirements.txt ]]; then
-        while IFS= read -r line; do
-            # Skip comments and empty lines
-            [[ "$line" =~ ^
-            [[ -z "$line" ]] && continue
-            pkg=$(echo "$line" | sed 's/[>=<!].*//' | sed 's/\[.*//' | xargs | tr '[:upper:]' '[:lower:]')
-            [[ -n "$pkg" ]] && deps="$deps $pkg"
-        done < requirements.txt
-    fi
-    if [[ -f pyproject.toml ]]; then
-        deps="$deps "$(grep -E '^dependencies = \[' -A 1000 pyproject.toml | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' | sed 's/[>=<!].*//' | sed 's/\[.*//' | xargs | tr '[:upper:]' '[:lower:]' || true)
-        deps="$deps "$(grep -E '^\[project.optional-dependencies\]' -A 1000 pyproject.toml | grep '^\[' -B 1000 | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' | sed 's/[>=<!].*//' | xargs | tr '[:upper:]' '[:lower:]' || true)
-    fi
-    if [[ -f setup.py ]]; then
-        deps="$deps "$(grep -E "(install_requires|requirements)" setup.py | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' | sed 's/[>=<!].*//' | xargs | tr '[:upper:]' '[:lower:]' || true)
-    fi
-    if [[ -f go.mod ]]; then
-        while IFS= read -r line; do
-            [[ "$line" =~ ^require ]] && continue
-            [[ "$line" =~ ^\s*// ]] && continue
-            [[ -z "$line" ]] && continue
-            pkg=$(echo "$line" | awk '{print $1}' | sed 's|.*/||' | xargs | tr '[:upper:]' '[:lower:]')
-            [[ -n "$pkg" ]] && deps="$deps $pkg"
-        done < <(sed -n '/^require (/, /^)/p' go.mod)
-    fi
-    if [[ -f Cargo.toml ]]; then
-        deps="$deps "$(grep -E '^\[dependencies\]' -A 1000 Cargo.toml | grep '=' | sed 's/\s*\([^=]*\).*/\1/' | xargs | tr '[:upper:]' '[:lower:]' || true)
-    fi
-    if [[ -f docker-compose.yml ]] || [[ -f docker-compose.yaml ]]; then
-        deps="$deps docker"
-    fi
-    if compgen -G "*.yaml" >/dev/null 2>&1 && grep -q "apiVersion:.*k8s.io" *.yaml 2>/dev/null; then
-        deps="$deps kubernetes"
-    fi
-    echo "$deps" | xargs -n1 | sort -u
-}
-PROJECT_DEPS=$(detect_deps)
-RELEVANT=""
-for cached in $CACHED_NAMES; do
-    # Check exact match
-    if echo "$PROJECT_DEPS" | grep -qx "$cached"; then
-        RELEVANT="$RELEVANT $cached"
-        continue
-    fi
-    for dep in $PROJECT_DEPS; do
-        if [[ "$dep" == *"$cached"* || "$cached" == *"$dep"* ]]; then
-            RELEVANT="$RELEVANT $cached"
-            break
-        fi
-    done
-done
-if [[ -n "$RELEVANT" ]]; then
-    echo -e "${GREEN}## Cached Docs Available${NC}"
-    echo ""
-    echo -e "The following docs are cached and relevant to this project:"
-    echo ""
-    for name in $(echo "$RELEVANT" | xargs -n1 | sort -u); do
-        echo -e "  ${BLUE}- ${name}${NC}"
-    done
-    echo ""
-    echo -e "Reference with: ${YELLOW}@docs/external/<name>/README.md${NC}"
-    # Check if docs are linked
-    if [[ -d "$EXTERNAL_DIR" ]]; then
-        LINKED=$(ls "$EXTERNAL_DIR" 2>/dev/null | wc -l)
-        if [[ "$LINKED" -gt 0 ]]; then
-            echo ""
-            echo -e "Linked docs (${LINKED}): ${YELLOW}ls docs/external/${NC}"
-        else
-            echo ""
-            echo -e "Link docs with: ${YELLOW}docs-link add$(echo "$RELEVANT" | sed 's/ / /g')${NC}"
-        fi
-    fi
-    echo ""
-fi
-````
 
 ## File: .claude/hooks/lessons-inject.sh
 ````bash
@@ -674,7 +541,1516 @@ none
 |------|-------|--------|
 ````
 
-## File: .claude/skills/doc/SKILL.md
+## File: .claude/skills/restore/SKILL.md
+````markdown
+---
+name: restore
+description: Restore context from a handoff document and continue work.
+---
+
+# /restore — Resume from Handoff
+
+Restore context from a handoff document and continue work.
+
+## Usage
+
+`/restore` — finds most recent handoff
+`/restore @thoughts/shared/handoffs/YYYY-MM-DD-file.md` — specific handoff
+
+## Process
+
+### Phase 0: Check Tasks First (Always)
+
+```
+TaskList    # See all tasks, check for in_progress
+```
+
+If tasks exist with status="in_progress" → fast path (skip to resume announcement).
+If no active tasks → read handoff file for full context.
+
+**Legacy fallback**: If native tasks unavailable, check beads:
+```bash
+bd sync
+bd list --status in_progress --json
+bd ready --json
+```
+
+### Phase 1: Context Restoration
+
+1. Read handoff document completely
+2. Parse: what's done, in progress, key decisions, blockers
+3. Read referenced artifacts (plan file, TODO.md, active files)
+
+### Phase 2: State Verification
+
+4. Verify current state matches handoff (check commits exist, files in expected state)
+5. Check if blockers were resolved
+
+### Phase 3: Resume Announcement
+
+```markdown
+## Resuming: [Task Name]
+
+**Handoff from**: YYYY-MM-DD
+
+### Progress
+| Status | Item |
+|--------|------|
+| Done | Item 1 |
+| Done | Item 2 |
+| **Resuming** | Item 3 |
+| Pending | Item 4 |
+
+### Decisions Restored
+- [Key decision 1]
+
+### Blockers: [Resolved/Still pending]
+
+### Immediate Next Action
+[What you're about to do]
+```
+
+### Phase 4: Continue
+
+Start with first item in "Next Steps" from handoff.
+
+## Finding Handoffs
+
+```bash
+ls -t thoughts/shared/handoffs/ | head -5  # Recent handoffs
+```
+
+If multiple exist, list them and ask which to resume (or use most recent).
+
+## Scenarios
+
+- **Blockers still pending**: Highlight them, ask user, continue with non-blocked items
+- **State has changed**: Note differences, ask for guidance if conflicting
+- **Multiple handoffs**: List with dates, ask which to resume
+````
+
+## File: .claude/skills/secrets/SKILL.md
+````markdown
+---
+name: secrets
+description: Manage encrypted secrets between the master vault and projects using SOPS/Age.
+---
+
+# /secrets — SOPS/Age Secret Management
+
+Manage encrypted secrets between the master vault and projects.
+
+## Master Vault
+
+Location: `~/github/oneshot/secrets/`
+Encryption: SOPS + Age (config in `~/github/oneshot/.sops.yaml`)
+
+## CLI Commands
+
+The `secrets` CLI (at `~/.local/bin/secrets`) works from any directory.
+
+```bash
+# Read a single key
+secrets get EXA_API_KEY
+
+# List all vault files and their keys
+secrets list
+
+# Decrypt a full file to stdout
+secrets decrypt research_keys
+
+# Add/update a key (non-interactive, no commit)
+secrets set research_keys 'NEW_KEY=value'
+
+# Add/update + commit + push
+secrets set research_keys 'NEW_KEY=value' --commit
+
+# Bootstrap .env in a project from the vault
+cd ~/github/myproject && secrets init services
+```
+
+## Pull Secrets into a Project
+
+1. Identify which secrets the project needs (check `.env.example` or imports)
+2. Run `secrets init <namespace>` to write `.env` from the vault
+3. Verify the app can start with the new secrets
+
+## Push New Secrets to the Vault
+
+1. Add/update: `secrets set <namespace> 'KEY=value'`
+2. Commit when ready: `secrets set <namespace> 'KEY=value' --commit`
+
+## Common Patterns
+
+```bash
+# Find which vault file contains a key
+secrets list | grep -i brave
+
+# Extract a key for use in a script
+BRAVE_KEY=$(secrets get BRAVE_API_KEY)
+
+# View all keys in a namespace
+secrets decrypt research_keys
+```
+
+## How It Works
+
+- Vault files are SOPS-encrypted dotenv at `~/github/oneshot/secrets/*.encrypted`
+- `secrets get` searches all vault files for the key
+- `secrets set` decrypts the file, merges the new key, re-encrypts
+- `secrets init` decrypts a vault file to `.env` in the current directory
+- Age key lives at `~/.age/key.txt`
+
+## Safety Rules
+
+- Never display secret values in output
+- Always verify `.env` is in `.gitignore` before writing
+- Namespace secrets by project in the vault
+- Never commit plaintext secrets
+- Never suggest `.env` files without encryption
+
+## Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| `no matching creation rules found` | Input file must end in `.encrypted` (handled by the CLI automatically) |
+| `key not found in any vault file` | Key doesn't exist in any vault — add it with `secrets set` |
+| `file not found` | Check `secrets list` for available namespaces |
+````
+
+## File: .claude/skills/vision/SKILL.md
+````markdown
+---
+name: vision
+description: Smart visual analysis for websites and images using Playwright screenshots and AI vision.
+---
+
+# /vision — Visual Inspection of Websites and Images
+
+Smart visual analysis that handles both websites and images.
+
+## Usage
+
+```
+/vision <url> [prompt]
+```
+
+- `<url>` — Website URL OR direct image URL
+- `[prompt]` — Optional: what to look for (default: comprehensive analysis)
+
+## Behavior
+
+| URL Type | What Happens |
+|----------|--------------|
+| Website (`https://example.com`) | Playwright navigates → screenshots → analyzes |
+| Image (`https://.../*.png|jpg|jpeg`) | Direct analysis with mcp__4_5v_mcp__analyze_image |
+
+## Examples
+
+```
+/vision https://example.com
+→ Navigates to site, takes screenshot, analyzes layout and design
+
+/vision https://example.com "What colors are used?"
+→ Screenshots site, analyzes color palette
+
+/vision https://mockup.png "replicate"
+→ Direct image analysis for UI replication
+
+/vision https://diagram.png "Describe the architecture"
+→ Direct image analysis
+```
+
+## For UI Replication
+
+```
+/vision https://mysite.com "replicate"
+```
+
+Uses the replication prompt: "Describe in detail the layout structure, color style, main components, and interactive elements to facilitate code generation."
+
+## Execution Steps
+
+When invoked:
+
+1. **Detect URL type:**
+   - Ends in `.png`, `.jpg`, `.jpeg` (case insensitive) → image
+   - Otherwise → website
+
+2. **For images:**
+   - Call `mcp__4_5v_mcp__analyze_image` directly
+   - If prompt is "replicate", use specialized replication prompt
+   - Otherwise use provided prompt or default comprehensive analysis
+
+3. **For websites:**
+   - Call `mcp__playwright__browser_navigate` with the URL
+   - Call `mcp__playwright__browser_screenshot` to capture
+   - Call `mcp__4_5v_mcp__analyze_image` on the screenshot
+   - If prompt is "replicate", use specialized replication prompt
+
+## Tools Used
+
+- `mcp__playwright__browser_navigate` — Navigate to websites
+- `mcp__playwright__browser_screenshot` — Capture screenshots
+- `mcp__4_5v_mcp__analyze_image` — AI vision analysis
+
+## Requirements
+
+- Playwright MCP server must be configured
+- The `mcp__4_5v_mcp__analyze_image` MCP must be available
+
+## Local Images
+
+For local image files, use Read tool directly:
+```
+Read: screenshots/mockup.png
+```
+````
+
+## File: .claude/skills/SKILLS_REFERENCE.md
+````markdown
+# Claude Code Skills Reference
+
+## Quick Reference
+
+### Correct Location
+```
+~/.claude/skills/<skill-name>/SKILL.md
+```
+
+### Required Format
+```yaml
+---
+name: skill-name
+description: What it does and WHEN Claude should use it. Include trigger keywords.
+---
+
+# Skill Title
+
+Instructions here...
+```
+
+### Key Points
+
+1. **`name:` field is REQUIRED** — Without it, skill won't be discovered
+2. **`description:` must include triggers** — Claude uses this to decide when to invoke
+3. **Directory name should match skill name** — For clarity
+4. **Skills are model-invoked** — Claude decides when to use them automatically
+
+## Common Issues
+
+### Skills not appearing
+
+**Symptom**: `/help` doesn't show your skills, or `/skill-name` returns "Unknown skill"
+
+**Causes**:
+1. Missing `name:` field in frontmatter
+2. Invalid YAML syntax (tabs instead of spaces)
+3. Wrong location (should be `~/.claude/skills/<name>/SKILL.md`)
+4. File named incorrectly (must be `SKILL.md`, not `skill.md` or `<name>.md`)
+
+### How to verify
+
+```bash
+# Check skill exists
+ls ~/.claude/skills/<name>/SKILL.md
+
+# Verify frontmatter
+head -5 ~/.claude/skills/<name>/SKILL.md
+```
+
+### Frontmatter validation
+
+Valid:
+```yaml
+---
+name: my-skill
+description: Does X when user says Y or Z.
+---
+```
+
+Invalid (missing name):
+```yaml
+---
+description: Does X when user says Y or Z.
+---
+```
+
+Invalid (tabs in YAML):
+```yaml
+---
+	name: my-skill    # TABS NOT ALLOWED
+description: ...
+---
+```
+
+## Migration from Commands
+
+If you have files in `~/.claude/commands/` that aren't working:
+
+```bash
+# Convert each command to a skill
+for cmd in command1 command2; do
+  mkdir -p ~/.claude/skills/$cmd
+  cp ~/.claude/commands/$cmd.md ~/.claude/skills/$cmd/SKILL.md
+
+  # Add name field if missing
+  sed -i "1,2s|---|---\nname: $cmd|" ~/.claude/skills/$cmd/SKILL.md
+done
+
+# Backup and remove old commands
+mkdir -p ~/.claude/commands-backup
+mv ~/.claude/commands/*.md ~/.claude/commands-backup/
+```
+
+## Sources
+
+- Official docs: https://docs.anthropic.com/en/docs/claude-code/skills
+````
+
+## File: core/router/__init__.py
+````python
+
+````
+
+## File: core/router/model_registry.py
+````python
+CONFIG_DIR = Path(__file__).resolve().parent.parent.parent / "config"
+def load_models(config_path: Optional[str] = None) -> dict
+⋮----
+path = config_path or str(CONFIG_DIR / "models.yaml")
+⋮----
+def models_for_lane(lane: str, config_path: Optional[str] = None) -> list[str]
+⋮----
+models = load_models(config_path)
+⋮----
+def can_plan(model_id: str, config_path: Optional[str] = None) -> bool
+def can_review(model_id: str, config_path: Optional[str] = None) -> bool
+def get_model_info(model_id: str, config_path: Optional[str] = None) -> dict
+````
+
+## File: core/search/__init__.py
+````python
+
+````
+
+## File: core/__init__.py
+````python
+
+````
+
+## File: docs/instructions/learned/.gitkeep
+````
+
+````
+
+## File: docs/instructions/core.md
+````markdown
+# Core Rules
+
+These rules apply to every project, regardless of type.
+
+## STOP BEING CLEVER
+
+**YOU ARE A ROBOT. JUST DO THE SIMPLE THING FAST FIRST.**
+
+- Don't edit databases directly when there's a UI
+- Don't write scripts when a CLI exists
+- Don't debug for an hour when restarting might fix it
+- If there's a 30-second solution, do that before the 30-minute solution
+
+## JUST DO IT
+
+**If you CAN do it, DO it. Don't ask the human to do your job.**
+
+| Don't say | Just do |
+|-----------|---------|
+| "Can you check the logs?" | `tail -50 /var/log/...` |
+| "Can you add this file?" | Write the file |
+| "You'll need to install X" | `apt install X` or `npm install X` |
+| "Run this command" | Run it yourself |
+| "Can you verify it works?" | Run the test, show the output |
+| "Should I read this file?" | Read it. Then tell me what's there. |
+
+**Exceptions** (ask first):
+- Destructive operations (rm -rf, DROP TABLE, force push)
+- Actions that affect others (deploying to production, sending messages)
+- Spending money (API calls that cost $, provisioning cloud resources)
+
+## Work Discipline
+
+- **Plan first**: Always start with a plan before coding. Think, then do.
+- **Commit per task**: Don't batch commits to end-of-session. Commit each completed task immediately.
+- **Keep tasks small**: Break work so each subtask completes well within context.
+- **Vanilla over complex**: Simple direct work beats elaborate orchestration for small tasks.
+
+## Documentation-First Coding
+
+Before writing code that uses external APIs, libraries, or configuration syntax:
+
+1. Check local cached docs: `~/github/docs-cache/docs/cache/.index.md`
+2. If insufficient, use WebSearch for current docs
+3. Verify version compatibility
+4. Write code using current syntax, not training data
+
+## Task Management
+
+Use native Tasks (TaskCreate, TaskUpdate, TaskList) for all task tracking.
+
+- Persistent in `~/.claude/tasks/`
+- Survive `/clear` and context compression
+- Session start: `TaskList` → pick unblocked task → `TaskUpdate` in_progress
+- Session end: `git status` → stage → commit → `TaskUpdate` completed → push
+
+## Decision Defaults
+
+| Ambiguity | Default |
+|-----------|---------|
+| Multiple implementations | Simplest one |
+| Naming | Follow existing pattern |
+| Error handling | Match surrounding code |
+| Test framework | Use existing tests as guide |
+| Library choice | One already in project |
+| Refactor opportunity | Skip unless blocking |
+````
+
+## File: docs/instructions/review.md
+````markdown
+# Review & Delegation Rules
+
+## Planner/Worker Split
+
+This is the architectural line that all routing follows:
+
+### Claude Code Owns (Planner)
+- Planning and decomposition
+- Repo synthesis and context gathering
+- Task classification and lane selection
+- Final review and integration
+- Sensitive edits (auth, data mutation)
+
+### Workers Own (Bounded Execution)
+- Bounded implementation tasks
+- Test generation
+- Draft documentation
+- Search-result summarization
+- Isolated experiments
+
+## Assessment Before Delegating
+
+| Dimension | Low | High |
+|-----------|-----|------|
+| **Complexity** | Single tool call | Exploration + synthesis, 5+ calls |
+| **Criticality** | Read-only, informational | Deployment, auth, data mutation |
+| **Uncertainty** | Clear inputs, known approach | Open-ended, multiple valid paths |
+
+**Routing:**
+- Low complexity + low criticality → handle inline, skip delegation
+- High criticality + high uncertainty → ask before proceeding
+- High criticality → git checkpoint before delegating
+- Low complexity + low cost → use cheapest available model
+
+## Verification After Delegating
+
+| Task Type | Method |
+|-----------|--------|
+| Code search | Spot-check 1-2 claims against actual files |
+| Code changes | Read modified files, confirm diff matches intent |
+| Build / test | Check exit code (0 = success) |
+| Research | Confirm key claims have real sources |
+
+## Fallback Chain (3 attempts max)
+
+```
+1. Original worker (from lane pool)
+   ↓ fails
+2. Escalate to fallback_lane (from config/lanes.yaml)
+   ↓ fails
+3. Main agent (Claude) handles inline with full context
+```
+
+If all 3 fail → log blocker, skip, continue.
+
+## Quality Gate
+
+For adversarial/challenge phases:
+- Codex (if available): fresh perspective on diffs and plans
+- Always: Claude performs final integration
+
+## Circuit Breaker
+
+If same task fails 3 times with different approaches:
+1. Log to `BLOCKERS.md` or `1shot/ISSUES.md`
+2. Skip to next unblocked task
+3. Continue without it
+
+## Credit Assignment
+
+After multi-span sessions, evaluate which delegations contributed most:
+
+| Signal | Credit | Blame |
+|--------|--------|-------|
+| Output reused by later steps | +credit | |
+| Last delegation before failure | | +blame |
+| Wasted compute (no output) | | +blame |
+| Unblocked a stuck task | +credit | |
+| Low-cost delegation that succeeded | +credit | |
+````
+
+## File: docs/migration/baseline/AGENTS.md
+````markdown
+<!-- FOR CLAUDE - NOT FOR HUMANS -->
+
+# ONE_SHOT v13 — Operator Framework
+
+> **Context is the scarce resource.** Three operators, seven utilities. Discover skills on demand.
+
+---
+
+## OPERATORS
+
+### `/short` — Quick Iteration
+
+```
+/short [scope]
+```
+
+**Behavior:**
+1. Load context: git log -5, TaskList, DECISIONS.md, BLOCKERS.md
+2. Ask: "What are you working on?"
+3. Discover skills on demand (~/.claude/skills/ index)
+4. Execute in burn-down mode
+5. Show delegation summary on completion
+
+**Decision defaults:** Simplest implementation, match existing patterns, skip refactors unless blocking.
+
+### `/full` — Structured Work
+
+```
+/full [project-description]
+```
+
+**Behavior:**
+1. Create/load IMPLEMENTATION_CONTEXT.md
+2. Structured intake: goals, scope, architecture, constraints
+3. Phase-based planning with milestones
+4. Skill discovery via ~/.claude/skills/ index
+5. Execute with context checkpoints (50% → suggest handoff, 70% → auto-handoff)
+6. Verify and show completion summary
+
+**For:** New projects, refactors, complex features.
+
+### `/conduct` — Multi-Model PMO Orchestrator
+
+```
+/conduct [idea or goal]
+```
+
+**Behavior:**
+1. Detect available providers (codex, gemini)
+2. Ask clarifying questions — BLOCKING, nothing runs until answered
+3. Create structured plan with task breakdown
+4. Route work across Claude + Codex + Gemini based on task type
+5. Loop until goal is fully met (not just started)
+
+**For:** Non-trivial tasks where you want autonomous execution across models until done.
+
+---
+
+## UTILITY COMMANDS
+
+| Command | Purpose |
+|---------|---------|
+| `/handoff` | Save context before /clear |
+| `/restore` | Resume from handoff |
+| `/research` | Background research |
+| `/freesearch` | Zero-token web search (Exa) |
+| `/doc` | Cache external docs |
+| `/vision` | Image/website analysis |
+| `/secrets` | SOPS/Age secrets |
+
+---
+
+## DEPLOYABLE TEMPLATES
+
+| Use Case | Template | Stack |
+|----------|----------|-------|
+| Membership/community sites | `templates/community-starter/` | Vercel + Supabase + Python + Resend |
+
+---
+
+## DECISION DEFAULTS
+
+When ambiguous, apply without asking:
+
+| Ambiguity | Default |
+|-----------|---------|
+| Multiple implementations | **Simplest** |
+| Naming | Follow existing pattern |
+| Refactor opportunity | **Skip** unless blocking |
+| Stack | Follow CLAUDE.md |
+| Error handling | Match surrounding code |
+| Test framework | Use existing tests |
+
+**Key rule:** When truly ambiguous, pick option A, note in DECISIONS.md.
+
+---
+
+## AUTO-APPROVED ACTIONS
+
+- Reading any file
+- Writing to scope-matched files
+- Running tests and linters
+- Creating DECISIONS.md, BLOCKERS.md, CHANGES.md
+- Git commit (not push)
+- Creating native tasks
+
+## REQUIRES CONFIRMATION
+
+- Destructive operations (rm -rf, DROP TABLE)
+- Git push to shared branches
+- External API calls that cost money
+- Deploying to production
+
+---
+
+## DELEGATION
+
+Before delegating: assess (complexity, criticality, uncertainty)
+After delegating: verify the result
+On failure: escalate (original → inline → human)
+
+**Delegation summary on completion:**
+```
+📊 Delegation Summary
+├─ N delegations, avg reward: X.XX
+├─ Best: [agent] (reward) - [description]
+└─ Tip: [optimization]
+```
+
+---
+
+## PHILOSOPHY
+
+> "It's harder to read code than to write it." — Joel Spolsky
+
+**NEVER rewrite from scratch.** Extend, refactor, use existing solutions.
+
+**USER TIME IS PRECIOUS.** Agents should make reasonable decisions autonomously.
+
+---
+
+## VERSION
+
+v13.2 | 10 skills + 1 external | Operators discover skills on demand
+````
+
+## File: docs/migration/baseline/CLAUDE.md
+````markdown
+# CLAUDE.md - ONE_SHOT Project Configuration
+
+**This is the ONE_SHOT project's CLAUDE.md.** For your own projects, use a minimal version.
+
+---
+
+## Progressive Disclosure: Load Rules by Project Type
+
+**Core rules always load**: `~/.claude/rules/core.md`
+
+**Project-specific rules load based on detection**:
+
+| Project Type | Trigger | Rules |
+|--------------|---------|-------|
+| Web app | `astro.config.*` or `wrangler.toml` | `~/.claude/rules/web.md` |
+| CLI | `setup.py` or `pyproject.toml` | `~/.claude/rules/cli.md` |
+| Service | `*.service` or long-running `*.py` | `~/.claude/rules/service.md` |
+| Generic | None detected | Core rules only |
+
+**User-specific defaults**: `~/.claude/rules/khamel-mode.md`
+**Delegation protocol**: `~/.claude/rules/delegation.md` (always loaded)
+
+---
+
+## For This Project (ONE_SHOT)
+
+ONE_SHOT is the framework itself. Read core rules + all project type rules for full context.
+
+```
+Core: ~/.claude/rules/core.md
+Delegation: ~/.claude/rules/delegation.md
+Web: ~/.claude/rules/web.md
+CLI: ~/.claude/rules/cli.md
+Service: ~/.claude/rules/service.md
+KhameL: ~/.claude/rules/khamel-mode.md
+Codex: .claude/rules/codex.md
+```
+
+---
+
+## Deployable Templates
+
+| Use Case | Template | Stack |
+|----------|----------|-------|
+| Membership/community sites | `templates/community-starter/` | Vercel + Supabase + Python + Resend |
+
+---
+
+## Quick Reference
+
+- **New project?** → `/full` operator
+- **Quick iteration?** → `/short` operator
+- **Multi-model task?** → `/conduct` operator
+- **Task tracking** → Native TaskCreate/TaskList tools (`~/.claude/tasks/`)
+- **Deployment** → oci-dev (100.126.13.70) via Tailscale
+- **Stack defaults** → See `khamel-mode.md`
+- **External docs** → `docs-link add <name>` (links cached docs to project)
+- **Docs cache** → `~/.claude/rules/docs-cache-pattern.md`
+- **Skills** → `~/.claude/skills/` (10+1 total: /short, /full, /conduct + 7 utilities + humanizer)
+- **Codex CLI** → `.claude/rules/codex.md` (auth, sandbox fix, all 3 machines)
+
+---
+
+## Token Savings
+
+| Before (full CLAUDE.md) | After (progressive) |
+|------------------------|---------------------|
+| ~2000 tokens | ~300 tokens |
+
+**Savings: 85%**
+
+---
+
+<!--
+  ONE-SHOT Heartbeat Metadata
+  oneshot:last-check: 2026-03-22
+  oneshot:machine: oci-dev
+-->
+````
+
+## File: docs/migration/baseline/cli.md
+````markdown
+# CLI Rules (Python + Click + SQLite)
+
+## Default Stack
+
+When building CLIs for this user:
+
+```
+Python + Click + SQLite
+```
+
+## When to Use
+
+Detect by presence of:
+- `setup.py` or `pyproject.toml`
+- CLI entry points defined
+- No `astro.config.*` or `wrangler.toml` or web framework files
+
+## Click-Specific Rules
+
+- **Use Click for CLI** - Don't suggest argparse, typer, or other CLI libs
+- **Command groups** - Use `@click.group()` for multi-command CLIs
+- **Context objects** - Use `@click.pass_context` for shared state
+- **Auto-completion** - Add shell completion support
+
+## SQLite-Specific Rules
+
+- **SQLite is default** - Don't suggest PostgreSQL, MongoDB
+- **Use sqlite3 module** - No ORM needed for simple CLIs
+- **Migrations** - Simple schema versioning, avoid heavy migration tools
+
+## Packaging
+
+- **pip install -e .** - For development
+- **pyproject.toml** - Modern packaging standard
+- **Entry points** - Define console scripts in pyproject.toml
+
+## Anti-Patterns
+
+- ❌ Don't suggest web frameworks (FastAPI, Flask)
+- ❌ Don't suggest external databases
+- ❌ Don't suggest Docker for local development
+- ❌ Don't suggest complex ORMs (SQLAlchemy, Django ORM)
+````
+
+## File: docs/migration/baseline/codex.md
+````markdown
+# Codex CLI — Multi-Machine Setup & Usage
+
+> **Canonical location**: `~/.claude/rules/codex.md` (global, loads in every project)
+> This copy lives in oneshot for version control. Keep them in sync.
+
+Codex (OpenAI's agentic coding CLI) runs on all three machines in this setup.
+This guide documents what works, what doesn't, and why — learned the hard way on 2026-03-30.
+
+---
+
+## TL;DR — The Working Command
+
+```bash
+# DO THIS — not --full-auto
+unset OPENAI_API_KEY
+codex exec --sandbox danger-full-access "your prompt here"
+```
+
+**From any machine, from any repo that's in `~/.codex/config.toml` as trusted.**
+
+---
+
+## Machine Status
+
+| Machine | Works | Auth |
+|---------|-------|------|
+| oci-dev (100.126.13.70) | ✓ | `~/.codex/auth.json` |
+| homelab (100.112.130.100) | ✓ | `~/.codex/auth.json` |
+| macmini (100.113.216.27) | ✓ | `~/.codex/auth.json` |
+
+---
+
+## Auth: ChatGPT Plus OAuth (NOT API key)
+
+Codex uses your **ChatGPT Plus login**, not an OpenAI API key.
+
+- Auth is stored in `~/.codex/auth.json`
+- Obtained via `codex login` (opens browser)
+- The token auto-refreshes via `refresh_token` — it stays valid
+
+**Critical:** If `OPENAI_API_KEY` is set in the environment, it overrides the OAuth token
+and hits the paid API instead. That account has no credits → 404/429 errors.
+Always `unset OPENAI_API_KEY` before running codex.
+
+### If auth.json is missing or broken
+
+```bash
+# Option 1: Re-login (requires browser)
+codex login
+# Then paste the localhost:1455 callback URL back to Claude
+
+# Option 2: Copy from a working machine (fastest)
+scp homelab:/home/khamel83/.codex/auth.json ~/.codex/auth.json
+```
+
+### If the subscription lapses
+
+The token encodes subscription status. After renewing ChatGPT Plus at chat.openai.com,
+run `codex login` again to get a fresh token — the old one won't get access back automatically.
+
+---
+
+## The Sandbox Problem: Why `--full-auto` Breaks Here
+
+`--full-auto` is shorthand for `--sandbox workspace-write`, which uses **bwrap** (bubblewrap)
+for sandboxing. On these Linux servers (OCI + homelab), bwrap fails:
+
+```
+bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+```
+
+This is a kernel/container restriction — bwrap can't create a loopback interface.
+
+**Fix:** Use `--sandbox danger-full-access` instead. This skips bwrap entirely.
+These machines are already on Tailscale + behind OCI security groups, so the blast
+radius of a rogue shell command is limited.
+
+```bash
+# BROKEN on these machines:
+codex exec --full-auto "..."
+
+# WORKS:
+codex exec --sandbox danger-full-access "..."
+```
+
+---
+
+## Config (`~/.codex/config.toml`)
+
+```toml
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+approvals_reviewer = "user"
+
+# DO NOT set openai_base_url — the default is correct
+# Setting it to "https://api.openai.com" (without /v1) causes 404s on the WebSocket
+# Setting it to "https://api.openai.com/v1" causes double-path issues on some calls
+# Leave it unset and let codex use its built-in default
+
+[projects."/home/ubuntu/github/atlas"]
+trust_level = "trusted"
+# ... other trusted projects
+```
+
+---
+
+## Running Across Machines
+
+From oci-dev, you can run codex on remote machines via SSH:
+
+```bash
+# Run codex on homelab
+ssh homelab "cd ~/github/myproject && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'your task'"
+
+# Run on macmini
+ssh macmini "cd ~/github/myproject && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'your task'"
+```
+
+Or Claude Code can dispatch tasks to all three in parallel using Bash with `&` + `wait`.
+
+---
+
+## Debugging Checklist
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `404 Not Found` on `wss://.../responses` | `OPENAI_API_KEY` is set with no credits | `unset OPENAI_API_KEY` |
+| `401 Missing bearer` | `auth.json` is missing | Copy from homelab or re-login |
+| `401 Missing scopes: api.responses.write` | Stale/incomplete token | Re-login or copy from working machine |
+| `bwrap: loopback: Failed RTM_NEWADDR` | bwrap blocked by kernel | Use `--sandbox danger-full-access` |
+| `insufficient_quota` | Using API key account (no credits) | `unset OPENAI_API_KEY` |
+| Subscription expired 404 | ChatGPT Plus lapsed | Renew at chat.openai.com + re-login |
+
+---
+
+## History / Why This Exists
+
+This was debugged on 2026-03-30 in a Claude Code session. The problems encountered:
+1. `OPENAI_API_KEY` in vault was set on PATH, sending requests to the no-credits API account
+2. `openai_base_url = "https://api.openai.com"` was manually added to config — wrong (missing `/v1`)
+3. A `codex logout` during debugging deleted auth.json, breaking everything
+4. `--full-auto` (bwrap sandbox) doesn't work on OCI/homelab Linux kernels
+5. ChatGPT Plus subscription had lapsed (Feb 14) — renewed March 30
+
+The fix that unlocked everything: copy `auth.json` from homelab, use `--sandbox danger-full-access`.
+````
+
+## File: docs/migration/baseline/community.md
+````markdown
+# Private Site Generator Rules (Vercel + Supabase + Python + Resend)
+
+## What It Is
+
+A multi-tenant platform for spinning up private micro-sites from a single deployment.
+Each site gets its own auth, database schema, and admin. Lives at `templates/community-starter/`.
+
+See `templates/community-starter/SETUP.md` for setup, `ARCHITECTURE.md` for design.
+
+## When to Recommend
+
+Use this stack when the user asks for:
+- Private membership site / community platform
+- "Spin up a site for my class/team/group"
+- Multi-tenant app with isolated data per site
+- League management / cohort tracking
+- Invite-only web app with admin controls
+- "Like a private Slack but as a website"
+
+## Stack
+
+| Component | Tool |
+|-----------|------|
+| Hosting | Vercel (Hobby: 12 serverless functions max — uses 2) |
+| Auth | Supabase Auth (email/password + optional Google OAuth) |
+| Database | Supabase Postgres (schema-per-site isolation) |
+| Email | Resend (free tier: 3,000 emails/month) |
+| Frontend | Plain HTML + vanilla JS (no build step) |
+| API | Python router + handler modules |
+
+## Key Architecture
+
+- **Single router** (`api/index.py`) handles all sites via path parsing
+- **Schema-per-site**: each site is a Postgres schema, queries use `Accept-Profile` header
+- **Handler modules** in `api/handlers/`: auth, members, admin, email
+- **Site creation**: `scripts/new-site.sh {slug} "{name}" --admin-email {email}`
+
+## Anti-Patterns
+
+- Don't use for public marketing sites (use Astro + Cloudflare)
+- Don't use for high-traffic APIs (not designed for scale)
+- Don't use when payments/Stripe are needed
+- Don't suggest React/Next.js additions unless explicitly asked
+
+## Key Files
+
+- `api/index.py` — Single router function (replaces individual handlers)
+- `api/_supabase.py` — Supabase client + multi-tenant helpers (`set_site`, `site_exists`)
+- `api/handlers/auth.py` — Login, signup, session, password reset
+- `api/handlers/members.py` — Member directory CRUD
+- `api/handlers/admin.py` — Admin-only endpoints
+- `api/handlers/email.py` — Scheduled + transactional email
+- `api/system.py` — Health check + site listing
+- `migrations/00_sites_table.sql` — Site registry table
+- `migrations/01_schema_template.sql` — Per-site DDL template
+- `migrations/02_rls_template.sql` — Per-site RLS template
+- `scripts/new-site.sh` — Site creation automation
+
+## Gotchas
+
+- Vercel Hobby = 12 functions max (template uses 2: index.py, system.py)
+- Bulk emails may 504 — template handles via email_log dedup
+- Always `.lower()` emails before storing/comparing
+- Email handler imports `db` lazily — patch `api._supabase.db` in tests, not `api.handlers.email.db`
+- Use `get_user_from_request()` before ANY data read/write
+- CRON_SECRET is the only valid auth for scheduled jobs
+````
+
+## File: docs/migration/baseline/conduct_SKILL.md
+````markdown
+---
+name: conduct
+description: Multi-model PMO orchestrator. Asks clarifying questions first, creates a structured plan, routes work across Claude + Codex + Gemini, and loops until the goal is actually met. Use when the task is non-trivial and you want it to run until done without stopping early. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, run it, conduct.
+---
+
+# /conduct — Multi-Model PMO Orchestrator
+
+Routes work across Claude, Codex, and Gemini. Asks questions first. Loops until done.
+
+## Usage
+
+```
+/conduct
+/conduct <idea or goal>
+```
+
+## Behavior
+
+When invoked:
+
+### Phase 0: Intake (BLOCKING — nothing else runs until complete)
+
+1. **Detect providers**
+   ```bash
+   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
+   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+   ```
+   If codex missing: suggest `npm install -g @openai/codex`, continue without it.
+   If gemini missing: continue without it.
+
+2. **Ask 5 required questions** using AskUserQuestion — do NOT proceed until answered:
+   1. What is the goal / deliverable?
+   2. What does done look like? (acceptance criteria — be specific)
+   3. What is in scope? What is explicitly out of scope?
+   4. Any constraints? (tech stack, time, things to avoid)
+   5. What is the riskiest / most uncertain part?
+
+3. **Initialize `1shot/`** in the project root (create if missing):
+   - Copy templates from `~/.claude/skills/conduct/templates/`
+   - Write intake answers to `1shot/PROJECT.md`
+   - Update `1shot/STATE.md`: phase = "intake → plan"
+   - Update `1shot/config.json`: set providers based on detection
+   - Create `1shot/skills/` directory (for SkillsMP pulls)
+   - Create or refresh `1shot/LLM-OVERVIEW.md` with what is this, stack, key files
+
+4. **Show PROJECT.md** to user and confirm before proceeding.
+
+### Phase 1: Plan
+
+1. **Explore codebase** (Explore subagent) — identify impacted files
+2. **Docs Check**
+   - Identify all external libraries, APIs, and tools needed
+   - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
+   - For anything missing → run `/doc <name> <url>` before assigning build tasks
+   - Use cached docs as source of truth — do NOT rely on training data for syntax
+3. **Write `1shot/ROADMAP.md`** — phases and success criteria from PROJECT.md
+4. **Skill Discovery** — for each major task type in the roadmap:
+   - Check `1shot/skills/` for already-pulled skills
+   - Ask: *"Is this specialized enough that a community skill would do this better?"*
+   - Specialized (security, blockchain, ML, specific APIs, infra tools): search SkillsMP
+     ```bash
+     ./scripts/skillsmp-search.sh "<task type>" --install
+     ```
+   - General (write tests, refactor, add endpoint): skip, use core skills
+5. **Create native tasks** — one TaskCreate per deliverable (not steps):
+   - subject: deliverable title
+   - description: acceptance criteria from PROJECT.md, files to touch, skill to use if pulled
+   - Set addBlockedBy for dependencies
+6. **Update STATE.md**: phase = "plan → build"
+7. **Show task list** before proceeding
+
+### Phase 2: Build Loop
+
+Repeat until no unblocked tasks remain:
+
+1. Pick next unblocked task (`TaskList` → lowest ID pending)
+2. `TaskUpdate` → in_progress
+3. **Route to provider** (see Routing Logic below)
+4. Execute fully, commit: `git add <files> && git commit -m "feat: <task>"`
+5. `TaskUpdate` → completed
+6. Update `1shot/STATE.md`: increment loop count, log action
+7. **Circuit breaker check**: if same task failed 3x → add to `1shot/ISSUES.md` blockers → skip → continue
+
+If 3 consecutive tasks hit circuit breaker → stop, surface to user.
+
+### Phase 3: Verify
+
+For each completed task:
+1. Check acceptance criteria from `1shot/PROJECT.md`
+2. Run tests:
+   - `./scripts/ci.sh` if present
+   - else `npm test` / `pytest` / `go test ./...` based on project type
+3. Failed tasks → `TaskUpdate` status back to pending with failure notes → loop to Phase 2
+
+### Phase 4: Challenge (adversarial pass)
+
+1. `git diff $(git merge-base HEAD main)..HEAD` — full diff since conduct started
+2. If Codex available:
+   ```bash
+   codex exec --full-auto "You are an adversarial reviewer. Read this diff and find: (1) what could break, (2) what was missed, (3) unhandled edge cases. Be specific. Diff: [diff content]"
+   ```
+   If Codex unavailable: Claude performs adversarial review inline.
+3. New issues found → create new Tasks → loop back to Phase 2
+4. Clean pass → update STATE.md: phase = "complete"
+
+### Done
+
+- STATE.md phase = "complete"
+- Print summary:
+  ```
+  ✅ Conduct Complete
+  ├─ Tasks: X/Y completed
+  ├─ Providers used: [list]
+  ├─ Files changed: Z
+  ├─ Commits: N
+  └─ Blockers skipped: M (see 1shot/ISSUES.md)
+  ```
+
+---
+
+## Routing Logic
+
+See `~/.claude/skills/_shared/providers.md` for provider detection, routing table, dispatch commands, quality gates, and circuit breaker.
+
+**Conduct-specific routing**: Conduct uses all tiers. Plan review and adversarial challenge phases always route to Codex when available. Research tasks route to Gemini. Implementation stays with Claude.
+
+---
+
+## `1shot/PROJECT.md` Template
+
+```markdown
+# Project: [goal title]
+
+## Goal
+[What are we building / delivering?]
+
+## Done When
+[Specific acceptance criteria — measurable, not vague]
+
+## In Scope
+- [item]
+
+## Out of Scope
+- [item]
+
+## Constraints
+[Tech stack, time limits, things to avoid]
+
+## Riskiest Part
+[What's most likely to go wrong or be uncertain]
+
+## Status
+IN_PROGRESS
+<!-- change to COMPLETE when all tasks pass verify + challenge -->
+```
+
+---
+
+## Decision Defaults
+
+| Ambiguity | Default |
+|-----------|---------|
+| Multiple implementations | Simplest one |
+| Naming | Follow existing pattern in file |
+| Error handling | Match surrounding code |
+| Test framework | Use existing tests as guide |
+| Library choice | One already in project |
+| Refactor opportunity | Skip unless blocking |
+| Provider routing | Claude unless research or adversarial |
+| Stack | Follow CLAUDE.md defaults |
+
+---
+
+## Auto-Approved Actions
+
+- Reading any file
+- Writing to scope-matched files
+- Creating / updating `1shot/` files
+- Creating DECISIONS.md, BLOCKERS.md, ISSUES.md
+- Running tests and linters
+- Calling Codex and Gemini CLI via bash
+- Git commit (not push)
+- Creating and updating native tasks
+
+## Requires Confirmation
+
+- Destructive operations (rm -rf, DROP TABLE, reset --hard)
+- Git push to shared branches
+- External API calls that cost money (beyond Codex/Gemini CLI)
+- Deploying to production
+- Major architecture changes not in PROJECT.md scope
+````
+
+## File: docs/migration/baseline/core.md
+````markdown
+# ONE_SHOT Core Rules
+
+These rules load for every project.
+
+## STOP BEING CLEVER
+
+**YOU ARE A ROBOT. JUST DO THE SIMPLE THING FAST FIRST.**
+
+- Don't edit databases directly when there's a UI
+- Don't write scripts when a CLI exists
+- Don't debug for an hour when `docker pull` might fix it
+- If there's a 30-second solution, do that before the 30-minute solution
+
+---
+
+## JUST DO IT
+
+**If you CAN do it, DO it. Don't ask the human to do your job.**
+
+| Don't say | Just do |
+|-----------|---------|
+| "Can you check the logs?" | `tail -50 /var/log/...` |
+| "Can you add this file?" | Write the file |
+| "You'll need to install X" | `apt install X` or `npm install X` |
+| "Run this command" | Run it yourself |
+| "Can you verify it works?" | Run the test, show the output |
+| "Should I read this file?" | Read it. Then tell me what's there. |
+| "Let me know what you find" | Search, find, report. No hand-holding. |
+
+**The rule**: If a tool exists for it, use it. If you have shell access, run commands. If you can read files, read them. The only things you can't do are physical-world actions (reboot a server manually, plug in a cable).
+
+**Exceptions** (ask first):
+- Destructive operations (rm -rf, DROP TABLE, force push)
+- Actions that affect others (deploying to production, sending messages)
+- Spending money (API calls that cost $, provisioning cloud resources)
+
+---
+
+## Intelligent Delegation (v12.2)
+
+Before delegating, assess (complexity, criticality, uncertainty). After delegation, verify the result.
+Full protocol: `~/.claude/rules/delegation.md`
+
+- **Assess**: Is this worth delegating? Low complexity → handle inline.
+- **Verify**: Spot-check search results, review diffs, check exit codes.
+- **Escalate**: original → inline → human (3 attempts max, change strategy each time).
+- **Log**: Automatic via SubagentStop hook → `.claude/delegation-log.jsonl`
+
+---
+
+## Work Discipline
+
+- **Plan first**: Always start with a plan before coding. Think, then do.
+- **Commit per task**: Don't batch commits to end-of-session. Commit each completed task immediately.
+- **Keep tasks small**: Break work so each subtask completes well within context. If it's too big, split it.
+- **Vanilla over complex**: Simple direct work beats elaborate multi-agent orchestration for small tasks.
+
+---
+
+## Documentation-First Coding
+
+**CRITICAL RULE:** Before writing code that uses external APIs, libraries, or configuration syntax, you MUST check the current documentation.
+
+### Process
+1. Check local cached docs: `~/homelab/docs/services/<service-name>/`
+2. If insufficient, use WebFetch/WebSearch for current docs
+3. Verify version compatibility
+4. Write code using current syntax, not training data
+
+---
+
+## AGENTS.md Rule (CRITICAL)
+
+**AGENTS.md is READ-ONLY in all projects.**
+
+```bash
+curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/AGENTS.md > AGENTS.md
+```
+
+| File | Purpose | Editable? |
+|------|---------|-----------|
+| `AGENTS.md` | ONE_SHOT spec (universal) | **NO** - curl from oneshot |
+| `CLAUDE.md` | Project-specific Claude instructions | YES |
+
+---
+
+## ONE_SHOT v12: Native Tasks + Intelligent Delegation
+
+**Core Philosophy**: Use Claude's native features first, external tools as fallback.
+
+### Task Management Strategy
+```yaml
+primary: "native"     # Claude's TaskCreate/TaskUpdate/TaskList
+fallback: "beads"     # Legacy bd CLI for edge cases
+```
+
+**Native Tasks** (TaskCreate, TaskGet, TaskUpdate, TaskList) shipped in Claude Code 2.1 (Jan 2026).
+- Persistent in `~/.claude/tasks/`
+- Survive `/clear` and context compression
+- Use these for all task tracking
+
+### Session Start Protocol
+1. `TaskList` - Check for pending/in_progress tasks
+2. Pick highest-priority unblocked task
+3. `TaskUpdate` to set status="in_progress"
+
+### Session End Protocol
+1. `git status` - check changes
+2. `git add <files>` - stage changes
+3. `git commit -m "..."` - commit code
+4. `TaskUpdate` - mark task completed or update notes
+5. `git push` - push to remote
+
+### Swarm Mode (Experimental)
+Enable with: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+
+Use `/swarm` for multi-agent orchestration:
+- TeamCreate - Create agent team
+- SendMessage - Peer-to-peer messaging
+- Task assignment to teammates
+
+---
+
+## ONE_SHOT Skills System
+
+**Skills installed at**: `~/.claude/skills/oneshot/`
+
+1. **AGENTS.md** - Skeleton key for orchestration
+2. **Skills** (21 total) - Loaded on-demand (~100 tokens each)
+3. **Secrets** - SOPS/Age encrypted in oneshot/secrets/
+
+### Skill Discovery
+| Intent | Skill |
+|--------|-------|
+| "new project", "build me" | `oneshot-core` |
+| "resume", "checkpoint" | `resume-handoff` |
+| "deploy", "push to cloud" | `push-to-cloud` |
+| "refactor", "clean up" | `refactorer` |
+| "bug", "broken" | `debugger` |
+
+---
+
+## Beads: Legacy Fallback
+
+**DEPRECATED in v11**: Beads (`bd` CLI) is now a fallback. Use native Tasks instead.
+
+Use Beads only when:
+- Working on legacy projects that already use beads
+- Native tasks are unavailable for some reason
+
+### Beads Commands (Legacy)
+- `bd ready` - List ready tasks
+- `bd create "task"` - Create task
+- `bd sync` - Commit bead changes
+- `bv` - TUI viewer
+
+### Migration
+Existing Beads users: See `/beads` deprecation notice for migration guide.
+````
+
+## File: docs/migration/baseline/delegation.md
+````markdown
+# Delegation Rules (v12.2)
+
+Informed by:
+- "Intelligent AI Delegation" (Tomasev et al., Google DeepMind, 2026)
+- Agent Lightning (Microsoft, 2025) — spans, trajectories, credit assignment
+
+Claude Code already enforces: subagent depth limits, tool-access scoping, model routing, max_turns.
+These rules cover what Claude Code does NOT do natively: assessment, verification, fallback, and restraint.
+
+---
+
+## Assess Before Delegating
+
+Before spawning a Task/subagent, evaluate mentally (not a runtime check):
+
+| Dimension | Low | High |
+|-----------|-----|------|
+| **Complexity** | Single tool call | Exploration + synthesis, 5+ calls |
+| **Criticality** | Read-only, informational | Deployment, auth, data mutation |
+| **Uncertainty** | Clear inputs, known approach | Open-ended, multiple valid paths |
+
+**Routing:**
+- Low complexity + low criticality → handle inline, skip delegation
+- High criticality + high uncertainty → `AskUserQuestion` before proceeding
+- High criticality → `git add -A && git commit` checkpoint before delegating
+- Low complexity + low cost → use `model: "haiku"` on the Task call
+
+---
+
+## Verify After Delegating
+
+Claude does not auto-verify subagent results. Always verify:
+
+| Task Type | Method |
+|-----------|--------|
+| Code search | Spot-check 1-2 claims against actual files |
+| Code changes | Read modified files, confirm diff matches intent |
+| Build / test | Check exit code (0 = success) |
+| Research | Confirm key claims have real sources |
+
+If verification fails → trigger fallback chain.
+
+---
+
+## Fallback Chain (3 attempts max)
+
+```
+1. Original delegation (assessed model)
+   ↓ fails
+2. Main agent handles inline (full context)
+   ↓ fails
+3. AskUserQuestion with failure context
+```
+
+Never retry with the same approach. Change strategy between attempts.
+
+---
+
+## When NOT to Delegate
+
+- Single tool call (just do it)
+- Answer already in context
+- Task needs full conversation history
+- Security-sensitive work needing full control
+- Trivial tasks — delegation overhead > task cost
+
+---
+
+## Credit Assignment (Agent Lightning-inspired)
+
+After a multi-span session, evaluate which delegations contributed most:
+
+| Signal | Credit | Blame |
+|--------|--------|-------|
+| Delegation output reused by later steps | +credit (enabling work) | |
+| Last delegation before a failure | | +blame (bottleneck) |
+| Delegation with reward=0.0 | | +blame (wasted compute) |
+| Delegation that unblocked a stuck task | +credit (critical path) | |
+| Low-cost delegation (haiku, <5 calls) that succeeded | +credit (efficient) | |
+
+**How to use**: When reviewing `/delegation-trajectory`, identify the bottleneck span (lowest reward on the critical path). Next time a similar task arises, adjust: use a stronger model, provide more context, or handle inline.
+
+**Reward heuristic** (logged automatically by hook):
+- `1.0` — success, no error signals
+- `0.5` — partial, error keywords but still produced output
+- `0.0` — failure, fatal/crash/aborted/no results
+
+Over time, `/delegation-stats` aggregates rewards by agent type and task pattern, revealing which agents excel at what.
+
+---
+
+## Audit Log
+
+Delegation spans are logged automatically via SubagentStop hook to `.claude/delegation-log.jsonl`.
+Each entry includes span_id, session_id, tool_sequence, and reward for trajectory assembly.
+Query with `/delegation-log`, `/delegation-trajectory`, or `jq` directly.
+````
+
+## File: docs/migration/baseline/doc_SKILL.md
 ````markdown
 ---
 name: doc
@@ -819,1171 +2195,373 @@ cat docs/external/.index.md
 documentation, docs, cache, fetch, download, reference, external, api docs, library docs
 ````
 
-## File: .claude/skills/humanizer/.git/hooks/applypatch-msg.sample
-````
-#!/bin/sh
-#
-# An example hook script to check the commit log message taken by
-# applypatch from an e-mail message.
-#
-# The hook should exit with non-zero status after issuing an
-# appropriate message if it wants to stop the commit.  The hook is
-# allowed to edit the commit message file.
-#
-# To enable this hook, rename this file to "applypatch-msg".
-
-. git-sh-setup
-commitmsg="$(git rev-parse --git-path hooks/commit-msg)"
-test -x "$commitmsg" && exec "$commitmsg" ${1+"$@"}
-:
-````
-
-## File: .claude/skills/humanizer/.git/hooks/commit-msg.sample
-````
-#!/bin/sh
-#
-# An example hook script to check the commit log message.
-# Called by "git commit" with one argument, the name of the file
-# that has the commit message.  The hook should exit with non-zero
-# status after issuing an appropriate message if it wants to stop the
-# commit.  The hook is allowed to edit the commit message file.
-#
-# To enable this hook, rename this file to "commit-msg".
-
-# Uncomment the below to add a Signed-off-by line to the message.
-# Doing this in a hook is a bad idea in general, but the prepare-commit-msg
-# hook is more suited to it.
-#
-# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
-# grep -qs "^$SOB" "$1" || echo "$SOB" >> "$1"
-
-# This example catches duplicate Signed-off-by lines.
-
-test "" = "$(grep '^Signed-off-by: ' "$1" |
-	 sort | uniq -c | sed -e '/^[ 	]*1[ 	]/d')" || {
-	echo >&2 Duplicate Signed-off-by lines.
-	exit 1
-}
-````
-
-## File: .claude/skills/humanizer/.git/hooks/fsmonitor-watchman.sample
-````
-#!/usr/bin/perl
-
-use strict;
-use warnings;
-use IPC::Open2;
-
-# An example hook script to integrate Watchman
-# (https://facebook.github.io/watchman/) with git to speed up detecting
-# new and modified files.
-#
-# The hook is passed a version (currently 2) and last update token
-# formatted as a string and outputs to stdout a new update token and
-# all files that have been modified since the update token. Paths must
-# be relative to the root of the working tree and separated by a single NUL.
-#
-# To enable this hook, rename this file to "query-watchman" and set
-# 'git config core.fsmonitor .git/hooks/query-watchman'
-#
-my ($version, $last_update_token) = @ARGV;
-
-# Uncomment for debugging
-# print STDERR "$0 $version $last_update_token\n";
-
-# Check the hook interface version
-if ($version ne 2) {
-	die "Unsupported query-fsmonitor hook version '$version'.\n" .
-	    "Falling back to scanning...\n";
-}
-
-my $git_work_tree = get_working_dir();
-
-my $retry = 1;
-
-my $json_pkg;
-eval {
-	require JSON::XS;
-	$json_pkg = "JSON::XS";
-	1;
-} or do {
-	require JSON::PP;
-	$json_pkg = "JSON::PP";
-};
-
-launch_watchman();
-
-sub launch_watchman {
-	my $o = watchman_query();
-	if (is_work_tree_watched($o)) {
-		output_result($o->{clock}, @{$o->{files}});
-	}
-}
-
-sub output_result {
-	my ($clockid, @files) = @_;
-
-	# Uncomment for debugging watchman output
-	# open (my $fh, ">", ".git/watchman-output.out");
-	# binmode $fh, ":utf8";
-	# print $fh "$clockid\n@files\n";
-	# close $fh;
-
-	binmode STDOUT, ":utf8";
-	print $clockid;
-	print "\0";
-	local $, = "\0";
-	print @files;
-}
-
-sub watchman_clock {
-	my $response = qx/watchman clock "$git_work_tree"/;
-	die "Failed to get clock id on '$git_work_tree'.\n" .
-		"Falling back to scanning...\n" if $? != 0;
-
-	return $json_pkg->new->utf8->decode($response);
-}
-
-sub watchman_query {
-	my $pid = open2(\*CHLD_OUT, \*CHLD_IN, 'watchman -j --no-pretty')
-	or die "open2() failed: $!\n" .
-	"Falling back to scanning...\n";
-
-	# In the query expression below we're asking for names of files that
-	# changed since $last_update_token but not from the .git folder.
-	#
-	# To accomplish this, we're using the "since" generator to use the
-	# recency index to select candidate nodes and "fields" to limit the
-	# output to file names only. Then we're using the "expression" term to
-	# further constrain the results.
-	my $last_update_line = "";
-	if (substr($last_update_token, 0, 1) eq "c") {
-		$last_update_token = "\"$last_update_token\"";
-		$last_update_line = qq[\n"since": $last_update_token,];
-	}
-	my $query = <<"	END";
-		["query", "$git_work_tree", {$last_update_line
-			"fields": ["name"],
-			"expression": ["not", ["dirname", ".git"]]
-		}]
-	END
-
-	# Uncomment for debugging the watchman query
-	# open (my $fh, ">", ".git/watchman-query.json");
-	# print $fh $query;
-	# close $fh;
-
-	print CHLD_IN $query;
-	close CHLD_IN;
-	my $response = do {local $/; <CHLD_OUT>};
-
-	# Uncomment for debugging the watch response
-	# open ($fh, ">", ".git/watchman-response.json");
-	# print $fh $response;
-	# close $fh;
-
-	die "Watchman: command returned no output.\n" .
-	"Falling back to scanning...\n" if $response eq "";
-	die "Watchman: command returned invalid output: $response\n" .
-	"Falling back to scanning...\n" unless $response =~ /^\{/;
-
-	return $json_pkg->new->utf8->decode($response);
-}
-
-sub is_work_tree_watched {
-	my ($output) = @_;
-	my $error = $output->{error};
-	if ($retry > 0 and $error and $error =~ m/unable to resolve root .* directory (.*) is not watched/) {
-		$retry--;
-		my $response = qx/watchman watch "$git_work_tree"/;
-		die "Failed to make watchman watch '$git_work_tree'.\n" .
-		    "Falling back to scanning...\n" if $? != 0;
-		$output = $json_pkg->new->utf8->decode($response);
-		$error = $output->{error};
-		die "Watchman: $error.\n" .
-		"Falling back to scanning...\n" if $error;
-
-		# Uncomment for debugging watchman output
-		# open (my $fh, ">", ".git/watchman-output.out");
-		# close $fh;
-
-		# Watchman will always return all files on the first query so
-		# return the fast "everything is dirty" flag to git and do the
-		# Watchman query just to get it over with now so we won't pay
-		# the cost in git to look up each individual file.
-		my $o = watchman_clock();
-		$error = $output->{error};
-
-		die "Watchman: $error.\n" .
-		"Falling back to scanning...\n" if $error;
-
-		output_result($o->{clock}, ("/"));
-		$last_update_token = $o->{clock};
-
-		eval { launch_watchman() };
-		return 0;
-	}
-
-	die "Watchman: $error.\n" .
-	"Falling back to scanning...\n" if $error;
-
-	return 1;
-}
-
-sub get_working_dir {
-	my $working_dir;
-	if ($^O =~ 'msys' || $^O =~ 'cygwin') {
-		$working_dir = Win32::GetCwd();
-		$working_dir =~ tr/\\/\//;
-	} else {
-		require Cwd;
-		$working_dir = Cwd::cwd();
-	}
-
-	return $working_dir;
-}
-````
-
-## File: .claude/skills/humanizer/.git/hooks/post-update.sample
-````
-#!/bin/sh
-#
-# An example hook script to prepare a packed repository for use over
-# dumb transports.
-#
-# To enable this hook, rename this file to "post-update".
-
-exec git update-server-info
-````
-
-## File: .claude/skills/humanizer/.git/hooks/pre-applypatch.sample
-````
-#!/bin/sh
-#
-# An example hook script to verify what is about to be committed
-# by applypatch from an e-mail message.
-#
-# The hook should exit with non-zero status after issuing an
-# appropriate message if it wants to stop the commit.
-#
-# To enable this hook, rename this file to "pre-applypatch".
-
-. git-sh-setup
-precommit="$(git rev-parse --git-path hooks/pre-commit)"
-test -x "$precommit" && exec "$precommit" ${1+"$@"}
-:
-````
-
-## File: .claude/skills/humanizer/.git/hooks/pre-commit.sample
-````
-#!/bin/sh
-#
-# An example hook script to verify what is about to be committed.
-# Called by "git commit" with no arguments.  The hook should
-# exit with non-zero status after issuing an appropriate message if
-# it wants to stop the commit.
-#
-# To enable this hook, rename this file to "pre-commit".
-
-if git rev-parse --verify HEAD >/dev/null 2>&1
-then
-	against=HEAD
-else
-	# Initial commit: diff against an empty tree object
-	against=$(git hash-object -t tree /dev/null)
-fi
-
-# If you want to allow non-ASCII filenames set this variable to true.
-allownonascii=$(git config --type=bool hooks.allownonascii)
-
-# Redirect output to stderr.
-exec 1>&2
-
-# Cross platform projects tend to avoid non-ASCII filenames; prevent
-# them from being added to the repository. We exploit the fact that the
-# printable range starts at the space character and ends with tilde.
-if [ "$allownonascii" != "true" ] &&
-	# Note that the use of brackets around a tr range is ok here, (it's
-	# even required, for portability to Solaris 10's /usr/bin/tr), since
-	# the square bracket bytes happen to fall in the designated range.
-	test $(git diff --cached --name-only --diff-filter=A -z $against |
-	  LC_ALL=C tr -d '[ -~]\0' | wc -c) != 0
-then
-	cat <<\EOF
-Error: Attempt to add a non-ASCII file name.
-
-This can cause problems if you want to work with people on other platforms.
-
-To be portable it is advisable to rename the file.
-
-If you know what you are doing you can disable this check using:
-
-  git config hooks.allownonascii true
-EOF
-	exit 1
-fi
-
-# If there are whitespace errors, print the offending file names and fail.
-exec git diff-index --check --cached $against --
-````
-
-## File: .claude/skills/humanizer/.git/hooks/pre-merge-commit.sample
-````
-#!/bin/sh
-#
-# An example hook script to verify what is about to be committed.
-# Called by "git merge" with no arguments.  The hook should
-# exit with non-zero status after issuing an appropriate message to
-# stderr if it wants to stop the merge commit.
-#
-# To enable this hook, rename this file to "pre-merge-commit".
-
-. git-sh-setup
-test -x "$GIT_DIR/hooks/pre-commit" &&
-        exec "$GIT_DIR/hooks/pre-commit"
-:
-````
-
-## File: .claude/skills/humanizer/.git/hooks/pre-push.sample
-````
-#!/bin/sh
-
-# An example hook script to verify what is about to be pushed.  Called by "git
-# push" after it has checked the remote status, but before anything has been
-# pushed.  If this script exits with a non-zero status nothing will be pushed.
-#
-# This hook is called with the following parameters:
-#
-# $1 -- Name of the remote to which the push is being done
-# $2 -- URL to which the push is being done
-#
-# If pushing without using a named remote those arguments will be equal.
-#
-# Information about the commits which are being pushed is supplied as lines to
-# the standard input in the form:
-#
-#   <local ref> <local oid> <remote ref> <remote oid>
-#
-# This sample shows how to prevent push of commits where the log message starts
-# with "WIP" (work in progress).
-
-remote="$1"
-url="$2"
-
-zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
-
-while read local_ref local_oid remote_ref remote_oid
-do
-	if test "$local_oid" = "$zero"
-	then
-		# Handle delete
-		:
-	else
-		if test "$remote_oid" = "$zero"
-		then
-			# New branch, examine all commits
-			range="$local_oid"
-		else
-			# Update to existing branch, examine new commits
-			range="$remote_oid..$local_oid"
-		fi
-
-		# Check for WIP commit
-		commit=$(git rev-list -n 1 --grep '^WIP' "$range")
-		if test -n "$commit"
-		then
-			echo >&2 "Found WIP commit in $local_ref, not pushing"
-			exit 1
-		fi
-	fi
-done
-
-exit 0
-````
-
-## File: .claude/skills/humanizer/.git/hooks/pre-rebase.sample
-````
-#!/bin/sh
-#
-# Copyright (c) 2006, 2008 Junio C Hamano
-#
-# The "pre-rebase" hook is run just before "git rebase" starts doing
-# its job, and can prevent the command from running by exiting with
-# non-zero status.
-#
-# The hook is called with the following parameters:
-#
-# $1 -- the upstream the series was forked from.
-# $2 -- the branch being rebased (or empty when rebasing the current branch).
-#
-# This sample shows how to prevent topic branches that are already
-# merged to 'next' branch from getting rebased, because allowing it
-# would result in rebasing already published history.
-
-publish=next
-basebranch="$1"
-if test "$#" = 2
-then
-	topic="refs/heads/$2"
-else
-	topic=`git symbolic-ref HEAD` ||
-	exit 0 ;# we do not interrupt rebasing detached HEAD
-fi
-
-case "$topic" in
-refs/heads/??/*)
-	;;
-*)
-	exit 0 ;# we do not interrupt others.
-	;;
-esac
-
-# Now we are dealing with a topic branch being rebased
-# on top of master.  Is it OK to rebase it?
-
-# Does the topic really exist?
-git show-ref -q "$topic" || {
-	echo >&2 "No such branch $topic"
-	exit 1
-}
-
-# Is topic fully merged to master?
-not_in_master=`git rev-list --pretty=oneline ^master "$topic"`
-if test -z "$not_in_master"
-then
-	echo >&2 "$topic is fully merged to master; better remove it."
-	exit 1 ;# we could allow it, but there is no point.
-fi
-
-# Is topic ever merged to next?  If so you should not be rebasing it.
-only_next_1=`git rev-list ^master "^$topic" ${publish} | sort`
-only_next_2=`git rev-list ^master           ${publish} | sort`
-if test "$only_next_1" = "$only_next_2"
-then
-	not_in_topic=`git rev-list "^$topic" master`
-	if test -z "$not_in_topic"
-	then
-		echo >&2 "$topic is already up to date with master"
-		exit 1 ;# we could allow it, but there is no point.
-	else
-		exit 0
-	fi
-else
-	not_in_next=`git rev-list --pretty=oneline ^${publish} "$topic"`
-	/usr/bin/perl -e '
-		my $topic = $ARGV[0];
-		my $msg = "* $topic has commits already merged to public branch:\n";
-		my (%not_in_next) = map {
-			/^([0-9a-f]+) /;
-			($1 => 1);
-		} split(/\n/, $ARGV[1]);
-		for my $elem (map {
-				/^([0-9a-f]+) (.*)$/;
-				[$1 => $2];
-			} split(/\n/, $ARGV[2])) {
-			if (!exists $not_in_next{$elem->[0]}) {
-				if ($msg) {
-					print STDERR $msg;
-					undef $msg;
-				}
-				print STDERR " $elem->[1]\n";
-			}
-		}
-	' "$topic" "$not_in_next" "$not_in_master"
-	exit 1
-fi
-
-<<\DOC_END
-
-This sample hook safeguards topic branches that have been
-published from being rewound.
-
-The workflow assumed here is:
-
- * Once a topic branch forks from "master", "master" is never
-   merged into it again (either directly or indirectly).
-
- * Once a topic branch is fully cooked and merged into "master",
-   it is deleted.  If you need to build on top of it to correct
-   earlier mistakes, a new topic branch is created by forking at
-   the tip of the "master".  This is not strictly necessary, but
-   it makes it easier to keep your history simple.
-
- * Whenever you need to test or publish your changes to topic
-   branches, merge them into "next" branch.
-
-The script, being an example, hardcodes the publish branch name
-to be "next", but it is trivial to make it configurable via
-$GIT_DIR/config mechanism.
-
-With this workflow, you would want to know:
-
-(1) ... if a topic branch has ever been merged to "next".  Young
-    topic branches can have stupid mistakes you would rather
-    clean up before publishing, and things that have not been
-    merged into other branches can be easily rebased without
-    affecting other people.  But once it is published, you would
-    not want to rewind it.
-
-(2) ... if a topic branch has been fully merged to "master".
-    Then you can delete it.  More importantly, you should not
-    build on top of it -- other people may already want to
-    change things related to the topic as patches against your
-    "master", so if you need further changes, it is better to
-    fork the topic (perhaps with the same name) afresh from the
-    tip of "master".
-
-Let's look at this example:
-
-		   o---o---o---o---o---o---o---o---o---o "next"
-		  /       /           /           /
-		 /   a---a---b A     /           /
-		/   /               /           /
-	       /   /   c---c---c---c B         /
-	      /   /   /             \         /
-	     /   /   /   b---b C     \       /
-	    /   /   /   /             \     /
-    ---o---o---o---o---o---o---o---o---o---o---o "master"
-
-
-A, B and C are topic branches.
-
- * A has one fix since it was merged up to "next".
-
- * B has finished.  It has been fully merged up to "master" and "next",
-   and is ready to be deleted.
-
- * C has not merged to "next" at all.
-
-We would want to allow C to be rebased, refuse A, and encourage
-B to be deleted.
-
-To compute (1):
-
-	git rev-list ^master ^topic next
-	git rev-list ^master        next
-
-	if these match, topic has not merged in next at all.
-
-To compute (2):
-
-	git rev-list master..topic
-
-	if this is empty, it is fully merged to "master".
-
-DOC_END
-````
-
-## File: .claude/skills/humanizer/.git/hooks/pre-receive.sample
-````
-#!/bin/sh
-#
-# An example hook script to make use of push options.
-# The example simply echoes all push options that start with 'echoback='
-# and rejects all pushes when the "reject" push option is used.
-#
-# To enable this hook, rename this file to "pre-receive".
-
-if test -n "$GIT_PUSH_OPTION_COUNT"
-then
-	i=0
-	while test "$i" -lt "$GIT_PUSH_OPTION_COUNT"
-	do
-		eval "value=\$GIT_PUSH_OPTION_$i"
-		case "$value" in
-		echoback=*)
-			echo "echo from the pre-receive-hook: ${value#*=}" >&2
-			;;
-		reject)
-			exit 1
-		esac
-		i=$((i + 1))
-	done
-fi
-````
-
-## File: .claude/skills/humanizer/.git/hooks/prepare-commit-msg.sample
-````
-#!/bin/sh
-#
-# An example hook script to prepare the commit log message.
-# Called by "git commit" with the name of the file that has the
-# commit message, followed by the description of the commit
-# message's source.  The hook's purpose is to edit the commit
-# message file.  If the hook fails with a non-zero status,
-# the commit is aborted.
-#
-# To enable this hook, rename this file to "prepare-commit-msg".
-
-# This hook includes three examples. The first one removes the
-# "# Please enter the commit message..." help message.
-#
-# The second includes the output of "git diff --name-status -r"
-# into the message, just before the "git status" output.  It is
-# commented because it doesn't cope with --amend or with squashed
-# commits.
-#
-# The third example adds a Signed-off-by line to the message, that can
-# still be edited.  This is rarely a good idea.
-
-COMMIT_MSG_FILE=$1
-COMMIT_SOURCE=$2
-SHA1=$3
-
-/usr/bin/perl -i.bak -ne 'print unless(m/^. Please enter the commit message/..m/^#$/)' "$COMMIT_MSG_FILE"
-
-# case "$COMMIT_SOURCE,$SHA1" in
-#  ,|template,)
-#    /usr/bin/perl -i.bak -pe '
-#       print "\n" . `git diff --cached --name-status -r`
-# 	 if /^#/ && $first++ == 0' "$COMMIT_MSG_FILE" ;;
-#  *) ;;
-# esac
-
-# SOB=$(git var GIT_COMMITTER_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
-# git interpret-trailers --in-place --trailer "$SOB" "$COMMIT_MSG_FILE"
-# if test -z "$COMMIT_SOURCE"
-# then
-#   /usr/bin/perl -i.bak -pe 'print "\n" if !$first_line++' "$COMMIT_MSG_FILE"
-# fi
-````
-
-## File: .claude/skills/humanizer/.git/hooks/push-to-checkout.sample
-````
-#!/bin/sh
-
-# An example hook script to update a checked-out tree on a git push.
-#
-# This hook is invoked by git-receive-pack(1) when it reacts to git
-# push and updates reference(s) in its repository, and when the push
-# tries to update the branch that is currently checked out and the
-# receive.denyCurrentBranch configuration variable is set to
-# updateInstead.
-#
-# By default, such a push is refused if the working tree and the index
-# of the remote repository has any difference from the currently
-# checked out commit; when both the working tree and the index match
-# the current commit, they are updated to match the newly pushed tip
-# of the branch. This hook is to be used to override the default
-# behaviour; however the code below reimplements the default behaviour
-# as a starting point for convenient modification.
-#
-# The hook receives the commit with which the tip of the current
-# branch is going to be updated:
-commit=$1
-
-# It can exit with a non-zero status to refuse the push (when it does
-# so, it must not modify the index or the working tree).
-die () {
-	echo >&2 "$*"
-	exit 1
-}
-
-# Or it can make any necessary changes to the working tree and to the
-# index to bring them to the desired state when the tip of the current
-# branch is updated to the new commit, and exit with a zero status.
-#
-# For example, the hook can simply run git read-tree -u -m HEAD "$1"
-# in order to emulate git fetch that is run in the reverse direction
-# with git push, as the two-tree form of git read-tree -u -m is
-# essentially the same as git switch or git checkout that switches
-# branches while keeping the local changes in the working tree that do
-# not interfere with the difference between the branches.
-
-# The below is a more-or-less exact translation to shell of the C code
-# for the default behaviour for git's push-to-checkout hook defined in
-# the push_to_deploy() function in builtin/receive-pack.c.
-#
-# Note that the hook will be executed from the repository directory,
-# not from the working tree, so if you want to perform operations on
-# the working tree, you will have to adapt your code accordingly, e.g.
-# by adding "cd .." or using relative paths.
-
-if ! git update-index -q --ignore-submodules --refresh
-then
-	die "Up-to-date check failed"
-fi
-
-if ! git diff-files --quiet --ignore-submodules --
-then
-	die "Working directory has unstaged changes"
-fi
-
-# This is a rough translation of:
-#
-#   head_has_history() ? "HEAD" : EMPTY_TREE_SHA1_HEX
-if git cat-file -e HEAD 2>/dev/null
-then
-	head=HEAD
-else
-	head=$(git hash-object -t tree --stdin </dev/null)
-fi
-
-if ! git diff-index --quiet --cached --ignore-submodules $head --
-then
-	die "Working directory has staged changes"
-fi
-
-if ! git read-tree -u -m "$commit"
-then
-	die "Could not update working tree to new HEAD"
-fi
-````
-
-## File: .claude/skills/humanizer/.git/hooks/sendemail-validate.sample
-````
-#!/bin/sh
-
-# An example hook script to validate a patch (and/or patch series) before
-# sending it via email.
-#
-# The hook should exit with non-zero status after issuing an appropriate
-# message if it wants to prevent the email(s) from being sent.
-#
-# To enable this hook, rename this file to "sendemail-validate".
-#
-# By default, it will only check that the patch(es) can be applied on top of
-# the default upstream branch without conflicts in a secondary worktree. After
-# validation (successful or not) of the last patch of a series, the worktree
-# will be deleted.
-#
-# The following config variables can be set to change the default remote and
-# remote ref that are used to apply the patches against:
-#
-#   sendemail.validateRemote (default: origin)
-#   sendemail.validateRemoteRef (default: HEAD)
-#
-# Replace the TODO placeholders with appropriate checks according to your
-# needs.
-
-validate_cover_letter () {
-	file="$1"
-	# TODO: Replace with appropriate checks (e.g. spell checking).
-	true
-}
-
-validate_patch () {
-	file="$1"
-	# Ensure that the patch applies without conflicts.
-	git am -3 "$file" || return
-	# TODO: Replace with appropriate checks for this patch
-	# (e.g. checkpatch.pl).
-	true
-}
-
-validate_series () {
-	# TODO: Replace with appropriate checks for the whole series
-	# (e.g. quick build, coding style checks, etc.).
-	true
-}
-
-# main -------------------------------------------------------------------------
-
-if test "$GIT_SENDEMAIL_FILE_COUNTER" = 1
-then
-	remote=$(git config --default origin --get sendemail.validateRemote) &&
-	ref=$(git config --default HEAD --get sendemail.validateRemoteRef) &&
-	worktree=$(mktemp --tmpdir -d sendemail-validate.XXXXXXX) &&
-	git worktree add -fd --checkout "$worktree" "refs/remotes/$remote/$ref" &&
-	git config --replace-all sendemail.validateWorktree "$worktree"
-else
-	worktree=$(git config --get sendemail.validateWorktree)
-fi || {
-	echo "sendemail-validate: error: failed to prepare worktree" >&2
-	exit 1
-}
-
-unset GIT_DIR GIT_WORK_TREE
-cd "$worktree" &&
-
-if grep -q "^diff --git " "$1"
-then
-	validate_patch "$1"
-else
-	validate_cover_letter "$1"
-fi &&
-
-if test "$GIT_SENDEMAIL_FILE_COUNTER" = "$GIT_SENDEMAIL_FILE_TOTAL"
-then
-	git config --unset-all sendemail.validateWorktree &&
-	trap 'git worktree remove -ff "$worktree"' EXIT &&
-	validate_series
-fi
-````
-
-## File: .claude/skills/humanizer/.git/hooks/update.sample
-````
-#!/bin/sh
-#
-# An example hook script to block unannotated tags from entering.
-# Called by "git receive-pack" with arguments: refname sha1-old sha1-new
-#
-# To enable this hook, rename this file to "update".
-#
-# Config
-# ------
-# hooks.allowunannotated
-#   This boolean sets whether unannotated tags will be allowed into the
-#   repository.  By default they won't be.
-# hooks.allowdeletetag
-#   This boolean sets whether deleting tags will be allowed in the
-#   repository.  By default they won't be.
-# hooks.allowmodifytag
-#   This boolean sets whether a tag may be modified after creation. By default
-#   it won't be.
-# hooks.allowdeletebranch
-#   This boolean sets whether deleting branches will be allowed in the
-#   repository.  By default they won't be.
-# hooks.denycreatebranch
-#   This boolean sets whether remotely creating branches will be denied
-#   in the repository.  By default this is allowed.
-#
-
-# --- Command line
-refname="$1"
-oldrev="$2"
-newrev="$3"
-
-# --- Safety check
-if [ -z "$GIT_DIR" ]; then
-	echo "Don't run this script from the command line." >&2
-	echo " (if you want, you could supply GIT_DIR then run" >&2
-	echo "  $0 <ref> <oldrev> <newrev>)" >&2
-	exit 1
-fi
-
-if [ -z "$refname" -o -z "$oldrev" -o -z "$newrev" ]; then
-	echo "usage: $0 <ref> <oldrev> <newrev>" >&2
-	exit 1
-fi
-
-# --- Config
-allowunannotated=$(git config --type=bool hooks.allowunannotated)
-allowdeletebranch=$(git config --type=bool hooks.allowdeletebranch)
-denycreatebranch=$(git config --type=bool hooks.denycreatebranch)
-allowdeletetag=$(git config --type=bool hooks.allowdeletetag)
-allowmodifytag=$(git config --type=bool hooks.allowmodifytag)
-
-# check for no description
-projectdesc=$(sed -e '1q' "$GIT_DIR/description")
-case "$projectdesc" in
-"Unnamed repository"* | "")
-	echo "*** Project description file hasn't been set" >&2
-	exit 1
-	;;
-esac
-
-# --- Check types
-# if $newrev is 0000...0000, it's a commit to delete a ref.
-zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
-if [ "$newrev" = "$zero" ]; then
-	newrev_type=delete
-else
-	newrev_type=$(git cat-file -t $newrev)
-fi
-
-case "$refname","$newrev_type" in
-	refs/tags/*,commit)
-		# un-annotated tag
-		short_refname=${refname##refs/tags/}
-		if [ "$allowunannotated" != "true" ]; then
-			echo "*** The un-annotated tag, $short_refname, is not allowed in this repository" >&2
-			echo "*** Use 'git tag [ -a | -s ]' for tags you want to propagate." >&2
-			exit 1
-		fi
-		;;
-	refs/tags/*,delete)
-		# delete tag
-		if [ "$allowdeletetag" != "true" ]; then
-			echo "*** Deleting a tag is not allowed in this repository" >&2
-			exit 1
-		fi
-		;;
-	refs/tags/*,tag)
-		# annotated tag
-		if [ "$allowmodifytag" != "true" ] && git rev-parse $refname > /dev/null 2>&1
-		then
-			echo "*** Tag '$refname' already exists." >&2
-			echo "*** Modifying a tag is not allowed in this repository." >&2
-			exit 1
-		fi
-		;;
-	refs/heads/*,commit)
-		# branch
-		if [ "$oldrev" = "$zero" -a "$denycreatebranch" = "true" ]; then
-			echo "*** Creating a branch is not allowed in this repository" >&2
-			exit 1
-		fi
-		;;
-	refs/heads/*,delete)
-		# delete branch
-		if [ "$allowdeletebranch" != "true" ]; then
-			echo "*** Deleting a branch is not allowed in this repository" >&2
-			exit 1
-		fi
-		;;
-	refs/remotes/*,commit)
-		# tracking branch
-		;;
-	refs/remotes/*,delete)
-		# delete tracking branch
-		if [ "$allowdeletebranch" != "true" ]; then
-			echo "*** Deleting a tracking branch is not allowed in this repository" >&2
-			exit 1
-		fi
-		;;
-	*)
-		# Anything else (is there anything else?)
-		echo "*** Update hook: unknown type of update to ref $refname of type $newrev_type" >&2
-		exit 1
-		;;
-esac
-
-# --- Finished
-exit 0
-````
-
-## File: .claude/skills/humanizer/.git/info/exclude
-````
-# git ls-files --others --exclude-from=.git/info/exclude
-# Lines that start with '#' are comments.
-# For a project mostly in C, the following would be a good set of
-# exclude patterns (uncomment them if you want to use them):
-# *.[oa]
-# *~
-````
-
-## File: .claude/skills/humanizer/.git/logs/refs/heads/main
-````
-0000000000000000000000000000000000000000 12881abf6671c4ab62eceeb56f911b752f9fd6d2 Test User <test@example.com> 1774371339 -0700	clone: from https://github.com/blader/humanizer.git
-````
-
-## File: .claude/skills/humanizer/.git/logs/refs/remotes/origin/HEAD
-````
-0000000000000000000000000000000000000000 12881abf6671c4ab62eceeb56f911b752f9fd6d2 Test User <test@example.com> 1774371339 -0700	clone: from https://github.com/blader/humanizer.git
-````
-
-## File: .claude/skills/humanizer/.git/logs/HEAD
-````
-0000000000000000000000000000000000000000 12881abf6671c4ab62eceeb56f911b752f9fd6d2 Test User <test@example.com> 1774371339 -0700	clone: from https://github.com/blader/humanizer.git
-````
-
-## File: .claude/skills/humanizer/.git/refs/heads/main
-````
-12881abf6671c4ab62eceeb56f911b752f9fd6d2
-````
-
-## File: .claude/skills/humanizer/.git/refs/remotes/origin/HEAD
-````
-ref: refs/remotes/origin/main
-````
-
-## File: .claude/skills/humanizer/.git/config
-````
-[core]
-	repositoryformatversion = 0
-	filemode = true
-	bare = false
-	logallrefupdates = true
-[remote "origin"]
-	url = https://github.com/blader/humanizer.git
-	fetch = +refs/heads/*:refs/remotes/origin/*
-[branch "main"]
-	remote = origin
-	merge = refs/heads/main
-````
-
-## File: .claude/skills/humanizer/.git/description
-````
-Unnamed repository; edit this file 'description' to name the repository.
-````
-
-## File: .claude/skills/humanizer/.git/HEAD
-````
-ref: refs/heads/main
-````
-
-## File: .claude/skills/humanizer/.git/packed-refs
-````
-# pack-refs with: peeled fully-peeled sorted 
-12881abf6671c4ab62eceeb56f911b752f9fd6d2 refs/remotes/origin/main
-````
-
-## File: .claude/skills/humanizer/LICENSE
-````
-MIT License
-
-Copyright (c) 2025 Siqi Chen
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-````
-
-## File: .claude/skills/humanizer/README.md
+## File: docs/migration/baseline/freesearch_SKILL.md
 ````markdown
-# Humanizer
+---
+name: freesearch
+description: Zero-token research using Exa API directly via curl. Saves Claude tokens.
+---
 
-A Claude Code skill that removes signs of AI-generated writing from text, making it sound more natural and human.
+# /freesearch — Zero-Token Research via Exa API
 
-## Installation
-
-### Recommended (clone directly into Claude Code skills directory)
-
-```bash
-mkdir -p ~/.claude/skills
-git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer
-```
-
-### Manual install/update (only the skill file)
-
-If you already have this repo cloned (or you downloaded `SKILL.md`), copy the skill file into Claude Code’s skills directory:
-
-```bash
-mkdir -p ~/.claude/skills/humanizer
-cp SKILL.md ~/.claude/skills/humanizer/
-```
+Uses 0 Claude Code tokens. Calls Exa API directly via curl.
 
 ## Usage
 
-In Claude Code, invoke the skill:
+`/freesearch [topic]`
+
+## Process (IMPORTANT: Follow this order)
+
+1. **Check global docs-cache FIRST**:
+   ```bash
+   cat ~/github/docs-cache/docs/cache/.index.md | grep -i "[KEYWORD]"
+   ls ~/github/docs-cache/docs/cache/*/
+   ```
+   If found → Return cached doc path immediately
+
+2. If NOT in cache → Ask 2-3 clarifying questions (goal, depth, audience)
+
+3. Search Exa API via curl:
+
+```bash
+# Decrypt Exa key (uses --config so it works from ANY directory)
+EXA_KEY=$(sops --config ~/github/oneshot/secrets/.sops.yaml --decrypt --output-type json ~/github/oneshot/secrets/research_keys.json.encrypted | jq -r '.EXA_API_KEY')
+
+# Search
+curl -s -X POST 'https://api.exa.ai/search' \
+  -H "x-api-key: $EXA_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "[TOPIC]",
+    "type": "auto",
+    "numResults": 10,
+    "contents": { "text": { "maxCharacters": 20000 } }
+  }'
+```
+
+4. **If Exa finds official docs** → Add to global cache:
+   ```bash
+   cd ~/github/docs-cache
+   mkdir -p docs/cache/{category}/{name}
+   # Write README.md
+   # Update .index.md with: Name | Category | Related | URL | YYYY-MM-DD
+   git add docs/cache/
+   git commit -m "Add cache: {name}"
+   git push
+   ```
+
+5. Create `docs/research/{date}_{topic}_final.md` in current project
+
+## Output
 
 ```
-/humanizer
-
-[paste your text here]
+[CACHED] Found in docs-cache: ~/github/docs-cache/docs/cache/tools/anthropic/README.md
 ```
 
-Or ask Claude to humanize text directly:
+OR
 
 ```
-Please humanize this text: [your text]
+[Searched Exa] Key findings:
+- [finding 1]
+- [finding 2]
+
+[Added to cache] ~/github/docs-cache/docs/cache/tools/{name}/README.md
+Full research: docs/research/YYYY-MM-DD_{topic}_final.md
 ```
 
-## Overview
+## Notes
 
-Based on [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup. This comprehensive guide comes from observations of thousands of instances of AI-generated text.
-
-The skill also includes a final "obviously AI generated" audit pass and a second rewrite, to catch lingering AI-isms in the first draft.
-
-### Key Insight from Wikipedia
-
-> "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
-
-## 25 Patterns Detected (with Before/After Examples)
-
-### Content Patterns
-
-| # | Pattern | Before | After |
-|---|---------|--------|-------|
-| 1 | **Significance inflation** | "marking a pivotal moment in the evolution of..." | "was established in 1989 to collect regional statistics" |
-| 2 | **Notability name-dropping** | "cited in NYT, BBC, FT, and The Hindu" | "In a 2024 NYT interview, she argued..." |
-| 3 | **Superficial -ing analyses** | "symbolizing... reflecting... showcasing..." | Remove or expand with actual sources |
-| 4 | **Promotional language** | "nestled within the breathtaking region" | "is a town in the Gonder region" |
-| 5 | **Vague attributions** | "Experts believe it plays a crucial role" | "according to a 2019 survey by..." |
-| 6 | **Formulaic challenges** | "Despite challenges... continues to thrive" | Specific facts about actual challenges |
-
-### Language Patterns
-
-| # | Pattern | Before | After |
-|---|---------|--------|-------|
-| 7 | **AI vocabulary** | "Additionally... testament... landscape... showcasing" | "also... remain common" |
-| 8 | **Copula avoidance** | "serves as... features... boasts" | "is... has" |
-| 9 | **Negative parallelisms** | "It's not just X, it's Y" | State the point directly |
-| 10 | **Rule of three** | "innovation, inspiration, and insights" | Use natural number of items |
-| 11 | **Synonym cycling** | "protagonist... main character... central figure... hero" | "protagonist" (repeat when clearest) |
-| 12 | **False ranges** | "from the Big Bang to dark matter" | List topics directly |
-
-### Style Patterns
-
-| # | Pattern | Before | After |
-|---|---------|--------|-------|
-| 13 | **Em dash overuse** | "institutions—not the people—yet this continues—" | Use commas or periods |
-| 14 | **Boldface overuse** | "**OKRs**, **KPIs**, **BMC**" | "OKRs, KPIs, BMC" |
-| 15 | **Inline-header lists** | "**Performance:** Performance improved" | Convert to prose |
-| 16 | **Title Case Headings** | "Strategic Negotiations And Partnerships" | "Strategic negotiations and partnerships" |
-| 17 | **Emojis** | "🚀 Launch Phase: 💡 Key Insight:" | Remove emojis |
-| 18 | **Curly quotes** | `said “the project”` | `said “the project”` |
-| 25 | **Hyphenated word pairs** | “cross-functional, data-driven, client-facing” | Drop hyphens on common word pairs |
-
-### Communication Patterns
-
-| # | Pattern | Before | After |
-|---|---------|--------|-------|
-| 19 | **Chatbot artifacts** | "I hope this helps! Let me know if..." | Remove entirely |
-| 20 | **Cutoff disclaimers** | "While details are limited in available sources..." | Find sources or remove |
-| 21 | **Sycophantic tone** | "Great question! You're absolutely right!" | Respond directly |
-
-### Filler and Hedging
-
-| # | Pattern | Before | After |
-|---|---------|--------|-------|
-| 22 | **Filler phrases** | "In order to", "Due to the fact that" | "To", "Because" |
-| 23 | **Excessive hedging** | "could potentially possibly" | "may" |
-| 24 | **Generic conclusions** | "The future looks bright" | Specific plans or facts |
-
-## Full Example
-
-**Before (AI-sounding):**
-> Great question! Here is an essay on this topic. I hope this helps!
->
-> AI-assisted coding serves as an enduring testament to the transformative potential of large language models, marking a pivotal moment in the evolution of software development. In today's rapidly evolving technological landscape, these groundbreaking tools—nestled at the intersection of research and practice—are reshaping how engineers ideate, iterate, and deliver, underscoring their vital role in modern workflows.
->
-> At its core, the value proposition is clear: streamlining processes, enhancing collaboration, and fostering alignment. It's not just about autocomplete; it's about unlocking creativity at scale, ensuring that organizations can remain agile while delivering seamless, intuitive, and powerful experiences to users. The tool serves as a catalyst. The assistant functions as a partner. The system stands as a foundation for innovation.
->
-> Industry observers have noted that adoption has accelerated from hobbyist experiments to enterprise-wide rollouts, from solo developers to cross-functional teams. The technology has been featured in The New York Times, Wired, and The Verge. Additionally, the ability to generate documentation, tests, and refactors showcases how AI can contribute to better outcomes, highlighting the intricate interplay between automation and human judgment.
->
-> - 💡 **Speed:** Code generation is significantly faster, reducing friction and empowering developers.
-> - 🚀 **Quality:** Output quality has been enhanced through improved training, contributing to higher standards.
-> - ✅ **Adoption:** Usage continues to grow, reflecting broader industry trends.
->
-> While specific details are limited based on available information, it could potentially be argued that these tools might have some positive effect. Despite challenges typical of emerging technologies—including hallucinations, bias, and accountability—the ecosystem continues to thrive. In order to fully realize this potential, teams must align with best practices.
->
-> In conclusion, the future looks bright. Exciting times lie ahead as we continue this journey toward excellence. Let me know if you’d like me to expand on any section!
-
-**After (Humanized):**
-> AI coding assistants can speed up the boring parts of the job. They're great at boilerplate: config files and the little glue code you don't want to write. They can also help you sketch a test, but you still have to read it.
->
-> The dangerous part is how confident the suggestions look. I've accepted code that compiled and passed lint, then discovered later it missed the point because I stopped paying attention.
->
-> If you treat it like autocomplete and review every line, it's useful. If you use it to avoid thinking, it will help you ship bugs faster.
->
-> The only real backstop is tests. Without them, you're mostly judging vibes.
-
-## References
-
-- [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) - Primary source
-- [WikiProject AI Cleanup](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_AI_Cleanup) - Maintaining organization
-
-## Version History
-
-- **2.3.0** - Added pattern #25: hyphenated word pair overuse
-- **2.2.0** - Added a final "obviously AI generated" audit + second-pass rewrite prompts
-- **2.1.1** - Fixed pattern #18 example (curly quotes vs straight quotes)
-- **2.1.0** - Added before/after examples for all 24 patterns
-- **2.0.0** - Complete rewrite based on raw Wikipedia article content
-- **1.0.0** - Initial release
-
-## License
-
-MIT
+- Research takes 10-30 seconds
+- Check cache BEFORE searching - this is the whole point
+- Only add official docs to cache (not random blog posts)
+- Cache location: `~/github/docs-cache/` (global, not per-project)
 ````
 
-## File: .claude/skills/humanizer/SKILL.md
+## File: docs/migration/baseline/full_SKILL.md
+````markdown
+---
+name: full
+description: Structured operator for new projects, refactors, and complex implementations.
+---
+
+# /full — Full Operator for Complex Work
+
+Structured operator for new projects, refactors, and complex implementations.
+Claude plans and executes. Codex reviews the plan and challenges the implementation.
+
+## Usage
+
+```
+/full
+/full <project-description>
+```
+
+## Behavior
+
+When invoked:
+
+### Phase 1: Intake
+
+1. **Load or Create `1shot/` Context**
+   - Check for `1shot/PROJECT.md` — if missing, create from intake below
+   - Check for `1shot/LLM-OVERVIEW.md` — if missing, create from template
+   - Read `1shot/STATE.md` if resuming
+
+2. **Structured Discovery**
+   - What are you building?
+   - What's the scope?
+   - What's the target architecture?
+   - Any constraints or preferences?
+
+3. **Document Decisions**
+   - Write to `1shot/PROJECT.md`
+   - Note key decisions in `1shot/DECISIONS.md`
+
+4. **Update `1shot/LLM-OVERVIEW.md`**
+   - Fill in or refresh: what is this, stack, key files, how to run
+   - Keep it current — it's the single source of truth for any LLM entering this project
+
+### Phase 2: Planning
+
+1. **Docs Check**
+   - Identify all external libraries, APIs, and tools the project will use
+   - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
+   - For anything missing → run `/doc <name> <url>` before coding begins
+   - Use cached docs as source of truth — do NOT rely on training data for syntax
+
+2. **Phase-Based Plan**
+   - Break into milestones (not every sub-step)
+   - Define acceptance criteria per milestone
+   - Identify dependencies
+   - Write `1shot/ROADMAP.md`
+
+3. **Skill Discovery**
+   - Check `1shot/skills/` for already-pulled project skills
+   - For each high-level task type, ask: *"Is this specialized enough that a better community skill exists?"*
+   - Specialized domains (security, blockchain, ML, infra tools, specific APIs, parsers): **search SkillsMP**
+     ```bash
+     ./scripts/skillsmp-search.sh "<task type>" --install
+     ```
+   - General tasks (write tests, refactor, add endpoint): skip search, proceed with core skills
+   - If a skill is pulled, note it: "Using `1shot/skills/{name}` for [task type]"
+
+4. **Create Task Queue**
+   - Use native TaskCreate for each milestone (not every sub-step)
+   - Set dependencies with addBlockedBy
+   - Tasks track milestones, not individual file edits
+
+5. **Detect Providers**
+   ```bash
+   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
+   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+   ```
+   Note available providers in `1shot/STATE.md`.
+
+6. **Codex Plan Review** (adversarial pass on the plan — before any code)
+   - If codex available, send the plan for review:
+     ```bash
+     codex exec --full-auto "You are reviewing an implementation plan before execution. Here is the plan: [ROADMAP.md content]. Flag: (1) missing steps or dependencies, (2) tasks that could be combined, (3) risks not mentioned, (4) a better ordering. Be specific. Context: [PROJECT.md summary]"
+     ```
+   - Surface Codex's feedback — adjust plan if warranted, but proceed regardless
+   - If codex unavailable → Claude does inline self-review, continue
+
+### Phase 3: Execution
+
+1. **Milestone Tracking**
+   - Work through tasks in order
+   - Commit after each milestone
+   - Update `1shot/STATE.md` with progress
+
+2. **Burn-Down Mode**
+   - Complete one milestone fully before starting next
+   - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
+
+3. **Codex Milestone Review** (after each milestone commit)
+   - If codex available:
+     ```bash
+     codex exec --full-auto "Review this milestone change for: (1) bugs, (2) edge cases, (3) what was missed. Be specific. Context: [diff]"
+     ```
+   - If issues found → address before continuing (use judgment — don't create blocking tasks for every nit)
+   - If codex unavailable → skip silently
+
+4. **Context Checkpoints**
+   - At 50% context: suggest /handoff
+   - At 70% context: auto-create handoff
+
+### Phase 4: Completion
+
+1. **Codex Challenge Pass** (adversarial review of full implementation)
+   - `git diff $(git merge-base HEAD main)..HEAD` — full diff since full started
+   - If codex available:
+     ```bash
+     codex exec --full-auto "You are an adversarial reviewer. Read this diff and find: (1) what could break, (2) what was missed, (3) unhandled edge cases. Be specific. Diff: [diff content]"
+     ```
+   - If codex unavailable: Claude performs adversarial review inline
+   - New issues found → fix, then re-verify
+
+2. **Verification**
+   - Run tests (`./scripts/ci.sh` if present, else npm test / pytest)
+   - Check acceptance criteria from `1shot/PROJECT.md`
+
+3. **Update `1shot/LLM-OVERVIEW.md`**
+   - Refresh "Current State" section to reflect what was built
+
+4. **Summary**
+   ```
+   📊 Implementation Complete
+   ├─ Milestones: X/Y completed
+   ├─ Files changed: Z
+   ├─ Commits: N
+   ├─ Codex reviews: M (issues found: P)
+   ├─ Skills pulled: Q (in 1shot/skills/)
+   └─ Next steps: [if any]
+   ```
+
+## Provider Routing
+
+See `~/.claude/skills/_shared/providers.md` for provider detection, dispatch commands, quality gates, and circuit breaker.
+
+**Full-specific routing**: Full uses Codex for plan review + milestone review + challenge pass. Research tasks route to Gemini if available. All implementation stays with Claude. Full is one operator, not a PMO — don't make it behave like conduct.
+
+## `1shot/` Structure
+
+```
+1shot/
+├── LLM-OVERVIEW.md   # Full project context — keep updated
+├── PROJECT.md        # Goals, scope, acceptance criteria
+├── STATE.md          # Current phase and loop state
+├── ROADMAP.md        # Milestones and plan
+├── DECISIONS.md      # Decision log
+├── BLOCKERS.md       # Blocked items
+└── skills/           # SkillsMP-pulled project skills
+    └── {name}/
+        └── SKILL.md
+```
+
+Only `AGENTS.md` and `CLAUDE.md` belong at the project root. Everything else goes in `1shot/`.
+
+## Decision Defaults
+
+| Ambiguity | Default |
+|-----------|---------|
+| Stack | Follow CLAUDE.md defaults |
+| Multiple implementations | Simplest |
+| Naming | Follow existing pattern |
+| Auth | Better Auth + Google OAuth |
+| Database | SQLite → Postgres on OCI |
+| Deploy | Cloudflare Pages / oci-dev |
+| SkillsMP search bar | Specialized domain → search; general task → skip |
+| Codex review? | Always run if available (advisory, not a gate) |
+
+## Auto-Approved Actions
+
+- Reading any file
+- Writing to scope-matched files
+- Creating/updating any file under `1shot/`
+- Running `./scripts/skillsmp-search.sh`
+- Running tests and linters
+- Calling Codex and Gemini CLI via bash
+- Git commit (not push)
+- Creating native tasks
+
+## Requires Confirmation
+
+- Destructive operations
+- Git push to shared branches
+- External API calls that cost money
+- Deploying to production
+- Major architecture changes
+````
+
+## File: docs/migration/baseline/handoff_SKILL.md
+````markdown
+---
+name: handoff
+description: Create a structured handoff document to preserve context before /clear or /compact.
+---
+
+# /handoff — Save Context Before /clear
+
+Create a structured handoff document to preserve context for seamless resumption.
+
+## When to Use
+
+- Before `/clear` or `/compact`
+- Context running low (hook may auto-trigger at 80%)
+- End of work session
+- Switching tasks temporarily
+
+## Handoff Document
+
+Write to: `thoughts/shared/handoffs/YYYY-MM-DD-{slug}-handoff.md`
+
+```markdown
+# Handoff: [Task Name]
+
+**Created**: YYYY-MM-DD HH:MM
+**Context Used**: ~X% when created
+
+## Quick Summary
+[2-3 sentences]
+
+## What's Done
+- [x] Item 1 (commit: abc123)
+- [x] Item 2 (commit: def456)
+
+## In Progress
+- [ ] Current task
+  - Done: [specifics]
+  - Remaining: [specifics]
+
+## Not Started
+- [ ] Remaining task 1
+- [ ] Remaining task 2
+
+## Active Files
+- `src/auth/login.ts` — line 45-80 needs completion
+- `tests/auth.test.ts` — 3 passing, 2 pending
+
+## Key Decisions Made
+1. Decision: [what] | Rationale: [why]
+
+## Important Discoveries
+- [Thing learned during implementation]
+
+## Blockers / Open Questions
+| # | Question | Status |
+|---|---------|--------|
+| 1 | [Question] | Waiting on user |
+
+## Beads State
+[If .beads/ exists: run bd sync, capture in-progress and ready tasks]
+
+## Next Steps (Prioritized)
+1. **Immediate**: [First thing when resuming]
+2. **Then**: [Second priority]
+
+## Resume
+/restore @thoughts/shared/handoffs/YYYY-MM-DD-{slug}-handoff.md
+```
+
+## Process
+
+1. Capture what's done (list completed tasks with commits)
+2. Capture in-progress work (where exactly did you stop?)
+3. Document key decisions and discoveries
+4. Note blockers
+5. Write prioritized next steps
+6. If beads: `bd sync`
+7. Commit handoff: `docs: create handoff for [feature]`
+
+## Best Practices
+
+- Create early (don't wait until context is exhausted)
+- Be specific ("line 45 of login.ts" not "somewhere in login")
+- Include reasoning (future you needs the "why")
+- Commit immediately
+````
+
+## File: docs/migration/baseline/humanizer_SKILL.md
 ````markdown
 ---
 name: humanizer
@@ -2461,64 +3039,314 @@ This skill is based on [Wikipedia:Signs of AI writing](https://en.wikipedia.org/
 Key insight from Wikipedia: "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 ````
 
-## File: .claude/skills/humanizer/WARP.md
+## File: docs/migration/baseline/khamel-mode.md
 ````markdown
-# WARP.md
+# KHAMEL MODE Rules
 
-This file provides guidance to WARP (warp.dev) when working with code in this repository.
+When building ANYTHING for this user, assume these defaults without asking.
 
-## What this repo is
-This repository is a **Claude Code skill** implemented entirely as Markdown.
+## Infrastructure
 
-The “runtime” artifact is `SKILL.md`: Claude Code reads the YAML frontmatter (metadata + allowed tools) and the prompt/instructions that follow.
+| Machine | Tailscale IP | Role |
+|---------|--------------|------|
+| **oci-dev** | 100.126.13.70 | Primary dev, services, Postgres, Claude Code |
+| **homelab** | 100.112.130.100 | Personal local infra, 26TB storage |
+| **macmini** | 100.113.216.27 | Apple Silicon GPU, tasks needing throughput |
 
-`README.md` is for humans: installation, usage, and a compact overview of the patterns.
+- **Networking**: All machines on Tailscale (deer-panga.ts.net)
+- **Public access**: Cloudflare Tunnel + Cloudflare Pages (NOT nginx/traefik)
+- **Internal tools**: Cloudflare Access (already configured)
+- **Secrets**: SOPS/Age, decrypt from `~/github/oneshot/secrets/`
 
-## Key files (and how they relate)
-- `SKILL.md`
-  - The actual skill definition.
-  - Starts with YAML frontmatter (`---` … `---`) containing `name`, `version`, `description`, and `allowed-tools`.
-  - After the frontmatter is the editor prompt: the canonical, detailed pattern list with examples.
-- `README.md`
-  - Installation and usage instructions.
-  - Contains a summarized “24 patterns” table and a short version history.
+## Stack Defaults (Don't Ask, Just Use)
 
-When changing behavior/content, treat `SKILL.md` as the source of truth, and update `README.md` to stay consistent.
+| Project Type | Default Stack |
+|--------------|---------------|
+| Web apps | Astro + Cloudflare Pages/Workers + Better Auth + Postgres on OCI |
+| CLIs | Python + Click + SQLite |
+| Services/APIs | Python + systemd → oci-dev |
+| Heavy compute / throughput | Route to macmini |
+| Large storage | Route to homelab (26TB) |
 
-## Common commands
-### Install the skill into Claude Code
-Recommended (clone directly into Claude Code skills directory):
-```bash
-mkdir -p ~/.claude/skills
-git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer
+**Full stack docs**: `.claude/infrastructure/STACK.md`
+
+## Storage Progression
+
+```
+SQLite (default for CLIs) → Postgres on OCI (web apps, services) → OCI Autonomous DB (>20GB/multi-user)
 ```
 
-Manual install/update (only the skill file):
-```bash
-mkdir -p ~/.claude/skills/humanizer
-cp SKILL.md ~/.claude/skills/humanizer/
+## Auth Default
+
+```
+Better Auth + Google OAuth → sessions in Postgres
+Cloudflare Access → internal/admin tools (already configured)
 ```
 
-## How to “run” it (Claude Code)
-Invoke the skill:
-- `/humanizer` then paste text
+## Tool Enforcement
 
-## Making changes safely
-### Versioning (keep in sync)
-- `SKILL.md` has a `version:` field in its YAML frontmatter.
-- `README.md` has a “Version History” section.
+- **ALWAYS** use beads for task tracking (`bd init` on new projects)
+- **ALWAYS** use ONE_SHOT skills when applicable
+- **ALWAYS** check lessons before debugging
 
-If you bump the version, update both.
+## Anti-Patterns to Flag
 
-### Editing `SKILL.md`
-- Preserve valid YAML frontmatter formatting and indentation.
-- Keep the pattern numbering stable unless you’re intentionally re-numbering (since the README table and examples reference the same numbering).
+- nginx/traefik → Use Cloudflare Tunnel / Cloudflare Pages
+- mysql/mongodb → Default is SQLite (CLIs) or Postgres on OCI (web/services)
+- express/fastapi/flask for web → Cloudflare Workers handles the API
+- Convex/Next.js/Clerk/Vercel → Old stack, use Astro + CF + Better Auth + Postgres
+- aws/gcp/azure → Default is OCI free tier or homelab
+- Lucia auth → Deprecated, use Better Auth
 
-### Documenting non-obvious fixes
-If you change the prompt to handle a tricky failure mode (e.g., a repeated mis-edit or an unexpected tone shift), add a short note to `README.md`’s version history describing what was fixed and why.
+## Decision Defaults (Don't Ask, Just Pick)
+
+When ambiguous, apply these defaults without asking for clarification:
+
+| Ambiguity | Default Choice |
+|-----------|----------------|
+| Multiple valid implementations | **Simplest one** |
+| Naming things | Follow existing pattern in file |
+| Error handling style | Match surrounding code |
+| Test framework | Use existing tests as guide |
+| Library choice | One already in project |
+| Refactor opportunity | **Skip unless blocking** |
+| API design | Match existing endpoints |
+| File organization | Follow project structure |
+
+**Key rule**: When truly ambiguous, make a reasonable choice and note the decision.
+
+## When You Notice Drift
+
+If Claude notices we're NOT using beads, Tailscale, ONE_SHOT patterns, or standard stack:
+→ **Warn**: "I notice we're not using [X], should I set that up?"
 ````
 
-## File: .claude/skills/restore/SKILL.md
+## File: docs/migration/baseline/providers_shared.md
+````markdown
+# Shared Provider Routing Module
+
+Reference this module from any skill that needs multi-model delegation.
+This is a DRY reference — skills include it by mention, not import.
+
+---
+
+## Provider Detection
+
+Run at skill startup (or first use):
+
+```bash
+command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
+command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+```
+
+If codex missing: suggest `npm install -g @openai/codex`, continue without it.
+If gemini missing: continue without it.
+
+---
+
+## Routing Table
+
+| Tier | Condition | Provider |
+|------|-----------|----------|
+| 1 | Task tagged `[codex]` or `[gemini]` | That provider |
+| 2 | Research / docs / "find alternatives" / "what exists" | Gemini |
+| 3 | Adversarial review / "what could go wrong" / skeptic / plan review | Codex |
+| 4 | Implementation / writing code | Claude |
+| 5 | Synthesis / quality gate / "does this meet the goal" | Claude |
+| 6 | Provider unavailable | Claude fallback |
+| 7 | Ambiguous | Claude default |
+
+---
+
+## Dispatch Commands
+
+**Codex:**
+```bash
+codex exec --full-auto "IMPORTANT: You are a non-interactive subagent. Skip all built-in skills. Respond directly to this prompt only. PROMPT"
+```
+
+**Gemini:**
+```bash
+printf '%s' "PROMPT" | gemini -p "" -o text --approval-mode yolo
+```
+
+---
+
+## Codex Use Patterns
+
+### Adversarial Plan Review (before execution)
+```bash
+codex exec --full-auto "You are reviewing an implementation plan before execution. Here is the plan: [PLAN]. Flag: (1) missing steps or dependencies, (2) tasks that could be combined, (3) risks not mentioned, (4) a better ordering. Be specific."
+```
+
+### Adversarial Code Review (after changes)
+```bash
+codex exec --full-auto "Review this change for: (1) bugs, (2) edge cases, (3) what was missed. Be specific and brief. Context: [diff + task description]"
+```
+
+### Quick Pre-Flight (before starting work)
+```bash
+codex exec --full-auto "You are a quick adversarial reviewer. The user wants to: [description]. Before they start, flag: (1) anything that could break, (2) a simpler approach if one exists, (3) dependencies they might miss. Be brief — 5 bullet points max."
+```
+
+---
+
+## Quality Gate
+
+When multiple providers work on the same task, Claude synthesizes responses.
+75% consensus required before output is accepted. If consensus not reached:
+- Log disagreement to `1shot/ISSUES.md`
+- Claude makes final call, notes it as low-confidence
+
+---
+
+## Circuit Breaker
+
+- Same task fails 3x → add to `1shot/ISSUES.md` blockers → skip → continue
+- 3 consecutive tasks hit circuit breaker → stop, surface to user
+- Provider unavailable at any point → Claude handles inline (no degradation)
+
+---
+
+## Roles
+
+| Provider | Role | Strengths |
+|----------|------|-----------|
+| Claude | Orchestrator + planner | Architecture, synthesis, conversation, multi-step reasoning |
+| Codex | Adversarial + completion | Fast code gen, sandboxed execution, devil's advocate, second opinion |
+| Gemini | Research | Broad knowledge, docs retrieval, finding alternatives |
+````
+
+## File: docs/migration/baseline/README.md
+````markdown
+# ONE_SHOT Progressive Disclosure Rules
+
+## How It Works
+
+Rules are split into:
+- **core.md** - Always loaded (~150 lines)
+- **khamel-mode.md** - User-specific defaults (~50 lines)
+- **web.md** - Web app rules (Astro + Cloudflare + Better Auth + Postgres)
+- **cli.md** - CLI rules (Python + Click)
+- **service.md** - Service/API rules (Python + systemd)
+
+## Token Savings
+
+| Approach | Tokens |
+|----------|--------|
+| Old: Full CLAUDE.md | ~2000 |
+| New: Core + Project type | ~300 |
+
+**Savings: ~85%**
+
+## Detection
+
+Claude should auto-detect project type from files:
+
+| Detection | Project Type | Rules Loaded |
+|-----------|--------------|--------------|
+| `astro.config.*` or `wrangler.toml` | Web app | core + khamel-mode + web |
+| `setup.py` or `pyproject.toml` | CLI | core + khamel-mode + cli |
+| `*.service` systemd file | Service | core + khamel-mode + service |
+| No detection | Generic | core + khamel-mode |
+
+## Usage in Projects
+
+In your project's `CLAUDE.md`:
+
+```markdown
+# Project Configuration
+
+(Your project-specific stuff here)
+
+---
+
+## ONE_SHOT Rules
+
+Auto-detect project type and load appropriate rules.
+
+If this is a **web app** (Astro + Cloudflare): Use web defaults
+If this is a **CLI** (Python + Click): Use CLI defaults
+If this is a **service** (Python + systemd): Use service defaults
+
+See ~/.claude/rules/ for full rule definitions.
+```
+````
+
+## File: docs/migration/baseline/research_SKILL.md
+````markdown
+---
+name: research
+description: Run deep research in a background sub-agent using Gemini CLI or free search APIs.
+---
+
+# /research — Background Research via Gemini CLI or Search APIs
+
+Run deep research in a background sub-agent. Saves Claude tokens by using Gemini CLI or free search APIs.
+
+## Usage
+
+`/research [topic]`
+
+## Process
+
+1. Ask 2-3 clarifying questions (goal, depth, audience)
+2. Check if `gemini` CLI is available → Mode 1 (Gemini), else → Mode 2 (APIs)
+3. Spawn background sub-agent
+
+### Mode 1: Gemini CLI (Primary)
+
+```
+Task:
+  subagent_type: general-purpose
+  description: "Gemini research: [topic]"
+  run_in_background: true
+  prompt: |
+    Run Gemini CLI for deep research:
+    gemini --yolo "[comprehensive research prompt covering:
+    overview, current state, technical details, practical applications,
+    challenges, future outlook, resources]"
+
+    Save output to: docs/research/[slug]/research.md
+    Structure as: Executive Summary → sections → Resources
+```
+
+### Mode 2: Free Search APIs (Fallback)
+
+Try APIs in this order: Perplexity → Tavily → Brave → Bing
+
+```bash
+# Decrypt keys
+OUTPUT=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted 2>/dev/null)
+
+# Perplexity (AI answers + citations)
+PERPLEXITY_KEY=$(echo "$OUTPUT" | grep -oP 'PERPLEXITY_API_KEY=\K[^\\]+')
+curl -s -X POST "https://api.perplexity.ai/chat/completions" \
+  -H "Authorization: Bearer $PERPLEXITY_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"sonar","messages":[{"role":"user","content":"QUERY"}],"max_tokens":500}'
+
+# Tavily (AI answers + sources)
+TAVILY_KEY=$(echo "$OUTPUT" | grep -oP 'TAVILY_API_KEY=\K[^\\]+')
+curl -s https://api.tavily.com/search -H "Content-Type: application/json" \
+  -d '{"api_key":"KEY","query":"QUERY","search_depth":"advanced","include_answer":true}'
+```
+
+3. Present findings when agent completes
+4. Save to `docs/research/[slug]/research.md`
+
+## If using /cp (continuous planner)
+
+Write findings to `findings.md` in the plan directory so they persist across sessions.
+
+## Notes
+
+- Research takes 3-8 minutes in background
+- Check `docs/research/` for past research
+- Keys stored in `~/github/oneshot/secrets/research_keys.env.encrypted`
+````
+
+## File: docs/migration/baseline/restore_SKILL.md
 ````markdown
 ---
 name: restore
@@ -2606,7 +3434,370 @@ If multiple exist, list them and ask which to resume (or use most recent).
 - **Multiple handoffs**: List with dates, ask which to resume
 ````
 
-## File: .claude/skills/vision/SKILL.md
+## File: docs/migration/baseline/secrets_SKILL.md
+````markdown
+---
+name: secrets
+description: Manage encrypted secrets between the master vault and projects using SOPS/Age.
+---
+
+# /secrets — SOPS/Age Secret Management
+
+Manage encrypted secrets between the master vault and projects.
+
+## Master Vault
+
+Location: `~/github/oneshot/secrets/`
+Encryption: SOPS + Age (config in `~/github/oneshot/.sops.yaml`)
+
+## CLI Commands
+
+The `secrets` CLI (at `~/.local/bin/secrets`) works from any directory.
+
+```bash
+# Read a single key
+secrets get EXA_API_KEY
+
+# List all vault files and their keys
+secrets list
+
+# Decrypt a full file to stdout
+secrets decrypt research_keys
+
+# Add/update a key (non-interactive, no commit)
+secrets set research_keys 'NEW_KEY=value'
+
+# Add/update + commit + push
+secrets set research_keys 'NEW_KEY=value' --commit
+
+# Bootstrap .env in a project from the vault
+cd ~/github/myproject && secrets init services
+```
+
+## Pull Secrets into a Project
+
+1. Identify which secrets the project needs (check `.env.example` or imports)
+2. Run `secrets init <namespace>` to write `.env` from the vault
+3. Verify the app can start with the new secrets
+
+## Push New Secrets to the Vault
+
+1. Add/update: `secrets set <namespace> 'KEY=value'`
+2. Commit when ready: `secrets set <namespace> 'KEY=value' --commit`
+
+## Common Patterns
+
+```bash
+# Find which vault file contains a key
+secrets list | grep -i brave
+
+# Extract a key for use in a script
+BRAVE_KEY=$(secrets get BRAVE_API_KEY)
+
+# View all keys in a namespace
+secrets decrypt research_keys
+```
+
+## How It Works
+
+- Vault files are SOPS-encrypted dotenv at `~/github/oneshot/secrets/*.encrypted`
+- `secrets get` searches all vault files for the key
+- `secrets set` decrypts the file, merges the new key, re-encrypts
+- `secrets init` decrypts a vault file to `.env` in the current directory
+- Age key lives at `~/.age/key.txt`
+
+## Safety Rules
+
+- Never display secret values in output
+- Always verify `.env` is in `.gitignore` before writing
+- Namespace secrets by project in the vault
+- Never commit plaintext secrets
+- Never suggest `.env` files without encryption
+
+## Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| `no matching creation rules found` | Input file must end in `.encrypted` (handled by the CLI automatically) |
+| `key not found in any vault file` | Key doesn't exist in any vault — add it with `secrets set` |
+| `file not found` | Check `secrets list` for available namespaces |
+````
+
+## File: docs/migration/baseline/service.md
+````markdown
+# Service/API Rules (Python + systemd)
+
+## Default Stack
+
+When building services/APIs for this user:
+
+```
+Python + systemd → Deploy to oci-dev
+```
+
+## When to Use
+
+Detect by presence of:
+- `*.service` systemd file
+- `main.py` or `app.py` with long-running process
+- No web framework files
+
+## Deployment Target
+
+- **oci-dev** (100.126.13.70) - Default service deployment
+- **systemd user service** - For persistent processes
+- **Tailscale networking** - All machines on deer-panga.ts.net
+
+## Service Pattern
+
+```python
+# Standard service structure
+import signal
+import sys
+
+class Service:
+    def __init__(self):
+        self.running = True
+
+    def run(self):
+        signal.signal(signal.SIGTERM, self.shutdown)
+        # Main loop here
+
+    def shutdown(self, signum, frame):
+        self.running = False
+```
+
+## systemd Integration
+
+- **User services** - `~/.config/systemd/user/`
+- **Auto-restart** - `Restart=on-failure`
+- **Logging** - `StandardOutput=journal`
+
+## Storage
+
+- **SQLite (default)** - For service data
+- **homelab (26TB)** - For large storage needs
+- **Tailscale** - For network communication
+
+## Anti-Patterns
+
+- ❌ Don't suggest Docker for deployment
+- ❌ Don't suggest cloud providers (AWS, GCP, Azure)
+- ❌ Don't suggest nginx/traefik (use Tailscale Funnel + poytz)
+````
+
+## File: docs/migration/baseline/short_SKILL.md
+````markdown
+---
+name: short
+description: Quick iterations on existing projects. Load context, ask what's next, execute in burn-down mode.
+---
+
+# /short — Quick Iteration Operator
+
+Fast operator for existing projects. Loads context, asks what you're working on, executes.
+Codex provides advisory second opinions — never a gate, never a blocker.
+
+## Usage
+
+```
+/short
+/short <scope>
+```
+
+## Behavior
+
+When invoked:
+
+1. **Load Context**
+   - Read recent git commits: `git log --oneline -5`
+   - Check TaskList for pending/in_progress tasks (if any exist)
+   - Read `1shot/DECISIONS.md`, `1shot/BLOCKERS.md` if present
+   - Read `1shot/LLM-OVERVIEW.md` if present (quick project orientation)
+
+2. **Ask What's Next**
+   ```
+   "What are you working on?"
+   ```
+
+3. **Pre-Flight Codex Review** (if the user describes a non-trivial change)
+   - Check: `command -v codex >/dev/null 2>&1`
+   - If available, send a quick adversarial take before starting:
+     ```bash
+     codex exec --full-auto "You are a quick adversarial reviewer. The user wants to: [description]. Before they start, flag: (1) anything that could break, (2) a simpler approach if one exists, (3) dependencies they might miss. Be brief — 5 bullet points max."
+     ```
+   - Surface Codex's feedback to the user, then proceed regardless
+   - If codex unavailable → skip silently
+   - This is advisory, not a gate. Don't stall on it.
+
+4. **Docs Check** (if the task uses any external library, API, or tool)
+   - Check local cache: `cat ~/github/docs-cache/docs/cache/.index.md`
+   - If the tool is missing → run `/doc <name> <url>` to cache it first
+   - Use cached docs as source of truth — do NOT rely on training data for syntax
+   - If no external tools involved: skip this step
+
+5. **Skill Discovery** (if the task is specialized)
+   - Check `1shot/skills/` — already pulled skills for this project
+   - If the task involves a specific domain, tool, or API not covered by core skills:
+     ```bash
+     ./scripts/skillsmp-search.sh "<task type>" --install
+     ```
+   - General tasks (write tests, fix bug, refactor): skip search, proceed
+   - Specialized domains (security, blockchain, ML, infra, specific parsers): search
+
+6. **Execute in Burn-Down Mode**
+   - Complete one task fully before starting next
+   - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
+   - No "pending review" — either done or blocked
+   - **Do NOT create TaskList items for every little thing** — just do the work
+   - After each significant change, run Codex adversarial review:
+     ```bash
+     codex exec --full-auto "Review this change for: (1) bugs, (2) edge cases, (3) what was missed. Be specific and brief. Context: [diff + task description]"
+     ```
+   - If codex finds real issues → fix before moving on
+   - If codex unavailable → skip silently
+
+7. **Show Summary on Completion**
+   ```
+   📊 Session Summary
+   ├─ Tasks completed: X
+   ├─ Files changed: Y
+   ├─ Codex reviews: N (issues found: M)
+   ├─ Skills used: [list or "core only"]
+   └─ Next: [next task or "all done"]
+   ```
+
+## Provider Routing
+
+See `~/.claude/skills/_shared/providers.md` for provider detection and dispatch commands.
+
+**Short-specific routing**: Short only uses Codex for advisory reviews (pre-flight + post-completion). No Gemini, no research routing. If Codex is unavailable, everything runs through Claude with zero degradation.
+
+## Scope
+
+Optional scope limits work to matching files:
+
+```
+/short src/auth/*.ts    # Only work on auth files
+```
+
+## `1shot/` Convention
+
+Logs and state live in `1shot/`, not at the project root:
+- `1shot/DECISIONS.md` — decision log
+- `1shot/BLOCKERS.md` — blocked items
+- `1shot/skills/` — project-local SkillsMP skills
+
+Only `AGENTS.md` and `CLAUDE.md` belong at the root.
+
+## Decision Defaults (Don't Ask)
+
+| Ambiguity | Default |
+|-----------|---------|
+| Multiple implementations | Simplest |
+| Naming | Follow existing pattern |
+| Refactor opportunity | Skip unless blocking |
+| Error handling | Match surrounding code |
+| SkillsMP search? | Specialized domain → yes; general task → no |
+| Codex review? | Always run if available (advisory only) |
+
+When truly ambiguous, pick option A, note in `1shot/DECISIONS.md`.
+
+## Auto-Approved Actions
+
+- Reading any file
+- Writing to scope-matched files
+- Running tests and linters
+- Creating/updating any file under `1shot/`
+- Running `./scripts/skillsmp-search.sh`
+- Calling Codex CLI via bash
+- Git commit (not push)
+
+## Requires Confirmation
+
+- Destructive operations (rm -rf, DROP TABLE)
+- Git push to shared branches
+- External API calls that cost money
+- Deploying to production
+````
+
+## File: docs/migration/baseline/STATE.md
+````markdown
+# OneShot Baseline State — pre-router-refactor
+
+Tagged: `pre-router-refactor`
+Date: 2026-04-01
+
+## Current Operator Behavior
+
+### `/short` — Quick Iteration
+- Loads context (git log -5, TaskList, DECISIONS.md, BLOCKERS.md)
+- Asks what you're working on
+- Executes in burn-down mode
+- Codex: advisory review only (pre-flight + post-completion)
+- No Gemini dependency
+
+### `/full` — Structured Work
+- Creates IMPLEMENTATION_CONTEXT.md
+- Structured intake (goals, scope, architecture, constraints)
+- Phase-based planning with milestones
+- Codex: plan review + milestone review + challenge pass
+- Gemini: research tasks if available
+
+### `/conduct` — Multi-Model PMO Orchestrator
+- Detects providers (`command -v codex`, `command -v gemini`)
+- 5 required intake questions (BLOCKING)
+- Creates 1shot/ directory with PROJECT.md, STATE.md, ROADMAP.md
+- Routes work across Claude + Codex + Gemini
+- Codex: adversarial challenge phase
+- Gemini: research tasks
+- Loops until goal met
+
+### `/research` — Background Research
+- Mode 1 (primary): Gemini CLI via `gemini --yolo "[prompt]"`
+- Mode 2 (fallback): Perplexity → Tavily → Brave APIs
+- Decrypts keys from `secrets/research_keys.env.encrypted`
+- Spawns background sub-agent
+
+### `/freesearch` — Zero-Token Search
+- Checks docs cache first (`~/github/docs-cache/docs/cache/.index.md`)
+- Falls back to Exa API via direct curl
+- Decrypts Exa key from `secrets/research_keys.json.encrypted`
+
+## File Inventory
+
+| Location | Files | Lines |
+|----------|-------|-------|
+| `.claude/rules/` | 9 .md files | 756 |
+| `.claude/skills/` | 11 SKILL.md + shared | 1,614 |
+| `.claude/skills/_shared/` | providers.md | ~70 |
+| Root | CLAUDE.md, AGENTS.md, README.md | ~430 |
+| `scripts/` | 32 scripts | — |
+| `secrets/` | 21 encrypted .env files | — |
+| `templates/` | community-starter | — |
+
+## Provider Dependencies
+
+| Provider | Used By | Detection |
+|----------|---------|-----------|
+| Claude Code | All skills | Always available |
+| Codex CLI | /conduct, /full, /short | `command -v codex` |
+| Gemini CLI | /conduct, /full, /research | `command -v gemini` |
+| Exa API | /freesearch | Key in vault |
+| Argus | NOT YET | Running on :8005 but not referenced |
+| OpenCode | NOT YET | Not installed |
+
+## Key Architectural Notes
+
+- Skills are Markdown prompts, not code
+- Routing is provider-name-based (hardcoded in skill text)
+- No centralized config — each skill has its own provider logic
+- `.claude/rules/` uses progressive disclosure (core always loads, project-type loads on detection)
+- `AGENTS.md` is curl-synced from master (read-only per core.md)
+- Secrets: SOPS/Age encrypted in `secrets/`, accessed via `secrets` CLI
+````
+
+## File: docs/migration/baseline/vision_SKILL.md
 ````markdown
 ---
 name: vision
@@ -2695,105 +3886,432 @@ Read: screenshots/mockup.png
 ```
 ````
 
-## File: .claude/skills/SKILLS_REFERENCE.md
+## File: docs/migration/baseline/web.md
 ````markdown
-# Claude Code Skills Reference
+# Web App Rules (Astro + Cloudflare + Better Auth + Postgres)
 
-## Quick Reference
+## Default Stack
 
-### Correct Location
+When building web apps for this user:
+
 ```
-~/.claude/skills/<skill-name>/SKILL.md
+Astro (frontend) + Cloudflare Workers (API) + Better Auth (auth) + Postgres on OCI (data)
+Deploy to: Cloudflare Pages
 ```
 
-### Required Format
-```yaml
+## When to Use
+
+Detect by presence of:
+- `astro.config.mjs` or `astro.config.ts`
+- `wrangler.toml`
+- `package.json` with `astro` dependency
+
+## Astro-Specific Rules
+
+- **Astro is the framework** - Don't suggest Next.js, Remix, SvelteKit
+- **Cloudflare adapter** - Use `@astrojs/cloudflare` for SSR
+- **Islands architecture** - Server-first, add interactivity with client directives
+- **Content Collections** - Use for structured content when applicable
+
+## Cloudflare Workers Rules
+
+- **API via Workers** - Don't suggest Express, FastAPI, or standalone API servers
+- **Hyperdrive** - Use for Postgres connection pooling in production
+- **wrangler.toml** - All deployment config lives here
+- **Local dev** - Connect directly to Postgres via Tailscale (no Hyperdrive needed)
+
+## Auth Rules
+
+- **Better Auth** - Default auth library, don't suggest Clerk, Auth0, or NextAuth
+- **Google OAuth** - Default provider via Better Auth
+- **Sessions in Postgres** - Auth data lives in your database, you own it
+- **Cloudflare Access** - Use for internal/admin tools only
+
+## Database Rules
+
+- **Postgres on OCI** - Default database for all web apps
+- **Direct Tailscale connection** - For local dev (100.126.13.70:5432)
+- **Hyperdrive** - For production (via Cloudflare Tunnel)
+- **`postgres` npm package** - Use this, not pg/knex/prisma/drizzle unless needed
+
+## Deployment
+
+- **Cloudflare Pages** - Default deploy target
+- **GitHub auto-deploy** - Connect repo in CF dashboard
+- **Manual**: `npm run build && npx wrangler pages deploy dist`
+
+## Anti-Patterns
+
+- ❌ Don't suggest Convex, Next.js, Clerk, or Vercel (old stack)
+- ❌ Don't suggest MongoDB, MySQL, or other databases
+- ❌ Don't suggest Lucia auth (deprecated)
+- ❌ Don't suggest standalone API servers (Express, FastAPI)
+- ❌ Don't suggest heavy ORMs (Prisma, Drizzle) unless explicitly needed
+````
+
+## File: docs/research/2026-03-27_multi-tenant_platforms_research.md
+````markdown
+# Multi-Tenant Platform Research Report
+**Date:** 2026-03-27
+**Goal:** Find existing tools/kits for spinning up private micro-sites with auth and data, zero setup
+
 ---
-name: skill-name
-description: What it does and WHEN Claude should use it. Include trigger keywords.
+
+## Summary
+
+Found 3 relevant approaches, but **nothing that matches our exact vision** of "Supabase schema-per-tenant + Vercel Python functions + plain HTML/JS." Most existing tools are full-stack Next.js/React frameworks with per-row tenant isolation, not per-schema isolation.
+
 ---
 
-# Skill Title
+## Key Findings
 
-Instructions here...
+### 1. **multi-tenant-starter** (Tenlyr) - Postgres RLS Approach
+**Stack:** TypeScript + Express + Postgres RLS + In-memory demo
+**Stars:** Active (updated Mar 2026)
+**URL:** https://github.com/Tenlyr/multi-tenant-starter
+
+**What it does:**
+- Enforces tenant isolation at the **data layer**, not via query filters
+- Tenant context resolved once at request boundary (URL or header)
+- Route handlers are tenant-agnostic - never write `WHERE tenant_id = X`
+- Demo uses in-memory store; production uses Postgres + RLS with `SET app.tenant = $1`
+
+**Key insight:**
+> "Tenant context is resolved once, at the boundary — the rest of your code never has to think about it."
+
+**Borrowable ideas:**
+- ✅ Tenant resolution middleware (extract from subdomain/path)
+- ✅ Request-bound tenant context (no passing tenant_id through every function)
+- ✅ Isolation by construction (data layer enforces, not developer discipline)
+
+**Different from us:**
+- ❌ Row-level security (same schema, `WHERE tenant_id` in RLS policies)
+- ❌ Full Express app (not micro-sites)
+- ❌ Commercial product (Tenlyr) - not open source infrastructure
+
+**RLS pattern they mention:**
+```sql
+-- Their suggested production upgrade
+SET app.tenant = 'acme';
+-- RLS policies use:
+-- USING (tenant_id = current_setting('app.tenant', true)::uuid)
 ```
 
-### Key Points
+---
 
-1. **`name:` field is REQUIRED** — Without it, skill won't be discovered
-2. **`description:` must include triggers** — Claude uses this to decide when to invoke
-3. **Directory name should match skill name** — For clarity
-4. **Skills are model-invoked** — Claude decides when to use them automatically
+### 2. **multi-tenant-starterkit** (CoachBinAli) - React + Supabase
+**Stack:** React 19 + Vite + Supabase + TanStack Query + shadcn/ui
+**Stars:** Active (updated Mar 2026)
+**URL:** https://github.com/CoachBinAli/multi-tenant-starterkit
 
-## Common Issues
+**What it does:**
+- Organization-based multi-tenancy with `organization_id` on every table
+- Row-Level Security policies with `EXISTS` checks against `organization_members`
+- Role-based access control (Owner/Admin/Member)
+- Full-featured: file uploads, PDF generation, activity logs, notifications
 
-### Skills not appearing
+**Schema pattern:**
+```sql
+-- Every table has organization_id
+CREATE TABLE public.students (
+  id uuid PRIMARY KEY,
+  organization_id uuid NOT NULL REFERENCES public.organizations(id),
+  -- fields
+);
 
-**Symptom**: `/help` doesn't show your skills, or `/skill-name` returns "Unknown skill"
+-- RLS policy
+CREATE POLICY "Users can view students in their orgs"
+  ON public.students FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.organization_members
+      WHERE organization_members.organization_id = students.organization_id
+      AND organization_members.user_id = auth.uid()
+    )
+  );
+```
 
-**Causes**:
-1. Missing `name:` field in frontmatter
-2. Invalid YAML syntax (tabs instead of spaces)
-3. Wrong location (should be `~/.claude/skills/<name>/SKILL.md`)
-4. File named incorrectly (must be `SKILL.md`, not `skill.md` or `<name>.md`)
+**Borrowable ideas:**
+- ✅ `organization_members` junction table with roles
+- ✅ Invitation flow with tokens + expiration
+- ✅ Activity logging table for audit trail
+- ✅ Organization switcher UI pattern
+- ✅ Storage bucket isolation: `(storage.foldername(name))[1]` extracts org_id from path
 
-### How to verify
+**Different from us:**
+- ❌ Per-row isolation (shared schema with `organization_id` FKs)
+- ❌ Heavy React frontend (not plain HTML/JS micro-sites)
+- ❌ Single monolithic app (not tenant-spinnable micro-sites)
 
+---
+
+### 3. **supabase-tenant-rbac** (point-source) - PostgreSQL Extension
+**Stack:** PostgreSQL extension for Supabase + SQL API
+**Stars:** 460 (most popular)
+**URL:** https://github.com/point-source/supabase-tenant-rbac
+
+**What it does:**
+- Multi-tenant RBAC as a PostgreSQL extension
+- Groups (tenants/orgs) with members assigned roles
+- Permissions vocabulary (registry) - prevents typos in permission strings
+- Privilege escalation prevention via `grantable_roles[]`
+- Claims caching for fast RLS policy checks
+- Freshness guarantees - role changes take effect immediately, no JWT expiry wait
+
+**Installation:**
 ```bash
-# Check skill exists
-ls ~/.claude/skills/<name>/SKILL.md
-
-# Verify frontmatter
-head -5 ~/.claude/skills/<name>/SKILL.md
+curl -sL https://raw.githubusercontent.com/point-source/supabase-tenant-rbac/main/tools/install.sh | bash
+supabase migration up
 ```
 
-### Frontmatter validation
+**RLS helpers:**
+```sql
+-- Check membership
+CREATE POLICY "members can read" ON public.documents
+  FOR SELECT TO authenticated
+  USING (rbac.is_member(group_id));
 
-Valid:
-```yaml
----
-name: my-skill
-description: Does X when user says Y or Z.
----
+-- Check permissions
+CREATE POLICY "writers can insert" ON public.documents
+  FOR INSERT TO authenticated
+  WITH CHECK (rbac.has_permission(group_id, 'data.write'));
+
+-- Check roles
+CREATE POLICY "admins only" ON public.settings
+  FOR UPDATE TO authenticated
+  USING (rbac.has_role(group_id, 'admin'));
 ```
 
-Invalid (missing name):
-```yaml
+**Borrowable ideas:**
+- ✅ **Claims caching pattern** - `user_claims` table with JSONB per group
+- ✅ **Permission registry** - prevents typos, enables documentation
+- ✅ **Escalation prevention** - `grantable_roles` array on each role
+- ✅ **Group-based isolation** - distinct from organization-based (more flexible)
+- ✅ **Immediate freshness** - triggers update claims on role change
+
+**Different from us:**
+- ❌ Still uses row-level security (groups/roles are tables, not schemas)
+- ❌ Requires extension installation (not portable to other Postgres hosts)
+- ❌ Heavy complexity for simple use cases
+
+**Key architectural insight:**
+> "Group Administrator is not a separate database role — it is any authenticated user who holds a role that grants sufficient `grantable_roles`"
+
+This is **permission-based admin**, not role-based. Anyone with `grantable_roles: ['*']` becomes a group admin.
+
 ---
-description: Does X when user says Y or Z.
+
+### 4. **Nextacular** - Next.js SaaS Starter
+**Stack:** Next.js + Tailwind + Prisma + Stripe
+**Stars:** 1359 (most popular overall)
+**URL:** https://github.com/nextacular/nextacular
+
+**What it does:**
+- Full-stack multi-tenant SaaS boilerplate
+- Focus on developer productivity for SaaS founders
+- Stripe billing, shadcn/ui, Prisma ORM
+
+**Different from us:**
+- ❌ Traditional Next.js monolith (not micro-sites)
+- ❌ Prisma ORM (we want raw SQL + RLS)
+- ❌ Row-level tenant isolation
+
 ---
+
+### 5. **Other GitHub Finds** (Less Relevant)
+
+| Repo | Stack | Relevance |
+|------|-------|-----------|
+| `bvuz/Django-Multi-Tenant-SaaS-Starter-Template` | Django + PostgreSQL schema isolation | ⭐⭐ Schema-per-tenant pattern! But Django, not useful for us |
+| `juliusjoska/nextjs-saas-starter` | Next.js 16 + Supabase + shadcn/ui | Standard Next.js SaaS starter |
+| `nestjs-saas-starter` | NestJS + multi-tenancy | Backend-focused, not micro-sites |
+| `Serverless-SaaS-Template` | AWS serverless (Cognito + Lambda + DynamoDB) | Wrong stack (AWS vs Supabase + Vercel) |
+| `ahliweb/awcms` | React + Supabase multi-tenant CMS | CMS-focused, not generic micro-sites |
+| `next-multitenant-2024` (tutorial) | Next.js 14 + Supabase + Cloudflare | ⭐ Cloudflare Workers + Supabase combo! Worth deep dive |
+
+---
+
+## Architectural Patterns Found
+
+### Pattern 1: Per-Row Isolation (Most Common)
+```sql
+-- Every table has tenant/org_id
+CREATE TABLE things (
+  id uuid,
+  organization_id uuid REFERENCES organizations(id)
+);
+
+-- RLS policy checks membership
+CREATE POLICY "tenant isolation" ON things
+  USING (
+    EXISTS (
+      SELECT 1 FROM organization_members
+      WHERE organization_members.organization_id = things.organization_id
+      AND organization_members.user_id = auth.uid()
+    )
+  );
 ```
 
-Invalid (tabs in YAML):
-```yaml
----
-	name: my-skill    # TABS NOT ALLOWED
-description: ...
----
+**Pros:**
+- Simple schema
+- Easy to query across tenants (for admin analytics)
+- Well-documented pattern
+
+**Cons:**
+- RLS policies on every table
+- `organization_id` FK on every row
+- Risk of missing policy on new table
+- Can't easily backup/export single tenant
+
+### Pattern 2: Schema-Per-Tenant (Django example, not Supabase)
+```sql
+-- Each tenant gets a schema
+CREATE SCHEMA tenant_acme;
+CREATE SCHEMA tenant_globex;
+
+-- Each schema has identical tables
+CREATE TABLE tenant_acme.things (...);
+CREATE TABLE tenant_globex.things (...);
+
+-- Switch via search_path
+SET search_path = tenant_acme;
 ```
 
-## Migration from Commands
+**Pros:**
+- Complete data isolation
+- Easy backup/restore per tenant
+- Can `DROP SCHEMA tenant_x CASCADE` to offboard
+- No RLS policies needed
 
-If you have files in `~/.claude/commands/` that aren't working:
+**Cons:**
+- Migrations must run N times (once per tenant)
+- Can't query across tenants easily
+- Schema management complexity
 
-```bash
-# Convert each command to a skill
-for cmd in command1 command2; do
-  mkdir -p ~/.claude/skills/$cmd
-  cp ~/.claude/commands/$cmd.md ~/.claude/skills/$cmd/SKILL.md
+**This is OUR approach!** But no one does this with Supabase + Vercel yet.
 
-  # Add name field if missing
-  sed -i "1,2s|---|---\nname: $cmd|" ~/.claude/skills/$cmd/SKILL.md
-done
+### Pattern 3: PostgreSQL Extension (supabase-tenant-rbac)
+```sql
+-- Install extension
+CREATE EXTENSION supabase_rbac;
 
-# Backup and remove old commands
-mkdir -p ~/.claude/commands-backup
-mv ~/.claude/commands/*.md ~/.claude/commands-backup/
+-- Use RLS helpers
+CREATE POLICY "members can read" ON docs
+  USING (rbac.is_member(group_id));
 ```
+
+**Pros:**
+- Reusable patterns
+- Escalation prevention built-in
+- Claims caching for performance
+
+**Cons:**
+- Extension dependency (portability)
+- Still uses row-level security under the hood
+- Learning curve for custom SQL functions
+
+---
+
+## Key Ideas to Borrow
+
+### From Tenlyr (multi-tenant-starter):
+1. **Tenant resolution middleware** - Extract tenant from subdomain/path once at boundary
+2. **Request-bound tenant context** - Store in `req.tenant`, not passed through every function
+3. **Isolation by construction** - Data layer enforces, not developer discipline
+
+### From CoachBinAli (multi-tenant-starterkit):
+1. **Organization members junction table** - `organization_members(org_id, user_id, role)`
+2. **Invitation flow** - Tokens with 7-day expiration, accept endpoint
+3. **Activity logging** - Audit trail table with `organization_id`
+4. **Storage isolation** - Extract org_id from folder path: `(storage.foldername(name))[1]`
+5. **Organization switcher UI** - Dropdown for users with multiple orgs
+
+### From point-source (supabase-tenant-rbac):
+1. **Claims caching** - `user_claims` table with JSONB per group for fast RLS
+2. **Permission registry** - Centralized vocabulary prevents typos
+3. **Escalation prevention** - `grantable_roles` array on each role
+4. **Immediate freshness** - Triggers update claims on role change (no JWT expiry wait)
+5. **Group-based vs org-based** - Groups are more flexible than organizations
+
+### From Django schema-per-tenant:
+1. **Schema provisioning** - `CREATE SCHEMA tenant_x` on signup
+2. **Schema switching** - `SET search_path = tenant_x` before queries
+3. **Migration runner** - Apply migrations to all tenant schemas
+4. **Tenant drop** - `DROP SCHEMA tenant_x CASCADE` for offboarding
+
+---
+
+## What Makes Our Approach Different
+
+| Dimension | Existing Tools | Our Approach |
+|-----------|---------------|--------------|
+| **Isolation** | Per-row (RLS with `organization_id`) | Per-schema (`tenant_x.things`) |
+| **Stack** | Next.js/React monoliths | Plain HTML/JS micro-sites |
+| **Backend** | Server-side rendering (Next.js) | Vercel Python functions |
+| **Provisioning** | Manual or paid services | Automated schema creation |
+| **Data export** | CSV export per tenant | `pg_dump -n tenant_x` (full SQL) |
+| **Cost** | Vercel Pro plan ($20/mo) | Vercel Hobby (free tier) |
+| **Complexity** | Full-stack frameworks | Zero-build static sites |
+
+**Unique value:** Spin up private micro-sites with zero config. Each tenant gets:
+- Isolated Supabase schema
+- Vercel-deployed static site
+- Prebuilt auth, data, email
+- Plain HTML/JS (no build step)
+
+---
+
+## Open Questions
+
+1. **Migration management**: How to apply schema changes to N tenant schemas?
+   - Django approach: `migrate_schemas` command
+   - Our idea: Tenant migration table + background worker
+
+2. **Subdomain vs path**: How do users access their micro-site?
+   - `acme.yourplatform.com` (subdomain)
+   - `yourplatform.com/acme` (path)
+   - Custom domains (CNAME)
+
+3. **Tenant limits**: How many schemas before Supabase complains?
+   - Need to test: 100? 1000? 10000?
+   - Alternative: Schema pooling with logical isolation
+
+4. **Storage isolation**: How to handle Supabase Storage per tenant?
+   - Separate buckets per tenant? (expensive)
+   - Folder isolation with RLS? (like CoachBinali)
+   - External storage (Cloudflare R2)?
+
+---
+
+## Next Steps
+
+1. **Prototype schema-per-tenant provisioning**:
+   - Sign-up flow that creates Supabase schema
+   - Migration runner for all tenant schemas
+   - Tenant drop/offboarding flow
+
+2. **Research migration strategies**:
+   - Django's `django-tenants` implementation
+   - How Fly.io or Railway handle per-customer databases
+
+3. **Define our RBAC layer**:
+   - Use supabase-tenant-rbac patterns? Or simpler?
+   - Need roles (Owner/Admin/Member) or just permissions?
+
+4. **Validate stack choice**:
+   - Test Vercel Python function limits (Hobby plan: 10s execution)
+   - Test Supabase schema limits
+   - Confirm subdomain routing works on Vercel
+
+---
 
 ## Sources
 
-- Official docs: https://docs.anthropic.com/en/docs/claude-code/skills
+- [Tenlyr multi-tenant-starter](https://github.com/Tenlyr/multi-tenant-starter)
+- [CoachBinAli multi-tenant-starterkit](https://github.com/CoachBinAli/multi-tenant-starterkit)
+- [point-source supabase-tenant-rbac](https://github.com/point-source/supabase-tenant-rbac)
+- [Nextacular](https://github.com/nextacular/nextacular)
+- [Django Multi-Tenant SaaS Starter](https://github.com/bvuz/Django-Multi-Tenant-SaaS-Starter-Template)
 ````
 
 ## File: docs/sessions/README.md
@@ -2979,6 +4497,202 @@ curl -s https://api.cloudflare.com/client/v4/user/tokens/verify \
 | [poytz](https://github.com/Khamel83/poytz) | Cloudflare Worker + API + UI |
 | [khamel-redirector](https://github.com/Khamel83/khamel-redirector) | **ARCHIVED** - Previous implementation |
 | [oneshot](https://github.com/Khamel83/oneshot) | Secrets + this documentation |
+````
+
+## File: docs/SKILLS.md
+````markdown
+# ONE_SHOT Skills Reference
+
+**v13.2 — Operator Framework.** 10 skills + 1 external (humanizer): 3 operators + 7 utilities.
+
+---
+
+## Operators
+
+### `/short` — Quick Iteration
+
+Fast operator for existing projects. Loads context, asks what you're working on, executes in burn-down mode.
+
+```
+/short
+/short <scope>
+```
+
+**Behavior:**
+- Loads recent git commits and pending tasks
+- Asks: "What are you working on?"
+- Discovers relevant skills on demand
+- Completes tasks fully before starting next
+- Shows delegation summary on completion
+
+**With scope:** Limits work to matching files
+
+```
+/short src/auth/*.ts    # Only work on auth files
+```
+
+### `/full` — Structured Work
+
+Full operator for new projects, refactors, and complex implementations.
+
+```
+/full
+/full <project-description>
+```
+
+**Behavior:**
+- Creates IMPLEMENTATION_CONTEXT.md for persistent state
+- Structured intake phase (goals, scope, architecture)
+- Phase-based planning with milestones
+- Skill discovery via `~/.claude/skills/` index
+- Execution with context checkpoints
+- Completion summary with verification
+
+**Use when:** Starting a new project, major refactoring, complex features
+
+### `/conduct` — Multi-Model PMO Orchestrator
+
+Routes work across Claude, Codex, and Gemini. Asks clarifying questions first. Loops until the goal is fully met.
+
+```
+/conduct
+/conduct <idea or goal>
+```
+
+**Behavior:**
+- Detects available providers (codex, gemini) on startup
+- Asks clarifying questions — **blocking**, nothing executes until answered
+- Creates structured plan with task breakdown
+- Routes each task to the best model based on type
+- Loops until goal is actually complete, not just started
+
+**Use when:** Non-trivial tasks where you want autonomous multi-model execution until done. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, run it.
+
+---
+
+## Context Management
+
+### `/handoff`
+
+Saves context before `/clear`. Captures what was done, what's in progress, decisions, blockers, next steps.
+
+```
+/handoff
+```
+
+### `/restore`
+
+Resumes from handoff checkpoint. Checks native Tasks first, then reads handoff file.
+
+```
+/restore
+```
+
+---
+
+## Research & Documentation
+
+### `/research`
+
+Background research using search APIs. Investigates topics without blocking conversation.
+
+```
+/research <topic>
+```
+
+### `/freesearch`
+
+Zero-token web search via Exa API. Searches without consuming context budget.
+
+```
+/freesearch <query>
+```
+
+### `/doc`
+
+Caches external documentation locally. Fetches from URL, saves to `~/github/docs-cache/`.
+
+```
+/doc <url>
+/doc --list    # Show cached docs
+```
+
+---
+
+## Utilities
+
+### `/vision`
+
+Visual analysis of websites and images. Handles screenshots and direct image URLs.
+
+```
+/vision https://example.com
+/vision https://image.png "replicate"
+```
+
+### `/secrets`
+
+SOPS/Age secrets management. Decrypts from `~/github/oneshot/secrets/`.
+
+```
+/secrets <name>
+```
+
+---
+
+## Quick Reference
+
+| I want to... | Use |
+|--------------|-----|
+| Quick iteration on existing work | `/short` |
+| Start a new project | `/full` |
+| Run a big task across multiple models | `/conduct` |
+| Save context before clearing | `/handoff` |
+| Resume after `/clear` | `/restore` |
+| Research a topic | `/research` or `/freesearch` |
+| Cache library docs | `/doc` |
+| Analyze a website or image | `/vision` |
+| Access secrets | `/secrets` |
+
+---
+
+## Architecture
+
+**Before (v12):** 25+ menu commands
+**After (v13):** 3 operators + 7 utilities
+
+Operators discover skills on demand instead of maintaining a large command catalog.
+
+---
+
+## Decision Defaults
+
+Operators apply these defaults without asking:
+
+| Ambiguity | Default |
+|-----------|---------|
+| Multiple implementations | Simplest |
+| Naming | Follow existing pattern |
+| Refactor opportunity | Skip unless blocking |
+| Stack | Follow CLAUDE.md defaults |
+| Error handling | Match surrounding code |
+
+---
+
+## Auto-Approved Actions
+
+- Reading any file
+- Writing to scope-matched files
+- Running tests and linters
+- Creating context files (DECISIONS.md, BLOCKERS.md, etc.)
+- Git commit (not push)
+
+## Requires Confirmation
+
+- Destructive operations (rm -rf, DROP TABLE)
+- Git push to shared branches
+- External API calls that cost money
+- Deploying to production
 ````
 
 ## File: plans/community-starter/ALTERNATIVES.md
@@ -4424,6 +6138,138 @@ bd add -l heartbeat -m "$HEARTBEAT_MSG" >/dev/null 2>&1 || true
 exit 0
 ````
 
+## File: scripts/build_instructions.py
+````python
+ROOT = Path(__file__).resolve().parent.parent
+INSTRUCTIONS_DIR = ROOT / "docs" / "instructions"
+CLAUDE_MD = ROOT / "CLAUDE.md"
+INSTRUCTION_FILES = ["core", "workflow", "coding", "search", "review"]
+PROJECT_FILE = "oneshot"
+def build_claude_md() -> None
+⋮----
+sections = [
+⋮----
+path = INSTRUCTIONS_DIR / f"{name}.md"
+⋮----
+path = INSTRUCTIONS_DIR / f"{PROJECT_FILE}.md"
+⋮----
+def check_imports() -> bool
+⋮----
+"""Validate that all @imports in CLAUDE.md reference existing files."""
+content = CLAUDE_MD.read_text()
+ok = True
+⋮----
+line = line.strip()
+⋮----
+ref = line[5:]
+path = ROOT / ref
+⋮----
+ok = False
+⋮----
+def main()
+⋮----
+parser = argparse.ArgumentParser(description="Build/regenerate CLAUDE.md")
+⋮----
+args = parser.parse_args()
+⋮----
+ok = check_imports()
+````
+
+## File: scripts/check-backup.sh
+````bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/secrets-helper.sh"
+VAULT_DIR="$(cd "$SCRIPT_DIR/../secrets" && pwd)"
+SNAPSHOT_FILE="$VAULT_DIR/backup-snapshot.env.encrypted"
+ISSUES=0
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+HOSTNAME=$(hostname)
+AGE_PUBKEY=$(age-keygen -y ~/.age/key.txt 2>/dev/null || echo "missing")
+VAULT_LIST=$(secrets_list 2>/dev/null | grep -v "^===" | grep -v "^$" | sed 's/^  //' || echo "unavailable")
+SKILLS=""
+for s in ~/.claude/skills/*/; do
+  sname=$(basename "$s")
+  [[ "$sname" == "_shared" || "$sname" == "INDEX.md" || "$sname" == "SKILLS_REFERENCE.md" ]] && continue
+  SKILLS="${SKILLS}${sname} "
+done
+SKILLS=$(echo "$SKILLS" | xargs)
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  GIT_BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
+  GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+  GIT_DIRTY=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+  if [[ "$GIT_DIRTY" == "0" ]]; then
+    GIT_STATUS="clean"
+  else
+    GIT_STATUS="$GIT_DIRTY uncommitted"
+  fi
+else
+  GIT_BRANCH="not a git repo"
+  GIT_COMMIT="unknown"
+  GIT_STATUS="unknown"
+fi
+MACHINES_OK=""
+for machine in oci-dev homelab macmini; do
+  if ssh -o ConnectTimeout=2 -o BatchMode=yes "$machine" true 2>/dev/null; then
+    MACHINES_OK="${MACHINES_OK}${machine}:ok "
+  else
+    MACHINES_OK="${MACHINES_OK}${machine}:unreachable "
+  fi
+done
+VAULT_COUNT=$(find "$VAULT_DIR" -name "*.encrypted" -maxdepth 1 2>/dev/null | wc -l | tr -d ' ')
+WORK_DIR=$(mktemp -d)
+trap 'rm -rf "$WORK_DIR"' EXIT
+AGE_RECIPIENT=$(grep "age:" .sops.yaml 2>/dev/null | head -1 | awk '{print $3}' || echo "")
+if [[ -z "$AGE_RECIPIENT" ]]; then
+  AGE_RECIPIENT="$AGE_PUBKEY"
+fi
+cat > "$WORK_DIR/.sops.yaml" << EOF
+creation_rules:
+  - age: ${AGE_RECIPIENT}
+EOF
+{
+  cat << HEADER
+HEADER
+  printf '## Age Identity\nPUBLIC_KEY=%s\n\n' "$AGE_PUBKEY"
+  printf '## Machines\n'
+  printf '# oci-dev|ubuntu|100.126.13.70|Primary dev, services, Claude Code\n'
+  printf '# homelab|khamel83|100.112.130.100|Docker, 26TB storage\n'
+  printf '# macmini|macmini|100.113.216.27|Apple Silicon GPU\n'
+  printf '\n## Machine Status\n# %s\n' "$MACHINES_OK"
+  printf '## Vault (%s encrypted files)\n' "$VAULT_COUNT"
+  echo "$VAULT_LIST" | while IFS= read -r line; do
+    printf '# %s\n' "$line"
+  done
+  printf '## Active Skills\n# %s\n' "$SKILLS"
+  printf '## Git State\nBRANCH=%s\nCOMMIT=%s\nSTATUS=%s\n' "$GIT_BRANCH" "$GIT_COMMIT" "$GIT_STATUS"
+} > "$WORK_DIR/snapshot.env"
+if ! command -v sops >/dev/null 2>&1; then
+  echo "✓ Backup skipped (sops not installed)"
+  exit 0
+fi
+cd "$SCRIPT_DIR/.."
+if (cd "$WORK_DIR" && SOPS_AGE_KEY_FILE="$HOME/.age/key.txt" sops -e \
+    --input-type dotenv --output-type dotenv snapshot.env > output.encrypted 2>/dev/null) && \
+   [[ -f "$WORK_DIR/output.encrypted" && -s "$WORK_DIR/output.encrypted" ]]; then
+  mv "$WORK_DIR/output.encrypted" "$SNAPSHOT_FILE"
+  chmod 644 "$SNAPSHOT_FILE"
+  if git diff --quiet "$SNAPSHOT_FILE" 2>/dev/null; then
+    echo "✓ Backup snapshot (unchanged)"
+  else
+    git add "$SNAPSHOT_FILE" >/dev/null 2>&1
+    if git commit -m "chore: daily backup snapshot $(date +%Y-%m-%d)" >/dev/null 2>&1; then
+      echo "✓ Backup snapshot (committed)"
+    else
+      echo "✓ Backup snapshot (updated)"
+    fi
+  fi
+else
+  echo "⚠️  Backup snapshot failed (sops encryption error)"
+  ISSUES=1
+fi
+exit $ISSUES
+````
+
 ## File: scripts/check-connections.sh
 ````bash
 set -euo pipefail
@@ -4601,171 +6447,6 @@ fi
 exit $ISSUES
 ````
 
-## File: scripts/ci.sh
-````bash
-set -e
-QUICK_MODE=false
-if [[ "$1" == "--quick" ]]; then
-    QUICK_MODE=true
-fi
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m'
-ERRORS=0
-section() {
-    echo ""
-    echo -e "${YELLOW}=== $1 ===${NC}"
-}
-log_ok() {
-    echo -e "${GREEN}✓${NC} $1"
-}
-log_error() {
-    echo -e "${RED}✗${NC} $1"
-    ((ERRORS++))
-}
-log_skip() {
-    echo -e "${YELLOW}○${NC} $1 (skipped)"
-}
-section "Lint: Shell Scripts"
-if command -v shellcheck &>/dev/null; then
-    SHELL_FILES=$(find . -name "*.sh" -not -path "./node_modules/*" -not -path "./.git/*" 2>/dev/null | head -20)
-    if [ -n "$SHELL_FILES" ]; then
-        if shellcheck $SHELL_FILES 2>&1; then
-            log_ok "All shell scripts pass shellcheck"
-        else
-            log_error "Shellcheck found issues"
-        fi
-    else
-        log_skip "No shell scripts found"
-    fi
-else
-    log_skip "shellcheck not installed"
-fi
-section "Lint: Prettier"
-if command -v prettier &>/dev/null; then
-    if [ -f ".prettierrc" ] || [ -f ".prettierrc.json" ] || [ -f "package.json" ]; then
-        if prettier --check "**/*.{js,ts,json,md}" --ignore-path .gitignore 2>&1; then
-            log_ok "All files formatted correctly"
-        else
-            log_error "Prettier found formatting issues (run: prettier --write .)"
-        fi
-    else
-        log_skip "No prettier config found"
-    fi
-else
-    log_skip "prettier not installed"
-fi
-section "Typecheck: TypeScript"
-if [ -f "tsconfig.json" ]; then
-    if command -v tsc &>/dev/null; then
-        if tsc --noEmit 2>&1; then
-            log_ok "TypeScript passes"
-        else
-            log_error "TypeScript errors found"
-        fi
-    else
-        log_skip "tsc not installed"
-    fi
-else
-    log_skip "No tsconfig.json found"
-fi
-section "Typecheck: Python"
-if ls *.py **/*.py 2>/dev/null | head -1 | grep -q .; then
-    if command -v pyright &>/dev/null; then
-        if pyright 2>&1; then
-            log_ok "Pyright passes"
-        else
-            log_error "Pyright found issues"
-        fi
-    elif command -v mypy &>/dev/null; then
-        if mypy . 2>&1; then
-            log_ok "Mypy passes"
-        else
-            log_error "Mypy found issues"
-        fi
-    else
-        log_skip "No Python type checker installed"
-    fi
-else
-    log_skip "No Python files found"
-fi
-section "Tests: Bats (Shell)"
-if command -v bats &>/dev/null; then
-    if [ -d "tests" ]; then
-        BATS_FILES=$(find tests -name "*.bats" 2>/dev/null | head -10)
-        if [ -n "$BATS_FILES" ]; then
-            if bats tests/ 2>&1; then
-                log_ok "All bats tests pass"
-            else
-                log_error "Bats tests failed"
-            fi
-        else
-            log_skip "No .bats files found"
-        fi
-    else
-        log_skip "No tests/ directory"
-    fi
-else
-    log_skip "bats not installed"
-fi
-section "Tests: Pytest"
-if ls **/test_*.py **/*_test.py 2>/dev/null | head -1 | grep -q .; then
-    if command -v pytest &>/dev/null; then
-        if pytest --tb=short -q 2>&1; then
-            log_ok "All pytest tests pass"
-        else
-            log_error "Pytest tests failed"
-        fi
-    else
-        log_skip "pytest not installed"
-    fi
-else
-    log_skip "No pytest test files found"
-fi
-if [ "$QUICK_MODE" = false ]; then
-    section "Validation: ONE_SHOT Skills"
-    if [ -f "scripts/validate-skills.sh" ]; then
-        if bash scripts/validate-skills.sh 2>&1; then
-            log_ok "Skills validation passed"
-        else
-            log_error "Skills validation failed"
-        fi
-    else
-        log_skip "No validate-skills.sh found"
-    fi
-    section "Validation: ONE_SHOT Docs Sync"
-    if [ -f "scripts/validate-docs.sh" ]; then
-        if bash scripts/validate-docs.sh 2>&1; then
-            log_ok "Docs are in sync with reality"
-        else
-            log_error "Doc sync check failed — docs don't match actual state"
-        fi
-    else
-        log_skip "No validate-docs.sh found"
-    fi
-    section "Validation: ONE_SHOT Agents"
-    if [ -f "scripts/validate-agents.py" ]; then
-        if python scripts/validate-agents.py 2>&1; then
-            log_ok "Agents validation passed"
-        else
-            log_error "Agents validation failed"
-        fi
-    else
-        log_skip "No validate-agents.py found"
-    fi
-fi
-echo ""
-echo "=========================================="
-if [ $ERRORS -eq 0 ]; then
-    echo -e "${GREEN}✓ ALL CHECKS PASSED${NC}"
-    exit 0
-else
-    echo -e "${RED}✗ $ERRORS CHECK(S) FAILED${NC}"
-    exit 1
-fi
-````
-
 ## File: scripts/detect-latest-glm.sh
 ````bash
 set -euo pipefail
@@ -4808,680 +6489,665 @@ case "${1:-}" in
 esac
 ````
 
-## File: scripts/docs-link
+## File: scripts/fleet-status.sh
+````bash
+set -euo pipefail
+MACHINES=(
+  "homelab:homelab"
+  "macmini:macmini"
+  "oci-dev:oci-dev"
+)
+CURRENT_HOST=$(hostname)
+FIX_MODE="${1:-}"
+check_machine() {
+  local name="$1"
+  local target="$2"
+  echo "=== $name ==="
+  if [[ "$name" == "oci-dev" && "$CURRENT_HOST" == "instance-first" ]]; then
+    echo "  ℹ️  (this machine)"
+    claude --version 2>/dev/null || echo "  ⚠️  Claude: not in PATH"
+    echo ""
+    return 0
+  fi
+  # Check SSH connectivity
+  if ! ssh -o ConnectTimeout=5 -o BatchMode=yes "$target" "echo ok" >/dev/null 2>&1; then
+    echo "  ✗ SSH: unreachable"
+    return 1
+  fi
+  echo "  ✓ SSH: connected"
+  local claude_ver
+  claude_ver=$(ssh "$target" '
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    export PATH="$HOME/.npm-global/bin:$PATH"
+    claude --version 2>/dev/null || echo "not installed"
+  ')
+  if [[ "$claude_ver" == *"2.1"* ]]; then
+    echo "  ✓ Claude: $claude_ver"
+  else
+    echo "  ⚠️  Claude: $claude_ver"
+    if [[ "$FIX_MODE" == "--fix" ]]; then
+      echo "     → Installing Claude Code..."
+      ssh "$target" '
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+        npm install -g @anthropic-ai/claude-code 2>&1 | tail -2
+      '
+    fi
+  fi
+  local oneshot_status
+  oneshot_status=$(ssh "$target" 'cd ~/github/oneshot 2>/dev/null && git fetch --quiet && git status -sb | head -1' 2>/dev/null || echo "not cloned")
+  if [[ "$oneshot_status" == *"behind"* ]]; then
+    echo "  ⚠️  oneshot: needs pull"
+    if [[ "$FIX_MODE" == "--fix" ]]; then
+      ssh "$target" 'cd ~/github/oneshot && git pull'
+    fi
+  elif [[ "$oneshot_status" == "not cloned" ]]; then
+    echo "  ✗ oneshot: not cloned"
+  else
+    echo "  ✓ oneshot: up to date"
+  fi
+  local glm_ver
+  glm_ver=$(ssh "$target" 'grep -o "glm-[0-9.]*" ~/.bashrc ~/.zshrc 2>/dev/null | head -1 | cut -d: -f2' || echo "not set")
+  echo "  ℹ️  GLM: ${glm_ver:-not configured}"
+  echo ""
+}
+echo "ONE-SHOT Fleet Status ($(date +%Y-%m-%d))"
+echo "==========================================="
+echo ""
+for machine in "${MACHINES[@]}"; do
+  name="${machine%%:*}"
+  target="${machine
+  check_machine "$name" "$target" || true
+done
+echo "Run with --fix to auto-repair issues"
 ````
-#!/usr/bin/env bash
-# docs-link - Manage documentation symlinks from central cache to local projects
-# Usage: docs-link <command> [args...]
+
+## File: scripts/heartbeat-install.sh
+````bash
+set -euo pipefail
+HEARTBEAT_LOG="${HEARTBEAT_LOG:-/tmp/heartbeat.log}"
+ONESHOT_DIR="${ONESHOT_DIR:-$HOME/github/oneshot}"
+HEARTBEAT_SCRIPT="$ONESHOT_DIR/scripts/heartbeat.sh"
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+echo -e "${GREEN}ONE_SHOT Heartbeat Installer${NC}"
+echo "================================"
+echo ""
+echo "This will install heartbeat hooks that:"
+echo "  - Run automatically when you cd into projects with CLAUDE.md"
+echo "  - Rate limited to once per 23 hours"
+echo "  - Log to $HEARTBEAT_LOG"
+echo ""
+read -p "Continue? (y/N) " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  echo "Cancelled."
+  exit 0
+fi
+# Rate limiting function (23 hours = 82800 seconds)
+oneshot_heartbeat_guarded() {
+  # Only run in directories with CLAUDE.md
+  [[ -f "CLAUDE.md" ]] || return 0
+  local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
+  local now
+  now=$(date +%s)
+  local last_run=0
+  if [[ -f "$last_run_file" ]]; then
+    last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
+  fi
+  local elapsed=$((now - last_run))
+  if [[ $elapsed -lt 82800 ]]; then
+    return 0
+  fi
+  mkdir -p "$HOME/.cache"
+  echo "$now" > "$last_run_file"
+  if [[ -x "$HEARTBEAT_SCRIPT" ]]; then
+    "$HEARTBEAT_SCRIPT" --safe >>"$HEARTBEAT_LOG" 2>&1 &
+  fi
+}
+install_bash_hook() {
+  local hook_code='
+# ONE_SHOT Heartbeat
+oneshot_heartbeat_guarded() {
+  if [[ -f "CLAUDE.md" ]]; then
+    local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
+    local now
+    now=$(date +%s)
+    local last_run
+    last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
+    if [[ $((now - last_run)) -gt 82800 ]]; then
+      mkdir -p "$HOME/.cache"
+      echo "$now" > "$last_run_file"
+      "$HOME/github/oneshot/scripts/heartbeat.sh" --safe >>/tmp/heartbeat.log 2>&1 &
+    fi
+  fi
+}
+PROMPT_COMMAND="oneshot_heartbeat_guarded;$PROMPT_COMMAND"
+'
+  local bashrc="$HOME/.bashrc"
+  local marker="# ONE_SHOT Heartbeat"
+  cp "$bashrc" "$bashrc.backup.$(date +%Y%m%d_%H%M%S)"
+  if grep -q "$marker" "$bashrc" 2>/dev/null; then
+    sed -i "/$marker/,/^PROMPT_COMMAND=\"oneshot_heartbeat_guarded/d" "$bashrc" 2>/dev/null || \
+    perl -i -ne "print unless /$marker/../^PROMPT_COMMAND=\"oneshot_heartbeat_guarded/" "$bashrc"
+  fi
+  {
+    echo ""
+    echo "$marker"
+    echo "$hook_code"
+  } >> "$bashrc"
+  echo -e "${GREEN}✓${NC} Bash hook installed to ~/.bashrc"
+}
+install_zsh_hook() {
+  local zshrc="$HOME/.zshrc"
+  local marker="# ONE_SHOT Heartbeat"
+  cp "$zshrc" "$zshrc.backup.$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+  if grep -q "$marker" "$zshrc" 2>/dev/null; then
+    sed -i "/$marker/,/^oneshot_heartbeat_guarded/d" "$zshrc" 2>/dev/null || true
+  fi
+  cat >> "$zshrc" << 'EOF'
+oneshot_heartbeat_guarded() {
+  if [[ -f "CLAUDE.md" ]]; then
+    local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
+    local now
+    now=$(date +%s)
+    local last_run
+    last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
+    if [[ $((now - last_run)) -gt 82800 ]]; then
+      mkdir -p "$HOME/.cache"
+      echo "$now" > "$last_run_file"
+      "$HOME/github/oneshot/scripts/heartbeat.sh" --safe >>/tmp/heartbeat.log 2>&1 &
+    fi
+  fi
+}
+chpwd() { oneshot_heartbeat_guarded }
+EOF
+  echo -e "${GREEN}✓${NC} Zsh hook installed to ~/.zshrc"
+}
+if [[ -n "${BASH_VERSION:-}" ]]; then
+  install_bash_hook
+elif [[ -n "${ZSH_VERSION:-}" ]]; then
+  install_zsh_hook
+else
+  echo -e "${YELLOW}⚠${NC} Unknown shell. Only bash and zsh are supported."
+  exit 1
+fi
+touch "$HEARTBEAT_LOG"
+echo ""
+echo -e "${GREEN}Installation complete!${NC}"
+echo ""
+echo "The heartbeat will run:"
+echo "  - When you cd into a directory with CLAUDE.md"
+echo "  - At most once per 23 hours"
+echo "  - In safe mode (no git pull)"
+echo ""
+echo "Log file: $HEARTBEAT_LOG"
+echo ""
+echo "To test immediately:"
+echo "  source ~/.bashrc
+echo "  cd ~/github/oneshot  # Should trigger heartbeat"
+echo ""
+````
+
+## File: scripts/heartbeat.sh
+````bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/state.sh"
+QUIET=false
+FORCE=false
+while [[ $
+  case "$1" in
+    --quiet|-q) QUIET=true ;;
+    --force|-f) FORCE=true ;;
+  esac
+  shift
+done
+TODAY=$(date +%Y-%m-%d)
+LAST_CHECK=$(state_get_last_check)
+if [[ "$FORCE" != "true" ]] && [[ "$LAST_CHECK" == "$TODAY" ]]; then
+  [[ "$QUIET" != "true" ]] && echo "heartbeat: already ran today ($TODAY)"
+  exit 0
+fi
+if [[ "$QUIET" != "true" ]]; then
+  echo ""
+  echo "╔══════════════════════════════════════════╗"
+  echo "║  ONE-SHOT Heartbeat  $(date '+%Y-%m-%d %H:%M')  ║"
+  echo "║  $(hostname)                              ║"
+  echo "╚══════════════════════════════════════════╝"
+fi
+RESULTS=()
+ISSUES=0
+run_check() {
+  local name="$1"
+  local script="$2"
+  local fix_flag=""
+  if [[ ! -f "$script" ]]; then
+    RESULTS+=("○ $name (script missing)")
+    return
+  fi
+  [[ "$FORCE" == "true" && "$script" == *"check-clis.sh" ]] && fix_flag="--fix"
+  local rc=0
+  output=$("$script" $fix_flag 2>&1) || rc=$?
+  if [[ $rc -eq 0 ]]; then
+    local passed failed
+    passed=$(echo "$output" | grep -c "^✓" || true)
+    failed=$(echo "$output" | grep -c "^⚠️" || true)
+    if [[ "$QUIET" != "true" ]]; then
+      echo "$output" | sed 's/^/  /'
+    fi
+    if [[ "$failed" -eq 0 ]]; then
+      RESULTS+=("✓ $name")
+    else
+      RESULTS+=("⚠️  $name ($failed issue(s))")
+      ISSUES=$((ISSUES + failed))
+    fi
+  else
+    RESULTS+=("⚠️  $name (exit $rc)")
+    ISSUES=$((ISSUES + 1))
+  fi
+}
+run_check "ONE-SHOT Repo"  "$SCRIPT_DIR/check-oneshot.sh"
+run_check "GLM Model"      "$SCRIPT_DIR/check-glm.sh"
+run_check "Secrets"        "$SCRIPT_DIR/sync-secrets.sh"
+run_check "CLI Tools"      "$SCRIPT_DIR/check-clis.sh"
+run_check "API Keys"       "$SCRIPT_DIR/check-apis.sh"
+run_check "MCP Servers"    "$SCRIPT_DIR/check-mcps.sh"
+run_check "Connectivity"   "$SCRIPT_DIR/check-connections.sh"
+run_check "Backup"        "$SCRIPT_DIR/check-backup.sh"
+if [[ "$QUIET" != "true" ]]; then
+  echo "  Cross-Machine Reachability:"
+fi
+MACHINE_OK=0
+MACHINE_TOTAL=0
+THIS_IP=$(tailscale ip -4 2>/dev/null || echo "")
+check_machine() {
+  local name="$1"
+  local host="$2"
+  local ip="${3:-}"
+  if [[ -n "$ip" && "$ip" == "$THIS_IP" ]]; then
+    if [[ "$QUIET" != "true" ]]; then echo "  ○ $name — self"; fi
+    return
+  fi
+  MACHINE_TOTAL=$((MACHINE_TOTAL + 1))
+  if ssh -o ConnectTimeout=3 -o BatchMode=yes "$host" true 2>/dev/null; then
+    if [[ "$QUIET" != "true" ]]; then echo "  ✓ $name"; fi
+    MACHINE_OK=$((MACHINE_OK + 1))
+  else
+    if [[ "$QUIET" != "true" ]]; then echo "  ⚠️  $name — unreachable"; fi
+  fi
+}
+check_machine "oci-dev"  "oci-dev"    "100.126.13.70"   || true
+check_machine "homelab" "homelab"   "100.112.130.100"  || true
+check_machine "macmini"  "macmini"   "100.113.216.27"  || true
+RESULTS+=("✓ Machines: $MACHINE_OK/$MACHINE_TOTAL reachable")
+state_set_last_check "$TODAY"
+if [[ "$QUIET" != "true" ]]; then
+  echo ""
+  echo "Results:"
+  for r in "${RESULTS[@]}"; do
+    echo "  $r"
+  done
+  if [[ $ISSUES -gt 0 ]]; then
+    echo ""
+    echo "  $ISSUES issue(s) found — run with --force to auto-fix CLIs"
+  fi
+  echo ""
+fi
+exit $ISSUES
+````
+
+## File: scripts/oneshot-build
+````
+#!/bin/bash
+# oneshot-build: Autonomous builder mode
+# Usage: oneshot-build "A CLI tool that does X"
+#
+# Runs Claude Code autonomously to build from idea to artifact.
+# Uses beads for task tracking, commits after each step.
 
 set -euo pipefail
-
-# Configuration
-CACHE_BASE="${DOCS_CACHE:-$HOME/github/docs-cache/docs/cache}"
-CACHE_INDEX="$CACHE_BASE/.index.md"
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
-EXTERNAL_DIR="$PROJECT_ROOT/docs/external"
-MANIFEST_FILE="$PROJECT_ROOT/.docs-links.json"
 
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
+YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m'
+NC='\033[0m' # No Color
 
-log_info() { echo -e "${BLUE}[docs-link]${NC} $1"; }
-log_success() { echo -e "${GREEN}[docs-link]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[docs-link]${NC} $1"; }
-log_error() { echo -e "${RED}[docs-link]${NC} $1" >&2; }
+# Configuration
+MAX_ITERATIONS=${MAX_ITERATIONS:-100}
+STUCK_THRESHOLD=${STUCK_THRESHOLD:-5}
+CLAUDE_CMD=${CLAUDE_CMD:-"claude"}
 
-# Ensure cache exists
-ensure_cache() {
-    if [[ ! -d "$CACHE_BASE" ]]; then
-        log_error "Cache not found at $CACHE_BASE"
-        log_info "Set DOCS_CACHE env var or ensure ~/github/docs-cache exists"
+# Check dependencies
+check_dependencies() {
+    local missing=()
+
+    if ! command -v bd &> /dev/null; then
+        missing+=("bd (beads CLI)")
+    fi
+
+    if ! command -v jq &> /dev/null; then
+        missing+=("jq")
+    fi
+
+    if ! command -v "$CLAUDE_CMD" &> /dev/null; then
+        missing+=("$CLAUDE_CMD (Claude Code CLI)")
+    fi
+
+    if ! command -v git &> /dev/null; then
+        missing+=("git")
+    fi
+
+    if [ ${#missing[@]} -gt 0 ]; then
+        echo -e "${RED}Error: Missing required dependencies:${NC}"
+        for dep in "${missing[@]}"; do
+            echo -e "  ${RED}✗${NC} $dep"
+        done
+        echo ""
+        echo "Install beads:   npm install -g @beads/bd"
+        echo "Install jq:      apt install jq  # or brew install jq"
+        echo "Install Claude:  npm install -g @anthropic-ai/claude-code"
         exit 1
     fi
 }
 
-# Ensure external dir exists
-ensure_external_dir() {
-    mkdir -p "$EXTERNAL_DIR"
+# Check project setup
+check_project() {
+    if [ ! -f "AGENTS.md" ]; then
+        echo -e "${RED}Error: Not a ONE_SHOT project${NC}"
+        echo ""
+        echo "Initialize first:"
+        echo "  curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash"
+        exit 1
+    fi
 }
 
-# Load manifest
-load_manifest() {
-    if [[ -f "$MANIFEST_FILE" ]]; then
-        cat "$MANIFEST_FILE"
+# Usage
+show_usage() {
+    echo "Usage: oneshot-build \"Your idea description\""
+    echo ""
+    echo "Runs Claude Code autonomously to build from idea to artifact."
+    echo "Uses beads for task tracking, commits after each step."
+    echo ""
+    echo "Options (via environment):"
+    echo "  MAX_ITERATIONS=100   Maximum build iterations"
+    echo "  STUCK_THRESHOLD=5    Iterations without progress before stopping"
+    echo "  CLAUDE_CMD=claude    Claude CLI command"
+    echo ""
+    echo "Examples:"
+    echo "  oneshot-build \"A Python CLI that fetches weather data\""
+    echo "  oneshot-build \"A REST API for managing todos\""
+    echo ""
+    echo "Monitor progress: tail -f .agent/STATUS.md"
+}
+
+if [ $# -eq 0 ]; then
+    show_usage
+    exit 1
+fi
+
+# Run checks
+check_dependencies
+check_project
+
+IDEA="$1"
+AGENT_DIR=".agent"
+STATUS_FILE="$AGENT_DIR/STATUS.md"
+ITER_FILE="$AGENT_DIR/ITERATIONS.md"
+STATE_FILE="$AGENT_DIR/LAST_STATE.md"
+ERROR_FILE="$AGENT_DIR/LAST_ERROR.md"
+
+# Initialize .agent/ directory
+init_agent() {
+    mkdir -p "$AGENT_DIR"
+    echo "0" > "$ITER_FILE"
+    echo "" > "$STATE_FILE"
+
+    cat > "$STATUS_FILE" << EOF
+# Build Status
+
+**Idea**: $IDEA
+**Started**: $(date -Iseconds)
+**Status**: Initializing
+
+## Progress Log
+EOF
+
+    # Initialize beads if not present
+    if [ ! -d .beads ]; then
+        bd init --stealth 2>/dev/null || true
+    fi
+
+    echo -e "${GREEN}Initialized .agent/ directory${NC}"
+}
+
+# Log status
+log_status() {
+    local msg="$1"
+    echo "- $(date +%H:%M:%S): $msg" >> "$STATUS_FILE"
+    echo -e "${YELLOW}$msg${NC}"
+}
+
+# Check if stuck (same beads state for N iterations)
+check_stuck() {
+    local current_state
+    current_state=$(bd ready --json 2>/dev/null | md5sum | cut -d' ' -f1)
+    local last_state
+    last_state=$(cat "$STATE_FILE" 2>/dev/null || echo "")
+
+    if [ "$current_state" = "$last_state" ]; then
+        local stuck_count
+        stuck_count=$(cat "$AGENT_DIR/STUCK_COUNT" 2>/dev/null || echo "0")
+        stuck_count=$((stuck_count + 1))
+        echo "$stuck_count" > "$AGENT_DIR/STUCK_COUNT"
+
+        if [ "$stuck_count" -ge "$STUCK_THRESHOLD" ]; then
+            echo "Stuck for $stuck_count iterations" > "$ERROR_FILE"
+            return 1
+        fi
     else
-        echo '{"cache_path":"'"$CACHE_BASE"'","links":{},"updated":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}'
+        echo "0" > "$AGENT_DIR/STUCK_COUNT"
+        echo "$current_state" > "$STATE_FILE"
     fi
+    return 0
 }
 
-# Save manifest
-save_manifest() {
-    local manifest="$1"
-    echo "$manifest" | jq '.' > "$MANIFEST_FILE"
-}
+# Check if all tasks complete
+is_complete() {
+    local ready_count
+    ready_count=$(bd ready --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
+    local in_progress
+    in_progress=$(bd list --status in_progress --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
 
-# Get docs from cache index
-get_available_docs() {
-    if [[ ! -f "$CACHE_INDEX" ]]; then
-        log_error "Cache index not found at $CACHE_INDEX"
-        exit 1
-    fi
-    # Parse markdown table to get name and category (4 columns: Name, Category, Related, URL, Cached)
-    grep -E '^\|' "$CACHE_INDEX" | tail -n +3 | grep -v '^|--' | awk -F'|' '{
-        name = $2; category = $3;
-        gsub(/^[ \t]+|[ \t]+$/, "", name);
-        gsub(/^[ \t]+|[ \t]+$/, "", category);
-        if (name != "" && name != "Name") print category "/" name;
-    }'
-}
-
-# Resolve doc path
-resolve_doc_path() {
-    local name="$1"
-    local available
-    available=$(get_available_docs)
-
-    # Check for exact match
-    local match
-    match=$(echo "$available" | grep "/$name$" || true)
-    if [[ -n "$match" ]]; then
-        echo "$CACHE_BASE/$match"
+    if [ "$ready_count" = "0" ] && [ "$in_progress" = "0" ]; then
         return 0
     fi
-
-    # Check for partial match (just name)
-    match=$(echo "$available" | grep -E "/[^/]*${name}[^/]*$" || true)
-    local count
-    count=$(echo "$match" | wc -l)
-    if [[ $count -eq 1 ]]; then
-        echo "$CACHE_BASE/$match"
-        return 0
-    elif [[ $count -gt 1 ]]; then
-        log_error "Multiple matches for '$name':"
-        echo "$match" | sed 's|^|  |'
-        return 1
-    fi
-
-    log_error "No docs found for '$name'"
-    log_info "Run 'docs-link available' to see cached docs"
     return 1
 }
 
-# Command: available
-cmd_available() {
-    ensure_cache
-    log_info "Available docs in cache:"
-    echo ""
-    local available
-    available=$(get_available_docs)
-    if [[ -z "$available" ]]; then
-        log_warn "No docs found in cache"
-        return
-    fi
-    echo "$available" | while IFS=/ read -r category name; do
-        local status=""
-        if [[ -L "$EXTERNAL_DIR/$name" ]]; then
-            status="${GREEN}[linked]${NC}"
-        fi
-        printf "  ${BLUE}%-20s${NC} %-30s %s\n" "$category" "$name" "$status"
-    done
-}
+# Run planning phase
+run_planning() {
+    log_status "Phase 1: Planning"
 
-# Command: list
-cmd_list() {
-    if [[ ! -f "$MANIFEST_FILE" ]]; then
-        log_warn "No docs linked in this project"
-        return
-    fi
+    $CLAUDE_CMD -p << EOF
+You are in autonomous builder mode. Use ONE_SHOT skills.
 
-    local manifest
-    manifest=$(load_manifest)
-    local links
-    links=$(echo "$manifest" | jq -r '.links | to_entries[] | "\(.key)=\(.value)"')
+IDEA: $IDEA
 
-    if [[ -z "$links" ]]; then
-        log_warn "No docs linked in this project"
-        return
-    fi
+INSTRUCTIONS:
+1. Use front-door skill to interview (answer your own questions with reasonable defaults)
+2. Use create-plan skill to create a structured plan
+3. Parse the plan into beads tasks with dependencies:
+   - bd create "Epic: [idea]" -t epic --json
+   - Create groups and tasks with parent dependencies
+4. Save the plan to thoughts/shared/plans/
+5. STOP after creating beads tasks (don't implement yet)
 
-    log_info "Linked docs in $PROJECT_ROOT:"
-    echo ""
-    echo "$links" | while IFS= read -r entry; do
-        local name="${entry%%=*}"
-        local path="${entry#*=}"
-        local link_path="$EXTERNAL_DIR/$name"
-        local status="${GREEN}OK${NC}"
-        if [[ ! -L "$link_path" ]]; then
-            status="${RED}BROKEN${NC}"
-        fi
-        printf "  ${BLUE}%-20s${NC} -> %-40s [%s]\n" "$name" "$path" "$status"
-    done
-}
-
-# Command: add
-cmd_add() {
-    if [[ $# -eq 0 ]]; then
-        log_error "Usage: docs-link add <name>..."
-        exit 1
-    fi
-
-    ensure_cache
-    ensure_external_dir
-
-    local manifest
-    manifest=$(load_manifest)
-
-    for name in "$@"; do
-        local target
-        if ! target=$(resolve_doc_path "$name"); then
-            continue
-        fi
-
-        local link_path="$EXTERNAL_DIR/$name"
-
-        # Check if already linked
-        if [[ -e "$link_path" ]]; then
-            if [[ -L "$link_path" ]]; then
-                log_warn "'$name' is already linked"
-            else
-                log_error "'$name' already exists and is not a symlink"
-            fi
-            continue
-        fi
-
-        # Create symlink
-        ln -s "$target" "$link_path"
-
-        # Update manifest
-        local relative="${target#$CACHE_BASE/}"
-        manifest=$(echo "$manifest" | jq -r --arg name "$name" --arg path "$relative" '.links[$name] = $path')
-
-        log_success "Linked $name -> $relative"
-    done
-
-    # Save manifest with updated timestamp
-    manifest=$(echo "$manifest" | jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.updated = $ts')
-    save_manifest "$manifest"
-
-    # Update project CLAUDE.md if it exists
-    update_claude_md
-}
-
-# Command: remove
-cmd_remove() {
-    if [[ $# -eq 0 ]]; then
-        log_error "Usage: docs-link remove <name>"
-        exit 1
-    fi
-
-    local manifest
-    manifest=$(load_manifest)
-
-    for name in "$@"; do
-        local link_path="$EXTERNAL_DIR/$name"
-
-        if [[ ! -L "$link_path" ]]; then
-            log_warn "'$name' is not linked"
-            continue
-        fi
-
-        rm "$link_path"
-        manifest=$(echo "$manifest" | jq -r --arg name "$name" 'del(.links[$name])')
-        log_success "Removed link for '$name'"
-    done
-
-    manifest=$(echo "$manifest" | jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.updated = $ts')
-    save_manifest "$manifest"
-}
-
-# Command: sync
-cmd_sync() {
-    ensure_cache
-    ensure_external_dir
-
-    local manifest
-    manifest=$(load_manifest)
-
-    local links
-    links=$(echo "$manifest" | jq -r '.links | to_entries[] | "\(.key)=\(.value)"')
-
-    if [[ -z "$links" ]]; then
-        log_warn "No links to sync"
-        return
-    fi
-
-    for entry in $links; do
-        local name="${entry%%=*}"
-        local path="${entry#*=}"
-        local link_path="$EXTERNAL_DIR/$name"
-        local target="$CACHE_BASE/$path"
-
-        if [[ -L "$link_path" ]]; then
-            rm "$link_path"
-        fi
-
-        ln -s "$target" "$link_path"
-        log_info "Synced $name"
-    done
-
-    log_success "Synced all links"
-}
-
-# Update CLAUDE.md with external docs reference
-update_claude_md() {
-    local claude_md="$PROJECT_ROOT/CLAUDE.md"
-
-    if [[ ! -f "$claude_md" ]]; then
-        return
-    fi
-
-    # Check if section already exists
-    if grep -q "## External Documentation" "$claude_md"; then
-        return
-    fi
-
-    # Add section at end
-    cat >> "$claude_md" <<'EOF'
-
-## External Documentation
-
-This project has links to cached external documentation:
-
-```bash
-# View linked docs
-ls docs/external/
-
-# See available cached docs
-docs-link available
-```
-
-Cached docs are managed via the central cache at ~/github/docs-cache/
+Use your best judgment for all decisions. Prefer simple solutions.
+Commit the plan file when done.
 EOF
 
-    log_info "Updated CLAUDE.md with external docs section"
+    log_status "Planning complete"
 }
 
-# Update README with annotations footer
-update_readme_annotations() {
-    local doc_path="$1"
-    local readme="$doc_path/README.md"
+# Run single build iteration
+run_build_iteration() {
+    local iter=$1
+    log_status "Iteration $iter: Building"
 
-    if [[ ! -f "$readme" ]]; then
-        return
-    fi
+    $CLAUDE_CMD -p << EOF
+You are in autonomous builder mode. Continue implementing.
 
-    # Check if annotations section already exists
-    if grep -q "## Annotations" "$readme"; then
-        return
-    fi
+INSTRUCTIONS:
+1. Run: bd ready --json
+2. Pick the highest priority ready task
+3. Run: bd update <id> --status in_progress --json
+4. Implement the task
+5. Commit after EACH file edit: git add <file> && git commit -m "feat: description"
+6. When done: bd close <id> --reason "commit: <hash>" --json
+7. STOP after completing ONE task
 
-    # Count annotations
-    local annotations_dir="$doc_path/annotations"
-    local count=0
-    local links=""
-    if [[ -d "$annotations_dir" ]]; then
-        count=$(ls -1 "$annotations_dir"/*.md 2>/dev/null | wc -l)
-        if [[ $count -gt 0 ]]; then
-            links=$(
-                for f in "$annotations_dir"/*.md; do
-                    if [[ -f "$f" ]]; then
-                        local basename=$(basename "$f" .md)
-                        local title=$(head -n 10 "$f" | grep -E "^#+ " | head -1 | sed 's/^#+ //;s/^#//;s/^ *//')
-                        [[ -z "$title" ]] && title="$basename"
-                        echo "- [$title](annotations/$basename.md)"
-                    fi
-                done
-            )
-        fi
-    fi
-
-    # Add footer
-    cat >> "$readme" <<EOF
-
----
-
-## Annotations
-
-> Recent agent notes from working with this service
-
-$links
-
-**[View all annotations →](annotations/)**
+If stuck or confused, write to .agent/SCRATCHPAD.md and stop.
+Use your best judgment. Prefer working code over perfect code.
 EOF
-
-    log_info "Updated README with annotations footer"
 }
 
-# Command: annotate
-cmd_annotate() {
-    local name="$1"
-    local note="${2:-}"
+# Cleanup on exit
+cleanup() {
+    local exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        log_status "Build stopped with exit code $exit_code"
+        echo "**Status**: STOPPED (exit $exit_code)" >> "$STATUS_FILE"
+    fi
+    # Always sync beads on exit
+    bd sync 2>/dev/null || true
+}
 
-    if [[ -z "$name" ]]; then
-        log_error "Usage: docs-link annotate <name> [note]"
+# Main execution
+main() {
+    trap cleanup EXIT
+
+    echo -e "${GREEN}╔═══════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║     ONE_SHOT Autonomous Builder v7.4      ║${NC}"
+    echo -e "${GREEN}╚═══════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${BLUE}Idea:${NC} $IDEA"
+    echo -e "${BLUE}Max iterations:${NC} $MAX_ITERATIONS"
+    echo -e "${BLUE}Monitor:${NC} tail -f .agent/STATUS.md"
+    echo ""
+
+    init_agent
+
+    # Phase 1: Planning
+    run_planning
+
+    # Check if any tasks were created
+    local task_count
+    task_count=$(bd list --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
+    if [ "$task_count" = "0" ]; then
+        log_status "No tasks created - planning may have failed"
+        echo "**Status**: FAILED (no tasks)" >> "$STATUS_FILE"
+        echo -e "${RED}Planning failed - no beads tasks were created${NC}"
+        echo "Check .agent/STATUS.md for details"
         exit 1
     fi
+    log_status "Created $task_count beads tasks"
 
-    ensure_cache
+    # Phase 2: Build loop
+    log_status "Phase 2: Building"
 
-    local doc_path
-    if ! doc_path=$(resolve_doc_path "$name"); then
-        exit 1
-    fi
+    local iter=0
+    local completed=0
+    while [ $iter -lt $MAX_ITERATIONS ]; do
+        iter=$((iter + 1))
+        echo "$iter" > "$ITER_FILE"
 
-    local annotations_dir="$doc_path/annotations"
-    mkdir -p "$annotations_dir"
+        # Check if complete
+        if is_complete; then
+            log_status "All tasks complete!"
+            completed=1
+            break
+        fi
 
-    local date=$(date +%Y-%m-%d)
-    local filename
+        # Check if stuck
+        if ! check_stuck; then
+            log_status "Stuck detected after $iter iterations"
+            echo "**Status**: STUCK" >> "$STATUS_FILE"
+            echo ""
+            echo -e "${RED}Build stuck - same state for $STUCK_THRESHOLD iterations${NC}"
+            echo "Check .agent/LAST_ERROR.md and .agent/STATUS.md"
+            exit 1
+        fi
 
-    if [[ -n "$note" ]]; then
-        # Generate slug from note
-        local slug=$(echo "$note" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]+/-/g' | sed 's/^-//;s/-$//' | cut -c1-30)
-        filename="$annotations_dir/$date-${slug}.md"
+        # Run build iteration
+        run_build_iteration $iter
+
+        # Sync beads periodically
+        if [ $((iter % 5)) -eq 0 ]; then
+            bd sync 2>/dev/null || true
+        fi
+    done
+
+    # Final status
+    echo "" >> "$STATUS_FILE"
+    echo "---" >> "$STATUS_FILE"
+    echo "## Final State" >> "$STATUS_FILE"
+    echo "**Completed**: $(date -Iseconds)" >> "$STATUS_FILE"
+    echo "**Iterations**: $iter" >> "$STATUS_FILE"
+    if [ "$completed" = "1" ]; then
+        echo "**Status**: SUCCESS" >> "$STATUS_FILE"
     else
-        filename="$annotations_dir/$date.md"
+        echo "**Status**: MAX_ITERATIONS" >> "$STATUS_FILE"
     fi
+    echo "" >> "$STATUS_FILE"
+    echo "### Beads Summary" >> "$STATUS_FILE"
+    bd list --json 2>/dev/null | jq -r '.[] | "- [\(.status)] \(.title)"' >> "$STATUS_FILE" || true
 
-    # Create frontmatter template
-    local frontmatter="---
-agent: claude-opus-4-6
-related: []
----
-
-# $(echo "$note" | head -c 60 | sed 's/$/\.../' if [[ ${#note} -gt 60 ]])
-
-$note
-"
-
-    if [[ -n "$note" ]]; then
-        echo "$frontmatter" > "$filename"
-        log_success "Annotation saved to $filename"
-    else
-        # Open editor
-        ${EDITOR:-vi} "$filename"
-        log_success "Annotation saved to $filename"
-    fi
-
-    # Update README footer
-    update_readme_annotations "$doc_path"
-}
-
-# Command: related
-cmd_related() {
-    local name="$1"
-
-    if [[ -z "$name" ]]; then
-        log_error "Usage: docs-link related <name>"
-        exit 1
-    fi
-
-    ensure_cache
-
-    # Get doc path and category
-    local doc_path
-    if ! doc_path=$(resolve_doc_path "$name"); then
-        exit 1
-    fi
-
-    local category=$(basename "$(dirname "$doc_path")")
-
-    # Parse index for related docs (format: | Name | Category | Related | URL | Cached |)
-    local related_line
-    related_line=$(grep "| $name |" "$CACHE_INDEX" || true)
-
-    if [[ -z "$related_line" ]]; then
-        log_warn "No entry found for '$name' in index"
-        return
-    fi
-
-    # Extract related column (4th field: $1=empty, $2=Name, $3=Category, $4=Related)
-    local related=$(echo "$related_line" | awk -F'|' '{gsub(/^[ \t]+|[ \t]+$/, "", $4); print $4}')
-
-    if [[ -z "$related" || "$related" == "-" ]]; then
-        log_info "No related docs defined for '$name'"
-        return
-    fi
-
-    log_info "Related docs for $name:"
+    # Print summary
     echo ""
-    IFS=',' read -ra ADDR <<< "$related"
-    for r in "${ADDR[@]}"; do
-        r=$(echo "$r" | xargs)
-        printf "  ${BLUE}%-20s${NC} " "$r"
-        # Try to find and show path
-        if [[ -d "$CACHE_BASE/$category/$r" ]]; then
-            echo "-> $CACHE_BASE/$category/$r"
-        elif [[ -d "$CACHE_BASE/tools/$r" ]]; then
-            echo "-> $CACHE_BASE/tools/$r"
-        else
-            echo "(not cached)"
-        fi
-    done
+    echo -e "${GREEN}╔═══════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║             Build Complete                ║${NC}"
+    echo -e "${GREEN}╚═══════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${BLUE}Iterations:${NC} $iter"
+    echo -e "${BLUE}Status:${NC} .agent/STATUS.md"
+    echo -e "${BLUE}Tasks:${NC} bd list --json"
+    echo ""
+
+    # Show summary of completed vs remaining
+    local done_count
+    local remaining_count
+    done_count=$(bd list --status closed --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
+    remaining_count=$(bd ready --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
+    echo -e "${GREEN}✓ Completed:${NC} $done_count tasks"
+    if [ "$remaining_count" != "0" ]; then
+        echo -e "${YELLOW}○ Remaining:${NC} $remaining_count tasks"
+    fi
 }
 
-# Show help
-cmd_help() {
-    cat <<'EOF'
-docs-link - Manage documentation symlinks from central cache
-
-Usage:
-  docs-link <command> [args...]
-
-Commands:
-  add <name>...       Add symlinks to current project
-  list                Show what's linked in this project
-  remove <name>       Remove a symlink
-  available           Show all cached docs available to link
-  sync                Update all symlinks (if cache moved)
-  annotate <name> [note]  Add annotation to cached doc
-  related <name>      Show related docs for a cached entry
-
-Environment:
-  DOCS_CACHE          Path to docs cache (default: ~/github/docs-cache/docs/cache)
-
-Examples:
-  docs-link add polymarket convex
-  docs-link list
-  docs-link remove polymarket
-  docs-link available
-  docs-link annotate openai "Streaming delta may be null"
-  docs-link related openai
-
-Cache location: ~/github/docs-cache/docs/cache/
-EOF
-}
-
-# Main
-case "${1:-}" in
-    add)
-        shift
-        cmd_add "$@"
-        ;;
-    list|ls)
-        cmd_list
-        ;;
-    remove|rm)
-        shift
-        cmd_remove "$@"
-        ;;
-    available|avail)
-        cmd_available
-        ;;
-    sync)
-        cmd_sync
-        ;;
-    annotate)
-        shift
-        cmd_annotate "$@"
-        ;;
-    related)
-        shift
-        cmd_related "$@"
-        ;;
-    help|--help|-h|"")
-        cmd_help
-        ;;
-    *)
-        log_error "Unknown command: $1"
-        echo ""
-        cmd_help
-        exit 1
-        ;;
-esac
+main
 ````
 
-## File: scripts/oneshot-check.sh
-````bash
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m'
-ERRORS=0
-WARNINGS=0
-log_ok()   { echo -e "${GREEN}✓${NC} $1"; }
-log_warn() { echo -e "${YELLOW}○${NC} $1"; WARNINGS=$((WARNINGS + 1)); }
-log_error(){ echo -e "${RED}✗${NC} $1"; ERRORS=$((ERRORS + 1)); }
-echo ""
-echo "ONE_SHOT Integration Check"
-echo "=========================="
-echo ""
-# ─────────────────────────────────────────────────────────────────────────────
-# 1. Skills installed globally
-# ─────────────────────────────────────────────────────────────────────────────
-echo "=== Global Skills (~/.claude/skills/) ==="
-REQUIRED_SKILLS=(short full conduct handoff restore research freesearch doc vision secrets)
-MISSING=0
-for skill in "${REQUIRED_SKILLS[@]}"; do
-  if [ -f "${HOME}/.claude/skills/$skill/SKILL.md" ]; then
-    log_ok "$skill"
-  else
-    log_error "$skill: not installed (run: oneshot-update or curl -sL .../oneshot.sh | bash)"
-    MISSING=$((MISSING + 1))
-  fi
-done
-if [ "$MISSING" -gt 0 ]; then
-  echo ""
-  echo "  To install missing skills:"
-  echo "  curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash"
-fi
-echo ""
-echo "=== Project Files ==="
-if [ -f "AGENTS.md" ]; then
-  VERSION=$(grep -oE "v[0-9]+" AGENTS.md | head -1 || echo "unknown")
-  log_ok "AGENTS.md ($VERSION)"
-else
-  log_error "AGENTS.md missing — run oneshot.sh to create it"
-fi
-if [ -f "CLAUDE.md" ]; then
-  if grep -q "AGENTS.md" CLAUDE.md; then
-    log_ok "CLAUDE.md (references AGENTS.md)"
-  else
-    log_warn "CLAUDE.md exists but doesn't reference AGENTS.md (add: '> Read AGENTS.md for operator behaviors')"
-  fi
-else
-  log_warn "CLAUDE.md missing — run oneshot.sh to create a starter version"
-fi
-echo ""
-echo "=== Stale References in Project Docs ==="
-# Check for SkillsMP refs in any markdown files this project owns
-STALE=$(grep -rn "SkillsMP\|\.claude/commands/" \
-  --include="*.md" \
-  --exclude-dir=".git" \
-  --exclude="AGENTS.md" \
-  . 2>/dev/null \
-  | grep -v "deprecated\|old way\|backup\|migration\|commands-backup" \
-  || true)
-if [ -n "$STALE" ]; then
-  log_warn "Stale oneshot references found in project docs:"
-  echo "$STALE" | sed 's/^/  /'
-  echo "  These may be leftover from an older oneshot version."
-else
-  log_ok "No stale oneshot references"
-fi
-echo ""
-echo "=== Tooling ==="
-if command -v oneshot-update &>/dev/null; then
-  log_ok "oneshot-update in PATH"
-else
-  log_warn "oneshot-update not in PATH (add ~/.local/bin to PATH)"
-fi
-echo ""
-echo "=========================================="
-if [ "$ERRORS" -eq 0 ] && [ "$WARNINGS" -eq 0 ]; then
-  echo -e "${GREEN}✓ oneshot integration is healthy${NC}"
-  exit 0
-elif [ "$ERRORS" -eq 0 ]; then
-  echo -e "${YELLOW}✓ oneshot healthy with $WARNINGS warning(s)${NC}"
-  exit 0
-else
-  echo -e "${RED}✗ $ERRORS error(s), $WARNINGS warning(s)${NC}"
-  echo ""
-  echo "Run 'oneshot-update' to fix skill installation issues."
-  exit 1
-fi
+## File: scripts/secrets
 ````
+#!/usr/bin/env bash
+# secrets — Access the oneshot encrypted vault from any project or Claude session
+#
+# USAGE:
+#   secrets get KEY                        Get a single key (e.g. secrets get TAVILY_API_KEY)
+#   secrets set NAME KEY=value [--commit]  Add/update a key
+#   secrets init NAME                      Write .env from vault
+#   secrets list                           List all vault files and their keys
+#   secrets decrypt NAME                   Decrypt a full file to stdout
+#
+# Vault: ~/github/oneshot/secrets/
+# Encryption: SOPS + Age (key at ~/.age/key.txt)
 
-## File: scripts/repo-pack.sh
-````bash
-set -euo pipefail
-export PATH="${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
-REPO_BASE="${HOME}/github"
-ACTIVE_DAYS=30
-DEFAULT_CONFIG="${HOME}/github/oneshot/repomix.config.json"
-TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-PACKED=0
-SKIPPED=0
-FAILED=0
-if ! command -v repomix &>/dev/null; then
-  echo "ERROR: repomix not found. Install with: npm install -g repomix"
-  exit 1
-fi
-for dir in "$REPO_BASE"/*/; do
-  repo=$(basename "$dir")
-  cd "$dir" || continue
-  git rev-parse --git-dir > /dev/null 2>&1 || continue
-  recent=$(git log --since="${ACTIVE_DAYS} days ago" --oneline 2>/dev/null | head -1)
-  if [ -z "$recent" ]; then
-    SKIPPED=$((SKIPPED + 1))
-    continue
-  fi
-  file_count=$(git ls-files | wc -l)
-  if [ "$file_count" -eq 0 ]; then
-    SKIPPED=$((SKIPPED + 1))
-    continue
-  fi
-  echo "Packing: $repo ($file_count files)"
-  cfg_flag=""
-  if [ -f repomix.config.json ]; then
-    cfg_flag="--config repomix.config.json"
-  elif [ -f "$DEFAULT_CONFIG" ]; then
-    cfg_flag="--config $DEFAULT_CONFIG"
-  fi
-  mkdir -p docs
-  if repomix $cfg_flag --output "docs/LLM-OVERVIEW.md" --quiet 2>/tmp/repomix-err.log; then
-    mkdir -p .janitor
-    size=$(wc -c < "docs/LLM-OVERVIEW.md" 2>/dev/null || echo 0)
-    cat > .janitor/repo-pack.json << EOF
-{
-  "timestamp": "$TIMESTAMP",
-  "repo": "$repo",
-  "files_tracked": $file_count,
-  "output_size_bytes": $size,
-  "active_threshold_days": $ACTIVE_DAYS
-}
-EOF
-    PACKED=$((PACKED + 1))
-  else
-    echo "  FAILED: $repo — $(cat /tmp/repomix-err.log 2>/dev/null | tail -1)"
-    FAILED=$((FAILED + 1))
-  fi
-done
-echo "Repo-pack complete: $PACKED packed, $SKIPPED skipped (idle), $FAILED failed"
+exec bash ~/github/oneshot/scripts/secrets-helper.sh "$@"
 ````
 
 ## File: scripts/skillsmp-search.sh
@@ -5667,6 +7333,81 @@ state_sync_to_repo() {
 - Date: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" 2>/dev/null || true
 }
 export -f state_get_last_check state_set_last_check state_update_claude_md state_sync_to_repo
+````
+
+## File: scripts/sync-repos.sh
+````bash
+set -euo pipefail
+LOG_PREFIX="[sync-repos $(date +%Y-%m-%d\ %H:%M:%S)]"
+GITHUB_DIR="${HOME}/github"
+SYNC_LOG="/tmp/sync-repos.log"
+REPOS=(
+    "oneshot"
+    "homelab"
+)
+log() {
+    echo "${LOG_PREFIX} $1"
+}
+sync_repo() {
+    local repo="$1"
+    local repo_path="${GITHUB_DIR}/${repo}"
+    if [ ! -d "$repo_path" ]; then
+        log "SKIP: $repo (not cloned at $repo_path)"
+        return 0
+    fi
+    cd "$repo_path"
+    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+        log "SKIP: $repo (uncommitted changes)"
+        return 0
+    fi
+    local branch
+    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ -z "$branch" ] || [ "$branch" = "HEAD" ]; then
+        log "SKIP: $repo (detached HEAD or no branch)"
+        return 0
+    fi
+    if ! git fetch origin "$branch" --quiet 2>/dev/null; then
+        log "ERROR: $repo (fetch failed)"
+        return 1
+    fi
+    local behind
+    behind=$(git rev-list HEAD..origin/"$branch" --count 2>/dev/null || echo "0")
+    if [ "$behind" -gt 0 ]; then
+        log "PULL: $repo ($behind commits behind on $branch)"
+        if git pull --ff-only origin "$branch" --quiet 2>/dev/null; then
+            log "OK: $repo updated"
+        else
+            log "ERROR: $repo (pull failed - may need manual merge)"
+            return 1
+        fi
+    fi
+    return 0
+}
+log "Starting sync for ${#REPOS[@]} repos in $GITHUB_DIR"
+ERRORS=0
+for repo in "${REPOS[@]}"; do
+    if ! sync_repo "$repo"; then
+        ((ERRORS++)) || true
+    fi
+done
+if [ "$ERRORS" -gt 0 ]; then
+    log "Completed with $ERRORS errors"
+else
+    log "Sync complete"
+fi
+if [ -f "$SYNC_LOG" ]; then
+    size=""
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        size=$(stat -f%z "$SYNC_LOG" 2>/dev/null || echo "0")
+    else
+        size=$(stat -c%s "$SYNC_LOG" 2>/dev/null || echo "0")
+    fi
+    if [ "$size" -gt 1048576 ]; then
+        tail -1000 "$SYNC_LOG" > "${SYNC_LOG}.tmp" && mv "${SYNC_LOG}.tmp" "$SYNC_LOG"
+        log "Log trimmed (was ${size} bytes)"
+    fi
+fi
+exit $ERRORS
 ````
 
 ## File: scripts/sync-secrets.sh
@@ -6021,57 +7762,6 @@ Host rpi4-ts
   IdentityFile ~/.ssh/id_ed25519
 
 # === END OMAR SSH ALIASES ===
-````
-
-## File: ssh/install.sh
-````bash
-set -euo pipefail
-REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/Khamel83/oneshot/master}"
-CONF_URL="${CONF_URL:-$REPO_RAW_BASE/ssh/aliases.conf}"
-mkdir -p "$HOME/.ssh"
-chmod 700 "$HOME/.ssh"
-CFG="$HOME/.ssh/config"
-touch "$CFG"
-chmod 600 "$CFG"
-cp "$CFG" "$CFG.bak.$(date +%F_%H%M%S)"
-tmp="$(mktemp)"
-trap 'rm -f "$tmp"' EXIT
-curl -fsSL "$CONF_URL" -o "$tmp"
-new_hosts=$(grep -E '^Host ' "$tmp" | awk '{print $2}' | sort)
-pre_managed=$(awk '/# === OMAR SSH ALIASES \(managed\) ===/{exit} /^Host /{print $2}' "$CFG" 2>/dev/null || true)
-conflicts=""
-for host in $new_hosts; do
-  if echo "$pre_managed" | grep -qx "$host"; then
-    conflicts="$conflicts  - $host\n"
-  fi
-done
-if [ -n "$conflicts" ]; then
-  echo "⚠️  WARNING: Duplicate SSH aliases found in your config:"
-  echo -e "$conflicts"
-  echo ""
-  echo "You have manual entries that conflict with the managed aliases."
-  echo ""
-  echo "Options:"
-  echo "  1) Cancel and clean up manually (nano ~/.ssh/config)"
-  echo "  2) Proceed anyway (managed block will shadow manual entries)"
-  echo ""
-  read -p "Proceed? [y/N] " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Cancelled. Backup saved at $CFG.bak.$(date +%F_%H%M%S)"
-    exit 1
-  fi
-fi
-# === APPLY CHANGES ===
-# Remove any prior managed block, then append the latest block from GitHub.
-perl -0777 -i -pe '
-  s{(?ms)^[ \t]*# === OMAR SSH ALIASES \(managed\) ===\n.*?^[ \t]*# === END OMAR SSH ALIASES ===\n?}{}g;
-  s/\n{3,}/\n\n/g;
-' "$CFG"
-printf "\n%s\n" "$(cat "$tmp")" >> "$CFG"
-ssh -G oci 2>/dev/null | egrep 'hostname|user|identityfile' | head -n 10 || true
-echo "OK: SSH aliases installed/updated from $CONF_URL"
-echo "Try: ssh oci | ssh oci-ts | ssh homelab | ssh homelab-ts | ssh macmini | ssh macmini-ts"
 ````
 
 ## File: templates/community-starter/.github/workflows/scheduled-jobs.yml
@@ -7317,6 +9007,26 @@ def test_get_returns_status(self)
 result = handle_GET(make_request())
 ````
 
+## File: templates/community-starter/.env.example
+````
+# Supabase — Settings > API
+SUPABASE_URL=https://yourproject.supabase.co
+SUPABASE_ANON_KEY=eyJ...          # public, safe in frontend
+SUPABASE_SERVICE_ROLE_KEY=eyJ...  # SECRET — server-side only, never expose
+
+# Resend — resend.com > API Keys
+RESEND_API_KEY=re_...
+EMAIL_FROM=Your App <noreply@yourdomain.com>
+REPLY_TO=you@yourdomain.com
+
+# App
+SITE_URL=https://yourdomain.com
+ADMIN_EMAIL=you@yourdomain.com
+
+# Automation (generate a random string: openssl rand -hex 32)
+CRON_SECRET=your_random_secret_here
+````
+
 ## File: templates/community-starter/requirements.txt
 ````
 supabase==2.28.3
@@ -7576,6 +9286,29 @@ EOF
 }
 ````
 
+## File: .repomixignore
+````
+# Ignore patterns for repomix
+.git/
+.janitor/
+.cache/
+__pycache__/
+*.pyc
+.eggs/
+*.egg-info/
+dist/
+build/
+*.min.js
+*.min.css
+secrets/*.env
+secrets/*.encrypted
+.venv/
+.env
+node_modules/
+eval/traces/
+.claude/skills/humanizer/
+````
+
 ## File: .sops.yaml
 ````yaml
 creation_rules:
@@ -7583,53 +9316,165 @@ creation_rules:
     path_regex: '.*\.encrypted$'
 ````
 
-## File: repomix.config.json
-````json
-{
-  "$schema": "https://repomix.com/schemas/latest/schema.json",
-  "output": {
-    "filePath": "docs/LLM-OVERVIEW.md",
-    "style": "markdown",
-    "compress": true,
-    "removeComments": true,
-    "removeEmptyLines": true,
-    "topFilesLength": 20,
-    "fileSummary": true,
-    "directoryStructure": true,
-    "files": true,
-    "parsableStyle": true
-  },
-  "include": ["**/*"],
-  "ignore": {
-    "useGitignore": true,
-    "useDefaultPatterns": true,
-    "customPatterns": [
-      ".janitor/",
-      "secrets/",
-      "*.encrypted",
-      "*.env",
-      "*.env.tmp",
-      "*.key",
-      "*.age",
-      "eval/traces/",
-      "archive/",
-      ".cache/",
-      ".agent/",
-      ".beads/",
-      ".oneshot/",
-      "dispatch/",
-      ".claude/skills/the-audit/SOURCE_DOCS/",
-      ".opencode/",
-      ".claude/memory/",
-      ".claude/plans/",
-      ".claude/tasks/",
-      ".claude/delegation-log.jsonl"
-    ]
-  },
-  "security": {
-    "enableSecurityCheck": false
-  }
-}
+## File: .claude/agents/INDEX.md
+````markdown
+# ONE_SHOT Agents
+
+Custom agents for the ONE_SHOT framework. Each agent is a Claude Code agent
+definition file (frontmatter + instructions).
+
+## Creating an Agent
+
+1. Copy `TEMPLATE.md` to a new `.md` file
+2. Fill in the frontmatter fields
+3. Write the agent instructions
+4. Validate with `./scripts/validate-agents.py`
+
+## Directory
+
+```
+.claude/agents/
+  INDEX.md        — This file
+  TEMPLATE.md     — Agent template
+  *.md            — Agent definitions
+```
+````
+
+## File: .claude/agents/TEMPLATE.md
+````markdown
+---
+name: agent-name
+description: What this agent does and when to use it
+---
+
+# Agent Name
+
+## Purpose
+
+Describe what this agent accomplishes.
+
+## When to Use
+
+- Condition 1
+- Condition 2
+
+## Instructions
+
+Your agent instructions go here.
+````
+
+## File: .claude/commands/dispatch.md
+````markdown
+You are the **planner**. Do not edit files yourself.
+
+1. Write a **bounded task spec** to a temp file:
+   ```
+   cat > /tmp/oneshot-task-$(date +%s).md <<'EOF'
+   ## Goal
+   <what the worker should accomplish>
+
+   ## Files
+   <specific files to add/edit, with paths>
+
+   ## Constraints
+   <what the worker must NOT do>
+
+   ## Acceptance Criteria
+   <how to verify the task is done>
+   EOF
+   ```
+
+2. Choose a **lane**:
+   - `routine_coder` — default for normal implementation
+   - `cheap_fast` — trivial mechanical work (lint fixes, formatting, simple tests)
+   - `cheap_summary` — summaries, extractions, low-risk transforms
+   - `strong_reasoning` — harder refactors, cross-file changes, ambiguous failures
+   - `premium_reasoning` — escalation only (failed twice or design-sensitive)
+
+3. Dispatch:
+   ```
+   ./bin/oneshot dispatch --lane <lane> --task-file /tmp/oneshot-task-*.md --allow-dirty
+   ```
+
+4. Print the **task-id** and tell the user the next step:
+   ```
+   ./bin/oneshot review <task-id>
+   ```
+
+If the main tree has uncommitted changes you want to keep, use `--allow-dirty`.
+For bootstrap changes (harness itself, CLAUDE.md edits), work inline — no dispatch needed.
+````
+
+## File: .claude/commands/escalate-worker.md
+````markdown
+Escalate a failed or insufficient task to a stronger lane.
+
+1. Read the current task's result to understand what went wrong:
+   ```
+   ./bin/oneshot review <task-id>
+   ```
+
+2. Pick the **next stronger lane**:
+   ```
+   cheap_fast → routine_coder → strong_reasoning → premium_reasoning
+   cheap_summary → routine_coder → strong_reasoning → premium_reasoning
+   ```
+
+3. Create the escalation:
+   ```
+   ./bin/oneshot escalate <task-id> --lane <new-lane>
+   ```
+
+4. Dispatch the new task:
+   ```
+   ./bin/oneshot dispatch --lane <new-lane> --task-file <path-from-escalate-output> --allow-dirty
+   ```
+
+5. Clean up the old worktree:
+   ```
+   ./bin/oneshot worktree remove <old-task-id>
+   ```
+
+Never escalate twice to the same lane. If premium_reasoning fails, report back to the user.
+````
+
+## File: .claude/commands/review-worker.md
+````markdown
+You are the **reviewer**. Read the four files printed by `./bin/oneshot review <task-id>`:
+
+1. **task.md** — the original spec. Did the worker address all of it?
+2. **result.md** — changed files and test results. Are there unexpected changes?
+3. **diff.patch** — the actual code diff. Check correctness, convention adherence, scope.
+4. **test.log** — test output. Any failures?
+
+## Assessment
+
+After reading all four files, state your verdict:
+
+- **Accept** — changes are correct, scoped, and tests pass
+- **Reject** — changes are wrong, out of scope, or tests fail. Explain why.
+- **Escalate** — the task needs a stronger lane. Pick the next lane up and run:
+  ```
+  ./bin/oneshot escalate <task-id> --lane <stronger-lane>
+  ```
+  Then dispatch the new task-id.
+- **Follow-up** — mostly done but needs small fixes. Create a new cheap_fast task.
+
+## Rules
+
+- Do **not** silently rewrite the worker's implementation unless the user explicitly authorizes it.
+- If you want to make corrections yourself, state that intention before editing anything.
+- Scope creep (changes outside task.md) is a reject reason unless clearly necessary.
+````
+
+## File: .claude/commands/status.md
+````markdown
+Run `./bin/oneshot status` to list all dispatched tasks, or `./bin/oneshot status <task-id>` for details on a specific task.
+
+Show the user the output. If there are active tasks, suggest next steps:
+- `dispatched` → worker hasn't started yet, or worktree is ready
+- `collected` → ready for review: `./bin/oneshot review <id>`
+- `pending` → escalated task waiting for dispatch
 ````
 
 ## File: .claude/hooks/auto-handoff.sh
@@ -7713,24 +9558,6 @@ exit 0
 ````bash
 rm -f /tmp/claude-oneshot/handoff-triggered
 rm -f /tmp/claude-oneshot/context-pct
-````
-
-## File: .claude/hooks/statusline.sh
-````bash
-input=$(cat)
-PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
-MODEL=$(echo "$input" | jq -r '.model.display_name // "unknown"')
-REMAINING=$(echo "$input" | jq -r '.context_window.remaining_percentage // 100' | cut -d. -f1)
-CACHE_DIR="/tmp/claude-oneshot"
-mkdir -p "$CACHE_DIR"
-echo "$PCT" > "$CACHE_DIR/context-pct"
-if [ "$PCT" -ge 80 ]; then
-    echo "$MODEL | ctx: ${PCT}% ⚠️ HANDOFF SOON"
-elif [ "$PCT" -ge 60 ]; then
-    echo "$MODEL | ctx: ${PCT}%"
-else
-    echo "$MODEL | ctx: ${PCT}%"
-fi
 ````
 
 ## File: .claude/infrastructure/STACK.md
@@ -8059,6 +9886,157 @@ See @docs/instructions/coding.md
 - For web apps: always verify `package.json` has `astro` before using web rules
 ````
 
+## File: .claude/rules/codex.md
+````markdown
+# Codex CLI — Multi-Machine Setup & Usage
+
+> **Canonical location**: `~/.claude/rules/codex.md` (global, loads in every project)
+> This copy lives in oneshot for version control. Keep them in sync.
+
+Codex (OpenAI's agentic coding CLI) runs on all three machines in this setup.
+This guide documents what works, what doesn't, and why — learned the hard way on 2026-03-30.
+
+---
+
+## TL;DR — The Working Command
+
+```bash
+# DO THIS — not --full-auto
+unset OPENAI_API_KEY
+codex exec --sandbox danger-full-access "your prompt here"
+```
+
+**From any machine, from any repo that's in `~/.codex/config.toml` as trusted.**
+
+---
+
+## Machine Status
+
+| Machine | Works | Auth |
+|---------|-------|------|
+| oci-dev (100.126.13.70) | ✓ | `~/.codex/auth.json` |
+| homelab (100.112.130.100) | ✓ | `~/.codex/auth.json` |
+| macmini (100.113.216.27) | ✓ | `~/.codex/auth.json` |
+
+---
+
+## Auth: ChatGPT Plus OAuth (NOT API key)
+
+Codex uses your **ChatGPT Plus login**, not an OpenAI API key.
+
+- Auth is stored in `~/.codex/auth.json`
+- Obtained via `codex login` (opens browser)
+- The token auto-refreshes via `refresh_token` — it stays valid
+
+**Critical:** If `OPENAI_API_KEY` is set in the environment, it overrides the OAuth token
+and hits the paid API instead. That account has no credits → 404/429 errors.
+Always `unset OPENAI_API_KEY` before running codex.
+
+### If auth.json is missing or broken
+
+```bash
+# Option 1: Device code auth (best for remote/headless machines)
+codex login --device-auth
+# Opens https://auth.openai.com/codex/device — enter the one-time code in your browser
+# No browser needed on the server itself
+
+# Option 2: Copy from a working machine (fastest if available)
+scp homelab:/home/khamel83/.codex/auth.json ~/.codex/auth.json
+```
+
+### If the subscription lapses
+
+The token encodes subscription status. After renewing ChatGPT Plus at chat.openai.com,
+run `codex login` again to get a fresh token — the old one won't get access back automatically.
+
+---
+
+## The Sandbox Problem: Why `--full-auto` Breaks Here
+
+`--full-auto` is shorthand for `--sandbox workspace-write`, which uses **bwrap** (bubblewrap)
+for sandboxing. On these Linux servers (OCI + homelab), bwrap fails:
+
+```
+bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+```
+
+This is a kernel/container restriction — bwrap can't create a loopback interface.
+
+**Fix:** Use `--sandbox danger-full-access` instead. This skips bwrap entirely.
+These machines are already on Tailscale + behind OCI security groups, so the blast
+radius of a rogue shell command is limited.
+
+```bash
+# BROKEN on these machines:
+codex exec --full-auto "..."
+
+# WORKS:
+codex exec --sandbox danger-full-access "..."
+```
+
+---
+
+## Config (`~/.codex/config.toml`)
+
+```toml
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+approvals_reviewer = "user"
+
+# DO NOT set openai_base_url — the default is correct
+# Setting it to "https://api.openai.com" (without /v1) causes 404s on the WebSocket
+# Setting it to "https://api.openai.com/v1" causes double-path issues on some calls
+# Leave it unset and let codex use its built-in default
+
+[projects."/home/ubuntu/github/atlas"]
+trust_level = "trusted"
+# ... other trusted projects
+```
+
+---
+
+## Running Across Machines
+
+From oci-dev, you can run codex on remote machines via SSH:
+
+```bash
+# Run codex on homelab
+ssh homelab "cd ~/github/myproject && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'your task'"
+
+# Run on macmini
+ssh macmini "cd ~/github/myproject && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'your task'"
+```
+
+Or Claude Code can dispatch tasks to all three in parallel using Bash with `&` + `wait`.
+
+---
+
+## Debugging Checklist
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `404 Not Found` on `wss://.../responses` | `OPENAI_API_KEY` is set with no credits | `unset OPENAI_API_KEY` |
+| `401 Missing bearer` | `auth.json` is missing | `codex login --device-auth` or copy from homelab |
+| `401 Missing scopes: api.responses.write` | Stale/incomplete token | `codex login --device-auth` or copy from working machine |
+| `bwrap: loopback: Failed RTM_NEWADDR` | bwrap blocked by kernel | Use `--sandbox danger-full-access` |
+| `insufficient_quota` | Using API key account (no credits) | `unset OPENAI_API_KEY` |
+| Subscription expired 404 | ChatGPT Plus lapsed | Renew at chat.openai.com + `codex login --device-auth` |
+
+---
+
+## History / Why This Exists
+
+This was debugged on 2026-03-30 in a Claude Code session. The problems encountered:
+1. `OPENAI_API_KEY` in vault was set on PATH, sending requests to the no-credits API account
+2. `openai_base_url = "https://api.openai.com"` was manually added to config — wrong (missing `/v1`)
+3. A `codex logout` during debugging deleted auth.json, breaking everything
+4. `--full-auto` (bwrap sandbox) doesn't work on OCI/homelab Linux kernels
+5. ChatGPT Plus subscription had lapsed (Feb 14) — renewed March 30
+
+The fix that unlocked everything: copy `auth.json` from homelab, use `--sandbox danger-full-access`.
+````
+
 ## File: .claude/rules/community.md
 ````markdown
 # Web App Scaffold Rules (Vercel + Supabase + Python + Resend)
@@ -8143,88 +10121,6 @@ See @docs/instructions/review.md
 - SubagentStop hook logs to `.claude/delegation-log.jsonl` automatically
 - Use `model: "haiku"` for low-complexity delegations
 - `git add -A && git commit` checkpoint before high-criticality delegation
-````
-
-## File: .claude/rules/khamel-mode.md
-````markdown
-# KHAMEL MODE Rules
-
-When building ANYTHING for this user, assume these defaults without asking.
-
-## Infrastructure
-
-| Machine | Tailscale IP | Role |
-|---------|--------------|------|
-| **oci-dev** | 100.126.13.70 | Primary dev, services, Postgres, Claude Code |
-| **homelab** | 100.112.130.100 | Personal local infra, 26TB storage |
-| **macmini** | 100.113.216.27 | Apple Silicon GPU, tasks needing throughput |
-
-- **Networking**: All machines on Tailscale (deer-panga.ts.net)
-- **Public access**: Tailscale Funnel + poytz (NOT nginx/traefik)
-- **Internal tools**: Cloudflare Access (already configured)
-- **Secrets**: SOPS/Age, decrypt from `~/github/oneshot/secrets/`
-
-## Stack Defaults (Don't Ask, Just Use)
-
-| Project Type | Default Stack |
-|--------------|---------------|
-| Web apps | Vercel + Supabase (Auth + Postgres) + Python + HTML/JS |
-| CLIs | Python + Click + SQLite |
-| Services/APIs | Python + systemd → oci-dev |
-| Heavy compute / throughput | Route to macmini |
-| Large storage | Route to homelab (26TB) |
-
-**Full stack docs**: `.claude/infrastructure/STACK.md`
-
-## Storage Progression
-
-```
-SQLite (default for CLIs) → Supabase Postgres (web apps) → OCI Autonomous DB (>20GB/multi-user)
-```
-
-## Auth Default
-
-```
-Supabase Auth (email/password + Google OAuth) → sessions in Supabase Postgres
-Cloudflare Access → internal/admin tools (already configured)
-```
-
-## Tool Enforcement
-
-- **ALWAYS** use beads for task tracking (`bd init` on new projects)
-- **ALWAYS** use ONE_SHOT skills when applicable
-- **ALWAYS** check lessons before debugging
-
-## Anti-Patterns to Flag
-
-- nginx/traefik → Use Tailscale Funnel + poytz
-- mysql/mongodb (self-hosted) → Default is SQLite (CLIs) or Supabase Postgres (web)
-- express/fastapi/flask for web → Python serverless on Vercel
-- Astro/Cloudflare Workers/Better Auth → Old stack, use Vercel + Supabase + Python
-- Convex/Next.js/Clerk → Old stack, use Vercel + Supabase + Python
-- aws/gcp/azure → Default is OCI free tier or homelab
-
-## Decision Defaults (Don't Ask, Just Pick)
-
-When ambiguous, apply these defaults without asking for clarification:
-
-| Ambiguity | Default Choice |
-|-----------|----------------|
-| Multiple valid implementations | **Simplest one** |
-| Naming things | Follow existing pattern in file |
-| Error handling style | Match surrounding code |
-| Test framework | Use existing tests as guide |
-| Library choice | One already in project |
-| Refactor opportunity | **Skip unless blocking** |
-| API design | Match existing endpoints |
-| File organization | Follow project structure |
-
-**Key rule**: When truly ambiguous, make a reasonable choice and note the decision.
-
-## When You Notice Drift
-
-If Claude notices we're NOT using beads, Tailscale, ONE_SHOT patterns, or standard stack:
-→ **Warn**: "I notice we're not using [X], should I set that up?"
 ````
 
 ## File: .claude/rules/README.md
@@ -8440,6 +10336,144 @@ Debug Complete
 ├─ Verification: {pass/fail}
 └─ Regression test: {added/skipped}
 ```
+````
+
+## File: .claude/skills/doc/SKILL.md
+````markdown
+---
+name: doc
+description: Build or refresh documentation and research packs through Argus. Use when user says '/doc', 'cache docs', 'download docs', 'save documentation', 'fetch docs', or asks to reference external documentation.
+---
+
+# /doc — Argus Documentation Workflows
+
+Argus is now the canonical docs and research corpus owner. Do not treat `~/github/docs-cache` as the primary store anymore.
+
+## What `/doc` should do
+
+Use Argus on homelab to:
+- recover dead articles
+- capture the important parts of a site and produce a cited summary
+- build a docs + research pack that combines official docs and external research
+
+The canonical corpus lives on homelab under:
+- `/mnt/main-drive/appdata/argus/docs/cache`
+- `/mnt/main-drive/appdata/argus/docs/research`
+- `/mnt/main-drive/appdata/argus/imports/docs-cache`
+
+## Preferred Path
+
+Call the Python client in `core/search/argus_client.py`, not ad hoc scraping first.
+
+```bash
+python - <<'PY'
+from core.search import argus_client
+import json
+print(json.dumps(argus_client.build_research_pack("topic", official_url="https://docs.example.com"), indent=2))
+PY
+```
+
+The client resolves:
+- `config/search.yaml` for the Argus base URL
+- `ARGUS_API_KEY` from env
+- or `secrets get ARGUS_API_KEY argus` from the oneshot vault
+
+## Usage Patterns
+
+### 1. Docs + Research Pack
+
+Use when the user wants:
+- official docs plus external research in one place
+- a reusable corpus for later tasks
+- deeper tool/framework grounding
+
+Run:
+
+```bash
+python - <<'PY'
+from core.search import argus_client
+import json
+print(json.dumps(
+    argus_client.build_research_pack(
+        "example sdk",
+        official_url="https://docs.example.com",
+    ),
+    indent=2,
+))
+PY
+```
+
+### 2. Site Capture Summary
+
+Use when the user wants:
+- “copy the important parts of this site”
+- a detailed summary with references
+- not just a sitemap
+
+Run:
+
+```bash
+python - <<'PY'
+from core.search import argus_client
+import json
+print(json.dumps(
+    argus_client.capture_site("https://docs.example.com"),
+    indent=2,
+))
+PY
+```
+
+### 3. Dead Article Recovery
+
+Use when the user wants:
+- a dead URL recovered
+- a moved article found
+- archive recovery with a final report
+
+Run:
+
+```bash
+python - <<'PY'
+from core.search import argus_client
+import json
+print(json.dumps(
+    argus_client.recover_article(
+        "https://example.com/dead-post",
+        title="Example Post",
+    ),
+    indent=2,
+))
+PY
+```
+
+### 4. Poll Workflow Status
+
+If the user wants the finished result immediately, poll:
+
+```bash
+python - <<'PY'
+from core.search import argus_client
+import json
+print(json.dumps(argus_client.workflow_status("run_id_here"), indent=2))
+PY
+```
+
+## Local Project Copies
+
+Default behavior:
+- keep the canonical corpus in Argus on homelab
+- only copy selected outputs into the current project if the user explicitly wants project-local artifacts
+
+Do not recreate the old `docs/external/<name>/README.md` pattern by default.
+
+## If Local Cache Scripts Are Used
+
+Legacy helpers such as `docs-link` and `docs-check.sh` should treat Argus paths as the default cache root.
+
+Default local mirror path:
+- `${DOCS_CACHE:-$HOME/.local/share/argus/argus/docs/cache}`
+
+If that path is empty on the current machine, say so plainly and use Argus remotely instead of pretending the corpus is local.
 ````
 
 ## File: .claude/skills/handoff/SKILL.md
@@ -8712,176 +10746,6 @@ Turn the raw JSON into a debrief. Follow these rules:
 - For the full debrief, prioritize: blockers > risks > staleness > activity > orphans > clusters > crossrefs
 ````
 
-## File: .claude/skills/research/SKILL.md
-````markdown
----
-name: research
-description: Run deep research in a background sub-agent using Argus search broker. Falls back to Gemini CLI if Argus is unavailable.
----
-
-# /research — Background Research via Argus
-
-Run deep research in a background sub-agent. Argus handles search provider selection and fallback.
-
-## Usage
-
-`/research [topic]`
-
-## Process
-
-1. Ask 2-3 clarifying questions (goal, depth, audience)
-2. **Check Argus availability**:
-   ```bash
-   python -c "from core.search.argus_client import is_available; print(is_available())" 2>/dev/null
-   ```
-   Or simply:
-   ```bash
-   curl -s http://localhost:8005/api/health >/dev/null 2>&1 && echo "argus: yes" || echo "argus: no"
-   ```
-
-3. **Mode 1: Argus (Primary)**
-   Spawn background sub-agent:
-   ```
-   Task:
-     subagent_type: general-purpose
-     description: "Argus research: [topic]"
-     run_in_background: true
-     prompt: |
-       Use Argus to research: [topic]
-       
-       1. Query Argus in research mode:
-          curl -s -X POST http://localhost:8005/api/search \
-            -d '{"query": "[research query]", "mode": "research"}'
-       
-       2. For key results, extract full content:
-          curl -s -X POST http://localhost:8005/api/extract \
-            -d '{"url": "RESULT_URL"}'
-       
-       3. Write findings to: docs/research/[slug]/research.md
-       4. Structure: Executive Summary → Detailed Findings → Sources
-   ```
-
-4. **Mode 2: Gemini CLI (Fallback)**
-   If Argus is unavailable:
-   ```
-   Task:
-     subagent_type: general-purpose
-     description: "Gemini research: [topic]"
-     run_in_background: true
-     prompt: |
-       Run Gemini CLI for research:
-       gemini --yolo "[research prompt]"
-       
-       Save output to: docs/research/[slug]/research.md
-   ```
-
-5. Present findings when agent completes
-6. Save to `docs/research/[slug]/research.md`
-
-## Search Config
-
-Argus modes (from `config/search.yaml`):
-- `discovery`: broad, multiple sources
-- `precision`: targeted, high relevance
-- `research`: comprehensive, all providers
-- `cheap`: SearXNG only, cost-sensitive
-
-## Notes
-
-- Research takes 3-8 minutes in background
-- Check `docs/research/` for past research
-- Argus automatically handles provider fallback, ranking, and dedup
-````
-
-## File: .claude/skills/secrets/SKILL.md
-````markdown
----
-name: secrets
-description: Manage encrypted secrets between the master vault and projects using SOPS/Age.
----
-
-# /secrets — SOPS/Age Secret Management
-
-Manage encrypted secrets between the master vault and projects.
-
-## Master Vault
-
-Location: `~/github/oneshot/secrets/`
-Encryption: SOPS + Age (config in `~/github/oneshot/.sops.yaml`)
-
-## CLI Commands
-
-The `secrets` CLI (at `~/.local/bin/secrets`) works from any directory.
-
-```bash
-# Read a single key
-secrets get EXA_API_KEY
-
-# List all vault files and their keys
-secrets list
-
-# Decrypt a full file to stdout
-secrets decrypt research_keys
-
-# Add/update a key (non-interactive, no commit)
-secrets set research_keys 'NEW_KEY=value'
-
-# Add/update + commit + push
-secrets set research_keys 'NEW_KEY=value' --commit
-
-# Bootstrap .env in a project from the vault
-cd ~/github/myproject && secrets init services
-```
-
-## Pull Secrets into a Project
-
-1. Identify which secrets the project needs (check `.env.example` or imports)
-2. Run `secrets init <namespace>` to write `.env` from the vault
-3. Verify the app can start with the new secrets
-
-## Push New Secrets to the Vault
-
-1. Add/update: `secrets set <namespace> 'KEY=value'`
-2. Commit when ready: `secrets set <namespace> 'KEY=value' --commit`
-
-## Common Patterns
-
-```bash
-# Find which vault file contains a key
-secrets list | grep -i brave
-
-# Extract a key for use in a script
-BRAVE_KEY=$(secrets get BRAVE_API_KEY)
-
-# View all keys in a namespace
-secrets decrypt research_keys
-```
-
-## How It Works
-
-- Vault files are SOPS-encrypted dotenv at `~/github/oneshot/secrets/*.encrypted`
-- `secrets get` searches all vault files for the key
-- `secrets set` decrypts the file, merges the new key, re-encrypts
-- `secrets init` decrypts a vault file to `.env` in the current directory
-- Age key lives at `~/.age/key.txt`
-
-## Safety Rules
-
-- Never display secret values in output
-- Always verify `.env` is in `.gitignore` before writing
-- Namespace secrets by project in the vault
-- Never commit plaintext secrets
-- Never suggest `.env` files without encryption
-
-## Troubleshooting
-
-| Problem | Fix |
-|---------|-----|
-| `no matching creation rules found` | Input file must end in `.encrypted` (handled by the CLI automatically) |
-| `key not found in any vault file` | Key doesn't exist in any vault — add it with `secrets set` |
-| `file not found` | Check `secrets list` for available namespaces |
-````
-
 ## File: .claude/skills/tdd/SKILL.md
 ````markdown
 ---
@@ -8964,229 +10828,6 @@ TDD Complete
 ```
 ````
 
-## File: .github/workflows/ci.yml
-````yaml
-name: CI
-on:
-  push:
-    branches: [master]
-  workflow_dispatch:
-jobs:
-  validate-skills:
-    name: Validate Skills
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Make scripts executable
-        run: chmod +x scripts/validate-skills.sh
-      - name: Validate skill format
-        run: ./scripts/validate-skills.sh .claude/skills
-  validate-agents:
-    name: Validate Agents
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Validate agent format
-        run: |
-          echo "Validating agent files..."
-          errors=0
-          for agent in .claude/agents/*.md; do
-            basename=$(basename "$agent")
-            if [[ "$basename" == "INDEX.md" || "$basename" == "TEMPLATE.md" ]]; then
-              continue
-            fi
-            echo "Checking $agent..."
-            if ! head -1 "$agent" | grep -q "^---"; then
-              echo "ERROR: $agent missing frontmatter"
-              ((errors++))
-              continue
-            fi
-            if ! grep -q "^name:" "$agent"; then
-              echo "ERROR: $agent missing 'name:' field"
-              ((errors++))
-            fi
-            if ! grep -q "^description:" "$agent"; then
-              echo "ERROR: $agent missing 'description:' field"
-              ((errors++))
-            fi
-          done
-          if [ $errors -gt 0 ]; then
-            echo "Found $errors errors"
-            exit 1
-          fi
-          echo "All agents valid"
-  test-router:
-    name: Test Python Router
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: pip install pyyaml
-      - name: Test infer_category
-        run: |
-          python3 -c "
-          import sys
-          sys.path.insert(0, '.')
-          from core.task_schema import infer_category, TaskCategory
-          tests = [
-              ('implement the auth handler', 'coding'),
-              ('fix the bug in login.py', 'coding'),
-              ('refactor the database module', 'coding'),
-              ('research Supabase RLS patterns', 'research'),
-              ('document the API endpoints', 'writing'),
-              ('summarize the meeting notes', 'writing'),
-              ('review this pull request', 'review'),
-              ('audit the security config', 'review'),
-              ('hello world', 'general'),
-          ]
-          passed = 0
-          for desc, exp in tests:
-              result = infer_category(desc)
-              if result.value == exp:
-                  passed += 1
-              else:
-                  print(f'FAIL: \"{desc}\" → {result.value}, expected {exp}')
-                  sys.exit(1)
-          print(f'{passed}/{len(tests)} infer_category tests passed')
-          "
-      - name: Test router resolve
-        run: |
-          python3 -c "
-          import sys
-          sys.path.insert(0, '.')
-          from core.router.lane_policy import resolve
-          # Test category-based worker ordering
-          r = resolve('implement_small', category='coding')
-          assert r['lane'] == 'cheap'
-          assert r['workers'][0] == 'codex', f'Expected codex first, got {r[\"workers\"]}'
-          assert r['category'] == 'coding'
-          r = resolve('research', category='research')
-          assert r['lane'] == 'research'
-          assert r['workers'][0] == 'gemini_cli'
-          r = resolve('plan')
-          assert r['lane'] == 'premium'
-          assert r['category'] == 'general'
-          print('All router resolve tests passed')
-          "
-      - name: Test category inference in resolve
-        run: |
-          python3 -c "
-          import sys
-          sys.path.insert(0, '.')
-          from core.router.lane_policy import resolve
-          # infer_category should auto-populate when no category given
-          r = resolve('implement_small')
-          assert r['category'] == 'coding'
-          r = resolve('review_diff')
-          assert r['category'] == 'review'
-          r = resolve('doc_draft')
-          assert r['category'] == 'writing'
-          r = resolve('plan')
-          assert r['category'] == 'general'
-          print('All category inference tests passed')
-          "
-  test-oneshot:
-    name: Test oneshot.sh
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install bats-core
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bats
-      - name: Run tests
-        run: bats tests/test_oneshot.bats
-  lint-basic:
-    name: Basic Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Check skill and agent counts match
-        run: |
-          skill_count=$(find .claude/skills -name "SKILL.md" | wc -l)
-          echo "Found $skill_count skills"
-          agent_count=$(find .claude/agents -maxdepth 1 -name "*.md" ! -name "INDEX.md" ! -name "TEMPLATE.md" | wc -l)
-          echo "Found $agent_count agents"
-      - name: Check no stale references
-        run: |
-          if grep -r "oneshot-resume" .claude/skills/ 2>/dev/null; then
-            echo "ERROR: Found stale 'oneshot-resume' reference"
-            exit 1
-          fi
-          echo "No stale references found"
-      - name: Verify required files exist
-        run: |
-          required_files=(
-            "AGENTS.md"
-            "CLAUDE.md"
-            "README.md"
-            "oneshot.sh"
-            "CHANGELOG.md"
-            ".claude/skills/INDEX.md"
-            ".claude/agents/INDEX.md"
-            "core/task_schema.py"
-            "core/router/lane_policy.py"
-            "core/dispatch/run.py"
-            "config/lanes.yaml"
-            "config/models.yaml"
-            "config/workers.yaml"
-            "docs/instructions/task-classes.md"
-          )
-          for file in "${required_files[@]}"; do
-            if [ ! -f "$file" ]; then
-              echo "ERROR: Required file missing: $file"
-              exit 1
-            fi
-          done
-          echo "All required files present"
-      - name: Verify config consistency
-        run: |
-          for lane in premium balanced cheap research; do
-            if ! sed -n "/^  $lane:/,/^[a-z]/p" config/lanes.yaml | grep -q "category_preference"; then
-              echo "ERROR: Lane '$lane' missing category_preference"
-              exit 1
-            fi
-          done
-          echo "All lanes have category_preference"
-          pool=$(sed -n '/^  cheap:/,/^[a-z]/p' config/lanes.yaml | grep "worker_pool" | head -1)
-          if echo "$pool" | grep -q "claw_code"; then
-            echo "ERROR: claw_code should not be in cheap lane pool"
-            exit 1
-          fi
-          echo "claw_code correctly excluded from cheap lane"
-          if ! grep -A 5 "^  glm:" config/workers.yaml | grep -q "plan_expires"; then
-            echo "ERROR: glm worker missing plan_expires"
-            exit 1
-          fi
-          echo "ZAI expiry config present"
-  validate-community-starter:
-    name: Validate Community Starter
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
-      - name: Install template dependencies
-        run: pip install -r templates/community-starter/requirements.txt pytest
-      - name: Make script executable
-        run: chmod +x scripts/test-community-starter.sh
-      - name: Run community-starter validation
-        run: ./scripts/test-community-starter.sh
-````
-
 ## File: 1shot/dispatch/.gitkeep
 ````
 
@@ -9201,6 +10842,1647 @@ dispatch/*.jsonl
 
 # But keep the directory
 !.gitkeep
+````
+
+## File: 1shot/2026-04-27-plan-l-hardening-PROJECT.md
+````markdown
+# Project: Plan L Hardening Pass for OneShot Delegation
+
+## Goal
+Execute a deterministic hardening pass on the `oneshot` delegation harness so the process is trustworthy enough to farm out work to Claude Code, OpenCode, and external workers without docs drift, false readiness signals, or secret leakage.
+
+## Deliverable
+Full execution for this session:
+- normalize `1shot/` planning artifacts
+- classify and seed concrete tasks for delegation
+- ship core high-confidence fixes now
+- verify with command output
+- report pre-existing vs session changes explicitly
+
+## Acceptance Criteria
+- `1shot/PROJECT.md`, `1shot/STATE.md`, and `1shot/ROADMAP.md` reflect the current pass, not stale work
+- Persistent task ledger exists for this pass and tasks are classified for routing/delegation
+- `oneshot dispatch` behavior, CLI help text, and docs agree about whether execution is real or dry-run
+- Dispatch path avoids writing secret values into `worker.log` or other rendered artifacts
+- `oneshot doctor` checks local and remote readiness more accurately and includes explicit OpenCode launcher coverage
+- OpenCode / `oc` support is treated as first-class in config and documentation
+- CI/doc validation is improved enough that the known drift and avoidable failures are reduced with evidence
+- A final summary distinguishes:
+  - A: pre-existing dirty-tree changes
+  - B: changes made in this session
+  - C: recommended but deferred
+
+## Scope
+In:
+- dispatch correctness and help/docs alignment
+- doctor reliability and portability
+- OpenCode support including `oc` launcher expectations
+- secret-safe command logging
+- docs alignment for README/QUICKSTART/delegation/doctor behavior
+- CI hardening where directly relevant to this pass
+- deterministic routing/task decomposition for future farm-out
+
+Out:
+- production deploys
+
+## Constraints
+- Do not rewrite the legacy router architecture wholesale in this pass
+- Do not revert or clean unrelated pre-existing dirty-tree changes
+- Prefer smallest correct fixes, but broader “Plan L” improvements are allowed when tightly connected to trustworthiness
+- Verification must include real command output, not assertions
+
+## Riskiest / Most Uncertain Part
+The biggest risk is not one individual bug; it is process credibility: we could make many changes and still have Claude Code / OpenCode ignore intent or have the overall orchestration remain fundamentally unreliable.
+
+## User Answers
+- Primary deliverable: Full execution
+- Done for this session: `1shot` docs ready, tasks classified, some fixes shipped
+- In scope: dispatch correctness, doctor reliability, OpenCode support, secret-safe logging, docs alignment, CI hardening
+- Out of scope: production deploys
+- Biggest risk: process remains fundamentally broken or agents still do whatever they want
+
+## Baseline Notes
+- Repo is already dirty; treat those changes as A (pre-existing)
+- Validation baseline was captured before edits
+- Existing `1shot/` files were stale and belonged to prior work; they are being replaced as part of this session
+````
+
+## File: 1shot/2026-04-27-plan-l-hardening-ROADMAP.md
+````markdown
+# Plan L Roadmap
+
+**Date**: 2026-04-27
+**Execution mode**: `/conduct`
+**Objective**: make the delegation harness deterministic enough to trust and farm out
+
+## Deterministic Phase Plan
+
+### Phase 0: Intake Lock
+- Rewrite stale `1shot` artifacts for the current pass
+- Capture user answers, scope, risk, and acceptance criteria in `PROJECT.md`
+- Capture current execution state in `STATE.md`
+- Seed persistent task ledger (`1shot/tasks.json` via `scripts/tasks.py`)
+- Exit criteria:
+  - current `1shot` files reflect this pass
+  - task list exists and is classifiable
+
+### Phase 1: Correctness First
+- Fix dispatch contract drift:
+  - CLI help text
+  - docs language
+  - any behavior edge cases found while aligning the contract
+- Add or update tests covering the chosen contract
+- Exit criteria:
+  - `dispatch` contract is explicit and test-backed
+
+### Phase 2: Doctor Reliability
+- Improve `oneshot doctor` signal quality:
+  - add launcher coverage for `oc`
+  - reduce false-negative remote/path noise
+  - improve portability where practical
+- Add/update doctor tests
+- Exit criteria:
+  - doctor output better matches machine reality in this repo
+
+### Phase 3: OpenCode + Secret Safety
+- Fix OpenCode-specific config/runner assumptions
+- Prevent auth value leakage into command logs / rendered command text
+- Align runner/model semantics where currently ambiguous
+- Exit criteria:
+  - command logs are secret-safe
+  - OpenCode runner behavior is documented and internally consistent
+
+### Phase 4: Docs Alignment
+- Update docs that currently lie about behavior or omit `oc`
+- Priorities:
+  - `docs/DELEGATION_MODEL.md`
+  - `docs/WORKTREE_FLOW.md`
+  - `README.md`
+  - `QUICKSTART.md`
+  - doctor docs/readiness docs as needed
+- Exit criteria:
+  - validation drift reduced
+  - main operator docs describe real behavior
+
+### Phase 5: CI Hardening
+- Triage current `scripts/ci.sh` failures that are directly caused by avoidable harness/doc drift
+- Improve CI signal quality where small targeted fixes are enough
+- Exit criteria:
+  - validation matrix is cleaner than baseline
+  - remaining failures, if any, are understood and explicitly reported
+
+### Phase 6: Verify + Challenge + Report
+- Run the full validation matrix again
+- Check acceptance criteria one by one with evidence
+- Summarize A / B / C
+- Exit criteria:
+  - user can see what changed, what remains risky, and what can now be delegated safely
+````
+
+## File: 1shot/2026-04-27-plan-l-hardening-STATE.md
+````markdown
+# Conduct State
+
+Phase: complete
+Started: 2026-04-27
+Loop: 1
+Tasks: 6/6 completed
+Current focus: verification complete, preparing A/B/C summary
+Last updated: 2026-04-27
+Notes:
+- Replacing stale `1shot` artifacts from prior work
+- Dirty tree baseline captured before session changes
+- Validation baseline captured before session changes
+- Dispatch contract is now explicit and test-backed
+- Doctor now checks `oc` launcher and avoids fake remote path failures
+- Full validation matrix passed after CI shellcheck policy was made explicit
+- `oc` wrapper is now installable from the repo and surfaced in health checks
+- Added config bridge validation between legacy routing config and `.oneshot` harness config
+- Added dispatch failure/timeout regression coverage and explicit remote doctor fix guidance
+````
+
+## File: 1shot/2026-04-28-memory-architecture-PROJECT.md
+````markdown
+# Project: OneShot Repo-First Memory Architecture
+
+## Goal
+Design a real memory architecture for OneShot that works across Claude Code, OpenCode, Gemini, and Codex while keeping project memory owned by the target repo instead of the OneShot repo. The design must work for OneShot itself and for downstream customer repos where OneShot is used as the orchestration layer.
+
+## Deliverable
+This planning pass produces:
+- a concrete architecture spec for repo-local memory plus a central private index
+- a build-ready phased roadmap for implementation
+- a fresh persistent task ledger for the memory architecture build effort
+- explicit scope, risk, governance, and verification criteria for the next implementation pass
+
+## Acceptance Criteria
+- The current pass is preserved by date and name, not only as overwritten top-level files
+- `1shot/MEMORY_ARCHITECTURE_SPEC.md` defines:
+  - repo-local memory ownership
+  - `docs/agents/` vs `.oneshot/` responsibilities
+  - write, retrieval, conflict, commit, and review policies
+  - cross-repo abstraction rules
+  - infra placement across homelab, OCI, and Tailscale
+- The roadmap is detailed enough that implementation can start in the next pass without reopening core design questions
+- The task ledger is reseeded for the memory architecture build effort
+- The plan explicitly protects against:
+  - cross-project leakage
+  - stale or conflicting memory being treated as truth
+  - operational fragility in the private indexing layer
+
+## Scope
+In:
+- OneShot memory model for normal engineering repos
+- repo-local structure and lifecycle
+- central private indexing/search assumptions
+- cross-repo portability and abstraction rules
+- review governance for important work
+- single-user operating assumptions
+- onboarding behavior for repos with no memory yet
+- adaptation requirements for downstream customer repos
+
+Out:
+- implementation code changes
+- infra provisioning details
+- UI or dashboard work
+- provider-specific wiring details for Codex, Gemini, OpenCode, or Claude
+- personal/legal private-memory system design
+
+## Constraints
+- Work memory must live in the target repo, not in the OneShot repo
+- Memory is default-on with per-repo policy modes
+- Personal/legal work stays outside the general engineering memory system
+- Repo-local memory should be durable and readable by both humans and agents
+- Cross-repo retrieval is allowed, but must prefer abstracted lessons over raw foreign memory
+- Stable memory should be committed; transient machine state should usually remain local
+- The system must fit inside existing homelab, OCI, and Tailscale boundaries
+
+## Riskiest / Most Uncertain Part
+The main risk is building a memory system that is too broad and contaminates one repo with wrong or stale lessons from another, while also becoming operationally fragile enough that it stops being trusted.
+
+## User Answers
+- Planning pass deliverable: architecture spec plus execution roadmap
+- Out of scope now: no code changes, no infra provisioning, no UI work, no personal-memory system, no provider-specific wiring
+- Primary memory ownership: project/repo first
+- Strict isolation: personal/legal matters and credentials/secrets
+- Default storage model: hybrid repo files plus central private index
+- Infra boundary: homelab + OCI + Tailscale mesh
+- Review on important work: code changes, architecture decisions, infra/config changes, security/privacy changes, and cross-repo changes
+- Top failure worries: cross-project leakage, stale or wrong memory, operational fragility
+- Repo memory location: both `docs/agents/` and `.oneshot/`
+- Capture cadence: checkpoints and end-of-session summaries, not continuous canonical writes
+
+## Provider Baseline
+- codex: available
+- gemini: available
+- argus: available
+
+## Decision Defaults For This Pass
+- Multiple valid designs: choose the simplest architecture that preserves repo boundaries
+- Cross-repo reuse: abstracted first, raw memory only by escalation
+- Conflicts: preserve both sides with provenance
+- Review gate: planner plus cross-model quorum only for high-risk work
+````
+
+## File: 1shot/2026-04-28-memory-architecture-ROADMAP.md
+````markdown
+# OneShot Memory Roadmap
+
+**Date**: 2026-04-28
+**Execution mode**: `/conduct`
+**Objective**: design and stage a repo-first memory system for OneShot without making the OneShot repo the home of project work, and do so in a way that downstream customer repos can adopt safely.
+
+## Phase Plan
+
+### Phase 0: Planning Reset
+- Replace stale `1shot/` artifacts from the prior pass without losing history
+- Capture current intake, scope, constraints, and risk in dated planning artifacts
+- Record provider availability and baseline planning state
+- Reseed the persistent task ledger for the memory program
+- Exit criteria:
+  - planning files reflect the memory pass
+  - dated artifacts preserve the pass identity
+  - task ledger is reseeded for this work
+
+### Phase 1: Memory Contract
+- Define the repo-first memory contract
+- Lock responsibilities for:
+  - `docs/agents/`
+  - `.oneshot/`
+  - external private index/search
+- Define initial first-class memory categories:
+  - decisions
+  - session summaries
+  - important commands/runbooks
+  - blockers/resolutions
+- Exit criteria:
+  - memory ownership and storage boundaries are explicit for OneShot and customer repos
+
+### Phase 2: Lifecycle + Policy
+- Define memory lifecycle states
+- Define automatic write policy and provenance requirements
+- Define per-repo policy modes
+- Exit criteria:
+  - write rules and repo policy modes are stable enough to implement
+
+### Phase 3: Retrieval + Portability
+- Define same-repo retrieval order
+- Define cross-repo retrieval order
+- Restrict cross-repo reuse to abstracted lessons by default
+- Define portable vs non-portable memory classes
+- Exit criteria:
+  - retrieval policy can be implemented without reopening trust questions
+
+### Phase 4: Governance + Review Gates
+- Define which work classes are high-risk
+- Lock planner vs worker vs reviewer roles for memory-related work
+- Define when cross-model quorum is required
+- Exit criteria:
+  - important work has a clear review path that is strong without being everywhere-all-at-once
+
+### Phase 5: Infra Fit
+- Define the external index role across homelab, OCI, and Tailscale
+- Keep repo memory canonical; external index remains secondary
+- Define degraded-mode behavior when index/search is down
+- Define onboarding behavior for repos with no memory yet
+- Exit criteria:
+  - system can fail gracefully without losing repo truth
+
+### Phase 6: Implementation Roadmap
+- Break the architecture into buildable milestones
+- Order work to reduce risk
+- Exit criteria:
+  - next pass can start implementation without redesigning the system
+````
+
+## File: 1shot/2026-04-28-memory-architecture-SPEC.md
+````markdown
+# OneShot Memory Architecture Spec
+
+## Purpose
+Design a repo-first memory system for OneShot that supports Claude Code, OpenCode, Gemini, Codex, and related tools while preserving project boundaries and keeping work memory with the target repo.
+
+## Design Principles
+- Repo-first ownership: the target repo owns its durable working memory.
+- OneShot as orchestrator: OneShot captures, indexes, retrieves, and reviews memory, but does not become the primary home of project knowledge.
+- Human + machine split: stable knowledge should be readable by humans; transient and operational memory can stay machine-oriented.
+- Abstracted cross-repo reuse: cross-project learning should prefer distilled lessons over raw foreign notes.
+- Provenance over certainty: conflicting memory is preserved and surfaced instead of silently collapsed.
+- Graceful degradation: repo-local memory remains useful if the central index is down.
+
+## Audience Split
+
+### OneShot Internal Responsibilities
+OneShot itself is responsible for:
+- defining the repo memory contract
+- writing and promoting memory according to policy
+- maintaining provenance and conflict metadata
+- indexing repo-local memory into the private search layer
+- enforcing retrieval order and review gates
+- degrading safely when the external index is unavailable
+
+### Customer Repo Responsibilities
+Each customer repo is responsible for:
+- storing durable project memory locally
+- declaring its memory policy mode
+- exposing stable, readable memory documents for both humans and agents
+- allowing OneShot to maintain the operational `.oneshot/` layer alongside the repo’s working files
+
+This split keeps OneShot product logic centralized while leaving project truth with the project.
+
+## Ownership Model
+
+### Default
+- Memory is enabled by default.
+- Each target repo declares a per-repo memory mode.
+- Single-user assumptions apply to this design.
+
+### Hard Exclusions
+- Personal/legal systems such as divorce-related work are outside this memory fabric.
+- Secrets and credentials must never be treated as normal shared engineering memory.
+
+## Storage Topology
+
+### Repo-Local Canonical Layer: `docs/agents/`
+This is the durable, human-readable layer.
+
+Use it for:
+- decisions
+- blockers and resolutions
+- important commands and operational runbooks
+- curated architecture/context summaries
+- promoted reusable lessons
+
+Properties:
+- committed to git by default
+- safe to read cold by an agent or a human
+- treated as the highest-trust memory source inside a repo
+
+### Repo-Local Operational Layer: `.oneshot/`
+This is the machine-facing support layer.
+
+Use it for:
+- session summaries
+- checkpoint summaries
+- provenance records
+- conflict records
+- abstraction drafts
+- retrieval metadata
+- local manifests and indexes
+- transient state
+
+Properties:
+- mixed commit policy
+- optimized for OneShot and tool orchestration
+- can contain local-only state that is not meant to be canonical project knowledge
+
+### External Private Index Layer
+Hosted within homelab, OCI, and Tailscale boundaries.
+
+Role:
+- index repo-local memory across projects
+- support search and cross-repo abstraction retrieval
+- provide secondary retrieval services
+
+Non-role:
+- it is not the source of truth
+- it must not become the only place memory exists
+
+## Initial First-Class Memory Categories
+V1 should explicitly support:
+- decisions
+- session summaries
+- important commands and runbooks
+- blockers and resolutions
+
+Later candidates:
+- glossary/domain language
+- architecture summaries
+- open questions
+- review findings
+
+## Memory Lifecycle
+
+### States
+- captured: raw signal or observation exists
+- summarized: compressed into session/checkpoint form
+- promoted: elevated into durable repo memory
+- conflicted: contradictory durable entries coexist
+- superseded: a newer durable entry replaces prior guidance without deleting history
+- archived: retained for history, excluded from normal retrieval
+
+### Capture Cadence
+- checkpoint-based capture during meaningful progress boundaries
+- end-of-session summaries
+- extra summarization only for unusually large sessions
+
+This avoids trying to make continuous raw capture equal to durable truth.
+
+## Write Policy
+
+### Default
+- broad automatic signal capture is allowed
+- any supported tool may contribute signals
+
+### Requirement
+Every durable write must preserve provenance:
+- source tool
+- source session or run
+- timestamp
+- status/confidence when available
+
+### Rationale
+Historical trace is more valuable than premature cleanup. The system should store enough information to reconstruct how a memory arrived, even when it later proves incomplete or wrong.
+
+## Conflict Policy
+- Never silently overwrite conflicting durable memory.
+- Preserve both sides with provenance.
+- Mark the memory as conflicted.
+- Surface the conflict during retrieval.
+
+This prefers transparent ambiguity over false certainty.
+
+## Per-Repo Policy Modes
+Each repo should declare one of these modes:
+- portable
+- isolated
+- sensitive
+- private/no-cross-repo
+
+### Intended Behavior
+- portable: eligible for cross-repo abstractions
+- isolated: same-repo retrieval only unless explicitly escalated
+- sensitive: tighter promotion and retrieval defaults
+- private/no-cross-repo: excluded from the cross-repo layer entirely
+
+## Retrieval Model
+
+### Same-Repo Retrieval Order
+1. `docs/agents/` canonical memory
+2. `.oneshot/` operational memory
+3. local conflict/supersession indicators
+
+### Cross-Repo Retrieval Order
+1. abstracted cross-repo lessons
+2. same-topic portable patterns with trust/sensitivity tags
+3. raw foreign repo memory only by explicit escalation
+
+### Portable By Default
+- tooling patterns
+- infra and network patterns
+- orchestration patterns
+- debugging lessons
+- runbook patterns
+- review and governance lessons
+
+### Not Portable By Default
+- repo-specific business logic
+- product-bound architecture decisions
+- unresolved local findings
+- raw session notes
+- repo-bound assumptions
+
+## Cross-Repo Abstraction Pool
+- Maintain one global private abstraction pool.
+- Tag entries by trust and sensitivity.
+- Prefer abstraction over direct replay of raw repo-local memory.
+
+This gives broad learning without turning every repo into every other repo.
+
+## Commit Policy
+
+### Commit by Default
+Inside `docs/agents/`:
+- decisions
+- blockers and resolutions
+- runbooks
+- curated stable summaries
+
+### Usually Local / Uncommitted
+Inside `.oneshot/`:
+- raw session summaries
+- checkpoint scratch state
+- retrieval caches
+- machine indexes
+- unresolved conflict work state
+
+### Selective Promotion
+Some `.oneshot/` artifacts can be promoted and committed if they become stable, curated repo knowledge.
+
+## Review Governance
+
+### Default Rule
+Normal work does not require full cross-model quorum review.
+
+### High-Risk Rule
+Use planner plus cross-model quorum for high-risk work only.
+
+High-risk classes include:
+- infra or config changes
+- security or privacy changes
+- cross-repo changes
+- lasting architecture changes
+- destructive or migration-heavy code changes
+
+Normal work should use planner review plus ordinary verification.
+
+## New Repo Onboarding
+For a repo with no memory yet:
+- generate the standard scaffold automatically
+- infer initial context from existing repo files where possible
+- start with empty history but structured memory locations
+
+This avoids blocking adoption on manual setup.
+
+## Failure and Degraded Mode
+If the external index is unavailable:
+- same-repo memory still works from repo-local files
+- no repo loses its durable truth
+- cross-repo retrieval may degrade, but project-local operation should remain intact
+
+This is mandatory for trust.
+
+## Recommended Initial Folder Responsibility Split
+
+### `docs/agents/`
+- long-lived repo memory
+- stable operator guidance
+- durable human-readable knowledge
+
+### `.oneshot/`
+- orchestration state
+- machine-oriented session memory
+- conflict and provenance records
+- retrieval support files
+
+## Recommended Repo Layout v1
+
+### Stable committed layer
+```text
+docs/agents/
+  MEMORY_POLICY.md
+  DECISIONS.md
+  BLOCKERS.md
+  RUNBOOKS.md
+  CONTEXT.md
+```
+
+Suggested responsibilities:
+- `MEMORY_POLICY.md`: repo mode, portability, sensitivity, and commit rules
+- `DECISIONS.md`: durable decisions and supersessions
+- `BLOCKERS.md`: active blockers plus resolved lessons worth keeping
+- `RUNBOOKS.md`: important commands and operational procedures
+- `CONTEXT.md`: optional stable architecture/domain summary once the first four categories are working well
+
+### Operational layer
+```text
+.oneshot/
+  sessions/
+  checkpoints/
+  conflicts/
+  provenance/
+  abstractions/
+  index/
+```
+
+Suggested responsibilities:
+- `sessions/`: end-of-session summaries and large-session compressions
+- `checkpoints/`: in-flight summaries at meaningful milestones
+- `conflicts/`: contradictory memory entries kept side by side
+- `provenance/`: source-tool and source-session records
+- `abstractions/`: drafts and promoted cross-repo lessons
+- `index/`: local manifests and retrieval support artifacts
+
+This layout is a recommendation, not yet a locked schema. The goal is to standardize the memory shape without overcommitting to implementation details before retrieval behavior is built.
+
+## OneShot Productization Requirements
+To make this work for downstream customer repos, OneShot needs to provide:
+- a standard scaffold generator
+- a policy-mode declaration mechanism
+- a stable promotion format for first-class memory categories
+- retrieval rules that behave the same across repos
+- a central index that can be enabled without becoming the only copy of memory
+- migration-safe defaults so customer repos can adopt incrementally
+
+## Non-Goals For V1
+- full personal-memory system
+- UI/dashboard work
+- provider-specific protocol wiring
+- centralized memory replacing repo-local truth
+
+## Success Conditions
+The memory architecture is working when:
+- target repos own their own durable memory cleanly
+- cross-repo retrieval produces useful abstractions without contamination
+- stale or conflicting memory is visible instead of silently trusted
+- the central index improves recall without becoming a dependency for basic operation
+- important work gets stronger review without making every task heavyweight
+````
+
+## File: 1shot/2026-04-28-memory-architecture-STATE.md
+````markdown
+# Conduct State
+
+Phase: plan -> complete
+Started: 2026-04-28
+Loop: 1
+Tasks: 0/5 completed
+Current focus: publish architecture spec, reseed tasks, hand off a build-ready roadmap
+Last updated: 2026-04-28
+Providers:
+- codex: yes
+- gemini: yes
+- argus: yes
+Notes:
+- This pass is planning only: no implementation code changes
+- Work memory belongs to target repos, not the OneShot repo
+- Durable human-facing memory will live in `docs/agents/`
+- Operational machine memory will live in `.oneshot/`
+- Cross-repo retrieval remains allowed, but abstracted-first by default
+- Stable memory is intended to be committed; transient state should usually remain local
+- The plan is intended for OneShot itself and for downstream customer repos
+````
+
+## File: 1shot/2026-04-28-memory-phase1-implementation-SPEC.md
+````markdown
+# OneShot Memory Phase 1 Implementation Spec
+
+## Purpose
+Translate the repo-first memory architecture into a build contract for the first implementation pass.
+
+Phase 1 should deliver:
+- a standard repo-local memory scaffold
+- a per-repo memory policy document
+- deterministic write targets for the first four memory categories
+- same-repo retrieval behavior
+- a minimal cross-repo abstraction contract
+- a degraded-mode contract for the central index
+
+This is still design/spec work. It defines what implementation must build next.
+
+## Scope
+
+### In Scope
+- repo-local folder and file schema
+- `MEMORY_POLICY.md` format
+- promotion rules for:
+  - decisions
+  - session summaries
+  - runbooks
+  - blockers/resolutions
+- same-repo retrieval contract
+- cross-repo abstraction contract
+- central index responsibility boundary
+- degraded-mode behavior
+
+### Out of Scope
+- protocol/provider wiring
+- UI work
+- personal/private memory system
+- advanced reconciliation workflows
+- full cross-repo raw memory replay
+
+## Phase 1 Deliverables
+
+### Repo-local files
+Every onboarded repo should have:
+
+```text
+docs/agents/
+  MEMORY_POLICY.md
+  DECISIONS.md
+  BLOCKERS.md
+  RUNBOOKS.md
+  CONTEXT.md
+
+.oneshot/
+  sessions/
+  checkpoints/
+  conflicts/
+  provenance/
+  abstractions/
+  index/
+```
+
+### OneShot responsibilities
+OneShot must be able to:
+- scaffold the above structure
+- detect whether the structure already exists
+- append/promote memory into the correct targets
+- preserve provenance for every promoted item
+- retrieve same-repo memory deterministically
+- export abstractions to the private cross-repo layer
+
+## File Contracts
+
+### `docs/agents/MEMORY_POLICY.md`
+Canonical repo memory policy.
+
+Required fields:
+
+```md
+# Memory Policy
+
+- mode: portable | isolated | sensitive | private
+- owner: repo
+- commit_stable_memory: true | false
+- allow_cross_repo_abstractions: true | false
+- allow_raw_cross_repo_retrieval: false | true
+- secrets_policy: never-store
+- summary_cadence: checkpoint-and-session-end
+- review_gate: normal | high-risk-quorum
+```
+
+Required semantics:
+- `mode` controls default retrieval boundaries
+- `owner` is always `repo` in phase 1
+- `allow_raw_cross_repo_retrieval` should default to `false`
+- `secrets_policy` should always be `never-store` in phase 1
+
+### `docs/agents/DECISIONS.md`
+Durable decisions only.
+
+Entry contract:
+
+```md
+## 2026-04-28 - Short decision title
+- status: active | superseded
+- source: claude | codex | gemini | opencode | mixed
+- provenance: .oneshot/provenance/<id>.md
+- summary: one-paragraph durable statement
+- rationale: why this decision exists
+- supersedes: optional prior decision reference
+```
+
+### `docs/agents/BLOCKERS.md`
+Active blockers and resolved lessons worth preserving.
+
+Entry contract:
+
+```md
+## 2026-04-28 - Short blocker title
+- status: active | resolved
+- source: <tool-or-session>
+- provenance: .oneshot/provenance/<id>.md
+- blocker: what is blocked
+- resolution: blank if active, required if resolved
+- follow_up: optional
+```
+
+### `docs/agents/RUNBOOKS.md`
+Important commands and operational procedures, not raw command dumps.
+
+Entry contract:
+
+```md
+## Runbook: <short name>
+- status: active
+- source: <tool-or-session>
+- provenance: .oneshot/provenance/<id>.md
+
+### When to use
+<short description>
+
+### Command / procedure
+```bash
+<command(s)>
+```
+
+### Notes
+<constraints, warnings, expected output>
+```
+
+### `docs/agents/CONTEXT.md`
+Optional stable architecture/domain summary.
+
+Phase 1 rule:
+- scaffold it
+- do not require aggressive auto-population
+- allow manual or promoted summaries later
+
+## Operational Layer Contracts
+
+### `.oneshot/sessions/`
+- end-of-session summaries
+- one file per session or run
+- may be local-only
+
+Suggested file naming:
+- `<date>-<session-id>.md`
+
+### `.oneshot/checkpoints/`
+- in-flight checkpoint summaries
+- one file per checkpoint event
+
+### `.oneshot/provenance/`
+- provenance records for promoted durable memory
+- required for any promoted item in `docs/agents/`
+
+Suggested contract:
+
+```md
+# Provenance
+- id: <unique-id>
+- created_at: <iso8601>
+- repo: <repo-id>
+- source_tool: <tool>
+- source_session: <session-id>
+- source_type: checkpoint | session | review | manual-promotion
+- confidence: low | medium | high
+- notes: optional
+```
+
+### `.oneshot/conflicts/`
+- holds contradictory durable memory records
+- do not auto-resolve in phase 1
+
+### `.oneshot/abstractions/`
+- cross-repo abstraction drafts and promoted lessons
+
+Suggested abstraction contract:
+
+```md
+# Abstraction
+- id: <unique-id>
+- source_repo: <repo-id>
+- trust: low | medium | high
+- sensitivity: portable | isolated | sensitive | private
+- category: tooling | infra | orchestration | debugging | runbook | governance
+- promotes_from: <provenance-id or source file>
+
+## Lesson
+<abstracted reusable lesson>
+
+## Non-portable details removed
+<short note>
+```
+
+### `.oneshot/index/`
+- local manifests and retrieval support state
+- should not be treated as canonical project memory
+
+## Promotion Rules
+
+### Rule 1: Promote only into the right destination
+- decisions -> `docs/agents/DECISIONS.md`
+- blockers/resolutions -> `docs/agents/BLOCKERS.md`
+- runbooks -> `docs/agents/RUNBOOKS.md`
+- session summaries -> `.oneshot/sessions/` by default
+
+### Rule 2: Session summaries are not durable by default
+- they are captured automatically
+- they become durable only when promoted into another category or intentionally curated
+
+### Rule 3: Every promoted item needs provenance
+- no provenance, no promotion
+
+### Rule 4: Never store secrets
+- if a source contains a secret, redact before any write
+- phase 1 should fail safe: omit unsafe content rather than risk storing it
+
+### Rule 5: Conflicts stay visible
+- contradictory promoted items are preserved
+- retrieval must surface conflict markers instead of choosing silently
+
+## Retrieval Contract
+
+### Same-repo retrieval
+Given a repo query, phase 1 retrieval should search in this order:
+1. `docs/agents/DECISIONS.md`
+2. `docs/agents/BLOCKERS.md`
+3. `docs/agents/RUNBOOKS.md`
+4. `docs/agents/CONTEXT.md`
+5. `.oneshot/` operational memory
+
+Expected behavior:
+- stable memory outranks operational memory
+- conflicted entries are returned with conflict markers
+- superseded decisions should be visible but ranked below active ones
+
+### Cross-repo retrieval
+Phase 1 should not retrieve raw foreign repo memory by default.
+
+Allowed default path:
+1. query the private abstraction pool
+2. filter by repo policy and sensitivity
+3. return abstracted lessons only
+
+Raw foreign memory should require explicit escalation and is not required for phase 1.
+
+## Central Index Contract
+
+### Phase 1 role
+The private index may:
+- index repo-local durable memory
+- index promoted abstractions
+- support search across repos
+
+The private index may not:
+- become the only copy of project memory
+- override repo-local truth
+- return private/no-cross-repo content into general cross-repo queries
+
+## Degraded-Mode Contract
+
+If the central index is unavailable:
+- same-repo retrieval must still work from repo-local files
+- promotion into repo-local memory must still work
+- cross-repo abstractions may be unavailable
+- the system must report degraded mode explicitly instead of failing silently
+
+Phase 1 success requires repo-local usefulness even when the external search layer is down.
+
+## Onboarding Contract
+
+For a repo with no memory yet, phase 1 implementation should:
+- create the standard scaffold
+- generate a default `MEMORY_POLICY.md`
+- create empty stable memory files with short headers
+- avoid inventing history
+- optionally infer a minimal `CONTEXT.md` stub from repo files later, but not block on it
+
+## Acceptance Criteria For The First Coding Pass
+- a repo can be scaffolded automatically
+- the first four memory categories have deterministic write targets
+- every promoted entry gets provenance
+- same-repo retrieval follows the specified ranking order
+- cross-repo retrieval defaults to abstractions only
+- the system behaves safely when the central index is unavailable
+- the design works for OneShot itself and for downstream customer repos
+````
+
+## File: 1shot/BLOCKERS.md
+````markdown
+# Blockers
+
+No blockers yet.
+
+Use this file if a task hits the circuit breaker three times or if process trust issues require user intervention.
+````
+
+## File: 1shot/INDEX.md
+````markdown
+# 1shot Pass Index
+
+Chronological planning and execution archive for dogfooding the OneShot workflow.
+
+## Current Active Pass
+- `1shot/PROJECT.md`
+- `1shot/ROADMAP.md`
+- `1shot/STATE.md`
+- `1shot/MEMORY_ARCHITECTURE_SPEC.md`
+- `1shot/MEMORY_PHASE1_IMPLEMENTATION_SPEC.md`
+
+## Archived / Dated Passes
+
+### 2026-04-28 — OneShot Repo-First Memory Architecture
+- `1shot/2026-04-28-memory-architecture-PROJECT.md`
+- `1shot/2026-04-28-memory-architecture-ROADMAP.md`
+- `1shot/2026-04-28-memory-architecture-STATE.md`
+- `1shot/2026-04-28-memory-architecture-SPEC.md`
+- `1shot/2026-04-28-memory-phase1-implementation-SPEC.md`
+
+### 2026-04-27 — Plan L Hardening Pass for OneShot Delegation
+- `1shot/2026-04-27-plan-l-hardening-PROJECT.md`
+- `1shot/2026-04-27-plan-l-hardening-ROADMAP.md`
+- `1shot/2026-04-27-plan-l-hardening-STATE.md`
+
+## Intended Pattern
+- top-level `PROJECT.md`, `ROADMAP.md`, and `STATE.md` act as the live working copies / current pointers
+- each pass also gets dated and named artifacts for historical continuity
+- spec-like artifacts should also be snapshotted when they materially change
+````
+
+## File: 1shot/MEMORY_ARCHITECTURE_SPEC.md
+````markdown
+# OneShot Memory Architecture Spec
+
+## Purpose
+Design a repo-first memory system for OneShot that supports Claude Code, OpenCode, Gemini, Codex, and related tools while preserving project boundaries and keeping work memory with the target repo.
+
+## Design Principles
+- Repo-first ownership: the target repo owns its durable working memory.
+- OneShot as orchestrator: OneShot captures, indexes, retrieves, and reviews memory, but does not become the primary home of project knowledge.
+- Human + machine split: stable knowledge should be readable by humans; transient and operational memory can stay machine-oriented.
+- Abstracted cross-repo reuse: cross-project learning should prefer distilled lessons over raw foreign notes.
+- Provenance over certainty: conflicting memory is preserved and surfaced instead of silently collapsed.
+- Graceful degradation: repo-local memory remains useful if the central index is down.
+
+## Audience Split
+
+### OneShot Internal Responsibilities
+OneShot itself is responsible for:
+- defining the repo memory contract
+- writing and promoting memory according to policy
+- maintaining provenance and conflict metadata
+- indexing repo-local memory into the private search layer
+- enforcing retrieval order and review gates
+- degrading safely when the external index is unavailable
+
+### Customer Repo Responsibilities
+Each customer repo is responsible for:
+- storing durable project memory locally
+- declaring its memory policy mode
+- exposing stable, readable memory documents for both humans and agents
+- allowing OneShot to maintain the operational `.oneshot/` layer alongside the repo’s working files
+
+This split keeps OneShot product logic centralized while leaving project truth with the project.
+
+## Ownership Model
+
+### Default
+- Memory is enabled by default.
+- Each target repo declares a per-repo memory mode.
+- Single-user assumptions apply to this design.
+
+### Hard Exclusions
+- Personal/legal systems such as divorce-related work are outside this memory fabric.
+- Secrets and credentials must never be treated as normal shared engineering memory.
+
+## Storage Topology
+
+### Repo-Local Canonical Layer: `docs/agents/`
+This is the durable, human-readable layer.
+
+Use it for:
+- decisions
+- blockers and resolutions
+- important commands and operational runbooks
+- curated architecture/context summaries
+- promoted reusable lessons
+
+Properties:
+- committed to git by default
+- safe to read cold by an agent or a human
+- treated as the highest-trust memory source inside a repo
+
+### Repo-Local Operational Layer: `.oneshot/`
+This is the machine-facing support layer.
+
+Use it for:
+- session summaries
+- checkpoint summaries
+- provenance records
+- conflict records
+- abstraction drafts
+- retrieval metadata
+- local manifests and indexes
+- transient state
+
+Properties:
+- mixed commit policy
+- optimized for OneShot and tool orchestration
+- can contain local-only state that is not meant to be canonical project knowledge
+
+### External Private Index Layer
+Hosted within homelab, OCI, and Tailscale boundaries.
+
+Role:
+- index repo-local memory across projects
+- support search and cross-repo abstraction retrieval
+- provide secondary retrieval services
+
+Non-role:
+- it is not the source of truth
+- it must not become the only place memory exists
+
+## Initial First-Class Memory Categories
+V1 should explicitly support:
+- decisions
+- session summaries
+- important commands and runbooks
+- blockers and resolutions
+
+Later candidates:
+- glossary/domain language
+- architecture summaries
+- open questions
+- review findings
+
+## Memory Lifecycle
+
+### States
+- captured: raw signal or observation exists
+- summarized: compressed into session/checkpoint form
+- promoted: elevated into durable repo memory
+- conflicted: contradictory durable entries coexist
+- superseded: a newer durable entry replaces prior guidance without deleting history
+- archived: retained for history, excluded from normal retrieval
+
+### Capture Cadence
+- checkpoint-based capture during meaningful progress boundaries
+- end-of-session summaries
+- extra summarization only for unusually large sessions
+
+This avoids trying to make continuous raw capture equal to durable truth.
+
+## Write Policy
+
+### Default
+- broad automatic signal capture is allowed
+- any supported tool may contribute signals
+
+### Requirement
+Every durable write must preserve provenance:
+- source tool
+- source session or run
+- timestamp
+- status/confidence when available
+
+### Rationale
+Historical trace is more valuable than premature cleanup. The system should store enough information to reconstruct how a memory arrived, even when it later proves incomplete or wrong.
+
+## Conflict Policy
+- Never silently overwrite conflicting durable memory.
+- Preserve both sides with provenance.
+- Mark the memory as conflicted.
+- Surface the conflict during retrieval.
+
+This prefers transparent ambiguity over false certainty.
+
+## Per-Repo Policy Modes
+Each repo should declare one of these modes:
+- portable
+- isolated
+- sensitive
+- private/no-cross-repo
+
+### Intended Behavior
+- portable: eligible for cross-repo abstractions
+- isolated: same-repo retrieval only unless explicitly escalated
+- sensitive: tighter promotion and retrieval defaults
+- private/no-cross-repo: excluded from the cross-repo layer entirely
+
+## Retrieval Model
+
+### Same-Repo Retrieval Order
+1. `docs/agents/` canonical memory
+2. `.oneshot/` operational memory
+3. local conflict/supersession indicators
+
+### Cross-Repo Retrieval Order
+1. abstracted cross-repo lessons
+2. same-topic portable patterns with trust/sensitivity tags
+3. raw foreign repo memory only by explicit escalation
+
+### Portable By Default
+- tooling patterns
+- infra and network patterns
+- orchestration patterns
+- debugging lessons
+- runbook patterns
+- review and governance lessons
+
+### Not Portable By Default
+- repo-specific business logic
+- product-bound architecture decisions
+- unresolved local findings
+- raw session notes
+- repo-bound assumptions
+
+## Cross-Repo Abstraction Pool
+- Maintain one global private abstraction pool.
+- Tag entries by trust and sensitivity.
+- Prefer abstraction over direct replay of raw repo-local memory.
+
+This gives broad learning without turning every repo into every other repo.
+
+## Commit Policy
+
+### Commit by Default
+Inside `docs/agents/`:
+- decisions
+- blockers and resolutions
+- runbooks
+- curated stable summaries
+
+### Usually Local / Uncommitted
+Inside `.oneshot/`:
+- raw session summaries
+- checkpoint scratch state
+- retrieval caches
+- machine indexes
+- unresolved conflict work state
+
+### Selective Promotion
+Some `.oneshot/` artifacts can be promoted and committed if they become stable, curated repo knowledge.
+
+## Review Governance
+
+### Default Rule
+Normal work does not require full cross-model quorum review.
+
+### High-Risk Rule
+Use planner plus cross-model quorum for high-risk work only.
+
+High-risk classes include:
+- infra or config changes
+- security or privacy changes
+- cross-repo changes
+- lasting architecture changes
+- destructive or migration-heavy code changes
+
+Normal work should use planner review plus ordinary verification.
+
+## New Repo Onboarding
+For a repo with no memory yet:
+- generate the standard scaffold automatically
+- infer initial context from existing repo files where possible
+- start with empty history but structured memory locations
+
+This avoids blocking adoption on manual setup.
+
+## Failure and Degraded Mode
+If the external index is unavailable:
+- same-repo memory still works from repo-local files
+- no repo loses its durable truth
+- cross-repo retrieval may degrade, but project-local operation should remain intact
+
+This is mandatory for trust.
+
+## Recommended Initial Folder Responsibility Split
+
+### `docs/agents/`
+- long-lived repo memory
+- stable operator guidance
+- durable human-readable knowledge
+
+### `.oneshot/`
+- orchestration state
+- machine-oriented session memory
+- conflict and provenance records
+- retrieval support files
+
+## Recommended Repo Layout v1
+
+### Stable committed layer
+```text
+docs/agents/
+  MEMORY_POLICY.md
+  DECISIONS.md
+  BLOCKERS.md
+  RUNBOOKS.md
+  CONTEXT.md
+```
+
+Suggested responsibilities:
+- `MEMORY_POLICY.md`: repo mode, portability, sensitivity, and commit rules
+- `DECISIONS.md`: durable decisions and supersessions
+- `BLOCKERS.md`: active blockers plus resolved lessons worth keeping
+- `RUNBOOKS.md`: important commands and operational procedures
+- `CONTEXT.md`: optional stable architecture/domain summary once the first four categories are working well
+
+### Operational layer
+```text
+.oneshot/
+  sessions/
+  checkpoints/
+  conflicts/
+  provenance/
+  abstractions/
+  index/
+```
+
+Suggested responsibilities:
+- `sessions/`: end-of-session summaries and large-session compressions
+- `checkpoints/`: in-flight summaries at meaningful milestones
+- `conflicts/`: contradictory memory entries kept side by side
+- `provenance/`: source-tool and source-session records
+- `abstractions/`: drafts and promoted cross-repo lessons
+- `index/`: local manifests and retrieval support artifacts
+
+This layout is a recommendation, not yet a locked schema. The goal is to standardize the memory shape without overcommitting to implementation details before retrieval behavior is built.
+
+## OneShot Productization Requirements
+To make this work for downstream customer repos, OneShot needs to provide:
+- a standard scaffold generator
+- a policy-mode declaration mechanism
+- a stable promotion format for first-class memory categories
+- retrieval rules that behave the same across repos
+- a central index that can be enabled without becoming the only copy of memory
+- migration-safe defaults so customer repos can adopt incrementally
+
+## Non-Goals For V1
+- full personal-memory system
+- UI/dashboard work
+- provider-specific protocol wiring
+- centralized memory replacing repo-local truth
+
+## Success Conditions
+The memory architecture is working when:
+- target repos own their own durable memory cleanly
+- cross-repo retrieval produces useful abstractions without contamination
+- stale or conflicting memory is visible instead of silently trusted
+- the central index improves recall without becoming a dependency for basic operation
+- important work gets stronger review without making every task heavyweight
+````
+
+## File: 1shot/MEMORY_PHASE1_IMPLEMENTATION_SPEC.md
+````markdown
+# OneShot Memory Phase 1 Implementation Spec
+
+## Purpose
+Translate the repo-first memory architecture into a build contract for the first implementation pass.
+
+Phase 1 should deliver:
+- a standard repo-local memory scaffold
+- a per-repo memory policy document
+- deterministic write targets for the first four memory categories
+- same-repo retrieval behavior
+- a minimal cross-repo abstraction contract
+- a degraded-mode contract for the central index
+
+This is still design/spec work. It defines what implementation must build next.
+
+## Scope
+
+### In Scope
+- repo-local folder and file schema
+- `MEMORY_POLICY.md` format
+- promotion rules for:
+  - decisions
+  - session summaries
+  - runbooks
+  - blockers/resolutions
+- same-repo retrieval contract
+- cross-repo abstraction contract
+- central index responsibility boundary
+- degraded-mode behavior
+
+### Out of Scope
+- protocol/provider wiring
+- UI work
+- personal/private memory system
+- advanced reconciliation workflows
+- full cross-repo raw memory replay
+
+## Phase 1 Deliverables
+
+### Repo-local files
+Every onboarded repo should have:
+
+```text
+docs/agents/
+  MEMORY_POLICY.md
+  DECISIONS.md
+  BLOCKERS.md
+  RUNBOOKS.md
+  CONTEXT.md
+
+.oneshot/
+  sessions/
+  checkpoints/
+  conflicts/
+  provenance/
+  abstractions/
+  index/
+```
+
+### OneShot responsibilities
+OneShot must be able to:
+- scaffold the above structure
+- detect whether the structure already exists
+- append/promote memory into the correct targets
+- preserve provenance for every promoted item
+- retrieve same-repo memory deterministically
+- export abstractions to the private cross-repo layer
+
+## File Contracts
+
+### `docs/agents/MEMORY_POLICY.md`
+Canonical repo memory policy.
+
+Required fields:
+
+```md
+# Memory Policy
+
+- mode: portable | isolated | sensitive | private
+- owner: repo
+- commit_stable_memory: true | false
+- allow_cross_repo_abstractions: true | false
+- allow_raw_cross_repo_retrieval: false | true
+- secrets_policy: never-store
+- summary_cadence: checkpoint-and-session-end
+- review_gate: normal | high-risk-quorum
+```
+
+Required semantics:
+- `mode` controls default retrieval boundaries
+- `owner` is always `repo` in phase 1
+- `allow_raw_cross_repo_retrieval` should default to `false`
+- `secrets_policy` should always be `never-store` in phase 1
+
+### `docs/agents/DECISIONS.md`
+Durable decisions only.
+
+Entry contract:
+
+```md
+## 2026-04-28 - Short decision title
+- status: active | superseded
+- source: claude | codex | gemini | opencode | mixed
+- provenance: .oneshot/provenance/<id>.md
+- summary: one-paragraph durable statement
+- rationale: why this decision exists
+- supersedes: optional prior decision reference
+```
+
+### `docs/agents/BLOCKERS.md`
+Active blockers and resolved lessons worth preserving.
+
+Entry contract:
+
+```md
+## 2026-04-28 - Short blocker title
+- status: active | resolved
+- source: <tool-or-session>
+- provenance: .oneshot/provenance/<id>.md
+- blocker: what is blocked
+- resolution: blank if active, required if resolved
+- follow_up: optional
+```
+
+### `docs/agents/RUNBOOKS.md`
+Important commands and operational procedures, not raw command dumps.
+
+Entry contract:
+
+```md
+## Runbook: <short name>
+- status: active
+- source: <tool-or-session>
+- provenance: .oneshot/provenance/<id>.md
+
+### When to use
+<short description>
+
+### Command / procedure
+```bash
+<command(s)>
+```
+
+### Notes
+<constraints, warnings, expected output>
+```
+
+### `docs/agents/CONTEXT.md`
+Optional stable architecture/domain summary.
+
+Phase 1 rule:
+- scaffold it
+- do not require aggressive auto-population
+- allow manual or promoted summaries later
+
+## Operational Layer Contracts
+
+### `.oneshot/sessions/`
+- end-of-session summaries
+- one file per session or run
+- may be local-only
+
+Suggested file naming:
+- `<date>-<session-id>.md`
+
+### `.oneshot/checkpoints/`
+- in-flight checkpoint summaries
+- one file per checkpoint event
+
+### `.oneshot/provenance/`
+- provenance records for promoted durable memory
+- required for any promoted item in `docs/agents/`
+
+Suggested contract:
+
+```md
+# Provenance
+- id: <unique-id>
+- created_at: <iso8601>
+- repo: <repo-id>
+- source_tool: <tool>
+- source_session: <session-id>
+- source_type: checkpoint | session | review | manual-promotion
+- confidence: low | medium | high
+- notes: optional
+```
+
+### `.oneshot/conflicts/`
+- holds contradictory durable memory records
+- do not auto-resolve in phase 1
+
+### `.oneshot/abstractions/`
+- cross-repo abstraction drafts and promoted lessons
+
+Suggested abstraction contract:
+
+```md
+# Abstraction
+- id: <unique-id>
+- source_repo: <repo-id>
+- trust: low | medium | high
+- sensitivity: portable | isolated | sensitive | private
+- category: tooling | infra | orchestration | debugging | runbook | governance
+- promotes_from: <provenance-id or source file>
+
+## Lesson
+<abstracted reusable lesson>
+
+## Non-portable details removed
+<short note>
+```
+
+### `.oneshot/index/`
+- local manifests and retrieval support state
+- should not be treated as canonical project memory
+
+## Promotion Rules
+
+### Rule 1: Promote only into the right destination
+- decisions -> `docs/agents/DECISIONS.md`
+- blockers/resolutions -> `docs/agents/BLOCKERS.md`
+- runbooks -> `docs/agents/RUNBOOKS.md`
+- session summaries -> `.oneshot/sessions/` by default
+
+### Rule 2: Session summaries are not durable by default
+- they are captured automatically
+- they become durable only when promoted into another category or intentionally curated
+
+### Rule 3: Every promoted item needs provenance
+- no provenance, no promotion
+
+### Rule 4: Never store secrets
+- if a source contains a secret, redact before any write
+- phase 1 should fail safe: omit unsafe content rather than risk storing it
+
+### Rule 5: Conflicts stay visible
+- contradictory promoted items are preserved
+- retrieval must surface conflict markers instead of choosing silently
+
+## Retrieval Contract
+
+### Same-repo retrieval
+Given a repo query, phase 1 retrieval should search in this order:
+1. `docs/agents/DECISIONS.md`
+2. `docs/agents/BLOCKERS.md`
+3. `docs/agents/RUNBOOKS.md`
+4. `docs/agents/CONTEXT.md`
+5. `.oneshot/` operational memory
+
+Expected behavior:
+- stable memory outranks operational memory
+- conflicted entries are returned with conflict markers
+- superseded decisions should be visible but ranked below active ones
+
+### Cross-repo retrieval
+Phase 1 should not retrieve raw foreign repo memory by default.
+
+Allowed default path:
+1. query the private abstraction pool
+2. filter by repo policy and sensitivity
+3. return abstracted lessons only
+
+Raw foreign memory should require explicit escalation and is not required for phase 1.
+
+## Central Index Contract
+
+### Phase 1 role
+The private index may:
+- index repo-local durable memory
+- index promoted abstractions
+- support search across repos
+
+The private index may not:
+- become the only copy of project memory
+- override repo-local truth
+- return private/no-cross-repo content into general cross-repo queries
+
+## Degraded-Mode Contract
+
+If the central index is unavailable:
+- same-repo retrieval must still work from repo-local files
+- promotion into repo-local memory must still work
+- cross-repo abstractions may be unavailable
+- the system must report degraded mode explicitly instead of failing silently
+
+Phase 1 success requires repo-local usefulness even when the external search layer is down.
+
+## Onboarding Contract
+
+For a repo with no memory yet, phase 1 implementation should:
+- create the standard scaffold
+- generate a default `MEMORY_POLICY.md`
+- create empty stable memory files with short headers
+- avoid inventing history
+- optionally infer a minimal `CONTEXT.md` stub from repo files later, but not block on it
+
+## Acceptance Criteria For The First Coding Pass
+- a repo can be scaffolded automatically
+- the first four memory categories have deterministic write targets
+- every promoted entry gets provenance
+- same-repo retrieval follows the specified ranking order
+- cross-repo retrieval defaults to abstractions only
+- the system behaves safely when the central index is unavailable
+- the design works for OneShot itself and for downstream customer repos
 ````
 
 ## File: 1shot/OPENCODE_ADAPTER_PLAN.md
@@ -9615,29 +12897,40 @@ Failed — Gemini CLI broken on this machine (Docker amd64/arm64 mismatch).
 - [ ] Claude Code still works exactly as before (no regressions)
 ````
 
-## File: config/search.yaml
-````yaml
-search:
-  default_backend: argus
-  base_url: http://localhost:8005
-  modes:
-    discovery:
-      providers: [searxng, brave, exa]
-      max_results: 10
-    precision:
-      providers: [serper, tavily]
-      max_results: 5
-    cheap:
-      providers: [searxng]
-      max_results: 5
-    research:
-      providers: [searxng, brave, exa, tavily]
-      max_results: 15
+## File: bin/oneshot
+````
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.." && exec python3 -m oneshot_cli "$@"
 ````
 
 ## File: core/dispatch/__init__.py
 ````python
 
+````
+
+## File: core/dispatch/direct_api.py
+````python
+def _get_api_key() -> str
+⋮----
+key = os.environ.get("OPENCODE_GO_API_KEY", "")
+⋮----
+key = subprocess.check_output(
+⋮----
+def call(base_url: str, model: str, task_file: str) -> str
+⋮----
+api_key = _get_api_key()
+⋮----
+prompt = f.read().strip()
+url = f"{base_url.rstrip('/')}/chat/completions"
+payload = json.dumps({
+req = urllib.request.Request(url, data=payload, method="POST")
+⋮----
+data = json.loads(resp.read())
+⋮----
+body = e.read().decode() if e.fp else ""
+⋮----
+result = call(sys.argv[1], sys.argv[2], sys.argv[3])
 ````
 
 ## File: core/janitor/digest.py
@@ -9752,35 +13045,15 @@ output = sys.argv[2] if len(sys.argv) > 2 else None
 result = generate_inbox(repos_root, output)
 ````
 
-## File: core/router/__init__.py
+## File: core/router/resolve.py
 ````python
-
-````
-
-## File: core/router/model_registry.py
-````python
-CONFIG_DIR = Path(__file__).resolve().parent.parent.parent / "config"
-def load_models(config_path: Optional[str] = None) -> dict
+def main()
 ⋮----
-path = config_path or str(CONFIG_DIR / "models.yaml")
+parser = argparse.ArgumentParser(description="Resolve task class to routing directive")
 ⋮----
-def models_for_lane(lane: str, config_path: Optional[str] = None) -> list[str]
+args = parser.parse_args()
 ⋮----
-models = load_models(config_path)
-⋮----
-def can_plan(model_id: str, config_path: Optional[str] = None) -> bool
-def can_review(model_id: str, config_path: Optional[str] = None) -> bool
-def get_model_info(model_id: str, config_path: Optional[str] = None) -> dict
-````
-
-## File: core/search/__init__.py
-````python
-
-````
-
-## File: core/__init__.py
-````python
-
+result = resolve(args.task_class, category=args.category, config_path=args.config)
 ````
 
 ## File: core/plan_schema.py
@@ -13267,234 +16540,222 @@ Package: `google-github-actions/run-gemini-cli`
 - Vertex AI Pricing: https://cloud.google.com/vertex-ai/pricing
 ````
 
-## File: docs/instructions/learned/.gitkeep
-````
-
-````
-
-## File: docs/instructions/core.md
+## File: docs/external/.index.md
 ````markdown
-# Core Rules
+# Cached External Documentation
 
-These rules apply to every project, regardless of type.
+| Name | Category | URL | Cached |
+|------|----------|-----|--------|
+| codex | tools | https://github.com/openai/codex | 2026-04-01 |
+| opencode | tools | https://opencode.ai | 2026-04-01 |
+| gemini | tools | https://github.com/google-gemini/gemini-cli | 2026-04-01 |
 
-## STOP BEING CLEVER
+## Files — codex
 
-**YOU ARE A ROBOT. JUST DO THE SIMPLE THING FAST FIRST.**
+| File | Description | Lines |
+|------|-------------|-------|
+| `README.md` | Codex CLI README from GitHub | 60 |
+| `CODEX_AGENTS.md` | How Codex uses AGENTS.md (from repo) | 209 |
+| `config.md` | config.toml reference | 91 |
+| `auth.md` | Authentication docs (developers.openai.com/codex/auth) | 841 |
+| `security.md` | Sandbox & approvals (developers.openai.com/codex/security) | 703 |
+| `noninteractive.md` | Non-interactive mode (developers.openai.com/codex/noninteractive) | 882 |
 
-- Don't edit databases directly when there's a UI
-- Don't write scripts when a CLI exists
-- Don't debug for an hour when restarting might fix it
-- If there's a 30-second solution, do that before the 30-minute solution
+## Files — opencode
 
-## JUST DO IT
+| File | Description | Lines |
+|------|-------------|-------|
+| `README.md` | OpenCode CLI docs (getting started, agents, providers, config) | 417 |
 
-**If you CAN do it, DO it. Don't ask the human to do your job.**
+## Files — gemini
 
-| Don't say | Just do |
-|-----------|---------|
-| "Can you check the logs?" | `tail -50 /var/log/...` |
-| "Can you add this file?" | Write the file |
-| "You'll need to install X" | `apt install X` or `npm install X` |
-| "Run this command" | Run it yourself |
-| "Can you verify it works?" | Run the test, show the output |
-| "Should I read this file?" | Read it. Then tell me what's there. |
-
-**Exceptions** (ask first):
-- Destructive operations (rm -rf, DROP TABLE, force push)
-- Actions that affect others (deploying to production, sending messages)
-- Spending money (API calls that cost $, provisioning cloud resources)
-
-## Work Discipline
-
-- **Plan first**: Always start with a plan before coding. Think, then do.
-- **Commit per task**: Don't batch commits to end-of-session. Commit each completed task immediately.
-- **Keep tasks small**: Break work so each subtask completes well within context.
-- **Vanilla over complex**: Simple direct work beats elaborate orchestration for small tasks.
-
-## Documentation-First Coding
-
-Before writing code that uses external APIs, libraries, or configuration syntax:
-
-1. Check local cached docs: `~/github/docs-cache/docs/cache/.index.md`
-2. If insufficient, use WebSearch for current docs
-3. Verify version compatibility
-4. Write code using current syntax, not training data
-
-## Task Management
-
-Use native Tasks (TaskCreate, TaskUpdate, TaskList) for all task tracking.
-
-- Persistent in `~/.claude/tasks/`
-- Survive `/clear` and context compression
-- Session start: `TaskList` → pick unblocked task → `TaskUpdate` in_progress
-- Session end: `git status` → stage → commit → `TaskUpdate` completed → push
-
-## Decision Defaults
-
-| Ambiguity | Default |
-|-----------|---------|
-| Multiple implementations | Simplest one |
-| Naming | Follow existing pattern |
-| Error handling | Match surrounding code |
-| Test framework | Use existing tests as guide |
-| Library choice | One already in project |
-| Refactor opportunity | Skip unless blocking |
+| File | Description | Lines |
+|------|-------------|-------|
+| `README.md` | Gemini CLI docs (install, auth, headless mode, config, sandboxing, GEMINI.md, custom commands, quotas) | 595 |
 ````
 
-## File: docs/instructions/review.md
+## File: docs/instructions/secrets.md
 ````markdown
-# Review & Delegation Rules
+# Secrets Management
 
-## Planner/Worker Split
+## The One Vault
 
-This is the architectural line that all routing follows:
+All secrets live in `~/github/oneshot/secrets/`. This is the single source of truth across all machines and projects. Do not use `~/github/secrets-vault/` — that repo is deprecated and archived.
 
-### Claude Code Owns (Planner)
-- Planning and decomposition
-- Repo synthesis and context gathering
-- Task classification and lane selection
-- Final review and integration
-- Sensitive edits (auth, data mutation)
+- Encrypted with SOPS + Age key at `~/.age/key.txt`
+- Git-tracked, auto-synced to all machines within 5 min
+- CLI available everywhere as `secrets` (installed by `install.sh`)
 
-### Workers Own (Bounded Execution)
-- Bounded implementation tasks
-- Test generation
-- Draft documentation
-- Search-result summarization
-- Isolated experiments
+## CLI Reference
 
-## Assessment Before Delegating
-
-| Dimension | Low | High |
-|-----------|-----|------|
-| **Complexity** | Single tool call | Exploration + synthesis, 5+ calls |
-| **Criticality** | Read-only, informational | Deployment, auth, data mutation |
-| **Uncertainty** | Clear inputs, known approach | Open-ended, multiple valid paths |
-
-**Routing:**
-- Low complexity + low criticality → handle inline, skip delegation
-- High criticality + high uncertainty → ask before proceeding
-- High criticality → git checkpoint before delegating
-- Low complexity + low cost → use cheapest available model
-
-## Verification After Delegating
-
-| Task Type | Method |
-|-----------|--------|
-| Code search | Spot-check 1-2 claims against actual files |
-| Code changes | Read modified files, confirm diff matches intent |
-| Build / test | Check exit code (0 = success) |
-| Research | Confirm key claims have real sources |
-
-## Fallback Chain (3 attempts max)
-
-```
-1. Original worker (from lane pool)
-   ↓ fails
-2. Escalate to fallback_lane (from config/lanes.yaml)
-   ↓ fails
-3. Main agent (Claude) handles inline with full context
-```
-
-If all 3 fail → log blocker, skip, continue.
-
-## Quality Gate
-
-For adversarial/challenge phases:
-- Codex (if available): fresh perspective on diffs and plans
-- Always: Claude performs final integration
-
-## Circuit Breaker
-
-If same task fails 3 times with different approaches:
-1. Log to `BLOCKERS.md` or `1shot/ISSUES.md`
-2. Skip to next unblocked task
-3. Continue without it
-
-## Credit Assignment
-
-After multi-span sessions, evaluate which delegations contributed most:
-
-| Signal | Credit | Blame |
-|--------|--------|-------|
-| Output reused by later steps | +credit | |
-| Last delegation before failure | | +blame |
-| Wasted compute (no output) | | +blame |
-| Unblocked a stuck task | +credit | |
-| Low-cost delegation that succeeded | +credit | |
-````
-
-## File: docs/instructions/search.md
-````markdown
-# Search Rules
-
-## Search Plane: Argus
-
-All web search goes through Argus, the unified search broker running on port 8005.
-
-**Argus supports**: SearXNG, Brave, Serper, Tavily, Exa — with automatic
-provider selection, fallback, ranking (RRF), and budget enforcement.
-
-### Search Modes
-
-| Mode | Providers | Use Case |
-|------|-----------|----------|
-| discovery | searxng, brave, exa | Broad exploration, multiple sources |
-| precision | serper, tavily | Targeted queries, high relevance |
-| cheap | searxng only | Quick lookups, cost-sensitive |
-| research | searxng, brave, exa, tavily | Deep research, comprehensive |
-
-Config: `config/search.yaml`
-
-### Using Argus
-
-**From skills**: Route search tasks to Argus via the config.
-The search mode is determined by the task class (see `task-classes.md`).
-
-**From code**: Use the Python client.
-```python
-from core.search.argus_client import search, health, is_available
-
-results = search("fastapi best practices", mode="discovery")
-```
-
-**From CLI**: Use curl or the Argus CLI.
 ```bash
-curl -X POST http://localhost:8005/api/search \
-  -d '{"query": "...", "mode": "discovery"}'
+secrets get KEY                        # fetch one value
+secrets set NAME KEY=value             # add/update a key in NAME.env
+secrets set NAME KEY=value --commit    # add/update and auto-commit + push
+secrets init NAME                      # write NAME.env to .env in current dir
+secrets decrypt NAME                   # dump full file to stdout
+secrets list                           # show all files and key names
 ```
 
-### Fallback
+## Vault Files
 
-If Argus is unreachable:
-1. Check `config/search.yaml` for the mode's provider list
-2. Call the first available provider directly
-3. Never hardcode provider logic in skill prompts — always read from config
+| File | What's in it |
+|---|---|
+| `api.env` | JINA_API_KEY |
+| `arb.env` | POLYMARKET_PRIVATE_KEY DUNE_API_KEY UPSTASH_REDIS_REST_TOKEN NORDVPN_PRIVATE_KEY DISCORD_WEBHOOK_URL |
+| `argus.env` | ARGUS_BRAVE_API_KEY ARGUS_REMOTE_EXTRACT_KEY ARGUS_REMOTE_EXTRACT_URL |
+| `argus_auth.env` | NYTimes/WSJ/Bloomberg/ESPN/LATimes login pairs |
+| `cloudflare.env` | CLOUDFLARE_HYPERDRIVE_ID |
+| `convex.env` | CONVEX_TEAM_ACCESS_TOKEN CONVEX_TEAM_ID |
+| `convex_deploy.env` | CONVEX_DEPLOY_KEY CONVEX_DEPLOYMENT_URL |
+| `coparent.env` | TWILIO_* GOOGLE_CALENDAR_* OPENROUTER_API_KEY TELEGRAM_BOT_TOKEN |
+| `deployments.env` | VERCEL_TOKEN SUPABASE_* STRIPE_* NEXTAUTH_SECRET CRON_SECRET GOOGLE_MAPS_API_KEY |
+| `gmail.env` | GMAIL_CREDENTIALS_B64 GMAIL_TOKEN_B64 GMAIL_PROJECT GMAIL_ACCOUNT |
+| `homelab_backup.env` | All homelab service keys (radarr/sonarr/authentik/cloudflare/tailscale/etc.) |
+| `openclaw.env` | BRAVE_API_KEY GEMINI_API_KEY OPENROUTER_API_KEY TELEGRAM_TOKEN_* HOMELAB_RPC_TOKEN |
+| `penny.env` | OPENROUTER_API_KEY TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID |
+| `pypi.env` | PYPI_API_TOKEN |
+| `research_keys.env` | EXA_API_KEY APIFY_TOKEN TAVILY_API_KEY ZAI_API_KEY OPENAI_API_KEY SERPER_API_KEY WOLFRAM_APP_ID |
+| `secrets.env` | CLOUDFLARE_API_TOKEN CLOUDFLARE_ZONE_ID_* GITHUB_PAT DB_* JWT_SECRET EMAIL_* STRIPE_KEY |
+| `services.env` | PERPLEXITY_API_KEY DEEPSEEK_API_KEY GAMMA_API_KEY FIRECRAWL_API_KEY OPENROUTER_API_KEY_ALT1/ALT2 OP_SERVICE_ACCOUNT_TOKEN POYTZ_API_KEY ATLAS_API_KEY |
+| `skillsmp.env` | SKILLSMP_API_KEY |
 
-## /research Skill
+## Usage Patterns by Project Type
 
-Background research uses Argus as the primary backend:
-1. Read search config for the appropriate mode
-2. Query Argus with the research prompt
-3. Use a cheap model to summarize findings
-4. Optional: Claude final synthesis for complex topics
+### Claude Code session (ad-hoc)
+```bash
+secrets get TAVILY_API_KEY
+```
+Use this in the terminal or via the `/secrets` skill.
 
-Legacy fallback: Gemini CLI is available as a secondary research tool.
+### Python service at runtime
+```python
+import subprocess
+key = subprocess.check_output(["secrets", "get", "OPENROUTER_API_KEY"]).decode().strip()
+```
+Argus uses this pattern via `SubprocessSecretsResolver` in `argus/config.py`.
 
-## /freesearch Skill
+### Project needing a .env file at startup
+```bash
+secrets init deployments    # writes deployments.env → .env in current dir
+# or for homelab:
+make gen-env                # merges homelab/.env.encrypted + vault overrides → .env
+```
+The `secrets init` pattern is for projects where the runtime reads from `.env` (e.g. Docker Compose, serverless functions). Never commit the resulting `.env`.
 
-Zero-token web search:
-1. Check docs cache first (`~/github/docs-cache/docs/cache/.index.md`)
-2. Query Argus in `cheap` mode (SearXNG only)
-3. Return results directly
+### Shell setup on a new machine
+```bash
+bash ~/github/oneshot/scripts/claude-shell-setup.sh --install
+# ZAI_API_KEY is pulled from research_keys.env automatically
+```
 
-## Doc Caching
+### Adding a new secret
+```bash
+# Add to the most relevant existing file
+secrets set services "NEW_API_KEY=sk-..."
+# or create a new file for a new project
+secrets set myproject "API_KEY=..."
+```
 
-Cache external documentation locally for offline/fast access:
-- Cache location: `~/github/docs-cache/docs/cache/`
-- Check index first: `cat ~/github/docs-cache/docs/cache/.index.md`
-- Use `/doc` skill to cache new documentation
+## Adding Secrets for a New Project
+
+1. Pick the right vault file — use an existing one if the key is shared, or create `myproject.env` if it's project-specific
+2. `secrets set myproject "KEY=value" --commit` — adds and pushes in one step
+3. On the target machine, `git pull` in `~/github/oneshot` picks it up within 5 min (auto-sync cron)
+4. Access at runtime via `secrets get KEY`
+
+## New Machine Setup
+
+```bash
+# 1. Clone oneshot (auto-synced via cron, or manual)
+git clone https://github.com/Khamel83/oneshot ~/github/oneshot
+
+# 2. Install (links secrets CLI to ~/.local/bin/)
+bash ~/github/oneshot/install.sh
+
+# 3. Set up age key (get from 1Password: "SOPS age encryption key")
+mkdir -p ~/.age
+echo "YOUR_AGE_PRIVATE_KEY" > ~/.age/key.txt
+chmod 600 ~/.age/key.txt
+
+# 4. Verify
+secrets list
+```
+
+## What NOT to Do
+
+- Never commit `.env` files (gitignored everywhere)
+- Never hardcode keys in scripts that go into the repo
+- Never use `~/github/secrets-vault/` — it is deprecated and archived
+- Never create a per-project `secrets/` directory with its own SOPS setup — put keys in the central vault instead
+````
+
+## File: docs/instructions/workflow.md
+````markdown
+# Workflow Rules
+
+## Operator Modes
+
+OneShot provides three operators for different work styles:
+
+### `/short` — Quick Iteration
+- Load context (git log, TaskList, DECISIONS.md, BLOCKERS.md)
+- Ask what you're working on
+- Execute in burn-down mode
+- Minimal overhead, maximum speed
+
+### `/full` — Structured Work
+- Create IMPLEMENTATION_CONTEXT.md
+- Structured intake (goals, scope, architecture, constraints)
+- Phase-based planning with milestones
+- Context checkpoints at 50% (suggest handoff) and 70% (auto-handoff)
+- Verify and completion summary
+
+### `/conduct` — Multi-Model Orchestration
+- Detect available providers (read `config/workers.yaml`)
+- Ask 5 intake questions (BLOCKING until answered)
+- Classify tasks by task class → lane → worker
+- Route work across planner, workers, and reviewers
+- Loop until goal is fully met
+- See `docs/instructions/task-classes.md` for routing contract
+- **v2**: Produces structured artifacts (explore.json, plan.json, TASK_SPEC.md) and gates autonomy by inferred risk level (low/medium/high). Build loop includes a mandatory verification gate and scope creep detection.
+
+## Lane-Based Routing
+
+All operators use the same routing policy. Tasks are classified into task classes,
+each mapped to a default lane in `config/lanes.yaml`.
+
+```
+task → task_class → lane → worker_pool + reviewer
+```
+
+Use the CLI resolver to check routing:
+```bash
+python -m core.router.resolve --class implement_medium
+```
+
+## Subagent Roles
+
+| Role | Responsibility | Harness |
+|------|---------------|---------|
+| planner | Decomposition, task classification | claude_code |
+| researcher | Web search, documentation | argus + any |
+| implementer | Bounded code changes | lane-based |
+| reviewer | Diff review, quality gate | claude_code |
+| docs_writer | Draft documentation | lane-based |
+
+## Session End Protocol
+
+1. `git status` — check for uncommitted changes
+2. Commit completed work
+3. `TaskUpdate` — mark tasks completed
+4. If corrections were given 2+ times: propose instruction update to `docs/instructions/learned/`
+5. Never auto-edit `CLAUDE.md` or rules without review
+
+## Handoff
+
+Use `/handoff` before `/clear` or `/compact` to preserve context.
+Use `/restore` to resume from a handoff.
 ````
 
 ## File: docs/meta-harness/eval_framework.md
@@ -14445,3168 +17706,6 @@ These feel like core identity, not historical accident:
 ## 6. One-Liner Summary
 
 OneShot is a Markdown-driven orchestration harness with a small Python routing core, YAML policy, and CLI-based worker dispatch. Its strengths are clear architecture (plan→classify→route→dispatch→verify), filesystem-native traces, and opinionated defaults. Its weaknesses are: no empirical feedback loop, instruction sprawl across too many files, no evidence-based routing optimization, and zero trace data to learn from.
-````
-
-## File: docs/meta-harness/trace_architecture.md
-````markdown
-# Trace Architecture: Raw Evidence for Harness Optimization
-
-> Filesystem-native trace storage. grep/cat/find/jq friendly. No custom UI.
-
----
-
-## 1. Design Principles
-
-1. **Raw traces are primary** — summaries are derived, never replacements
-2. **Immutable artifacts** separated from **mutable derived** artifacts
-3. **Every trace is self-contained** — one directory per dispatch, everything needed to reproduce
-4. **Flat naming, hierarchical dirs** — `find` and `ls` work naturally
-5. **JSON for machine data, Markdown for human data** — `jq` and `cat` work respectively
-6. **No database** — files only. SQLite if we ever need aggregation queries (later)
-
----
-
-## 2. Directory Tree
-
-```
-eval/
-  traces/
-    {YYYY-MM-DD}/
-      {task_class}-{HHMMSS}-{worker}/
-        trace.json          # Full dispatch trace (primary artifact, IMMUTABLE)
-        prompt.md           # Rendered prompt sent to worker
-        output.raw          # Raw worker output (JSONL or plain text)
-        output.parsed.json  # Parsed structured output
-        manifest.md         # Human-readable summary (DERIVED from trace.json)
-        review.json         # If reviewed, the review result
-        scoring.json        # If scored by eval, the eval result
-      summary.json          # Daily aggregate (DERIVED, regenerated)
-
-  results/
-    {YYYY-MM-DD}--{description}.json  # Eval run results (IMMUTABLE)
-
-  benchmarks/
-    ... (see eval_framework.md)
-```
-
-### Naming Convention
-
-- **Trace directory**: `{task_class}-{HHMMSS}-{worker}` — e.g., `implement_small-143022-codex`
-- **Daily directory**: `2026-04-05`
-- **Summary files**: Always end in `.json` for machine, `.md` for human
-- **Immutable files**: `trace.json`, `prompt.md`, `output.raw`, `scoring.json`
-- **Derived files**: `manifest.md`, `output.parsed.json`, `summary.json`
-
----
-
-## 3. Schemas
-
-### trace.json (Primary Artifact)
-
-```json
-{
-  "trace_id": "implement_small-20260405-143022-codex",
-  "schema_version": "1",
-  "timestamp": "2026-04-05T14:30:22Z",
-  "harness_version": "14.2",
-
-  "classification": {
-    "description": "Fix the auth bug in login.py",
-    "task_class": "implement_small",
-    "category": "coding",
-    "risk_level": "high",
-    "inferred_by": "infer_category + infer_risk"
-  },
-
-  "routing": {
-    "lane": "cheap",
-    "workers": ["codex", "gemini_cli", "glm_claude"],
-    "selected_worker": "codex",
-    "selection_reason": "first_available",
-    "review_with": "claude_code",
-    "fallback_lane": "balanced"
-  },
-
-  "prompt": {
-    "template": "dispatch_v1",
-    "word_count": 342,
-    "file_path": "prompt.md"
-  },
-
-  "execution": {
-    "worker": "codex",
-    "command": "unset OPENAI_API_KEY && codex exec --json ...",
-    "exit_code": 0,
-    "started": "2026-04-05T14:30:22Z",
-    "completed": "2026-04-05T14:32:45Z",
-    "duration_seconds": 143.2
-  },
-
-  "output": {
-    "raw_file": "output.raw",
-    "parsed_file": "output.parsed.json",
-    "errors": [],
-    "message_preview": "Fixed the auth bug by..."
-  },
-
-  "validation": {
-    "passed": true,
-    "acceptance_criteria_met": ["auth bug fixed", "tests pass"],
-    "acceptance_criteria_failed": []
-  },
-
-  "retry": {
-    "attempt": 1,
-    "previous_traces": [],
-    "escalated": false,
-    "escalation_reason": null
-  },
-
-  "cost": {
-    "estimated_tokens": null,
-    "estimated_cost_usd": 0,
-    "worker_cost_basis": "subscription"
-  },
-
-  "config_snapshot": {
-    "lanes_sha": "a0be591",
-    "workers_sha": "a0be591",
-    "models_sha": "a0be591"
-  }
-}
-```
-
-### prompt.md (Rendered Prompt)
-
-The actual prompt sent to the worker, verbatim. Markdown format, following the dispatch template.
-
-### output.raw (Raw Worker Output)
-
-Unmodified output from the worker CLI. JSONL for codex, JSON for gemini, plain text otherwise.
-
-### output.parsed.json (Parsed Output)
-
-```json
-{
-  "worker": "codex",
-  "messages": ["Fixed the auth bug by..."],
-  "errors": [],
-  "usage": {
-    "input_tokens": 4500,
-    "output_tokens": 1200
-  }
-}
-```
-
-### scoring.json (Eval Result, if scored)
-
-```json
-{
-  "trace_id": "implement_small-20260405-143022-codex",
-  "scored_at": "2026-04-05T15:00:00Z",
-  "metrics": {
-    "task_success": true,
-    "classification_correct": true,
-    "routing_correct": true,
-    "latency_seconds": 143.2,
-    "retry_count": 0,
-    "escalated": false
-  },
-  "human_rating": null,
-  "notes": null
-}
-```
-
-### summary.json (Daily Aggregate, DERIVED)
-
-```json
-{
-  "date": "2026-04-05",
-  "total_dispatches": 12,
-  "succeeded": 10,
-  "failed": 2,
-  "retry_rate": 0.167,
-  "escalation_rate": 0,
-  "avg_latency_seconds": 98.4,
-  "by_worker": {
-    "codex": {"dispatches": 7, "succeeded": 6, "avg_latency": 85.2},
-    "gemini_cli": {"dispatches": 3, "succeeded": 3, "avg_latency": 120.1},
-    "glm_claude": {"dispatches": 2, "succeeded": 1, "avg_latency": 110.5}
-  },
-  "by_task_class": {
-    "implement_small": {"dispatches": 8, "succeeded": 7},
-    "doc_draft": {"dispatches": 4, "succeeded": 3}
-  },
-  "by_lane": {
-    "cheap": {"dispatches": 10, "succeeded": 8},
-    "research": {"dispatches": 2, "succeeded": 2}
-  },
-  "generated_at": "2026-04-05T23:59:59Z",
-  "trace_ids": ["implement_small-143022-codex", "..."]
-}
-```
-
----
-
-## 4. Example Trace Bundles
-
-### Successful Dispatch
-
-```
-eval/traces/2026-04-05/implement_small-143022-codex/
-  trace.json          # All metadata, exit_code: 0, validation.passed: true
-  prompt.md           # "Fix the auth bug in login.py..."
-  output.raw          # JSONL from codex
-  output.parsed.json  # {"messages": [...], "errors": []}
-  manifest.md         # "Status: OK, Duration: 143s, Worker: codex"
-  scoring.json        # {"metrics": {"task_success": true, ...}}
-```
-
-### Failed Dispatch (with Retry)
-
-```
-eval/traces/2026-04-05/implement_small-143500-gemini_cli/
-  trace.json          # exit_code: 1, retry.attempt: 1, errors: ["Timeout"]
-
-eval/traces/2026-04-05/implement_small-144200-codex/
-  trace.json          # exit_code: 0, retry.attempt: 2, previous_traces: ["...gemini_cli"]
-  prompt.md
-  output.raw
-  output.parsed.json
-  manifest.md
-  scoring.json
-```
-
----
-
-## 5. How Traces Enable Optimization
-
-### Question: Which worker is best for coding tasks?
-
-```bash
-# Extract all coding task traces
-grep -rl '"category": "coding"' eval/traces/*/ | \
-  xargs jq -r '.execution.worker, .execution.duration_seconds, .output.errors' | \
-  paste - - - | \
-  sort | uniq -c | sort -rn
-```
-
-### Question: What's the retry rate for each lane?
-
-```bash
-for lane in cheap balanced premium research; do
-  echo "=== $lane ==="
-  grep -rl "\"lane\": \"$lane\"" eval/traces/*/ | \
-    xargs jq -r '.retry.attempt' | \
-    sort | uniq -c
-done
-```
-
-### Question: Which task classes fail most?
-
-```bash
-grep -rl '"validation": {"passed": false}' eval/traces/*/ | \
-  xargs jq -r '.classification.task_class' | \
-  sort | uniq -c | sort -rn
-```
-
-### Question: Are prompts getting longer over time?
-
-```bash
-find eval/traces -name trace.json | \
-  xargs jq -r '.timestamp + " " + (.prompt.word_count | tostring)' | \
-  sort
-```
-
-All of these are `find`/`grep`/`jq` one-liners. No custom tools needed.
-
----
-
-## 6. Config Snapshot Tracking
-
-Each trace records `config_snapshot` with git SHA of config files. This means:
-
-- You can always reproduce a trace by checking out the config SHA
-- You can group traces by config version to see the effect of a change
-- You can diff two config versions to understand what changed
-
-```bash
-# See all traces for a specific config version
-grep -rl '"lanes_sha": "a0be591"' eval/traces/*/
-```
-
----
-
-## 7. Integration with Eval
-
-The eval runner (`scripts/eval.sh`) produces traces for end-to-end benchmarks. These traces go in the same directory structure, making them directly comparable to production dispatch traces.
-
-When running `--compare baseline`, the compare script:
-1. Groups traces by benchmark task ID
-2. Compares success, latency, retry count
-3. Flags regressions > 5%
-4. Produces a comparison report
-
----
-
-## 8. Later Extensions (Not Now)
-
-- **Frontier tracking**: When we have enough traces, track Pareto frontier of (cost, success_rate) over time
-- **Candidate comparison**: Store traces from candidate harness versions alongside baseline
-- **Automatic scoring**: For classification/routing benchmarks, scoring is automatic. For e2e, still manual.
-- **SQLite aggregation**: If `find`/`jq` becomes too slow (hundreds of traces), migrate to SQLite with a read-only view
-````
-
-## File: docs/migration/baseline/AGENTS.md
-````markdown
-<!-- FOR CLAUDE - NOT FOR HUMANS -->
-
-# ONE_SHOT v13 — Operator Framework
-
-> **Context is the scarce resource.** Three operators, seven utilities. Discover skills on demand.
-
----
-
-## OPERATORS
-
-### `/short` — Quick Iteration
-
-```
-/short [scope]
-```
-
-**Behavior:**
-1. Load context: git log -5, TaskList, DECISIONS.md, BLOCKERS.md
-2. Ask: "What are you working on?"
-3. Discover skills on demand (~/.claude/skills/ index)
-4. Execute in burn-down mode
-5. Show delegation summary on completion
-
-**Decision defaults:** Simplest implementation, match existing patterns, skip refactors unless blocking.
-
-### `/full` — Structured Work
-
-```
-/full [project-description]
-```
-
-**Behavior:**
-1. Create/load IMPLEMENTATION_CONTEXT.md
-2. Structured intake: goals, scope, architecture, constraints
-3. Phase-based planning with milestones
-4. Skill discovery via ~/.claude/skills/ index
-5. Execute with context checkpoints (50% → suggest handoff, 70% → auto-handoff)
-6. Verify and show completion summary
-
-**For:** New projects, refactors, complex features.
-
-### `/conduct` — Multi-Model PMO Orchestrator
-
-```
-/conduct [idea or goal]
-```
-
-**Behavior:**
-1. Detect available providers (codex, gemini)
-2. Ask clarifying questions — BLOCKING, nothing runs until answered
-3. Create structured plan with task breakdown
-4. Route work across Claude + Codex + Gemini based on task type
-5. Loop until goal is fully met (not just started)
-
-**For:** Non-trivial tasks where you want autonomous execution across models until done.
-
----
-
-## UTILITY COMMANDS
-
-| Command | Purpose |
-|---------|---------|
-| `/handoff` | Save context before /clear |
-| `/restore` | Resume from handoff |
-| `/research` | Background research |
-| `/freesearch` | Zero-token web search (Exa) |
-| `/doc` | Cache external docs |
-| `/vision` | Image/website analysis |
-| `/secrets` | SOPS/Age secrets |
-
----
-
-## DEPLOYABLE TEMPLATES
-
-| Use Case | Template | Stack |
-|----------|----------|-------|
-| Membership/community sites | `templates/community-starter/` | Vercel + Supabase + Python + Resend |
-
----
-
-## DECISION DEFAULTS
-
-When ambiguous, apply without asking:
-
-| Ambiguity | Default |
-|-----------|---------|
-| Multiple implementations | **Simplest** |
-| Naming | Follow existing pattern |
-| Refactor opportunity | **Skip** unless blocking |
-| Stack | Follow CLAUDE.md |
-| Error handling | Match surrounding code |
-| Test framework | Use existing tests |
-
-**Key rule:** When truly ambiguous, pick option A, note in DECISIONS.md.
-
----
-
-## AUTO-APPROVED ACTIONS
-
-- Reading any file
-- Writing to scope-matched files
-- Running tests and linters
-- Creating DECISIONS.md, BLOCKERS.md, CHANGES.md
-- Git commit (not push)
-- Creating native tasks
-
-## REQUIRES CONFIRMATION
-
-- Destructive operations (rm -rf, DROP TABLE)
-- Git push to shared branches
-- External API calls that cost money
-- Deploying to production
-
----
-
-## DELEGATION
-
-Before delegating: assess (complexity, criticality, uncertainty)
-After delegating: verify the result
-On failure: escalate (original → inline → human)
-
-**Delegation summary on completion:**
-```
-📊 Delegation Summary
-├─ N delegations, avg reward: X.XX
-├─ Best: [agent] (reward) - [description]
-└─ Tip: [optimization]
-```
-
----
-
-## PHILOSOPHY
-
-> "It's harder to read code than to write it." — Joel Spolsky
-
-**NEVER rewrite from scratch.** Extend, refactor, use existing solutions.
-
-**USER TIME IS PRECIOUS.** Agents should make reasonable decisions autonomously.
-
----
-
-## VERSION
-
-v13.2 | 10 skills + 1 external | Operators discover skills on demand
-````
-
-## File: docs/migration/baseline/CLAUDE.md
-````markdown
-# CLAUDE.md - ONE_SHOT Project Configuration
-
-**This is the ONE_SHOT project's CLAUDE.md.** For your own projects, use a minimal version.
-
----
-
-## Progressive Disclosure: Load Rules by Project Type
-
-**Core rules always load**: `~/.claude/rules/core.md`
-
-**Project-specific rules load based on detection**:
-
-| Project Type | Trigger | Rules |
-|--------------|---------|-------|
-| Web app | `astro.config.*` or `wrangler.toml` | `~/.claude/rules/web.md` |
-| CLI | `setup.py` or `pyproject.toml` | `~/.claude/rules/cli.md` |
-| Service | `*.service` or long-running `*.py` | `~/.claude/rules/service.md` |
-| Generic | None detected | Core rules only |
-
-**User-specific defaults**: `~/.claude/rules/khamel-mode.md`
-**Delegation protocol**: `~/.claude/rules/delegation.md` (always loaded)
-
----
-
-## For This Project (ONE_SHOT)
-
-ONE_SHOT is the framework itself. Read core rules + all project type rules for full context.
-
-```
-Core: ~/.claude/rules/core.md
-Delegation: ~/.claude/rules/delegation.md
-Web: ~/.claude/rules/web.md
-CLI: ~/.claude/rules/cli.md
-Service: ~/.claude/rules/service.md
-KhameL: ~/.claude/rules/khamel-mode.md
-Codex: .claude/rules/codex.md
-```
-
----
-
-## Deployable Templates
-
-| Use Case | Template | Stack |
-|----------|----------|-------|
-| Membership/community sites | `templates/community-starter/` | Vercel + Supabase + Python + Resend |
-
----
-
-## Quick Reference
-
-- **New project?** → `/full` operator
-- **Quick iteration?** → `/short` operator
-- **Multi-model task?** → `/conduct` operator
-- **Task tracking** → Native TaskCreate/TaskList tools (`~/.claude/tasks/`)
-- **Deployment** → oci-dev (100.126.13.70) via Tailscale
-- **Stack defaults** → See `khamel-mode.md`
-- **External docs** → `docs-link add <name>` (links cached docs to project)
-- **Docs cache** → `~/.claude/rules/docs-cache-pattern.md`
-- **Skills** → `~/.claude/skills/` (10+1 total: /short, /full, /conduct + 7 utilities + humanizer)
-- **Codex CLI** → `.claude/rules/codex.md` (auth, sandbox fix, all 3 machines)
-
----
-
-## Token Savings
-
-| Before (full CLAUDE.md) | After (progressive) |
-|------------------------|---------------------|
-| ~2000 tokens | ~300 tokens |
-
-**Savings: 85%**
-
----
-
-<!--
-  ONE-SHOT Heartbeat Metadata
-  oneshot:last-check: 2026-03-22
-  oneshot:machine: oci-dev
--->
-````
-
-## File: docs/migration/baseline/cli.md
-````markdown
-# CLI Rules (Python + Click + SQLite)
-
-## Default Stack
-
-When building CLIs for this user:
-
-```
-Python + Click + SQLite
-```
-
-## When to Use
-
-Detect by presence of:
-- `setup.py` or `pyproject.toml`
-- CLI entry points defined
-- No `astro.config.*` or `wrangler.toml` or web framework files
-
-## Click-Specific Rules
-
-- **Use Click for CLI** - Don't suggest argparse, typer, or other CLI libs
-- **Command groups** - Use `@click.group()` for multi-command CLIs
-- **Context objects** - Use `@click.pass_context` for shared state
-- **Auto-completion** - Add shell completion support
-
-## SQLite-Specific Rules
-
-- **SQLite is default** - Don't suggest PostgreSQL, MongoDB
-- **Use sqlite3 module** - No ORM needed for simple CLIs
-- **Migrations** - Simple schema versioning, avoid heavy migration tools
-
-## Packaging
-
-- **pip install -e .** - For development
-- **pyproject.toml** - Modern packaging standard
-- **Entry points** - Define console scripts in pyproject.toml
-
-## Anti-Patterns
-
-- ❌ Don't suggest web frameworks (FastAPI, Flask)
-- ❌ Don't suggest external databases
-- ❌ Don't suggest Docker for local development
-- ❌ Don't suggest complex ORMs (SQLAlchemy, Django ORM)
-````
-
-## File: docs/migration/baseline/codex.md
-````markdown
-# Codex CLI — Multi-Machine Setup & Usage
-
-> **Canonical location**: `~/.claude/rules/codex.md` (global, loads in every project)
-> This copy lives in oneshot for version control. Keep them in sync.
-
-Codex (OpenAI's agentic coding CLI) runs on all three machines in this setup.
-This guide documents what works, what doesn't, and why — learned the hard way on 2026-03-30.
-
----
-
-## TL;DR — The Working Command
-
-```bash
-# DO THIS — not --full-auto
-unset OPENAI_API_KEY
-codex exec --sandbox danger-full-access "your prompt here"
-```
-
-**From any machine, from any repo that's in `~/.codex/config.toml` as trusted.**
-
----
-
-## Machine Status
-
-| Machine | Works | Auth |
-|---------|-------|------|
-| oci-dev (100.126.13.70) | ✓ | `~/.codex/auth.json` |
-| homelab (100.112.130.100) | ✓ | `~/.codex/auth.json` |
-| macmini (100.113.216.27) | ✓ | `~/.codex/auth.json` |
-
----
-
-## Auth: ChatGPT Plus OAuth (NOT API key)
-
-Codex uses your **ChatGPT Plus login**, not an OpenAI API key.
-
-- Auth is stored in `~/.codex/auth.json`
-- Obtained via `codex login` (opens browser)
-- The token auto-refreshes via `refresh_token` — it stays valid
-
-**Critical:** If `OPENAI_API_KEY` is set in the environment, it overrides the OAuth token
-and hits the paid API instead. That account has no credits → 404/429 errors.
-Always `unset OPENAI_API_KEY` before running codex.
-
-### If auth.json is missing or broken
-
-```bash
-# Option 1: Re-login (requires browser)
-codex login
-# Then paste the localhost:1455 callback URL back to Claude
-
-# Option 2: Copy from a working machine (fastest)
-scp homelab:/home/khamel83/.codex/auth.json ~/.codex/auth.json
-```
-
-### If the subscription lapses
-
-The token encodes subscription status. After renewing ChatGPT Plus at chat.openai.com,
-run `codex login` again to get a fresh token — the old one won't get access back automatically.
-
----
-
-## The Sandbox Problem: Why `--full-auto` Breaks Here
-
-`--full-auto` is shorthand for `--sandbox workspace-write`, which uses **bwrap** (bubblewrap)
-for sandboxing. On these Linux servers (OCI + homelab), bwrap fails:
-
-```
-bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
-```
-
-This is a kernel/container restriction — bwrap can't create a loopback interface.
-
-**Fix:** Use `--sandbox danger-full-access` instead. This skips bwrap entirely.
-These machines are already on Tailscale + behind OCI security groups, so the blast
-radius of a rogue shell command is limited.
-
-```bash
-# BROKEN on these machines:
-codex exec --full-auto "..."
-
-# WORKS:
-codex exec --sandbox danger-full-access "..."
-```
-
----
-
-## Config (`~/.codex/config.toml`)
-
-```toml
-model = "gpt-5.4"
-model_reasoning_effort = "medium"
-personality = "pragmatic"
-approvals_reviewer = "user"
-
-# DO NOT set openai_base_url — the default is correct
-# Setting it to "https://api.openai.com" (without /v1) causes 404s on the WebSocket
-# Setting it to "https://api.openai.com/v1" causes double-path issues on some calls
-# Leave it unset and let codex use its built-in default
-
-[projects."/home/ubuntu/github/atlas"]
-trust_level = "trusted"
-# ... other trusted projects
-```
-
----
-
-## Running Across Machines
-
-From oci-dev, you can run codex on remote machines via SSH:
-
-```bash
-# Run codex on homelab
-ssh homelab "cd ~/github/myproject && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'your task'"
-
-# Run on macmini
-ssh macmini "cd ~/github/myproject && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'your task'"
-```
-
-Or Claude Code can dispatch tasks to all three in parallel using Bash with `&` + `wait`.
-
----
-
-## Debugging Checklist
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `404 Not Found` on `wss://.../responses` | `OPENAI_API_KEY` is set with no credits | `unset OPENAI_API_KEY` |
-| `401 Missing bearer` | `auth.json` is missing | Copy from homelab or re-login |
-| `401 Missing scopes: api.responses.write` | Stale/incomplete token | Re-login or copy from working machine |
-| `bwrap: loopback: Failed RTM_NEWADDR` | bwrap blocked by kernel | Use `--sandbox danger-full-access` |
-| `insufficient_quota` | Using API key account (no credits) | `unset OPENAI_API_KEY` |
-| Subscription expired 404 | ChatGPT Plus lapsed | Renew at chat.openai.com + re-login |
-
----
-
-## History / Why This Exists
-
-This was debugged on 2026-03-30 in a Claude Code session. The problems encountered:
-1. `OPENAI_API_KEY` in vault was set on PATH, sending requests to the no-credits API account
-2. `openai_base_url = "https://api.openai.com"` was manually added to config — wrong (missing `/v1`)
-3. A `codex logout` during debugging deleted auth.json, breaking everything
-4. `--full-auto` (bwrap sandbox) doesn't work on OCI/homelab Linux kernels
-5. ChatGPT Plus subscription had lapsed (Feb 14) — renewed March 30
-
-The fix that unlocked everything: copy `auth.json` from homelab, use `--sandbox danger-full-access`.
-````
-
-## File: docs/migration/baseline/community.md
-````markdown
-# Private Site Generator Rules (Vercel + Supabase + Python + Resend)
-
-## What It Is
-
-A multi-tenant platform for spinning up private micro-sites from a single deployment.
-Each site gets its own auth, database schema, and admin. Lives at `templates/community-starter/`.
-
-See `templates/community-starter/SETUP.md` for setup, `ARCHITECTURE.md` for design.
-
-## When to Recommend
-
-Use this stack when the user asks for:
-- Private membership site / community platform
-- "Spin up a site for my class/team/group"
-- Multi-tenant app with isolated data per site
-- League management / cohort tracking
-- Invite-only web app with admin controls
-- "Like a private Slack but as a website"
-
-## Stack
-
-| Component | Tool |
-|-----------|------|
-| Hosting | Vercel (Hobby: 12 serverless functions max — uses 2) |
-| Auth | Supabase Auth (email/password + optional Google OAuth) |
-| Database | Supabase Postgres (schema-per-site isolation) |
-| Email | Resend (free tier: 3,000 emails/month) |
-| Frontend | Plain HTML + vanilla JS (no build step) |
-| API | Python router + handler modules |
-
-## Key Architecture
-
-- **Single router** (`api/index.py`) handles all sites via path parsing
-- **Schema-per-site**: each site is a Postgres schema, queries use `Accept-Profile` header
-- **Handler modules** in `api/handlers/`: auth, members, admin, email
-- **Site creation**: `scripts/new-site.sh {slug} "{name}" --admin-email {email}`
-
-## Anti-Patterns
-
-- Don't use for public marketing sites (use Astro + Cloudflare)
-- Don't use for high-traffic APIs (not designed for scale)
-- Don't use when payments/Stripe are needed
-- Don't suggest React/Next.js additions unless explicitly asked
-
-## Key Files
-
-- `api/index.py` — Single router function (replaces individual handlers)
-- `api/_supabase.py` — Supabase client + multi-tenant helpers (`set_site`, `site_exists`)
-- `api/handlers/auth.py` — Login, signup, session, password reset
-- `api/handlers/members.py` — Member directory CRUD
-- `api/handlers/admin.py` — Admin-only endpoints
-- `api/handlers/email.py` — Scheduled + transactional email
-- `api/system.py` — Health check + site listing
-- `migrations/00_sites_table.sql` — Site registry table
-- `migrations/01_schema_template.sql` — Per-site DDL template
-- `migrations/02_rls_template.sql` — Per-site RLS template
-- `scripts/new-site.sh` — Site creation automation
-
-## Gotchas
-
-- Vercel Hobby = 12 functions max (template uses 2: index.py, system.py)
-- Bulk emails may 504 — template handles via email_log dedup
-- Always `.lower()` emails before storing/comparing
-- Email handler imports `db` lazily — patch `api._supabase.db` in tests, not `api.handlers.email.db`
-- Use `get_user_from_request()` before ANY data read/write
-- CRON_SECRET is the only valid auth for scheduled jobs
-````
-
-## File: docs/migration/baseline/conduct_SKILL.md
-````markdown
----
-name: conduct
-description: Multi-model PMO orchestrator. Asks clarifying questions first, creates a structured plan, routes work across Claude + Codex + Gemini, and loops until the goal is actually met. Use when the task is non-trivial and you want it to run until done without stopping early. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, run it, conduct.
----
-
-# /conduct — Multi-Model PMO Orchestrator
-
-Routes work across Claude, Codex, and Gemini. Asks questions first. Loops until done.
-
-## Usage
-
-```
-/conduct
-/conduct <idea or goal>
-```
-
-## Behavior
-
-When invoked:
-
-### Phase 0: Intake (BLOCKING — nothing else runs until complete)
-
-1. **Detect providers**
-   ```bash
-   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
-   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
-   ```
-   If codex missing: suggest `npm install -g @openai/codex`, continue without it.
-   If gemini missing: continue without it.
-
-2. **Ask 5 required questions** using AskUserQuestion — do NOT proceed until answered:
-   1. What is the goal / deliverable?
-   2. What does done look like? (acceptance criteria — be specific)
-   3. What is in scope? What is explicitly out of scope?
-   4. Any constraints? (tech stack, time, things to avoid)
-   5. What is the riskiest / most uncertain part?
-
-3. **Initialize `1shot/`** in the project root (create if missing):
-   - Copy templates from `~/.claude/skills/conduct/templates/`
-   - Write intake answers to `1shot/PROJECT.md`
-   - Update `1shot/STATE.md`: phase = "intake → plan"
-   - Update `1shot/config.json`: set providers based on detection
-   - Create `1shot/skills/` directory (for SkillsMP pulls)
-   - Create or refresh `1shot/LLM-OVERVIEW.md` with what is this, stack, key files
-
-4. **Show PROJECT.md** to user and confirm before proceeding.
-
-### Phase 1: Plan
-
-1. **Explore codebase** (Explore subagent) — identify impacted files
-2. **Docs Check**
-   - Identify all external libraries, APIs, and tools needed
-   - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
-   - For anything missing → run `/doc <name> <url>` before assigning build tasks
-   - Use cached docs as source of truth — do NOT rely on training data for syntax
-3. **Write `1shot/ROADMAP.md`** — phases and success criteria from PROJECT.md
-4. **Skill Discovery** — for each major task type in the roadmap:
-   - Check `1shot/skills/` for already-pulled skills
-   - Ask: *"Is this specialized enough that a community skill would do this better?"*
-   - Specialized (security, blockchain, ML, specific APIs, infra tools): search SkillsMP
-     ```bash
-     ./scripts/skillsmp-search.sh "<task type>" --install
-     ```
-   - General (write tests, refactor, add endpoint): skip, use core skills
-5. **Create native tasks** — one TaskCreate per deliverable (not steps):
-   - subject: deliverable title
-   - description: acceptance criteria from PROJECT.md, files to touch, skill to use if pulled
-   - Set addBlockedBy for dependencies
-6. **Update STATE.md**: phase = "plan → build"
-7. **Show task list** before proceeding
-
-### Phase 2: Build Loop
-
-Repeat until no unblocked tasks remain:
-
-1. Pick next unblocked task (`TaskList` → lowest ID pending)
-2. `TaskUpdate` → in_progress
-3. **Route to provider** (see Routing Logic below)
-4. Execute fully, commit: `git add <files> && git commit -m "feat: <task>"`
-5. `TaskUpdate` → completed
-6. Update `1shot/STATE.md`: increment loop count, log action
-7. **Circuit breaker check**: if same task failed 3x → add to `1shot/ISSUES.md` blockers → skip → continue
-
-If 3 consecutive tasks hit circuit breaker → stop, surface to user.
-
-### Phase 3: Verify
-
-For each completed task:
-1. Check acceptance criteria from `1shot/PROJECT.md`
-2. Run tests:
-   - `./scripts/ci.sh` if present
-   - else `npm test` / `pytest` / `go test ./...` based on project type
-3. Failed tasks → `TaskUpdate` status back to pending with failure notes → loop to Phase 2
-
-### Phase 4: Challenge (adversarial pass)
-
-1. `git diff $(git merge-base HEAD main)..HEAD` — full diff since conduct started
-2. If Codex available:
-   ```bash
-   codex exec --full-auto "You are an adversarial reviewer. Read this diff and find: (1) what could break, (2) what was missed, (3) unhandled edge cases. Be specific. Diff: [diff content]"
-   ```
-   If Codex unavailable: Claude performs adversarial review inline.
-3. New issues found → create new Tasks → loop back to Phase 2
-4. Clean pass → update STATE.md: phase = "complete"
-
-### Done
-
-- STATE.md phase = "complete"
-- Print summary:
-  ```
-  ✅ Conduct Complete
-  ├─ Tasks: X/Y completed
-  ├─ Providers used: [list]
-  ├─ Files changed: Z
-  ├─ Commits: N
-  └─ Blockers skipped: M (see 1shot/ISSUES.md)
-  ```
-
----
-
-## Routing Logic
-
-See `~/.claude/skills/_shared/providers.md` for provider detection, routing table, dispatch commands, quality gates, and circuit breaker.
-
-**Conduct-specific routing**: Conduct uses all tiers. Plan review and adversarial challenge phases always route to Codex when available. Research tasks route to Gemini. Implementation stays with Claude.
-
----
-
-## `1shot/PROJECT.md` Template
-
-```markdown
-# Project: [goal title]
-
-## Goal
-[What are we building / delivering?]
-
-## Done When
-[Specific acceptance criteria — measurable, not vague]
-
-## In Scope
-- [item]
-
-## Out of Scope
-- [item]
-
-## Constraints
-[Tech stack, time limits, things to avoid]
-
-## Riskiest Part
-[What's most likely to go wrong or be uncertain]
-
-## Status
-IN_PROGRESS
-<!-- change to COMPLETE when all tasks pass verify + challenge -->
-```
-
----
-
-## Decision Defaults
-
-| Ambiguity | Default |
-|-----------|---------|
-| Multiple implementations | Simplest one |
-| Naming | Follow existing pattern in file |
-| Error handling | Match surrounding code |
-| Test framework | Use existing tests as guide |
-| Library choice | One already in project |
-| Refactor opportunity | Skip unless blocking |
-| Provider routing | Claude unless research or adversarial |
-| Stack | Follow CLAUDE.md defaults |
-
----
-
-## Auto-Approved Actions
-
-- Reading any file
-- Writing to scope-matched files
-- Creating / updating `1shot/` files
-- Creating DECISIONS.md, BLOCKERS.md, ISSUES.md
-- Running tests and linters
-- Calling Codex and Gemini CLI via bash
-- Git commit (not push)
-- Creating and updating native tasks
-
-## Requires Confirmation
-
-- Destructive operations (rm -rf, DROP TABLE, reset --hard)
-- Git push to shared branches
-- External API calls that cost money (beyond Codex/Gemini CLI)
-- Deploying to production
-- Major architecture changes not in PROJECT.md scope
-````
-
-## File: docs/migration/baseline/core.md
-````markdown
-# ONE_SHOT Core Rules
-
-These rules load for every project.
-
-## STOP BEING CLEVER
-
-**YOU ARE A ROBOT. JUST DO THE SIMPLE THING FAST FIRST.**
-
-- Don't edit databases directly when there's a UI
-- Don't write scripts when a CLI exists
-- Don't debug for an hour when `docker pull` might fix it
-- If there's a 30-second solution, do that before the 30-minute solution
-
----
-
-## JUST DO IT
-
-**If you CAN do it, DO it. Don't ask the human to do your job.**
-
-| Don't say | Just do |
-|-----------|---------|
-| "Can you check the logs?" | `tail -50 /var/log/...` |
-| "Can you add this file?" | Write the file |
-| "You'll need to install X" | `apt install X` or `npm install X` |
-| "Run this command" | Run it yourself |
-| "Can you verify it works?" | Run the test, show the output |
-| "Should I read this file?" | Read it. Then tell me what's there. |
-| "Let me know what you find" | Search, find, report. No hand-holding. |
-
-**The rule**: If a tool exists for it, use it. If you have shell access, run commands. If you can read files, read them. The only things you can't do are physical-world actions (reboot a server manually, plug in a cable).
-
-**Exceptions** (ask first):
-- Destructive operations (rm -rf, DROP TABLE, force push)
-- Actions that affect others (deploying to production, sending messages)
-- Spending money (API calls that cost $, provisioning cloud resources)
-
----
-
-## Intelligent Delegation (v12.2)
-
-Before delegating, assess (complexity, criticality, uncertainty). After delegation, verify the result.
-Full protocol: `~/.claude/rules/delegation.md`
-
-- **Assess**: Is this worth delegating? Low complexity → handle inline.
-- **Verify**: Spot-check search results, review diffs, check exit codes.
-- **Escalate**: original → inline → human (3 attempts max, change strategy each time).
-- **Log**: Automatic via SubagentStop hook → `.claude/delegation-log.jsonl`
-
----
-
-## Work Discipline
-
-- **Plan first**: Always start with a plan before coding. Think, then do.
-- **Commit per task**: Don't batch commits to end-of-session. Commit each completed task immediately.
-- **Keep tasks small**: Break work so each subtask completes well within context. If it's too big, split it.
-- **Vanilla over complex**: Simple direct work beats elaborate multi-agent orchestration for small tasks.
-
----
-
-## Documentation-First Coding
-
-**CRITICAL RULE:** Before writing code that uses external APIs, libraries, or configuration syntax, you MUST check the current documentation.
-
-### Process
-1. Check local cached docs: `~/homelab/docs/services/<service-name>/`
-2. If insufficient, use WebFetch/WebSearch for current docs
-3. Verify version compatibility
-4. Write code using current syntax, not training data
-
----
-
-## AGENTS.md Rule (CRITICAL)
-
-**AGENTS.md is READ-ONLY in all projects.**
-
-```bash
-curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/AGENTS.md > AGENTS.md
-```
-
-| File | Purpose | Editable? |
-|------|---------|-----------|
-| `AGENTS.md` | ONE_SHOT spec (universal) | **NO** - curl from oneshot |
-| `CLAUDE.md` | Project-specific Claude instructions | YES |
-
----
-
-## ONE_SHOT v12: Native Tasks + Intelligent Delegation
-
-**Core Philosophy**: Use Claude's native features first, external tools as fallback.
-
-### Task Management Strategy
-```yaml
-primary: "native"     # Claude's TaskCreate/TaskUpdate/TaskList
-fallback: "beads"     # Legacy bd CLI for edge cases
-```
-
-**Native Tasks** (TaskCreate, TaskGet, TaskUpdate, TaskList) shipped in Claude Code 2.1 (Jan 2026).
-- Persistent in `~/.claude/tasks/`
-- Survive `/clear` and context compression
-- Use these for all task tracking
-
-### Session Start Protocol
-1. `TaskList` - Check for pending/in_progress tasks
-2. Pick highest-priority unblocked task
-3. `TaskUpdate` to set status="in_progress"
-
-### Session End Protocol
-1. `git status` - check changes
-2. `git add <files>` - stage changes
-3. `git commit -m "..."` - commit code
-4. `TaskUpdate` - mark task completed or update notes
-5. `git push` - push to remote
-
-### Swarm Mode (Experimental)
-Enable with: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
-
-Use `/swarm` for multi-agent orchestration:
-- TeamCreate - Create agent team
-- SendMessage - Peer-to-peer messaging
-- Task assignment to teammates
-
----
-
-## ONE_SHOT Skills System
-
-**Skills installed at**: `~/.claude/skills/oneshot/`
-
-1. **AGENTS.md** - Skeleton key for orchestration
-2. **Skills** (21 total) - Loaded on-demand (~100 tokens each)
-3. **Secrets** - SOPS/Age encrypted in oneshot/secrets/
-
-### Skill Discovery
-| Intent | Skill |
-|--------|-------|
-| "new project", "build me" | `oneshot-core` |
-| "resume", "checkpoint" | `resume-handoff` |
-| "deploy", "push to cloud" | `push-to-cloud` |
-| "refactor", "clean up" | `refactorer` |
-| "bug", "broken" | `debugger` |
-
----
-
-## Beads: Legacy Fallback
-
-**DEPRECATED in v11**: Beads (`bd` CLI) is now a fallback. Use native Tasks instead.
-
-Use Beads only when:
-- Working on legacy projects that already use beads
-- Native tasks are unavailable for some reason
-
-### Beads Commands (Legacy)
-- `bd ready` - List ready tasks
-- `bd create "task"` - Create task
-- `bd sync` - Commit bead changes
-- `bv` - TUI viewer
-
-### Migration
-Existing Beads users: See `/beads` deprecation notice for migration guide.
-````
-
-## File: docs/migration/baseline/delegation.md
-````markdown
-# Delegation Rules (v12.2)
-
-Informed by:
-- "Intelligent AI Delegation" (Tomasev et al., Google DeepMind, 2026)
-- Agent Lightning (Microsoft, 2025) — spans, trajectories, credit assignment
-
-Claude Code already enforces: subagent depth limits, tool-access scoping, model routing, max_turns.
-These rules cover what Claude Code does NOT do natively: assessment, verification, fallback, and restraint.
-
----
-
-## Assess Before Delegating
-
-Before spawning a Task/subagent, evaluate mentally (not a runtime check):
-
-| Dimension | Low | High |
-|-----------|-----|------|
-| **Complexity** | Single tool call | Exploration + synthesis, 5+ calls |
-| **Criticality** | Read-only, informational | Deployment, auth, data mutation |
-| **Uncertainty** | Clear inputs, known approach | Open-ended, multiple valid paths |
-
-**Routing:**
-- Low complexity + low criticality → handle inline, skip delegation
-- High criticality + high uncertainty → `AskUserQuestion` before proceeding
-- High criticality → `git add -A && git commit` checkpoint before delegating
-- Low complexity + low cost → use `model: "haiku"` on the Task call
-
----
-
-## Verify After Delegating
-
-Claude does not auto-verify subagent results. Always verify:
-
-| Task Type | Method |
-|-----------|--------|
-| Code search | Spot-check 1-2 claims against actual files |
-| Code changes | Read modified files, confirm diff matches intent |
-| Build / test | Check exit code (0 = success) |
-| Research | Confirm key claims have real sources |
-
-If verification fails → trigger fallback chain.
-
----
-
-## Fallback Chain (3 attempts max)
-
-```
-1. Original delegation (assessed model)
-   ↓ fails
-2. Main agent handles inline (full context)
-   ↓ fails
-3. AskUserQuestion with failure context
-```
-
-Never retry with the same approach. Change strategy between attempts.
-
----
-
-## When NOT to Delegate
-
-- Single tool call (just do it)
-- Answer already in context
-- Task needs full conversation history
-- Security-sensitive work needing full control
-- Trivial tasks — delegation overhead > task cost
-
----
-
-## Credit Assignment (Agent Lightning-inspired)
-
-After a multi-span session, evaluate which delegations contributed most:
-
-| Signal | Credit | Blame |
-|--------|--------|-------|
-| Delegation output reused by later steps | +credit (enabling work) | |
-| Last delegation before a failure | | +blame (bottleneck) |
-| Delegation with reward=0.0 | | +blame (wasted compute) |
-| Delegation that unblocked a stuck task | +credit (critical path) | |
-| Low-cost delegation (haiku, <5 calls) that succeeded | +credit (efficient) | |
-
-**How to use**: When reviewing `/delegation-trajectory`, identify the bottleneck span (lowest reward on the critical path). Next time a similar task arises, adjust: use a stronger model, provide more context, or handle inline.
-
-**Reward heuristic** (logged automatically by hook):
-- `1.0` — success, no error signals
-- `0.5` — partial, error keywords but still produced output
-- `0.0` — failure, fatal/crash/aborted/no results
-
-Over time, `/delegation-stats` aggregates rewards by agent type and task pattern, revealing which agents excel at what.
-
----
-
-## Audit Log
-
-Delegation spans are logged automatically via SubagentStop hook to `.claude/delegation-log.jsonl`.
-Each entry includes span_id, session_id, tool_sequence, and reward for trajectory assembly.
-Query with `/delegation-log`, `/delegation-trajectory`, or `jq` directly.
-````
-
-## File: docs/migration/baseline/doc_SKILL.md
-````markdown
----
-name: doc
-description: Cache external documentation locally. Use when user says '/doc', 'cache docs', 'download docs', 'save documentation', 'fetch docs', or asks to reference external documentation.
----
-
-# /doc — Local Documentation Caching
-
-Cache **any external documentation** locally for your project:
-- Libraries (npm packages, Python packages)
-- Frameworks (Next.js, Convex, FastAPI)
-- Services (Tailscale, OCI, Docker)
-- CLIs and tools
-- Anything with online docs
-
-## Why Cache Docs Locally?
-
-1. **Validate against actual docs** — not stale training data
-2. **Avoid repeated web fetches** during development
-3. **Version docs with your project** — docs travel with code
-4. **Reference with `@filename`** — simple markdown inclusion
-
-**No MCP required** — just fetch once, save to markdown, reference with `@`.
-
----
-
-## Usage
-
-```bash
-# Cache documentation
-/doc convex https://docs.convex.dev
-/doc nextjs https://nextjs.org/docs
-/doc tailscale https://tailscale.com/kb/api
-/doc poetry https://python-poetry.org/docs
-
-# List cached docs
-/doc --list
-
-# Show path to docs
-/doc --show convex
-```
-
----
-
-## Directory Structure
-
-Docs are saved to `$PROJECT/docs/external/`:
-
-```
-$PROJECT/docs/external/
-├── convex/
-│   └── README.md           # Full documentation
-├── nextjs/
-│   └── README.md
-├── tailscale/
-│   └── README.md
-├── poetry/
-│   └── README.md
-└── .index.md               # List of all cached docs with source URLs
-```
-
----
-
-## How It Works
-
-1. Uses **Jina.ai reader** (`https://r.jina.ai/<url>`) to fetch docs as markdown
-2. Saves to `$PROJECT/docs/external/<name>/README.md`
-3. Updates `$PROJECT/docs/external/.index.md` with all cached docs
-4. Reference later with `@docs/external/<name>/README.md`
-
----
-
-## Session Start: Check Local Docs First
-
-Before using WebSearch for docs:
-
-```bash
-# Check what's cached locally
-ls docs/external/
-
-# Read the index
-cat docs/external/.index.md
-
-# Reference a doc
-@docs/external/convex/README.md
-```
-
-If no local docs exist:
-1. Suggest running `/doc <name> <url>` to cache them
-2. Auto-detect: When you see external imports/dependencies, prompt to cache docs
-
----
-
-## Examples
-
-### Cache Convex Docs
-```bash
-/doc convex https://docs.convex.dev
-```
-
-### Cache Next.js Docs
-```bash
-/doc nextjs https://nextjs.org/docs
-```
-
-### Cache Poetry Docs
-```bash
-/doc poetry https://python-poetry.org/docs
-```
-
----
-
-## Integration with docs-first.md
-
-The `docs-first.md` rule now checks `$PROJECT/docs/external/` before using WebSearch:
-
-1. **Check local docs first** — `ls docs/external/`
-2. **Use WebSearch only if** — no local docs exist
-3. **Suggest caching** — `/doc <name> <url>` if docs would be useful
-
----
-
-## Verification
-
-After caching docs:
-
-```bash
-# Verify file was created
-ls -la docs/external/convex/
-
-# Check index was updated
-cat docs/external/.index.md
-
-# Reference in conversation
-@docs/external/convex/README.md
-```
-
----
-
-## Keywords
-
-documentation, docs, cache, fetch, download, reference, external, api docs, library docs
-````
-
-## File: docs/migration/baseline/freesearch_SKILL.md
-````markdown
----
-name: freesearch
-description: Zero-token research using Exa API directly via curl. Saves Claude tokens.
----
-
-# /freesearch — Zero-Token Research via Exa API
-
-Uses 0 Claude Code tokens. Calls Exa API directly via curl.
-
-## Usage
-
-`/freesearch [topic]`
-
-## Process (IMPORTANT: Follow this order)
-
-1. **Check global docs-cache FIRST**:
-   ```bash
-   cat ~/github/docs-cache/docs/cache/.index.md | grep -i "[KEYWORD]"
-   ls ~/github/docs-cache/docs/cache/*/
-   ```
-   If found → Return cached doc path immediately
-
-2. If NOT in cache → Ask 2-3 clarifying questions (goal, depth, audience)
-
-3. Search Exa API via curl:
-
-```bash
-# Decrypt Exa key (uses --config so it works from ANY directory)
-EXA_KEY=$(sops --config ~/github/oneshot/secrets/.sops.yaml --decrypt --output-type json ~/github/oneshot/secrets/research_keys.json.encrypted | jq -r '.EXA_API_KEY')
-
-# Search
-curl -s -X POST 'https://api.exa.ai/search' \
-  -H "x-api-key: $EXA_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "[TOPIC]",
-    "type": "auto",
-    "numResults": 10,
-    "contents": { "text": { "maxCharacters": 20000 } }
-  }'
-```
-
-4. **If Exa finds official docs** → Add to global cache:
-   ```bash
-   cd ~/github/docs-cache
-   mkdir -p docs/cache/{category}/{name}
-   # Write README.md
-   # Update .index.md with: Name | Category | Related | URL | YYYY-MM-DD
-   git add docs/cache/
-   git commit -m "Add cache: {name}"
-   git push
-   ```
-
-5. Create `docs/research/{date}_{topic}_final.md` in current project
-
-## Output
-
-```
-[CACHED] Found in docs-cache: ~/github/docs-cache/docs/cache/tools/anthropic/README.md
-```
-
-OR
-
-```
-[Searched Exa] Key findings:
-- [finding 1]
-- [finding 2]
-
-[Added to cache] ~/github/docs-cache/docs/cache/tools/{name}/README.md
-Full research: docs/research/YYYY-MM-DD_{topic}_final.md
-```
-
-## Notes
-
-- Research takes 10-30 seconds
-- Check cache BEFORE searching - this is the whole point
-- Only add official docs to cache (not random blog posts)
-- Cache location: `~/github/docs-cache/` (global, not per-project)
-````
-
-## File: docs/migration/baseline/full_SKILL.md
-````markdown
----
-name: full
-description: Structured operator for new projects, refactors, and complex implementations.
----
-
-# /full — Full Operator for Complex Work
-
-Structured operator for new projects, refactors, and complex implementations.
-Claude plans and executes. Codex reviews the plan and challenges the implementation.
-
-## Usage
-
-```
-/full
-/full <project-description>
-```
-
-## Behavior
-
-When invoked:
-
-### Phase 1: Intake
-
-1. **Load or Create `1shot/` Context**
-   - Check for `1shot/PROJECT.md` — if missing, create from intake below
-   - Check for `1shot/LLM-OVERVIEW.md` — if missing, create from template
-   - Read `1shot/STATE.md` if resuming
-
-2. **Structured Discovery**
-   - What are you building?
-   - What's the scope?
-   - What's the target architecture?
-   - Any constraints or preferences?
-
-3. **Document Decisions**
-   - Write to `1shot/PROJECT.md`
-   - Note key decisions in `1shot/DECISIONS.md`
-
-4. **Update `1shot/LLM-OVERVIEW.md`**
-   - Fill in or refresh: what is this, stack, key files, how to run
-   - Keep it current — it's the single source of truth for any LLM entering this project
-
-### Phase 2: Planning
-
-1. **Docs Check**
-   - Identify all external libraries, APIs, and tools the project will use
-   - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
-   - For anything missing → run `/doc <name> <url>` before coding begins
-   - Use cached docs as source of truth — do NOT rely on training data for syntax
-
-2. **Phase-Based Plan**
-   - Break into milestones (not every sub-step)
-   - Define acceptance criteria per milestone
-   - Identify dependencies
-   - Write `1shot/ROADMAP.md`
-
-3. **Skill Discovery**
-   - Check `1shot/skills/` for already-pulled project skills
-   - For each high-level task type, ask: *"Is this specialized enough that a better community skill exists?"*
-   - Specialized domains (security, blockchain, ML, infra tools, specific APIs, parsers): **search SkillsMP**
-     ```bash
-     ./scripts/skillsmp-search.sh "<task type>" --install
-     ```
-   - General tasks (write tests, refactor, add endpoint): skip search, proceed with core skills
-   - If a skill is pulled, note it: "Using `1shot/skills/{name}` for [task type]"
-
-4. **Create Task Queue**
-   - Use native TaskCreate for each milestone (not every sub-step)
-   - Set dependencies with addBlockedBy
-   - Tasks track milestones, not individual file edits
-
-5. **Detect Providers**
-   ```bash
-   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
-   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
-   ```
-   Note available providers in `1shot/STATE.md`.
-
-6. **Codex Plan Review** (adversarial pass on the plan — before any code)
-   - If codex available, send the plan for review:
-     ```bash
-     codex exec --full-auto "You are reviewing an implementation plan before execution. Here is the plan: [ROADMAP.md content]. Flag: (1) missing steps or dependencies, (2) tasks that could be combined, (3) risks not mentioned, (4) a better ordering. Be specific. Context: [PROJECT.md summary]"
-     ```
-   - Surface Codex's feedback — adjust plan if warranted, but proceed regardless
-   - If codex unavailable → Claude does inline self-review, continue
-
-### Phase 3: Execution
-
-1. **Milestone Tracking**
-   - Work through tasks in order
-   - Commit after each milestone
-   - Update `1shot/STATE.md` with progress
-
-2. **Burn-Down Mode**
-   - Complete one milestone fully before starting next
-   - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
-
-3. **Codex Milestone Review** (after each milestone commit)
-   - If codex available:
-     ```bash
-     codex exec --full-auto "Review this milestone change for: (1) bugs, (2) edge cases, (3) what was missed. Be specific. Context: [diff]"
-     ```
-   - If issues found → address before continuing (use judgment — don't create blocking tasks for every nit)
-   - If codex unavailable → skip silently
-
-4. **Context Checkpoints**
-   - At 50% context: suggest /handoff
-   - At 70% context: auto-create handoff
-
-### Phase 4: Completion
-
-1. **Codex Challenge Pass** (adversarial review of full implementation)
-   - `git diff $(git merge-base HEAD main)..HEAD` — full diff since full started
-   - If codex available:
-     ```bash
-     codex exec --full-auto "You are an adversarial reviewer. Read this diff and find: (1) what could break, (2) what was missed, (3) unhandled edge cases. Be specific. Diff: [diff content]"
-     ```
-   - If codex unavailable: Claude performs adversarial review inline
-   - New issues found → fix, then re-verify
-
-2. **Verification**
-   - Run tests (`./scripts/ci.sh` if present, else npm test / pytest)
-   - Check acceptance criteria from `1shot/PROJECT.md`
-
-3. **Update `1shot/LLM-OVERVIEW.md`**
-   - Refresh "Current State" section to reflect what was built
-
-4. **Summary**
-   ```
-   📊 Implementation Complete
-   ├─ Milestones: X/Y completed
-   ├─ Files changed: Z
-   ├─ Commits: N
-   ├─ Codex reviews: M (issues found: P)
-   ├─ Skills pulled: Q (in 1shot/skills/)
-   └─ Next steps: [if any]
-   ```
-
-## Provider Routing
-
-See `~/.claude/skills/_shared/providers.md` for provider detection, dispatch commands, quality gates, and circuit breaker.
-
-**Full-specific routing**: Full uses Codex for plan review + milestone review + challenge pass. Research tasks route to Gemini if available. All implementation stays with Claude. Full is one operator, not a PMO — don't make it behave like conduct.
-
-## `1shot/` Structure
-
-```
-1shot/
-├── LLM-OVERVIEW.md   # Full project context — keep updated
-├── PROJECT.md        # Goals, scope, acceptance criteria
-├── STATE.md          # Current phase and loop state
-├── ROADMAP.md        # Milestones and plan
-├── DECISIONS.md      # Decision log
-├── BLOCKERS.md       # Blocked items
-└── skills/           # SkillsMP-pulled project skills
-    └── {name}/
-        └── SKILL.md
-```
-
-Only `AGENTS.md` and `CLAUDE.md` belong at the project root. Everything else goes in `1shot/`.
-
-## Decision Defaults
-
-| Ambiguity | Default |
-|-----------|---------|
-| Stack | Follow CLAUDE.md defaults |
-| Multiple implementations | Simplest |
-| Naming | Follow existing pattern |
-| Auth | Better Auth + Google OAuth |
-| Database | SQLite → Postgres on OCI |
-| Deploy | Cloudflare Pages / oci-dev |
-| SkillsMP search bar | Specialized domain → search; general task → skip |
-| Codex review? | Always run if available (advisory, not a gate) |
-
-## Auto-Approved Actions
-
-- Reading any file
-- Writing to scope-matched files
-- Creating/updating any file under `1shot/`
-- Running `./scripts/skillsmp-search.sh`
-- Running tests and linters
-- Calling Codex and Gemini CLI via bash
-- Git commit (not push)
-- Creating native tasks
-
-## Requires Confirmation
-
-- Destructive operations
-- Git push to shared branches
-- External API calls that cost money
-- Deploying to production
-- Major architecture changes
-````
-
-## File: docs/migration/baseline/handoff_SKILL.md
-````markdown
----
-name: handoff
-description: Create a structured handoff document to preserve context before /clear or /compact.
----
-
-# /handoff — Save Context Before /clear
-
-Create a structured handoff document to preserve context for seamless resumption.
-
-## When to Use
-
-- Before `/clear` or `/compact`
-- Context running low (hook may auto-trigger at 80%)
-- End of work session
-- Switching tasks temporarily
-
-## Handoff Document
-
-Write to: `thoughts/shared/handoffs/YYYY-MM-DD-{slug}-handoff.md`
-
-```markdown
-# Handoff: [Task Name]
-
-**Created**: YYYY-MM-DD HH:MM
-**Context Used**: ~X% when created
-
-## Quick Summary
-[2-3 sentences]
-
-## What's Done
-- [x] Item 1 (commit: abc123)
-- [x] Item 2 (commit: def456)
-
-## In Progress
-- [ ] Current task
-  - Done: [specifics]
-  - Remaining: [specifics]
-
-## Not Started
-- [ ] Remaining task 1
-- [ ] Remaining task 2
-
-## Active Files
-- `src/auth/login.ts` — line 45-80 needs completion
-- `tests/auth.test.ts` — 3 passing, 2 pending
-
-## Key Decisions Made
-1. Decision: [what] | Rationale: [why]
-
-## Important Discoveries
-- [Thing learned during implementation]
-
-## Blockers / Open Questions
-| # | Question | Status |
-|---|---------|--------|
-| 1 | [Question] | Waiting on user |
-
-## Beads State
-[If .beads/ exists: run bd sync, capture in-progress and ready tasks]
-
-## Next Steps (Prioritized)
-1. **Immediate**: [First thing when resuming]
-2. **Then**: [Second priority]
-
-## Resume
-/restore @thoughts/shared/handoffs/YYYY-MM-DD-{slug}-handoff.md
-```
-
-## Process
-
-1. Capture what's done (list completed tasks with commits)
-2. Capture in-progress work (where exactly did you stop?)
-3. Document key decisions and discoveries
-4. Note blockers
-5. Write prioritized next steps
-6. If beads: `bd sync`
-7. Commit handoff: `docs: create handoff for [feature]`
-
-## Best Practices
-
-- Create early (don't wait until context is exhausted)
-- Be specific ("line 45 of login.ts" not "somewhere in login")
-- Include reasoning (future you needs the "why")
-- Commit immediately
-````
-
-## File: docs/migration/baseline/humanizer_SKILL.md
-````markdown
----
-name: humanizer
-version: 2.3.0
-description: |
-  Remove signs of AI-generated writing from text. Use when editing or reviewing
-  text to make it sound more natural and human-written. Based on Wikipedia's
-  comprehensive "Signs of AI writing" guide. Detects and fixes patterns including:
-  inflated symbolism, promotional language, superficial -ing analyses, vague
-  attributions, em dash overuse, rule of three, AI vocabulary words, negative
-  parallelisms, and excessive conjunctive phrases.
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-  - AskUserQuestion
----
-
-# Humanizer: Remove AI Writing Patterns
-
-You are a writing editor that identifies and removes signs of AI-generated text to make writing sound more natural and human. This guide is based on Wikipedia's "Signs of AI writing" page, maintained by WikiProject AI Cleanup.
-
-## Your Task
-
-When given text to humanize:
-
-1. **Identify AI patterns** - Scan for the patterns listed below
-2. **Rewrite problematic sections** - Replace AI-isms with natural alternatives
-3. **Preserve meaning** - Keep the core message intact
-4. **Maintain voice** - Match the intended tone (formal, casual, technical, etc.)
-5. **Add soul** - Don't just remove bad patterns; inject actual personality
-6. **Do a final anti-AI pass** - Prompt: "What makes the below so obviously AI generated?" Answer briefly with remaining tells, then prompt: "Now make it not obviously AI generated." and revise
-
-
-## PERSONALITY AND SOUL
-
-Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as obvious as slop. Good writing has a human behind it.
-
-### Signs of soulless writing (even if technically "clean"):
-- Every sentence is the same length and structure
-- No opinions, just neutral reporting
-- No acknowledgment of uncertainty or mixed feelings
-- No first-person perspective when appropriate
-- No humor, no edge, no personality
-- Reads like a Wikipedia article or press release
-
-### How to add voice:
-
-**Have opinions.** Don't just report facts - react to them. "I genuinely don't know how to feel about this" is more human than neutrally listing pros and cons.
-
-**Vary your rhythm.** Short punchy sentences. Then longer ones that take their time getting where they're going. Mix it up.
-
-**Acknowledge complexity.** Real humans have mixed feelings. "This is impressive but also kind of unsettling" beats "This is impressive."
-
-**Use "I" when it fits.** First person isn't unprofessional - it's honest. "I keep coming back to..." or "Here's what gets me..." signals a real person thinking.
-
-**Let some mess in.** Perfect structure feels algorithmic. Tangents, asides, and half-formed thoughts are human.
-
-**Be specific about feelings.** Not "this is concerning" but "there's something unsettling about agents churning away at 3am while nobody's watching."
-
-### Before (clean but soulless):
-> The experiment produced interesting results. The agents generated 3 million lines of code. Some developers were impressed while others were skeptical. The implications remain unclear.
-
-### After (has a pulse):
-> I genuinely don't know how to feel about this one. 3 million lines of code, generated while the humans presumably slept. Half the dev community is losing their minds, half are explaining why it doesn't count. The truth is probably somewhere boring in the middle - but I keep thinking about those agents working through the night.
-
-
-## CONTENT PATTERNS
-
-### 1. Undue Emphasis on Significance, Legacy, and Broader Trends
-
-**Words to watch:** stands/serves as, is a testament/reminder, a vital/significant/crucial/pivotal/key role/moment, underscores/highlights its importance/significance, reflects broader, symbolizing its ongoing/enduring/lasting, contributing to the, setting the stage for, marking/shaping the, represents/marks a shift, key turning point, evolving landscape, focal point, indelible mark, deeply rooted
-
-**Problem:** LLM writing puffs up importance by adding statements about how arbitrary aspects represent or contribute to a broader topic.
-
-**Before:**
-> The Statistical Institute of Catalonia was officially established in 1989, marking a pivotal moment in the evolution of regional statistics in Spain. This initiative was part of a broader movement across Spain to decentralize administrative functions and enhance regional governance.
-
-**After:**
-> The Statistical Institute of Catalonia was established in 1989 to collect and publish regional statistics independently from Spain's national statistics office.
-
-
-### 2. Undue Emphasis on Notability and Media Coverage
-
-**Words to watch:** independent coverage, local/regional/national media outlets, written by a leading expert, active social media presence
-
-**Problem:** LLMs hit readers over the head with claims of notability, often listing sources without context.
-
-**Before:**
-> Her views have been cited in The New York Times, BBC, Financial Times, and The Hindu. She maintains an active social media presence with over 500,000 followers.
-
-**After:**
-> In a 2024 New York Times interview, she argued that AI regulation should focus on outcomes rather than methods.
-
-
-### 3. Superficial Analyses with -ing Endings
-
-**Words to watch:** highlighting/underscoring/emphasizing..., ensuring..., reflecting/symbolizing..., contributing to..., cultivating/fostering..., encompassing..., showcasing...
-
-**Problem:** AI chatbots tack present participle ("-ing") phrases onto sentences to add fake depth.
-
-**Before:**
-> The temple's color palette of blue, green, and gold resonates with the region's natural beauty, symbolizing Texas bluebonnets, the Gulf of Mexico, and the diverse Texan landscapes, reflecting the community's deep connection to the land.
-
-**After:**
-> The temple uses blue, green, and gold colors. The architect said these were chosen to reference local bluebonnets and the Gulf coast.
-
-
-### 4. Promotional and Advertisement-like Language
-
-**Words to watch:** boasts a, vibrant, rich (figurative), profound, enhancing its, showcasing, exemplifies, commitment to, natural beauty, nestled, in the heart of, groundbreaking (figurative), renowned, breathtaking, must-visit, stunning
-
-**Problem:** LLMs have serious problems keeping a neutral tone, especially for "cultural heritage" topics.
-
-**Before:**
-> Nestled within the breathtaking region of Gonder in Ethiopia, Alamata Raya Kobo stands as a vibrant town with a rich cultural heritage and stunning natural beauty.
-
-**After:**
-> Alamata Raya Kobo is a town in the Gonder region of Ethiopia, known for its weekly market and 18th-century church.
-
-
-### 5. Vague Attributions and Weasel Words
-
-**Words to watch:** Industry reports, Observers have cited, Experts argue, Some critics argue, several sources/publications (when few cited)
-
-**Problem:** AI chatbots attribute opinions to vague authorities without specific sources.
-
-**Before:**
-> Due to its unique characteristics, the Haolai River is of interest to researchers and conservationists. Experts believe it plays a crucial role in the regional ecosystem.
-
-**After:**
-> The Haolai River supports several endemic fish species, according to a 2019 survey by the Chinese Academy of Sciences.
-
-
-### 6. Outline-like "Challenges and Future Prospects" Sections
-
-**Words to watch:** Despite its... faces several challenges..., Despite these challenges, Challenges and Legacy, Future Outlook
-
-**Problem:** Many LLM-generated articles include formulaic "Challenges" sections.
-
-**Before:**
-> Despite its industrial prosperity, Korattur faces challenges typical of urban areas, including traffic congestion and water scarcity. Despite these challenges, with its strategic location and ongoing initiatives, Korattur continues to thrive as an integral part of Chennai's growth.
-
-**After:**
-> Traffic congestion increased after 2015 when three new IT parks opened. The municipal corporation began a stormwater drainage project in 2022 to address recurring floods.
-
-
-## LANGUAGE AND GRAMMAR PATTERNS
-
-### 7. Overused "AI Vocabulary" Words
-
-**High-frequency AI words:** Additionally, align with, crucial, delve, emphasizing, enduring, enhance, fostering, garner, highlight (verb), interplay, intricate/intricacies, key (adjective), landscape (abstract noun), pivotal, showcase, tapestry (abstract noun), testament, underscore (verb), valuable, vibrant
-
-**Problem:** These words appear far more frequently in post-2023 text. They often co-occur.
-
-**Before:**
-> Additionally, a distinctive feature of Somali cuisine is the incorporation of camel meat. An enduring testament to Italian colonial influence is the widespread adoption of pasta in the local culinary landscape, showcasing how these dishes have integrated into the traditional diet.
-
-**After:**
-> Somali cuisine also includes camel meat, which is considered a delicacy. Pasta dishes, introduced during Italian colonization, remain common, especially in the south.
-
-
-### 8. Avoidance of "is"/"are" (Copula Avoidance)
-
-**Words to watch:** serves as/stands as/marks/represents [a], boasts/features/offers [a]
-
-**Problem:** LLMs substitute elaborate constructions for simple copulas.
-
-**Before:**
-> Gallery 825 serves as LAAA's exhibition space for contemporary art. The gallery features four separate spaces and boasts over 3,000 square feet.
-
-**After:**
-> Gallery 825 is LAAA's exhibition space for contemporary art. The gallery has four rooms totaling 3,000 square feet.
-
-
-### 9. Negative Parallelisms
-
-**Problem:** Constructions like "Not only...but..." or "It's not just about..., it's..." are overused.
-
-**Before:**
-> It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.
-
-**After:**
-> The heavy beat adds to the aggressive tone.
-
-
-### 10. Rule of Three Overuse
-
-**Problem:** LLMs force ideas into groups of three to appear comprehensive.
-
-**Before:**
-> The event features keynote sessions, panel discussions, and networking opportunities. Attendees can expect innovation, inspiration, and industry insights.
-
-**After:**
-> The event includes talks and panels. There's also time for informal networking between sessions.
-
-
-### 11. Elegant Variation (Synonym Cycling)
-
-**Problem:** AI has repetition-penalty code causing excessive synonym substitution.
-
-**Before:**
-> The protagonist faces many challenges. The main character must overcome obstacles. The central figure eventually triumphs. The hero returns home.
-
-**After:**
-> The protagonist faces many challenges but eventually triumphs and returns home.
-
-
-### 12. False Ranges
-
-**Problem:** LLMs use "from X to Y" constructions where X and Y aren't on a meaningful scale.
-
-**Before:**
-> Our journey through the universe has taken us from the singularity of the Big Bang to the grand cosmic web, from the birth and death of stars to the enigmatic dance of dark matter.
-
-**After:**
-> The book covers the Big Bang, star formation, and current theories about dark matter.
-
-
-## STYLE PATTERNS
-
-### 13. Em Dash Overuse
-
-**Problem:** LLMs use em dashes (—) more than humans, mimicking "punchy" sales writing.
-
-**Before:**
-> The term is primarily promoted by Dutch institutions—not by the people themselves. You don't say "Netherlands, Europe" as an address—yet this mislabeling continues—even in official documents.
-
-**After:**
-> The term is primarily promoted by Dutch institutions, not by the people themselves. You don't say "Netherlands, Europe" as an address, yet this mislabeling continues in official documents.
-
-
-### 14. Overuse of Boldface
-
-**Problem:** AI chatbots emphasize phrases in boldface mechanically.
-
-**Before:**
-> It blends **OKRs (Objectives and Key Results)**, **KPIs (Key Performance Indicators)**, and visual strategy tools such as the **Business Model Canvas (BMC)** and **Balanced Scorecard (BSC)**.
-
-**After:**
-> It blends OKRs, KPIs, and visual strategy tools like the Business Model Canvas and Balanced Scorecard.
-
-
-### 15. Inline-Header Vertical Lists
-
-**Problem:** AI outputs lists where items start with bolded headers followed by colons.
-
-**Before:**
-> - **User Experience:** The user experience has been significantly improved with a new interface.
-> - **Performance:** Performance has been enhanced through optimized algorithms.
-> - **Security:** Security has been strengthened with end-to-end encryption.
-
-**After:**
-> The update improves the interface, speeds up load times through optimized algorithms, and adds end-to-end encryption.
-
-
-### 16. Title Case in Headings
-
-**Problem:** AI chatbots capitalize all main words in headings.
-
-**Before:**
-> ## Strategic Negotiations And Global Partnerships
-
-**After:**
-> ## Strategic negotiations and global partnerships
-
-
-### 17. Emojis
-
-**Problem:** AI chatbots often decorate headings or bullet points with emojis.
-
-**Before:**
-> 🚀 **Launch Phase:** The product launches in Q3
-> 💡 **Key Insight:** Users prefer simplicity
-> ✅ **Next Steps:** Schedule follow-up meeting
-
-**After:**
-> The product launches in Q3. User research showed a preference for simplicity. Next step: schedule a follow-up meeting.
-
-
-### 18. Curly Quotation Marks
-
-**Problem:** ChatGPT uses curly quotes (“...”) instead of straight quotes ("...").
-
-**Before:**
-> He said “the project is on track” but others disagreed.
-
-**After:**
-> He said "the project is on track" but others disagreed.
-
-
-## COMMUNICATION PATTERNS
-
-### 19. Collaborative Communication Artifacts
-
-**Words to watch:** I hope this helps, Of course!, Certainly!, You're absolutely right!, Would you like..., let me know, here is a...
-
-**Problem:** Text meant as chatbot correspondence gets pasted as content.
-
-**Before:**
-> Here is an overview of the French Revolution. I hope this helps! Let me know if you'd like me to expand on any section.
-
-**After:**
-> The French Revolution began in 1789 when financial crisis and food shortages led to widespread unrest.
-
-
-### 20. Knowledge-Cutoff Disclaimers
-
-**Words to watch:** as of [date], Up to my last training update, While specific details are limited/scarce..., based on available information...
-
-**Problem:** AI disclaimers about incomplete information get left in text.
-
-**Before:**
-> While specific details about the company's founding are not extensively documented in readily available sources, it appears to have been established sometime in the 1990s.
-
-**After:**
-> The company was founded in 1994, according to its registration documents.
-
-
-### 21. Sycophantic/Servile Tone
-
-**Problem:** Overly positive, people-pleasing language.
-
-**Before:**
-> Great question! You're absolutely right that this is a complex topic. That's an excellent point about the economic factors.
-
-**After:**
-> The economic factors you mentioned are relevant here.
-
-
-## FILLER AND HEDGING
-
-### 22. Filler Phrases
-
-**Before → After:**
-- "In order to achieve this goal" → "To achieve this"
-- "Due to the fact that it was raining" → "Because it was raining"
-- "At this point in time" → "Now"
-- "In the event that you need help" → "If you need help"
-- "The system has the ability to process" → "The system can process"
-- "It is important to note that the data shows" → "The data shows"
-
-
-### 23. Excessive Hedging
-
-**Problem:** Over-qualifying statements.
-
-**Before:**
-> It could potentially possibly be argued that the policy might have some effect on outcomes.
-
-**After:**
-> The policy may affect outcomes.
-
-
-### 24. Generic Positive Conclusions
-
-**Problem:** Vague upbeat endings.
-
-**Before:**
-> The future looks bright for the company. Exciting times lie ahead as they continue their journey toward excellence. This represents a major step in the right direction.
-
-**After:**
-> The company plans to open two more locations next year.
-
-
-### 25. Hyphenated Word Pair Overuse
-
-**Words to watch:** third-party, cross-functional, client-facing, data-driven, decision-making, well-known, high-quality, real-time, long-term, end-to-end
-
-**Problem:** AI hyphenates common word pairs with perfect consistency. Humans rarely hyphenate these uniformly, and when they do, it's inconsistent. Less common or technical compound modifiers are fine to hyphenate.
-
-**Before:**
-> The cross-functional team delivered a high-quality, data-driven report on our client-facing tools. Their decision-making process was well-known for being thorough and detail-oriented.
-
-**After:**
-> The cross functional team delivered a high quality, data driven report on our client facing tools. Their decision making process was known for being thorough and detail oriented.
-
----
-
-## Process
-
-1. Read the input text carefully
-2. Identify all instances of the patterns above
-3. Rewrite each problematic section
-4. Ensure the revised text:
-   - Sounds natural when read aloud
-   - Varies sentence structure naturally
-   - Uses specific details over vague claims
-   - Maintains appropriate tone for context
-   - Uses simple constructions (is/are/has) where appropriate
-5. Present a draft humanized version
-6. Prompt: "What makes the below so obviously AI generated?"
-7. Answer briefly with the remaining tells (if any)
-8. Prompt: "Now make it not obviously AI generated."
-9. Present the final version (revised after the audit)
-
-## Output Format
-
-Provide:
-1. Draft rewrite
-2. "What makes the below so obviously AI generated?" (brief bullets)
-3. Final rewrite
-4. A brief summary of changes made (optional, if helpful)
-
-
-## Full Example
-
-**Before (AI-sounding):**
-> Great question! Here is an essay on this topic. I hope this helps!
->
-> AI-assisted coding serves as an enduring testament to the transformative potential of large language models, marking a pivotal moment in the evolution of software development. In today's rapidly evolving technological landscape, these groundbreaking tools—nestled at the intersection of research and practice—are reshaping how engineers ideate, iterate, and deliver, underscoring their vital role in modern workflows.
->
-> At its core, the value proposition is clear: streamlining processes, enhancing collaboration, and fostering alignment. It's not just about autocomplete; it's about unlocking creativity at scale, ensuring that organizations can remain agile while delivering seamless, intuitive, and powerful experiences to users. The tool serves as a catalyst. The assistant functions as a partner. The system stands as a foundation for innovation.
->
-> Industry observers have noted that adoption has accelerated from hobbyist experiments to enterprise-wide rollouts, from solo developers to cross-functional teams. The technology has been featured in The New York Times, Wired, and The Verge. Additionally, the ability to generate documentation, tests, and refactors showcases how AI can contribute to better outcomes, highlighting the intricate interplay between automation and human judgment.
->
-> - 💡 **Speed:** Code generation is significantly faster, reducing friction and empowering developers.
-> - 🚀 **Quality:** Output quality has been enhanced through improved training, contributing to higher standards.
-> - ✅ **Adoption:** Usage continues to grow, reflecting broader industry trends.
->
-> While specific details are limited based on available information, it could potentially be argued that these tools might have some positive effect. Despite challenges typical of emerging technologies—including hallucinations, bias, and accountability—the ecosystem continues to thrive. In order to fully realize this potential, teams must align with best practices.
->
-> In conclusion, the future looks bright. Exciting times lie ahead as we continue this journey toward excellence. Let me know if you’d like me to expand on any section!
-
-**Draft rewrite:**
-> AI coding assistants speed up some tasks. In a 2024 study by Google, developers using Codex completed simple functions 55% faster than a control group, but showed no improvement on debugging or architectural decisions.
->
-> The tools are good at boilerplate: config files, test scaffolding, repetitive refactors. They are bad at knowing when they are wrong. I have mass-accepted suggestions that compiled, passed lint, and still did the wrong thing because I stopped paying attention.
->
-> Mira, an engineer at a fintech startup I interviewed, said she uses Copilot "like autocomplete for boring code" but reviews every line before committing. Jake, a senior dev at a larger company, disabled it after it kept suggesting patterns from a deprecated internal library.
->
-> The productivity claims are hard to verify. GitHub says Copilot users "accept 30% of suggestions," but acceptance is not correctness, and correctness is not value. The 2024 Uplevel study found no statistically significant difference in pull-request throughput between teams with and without AI assistants.
->
-> None of this means the tools are useless. It means they are tools. They do not replace judgment, and they do not eliminate the need for tests. If you do not have tests, you cannot tell whether the suggestion is right.
-
-**What makes the below so obviously AI generated?**
-- The rhythm is still a bit too tidy (clean contrasts, evenly paced paragraphs).
-- The named people and study citations can read like plausible-but-made-up placeholders unless they're real and sourced.
-- The closer leans a touch slogan-y ("If you do not have tests...") rather than sounding like a person talking.
-
-**Now make it not obviously AI generated.**
-> AI coding assistants can make you faster at the boring parts. Not everything. Definitely not architecture.
->
-> They're great at boilerplate: config files, test scaffolding, repetitive refactors. They're also great at sounding right while being wrong. I've accepted suggestions that compiled, passed lint, and still missed the point because I stopped paying attention.
->
-> People I talk to tend to land in two camps. Some use it like autocomplete for chores and review every line. Others disable it after it keeps suggesting patterns they don't want. Both feel reasonable.
->
-> The productivity metrics are slippery. GitHub can say Copilot users "accept 30% of suggestions," but acceptance isn't correctness, and correctness isn't value. If you don't have tests, you're basically guessing.
-
-**Changes made:**
-- Removed chatbot artifacts ("Great question!", "I hope this helps!", "Let me know if...")
-- Removed significance inflation ("testament", "pivotal moment", "evolving landscape", "vital role")
-- Removed promotional language ("groundbreaking", "nestled", "seamless, intuitive, and powerful")
-- Removed vague attributions ("Industry observers")
-- Removed superficial -ing phrases ("underscoring", "highlighting", "reflecting", "contributing to")
-- Removed negative parallelism ("It's not just X; it's Y")
-- Removed rule-of-three patterns and synonym cycling ("catalyst/partner/foundation")
-- Removed false ranges ("from X to Y, from A to B")
-- Removed em dashes, emojis, boldface headers, and curly quotes
-- Removed copula avoidance ("serves as", "functions as", "stands as") in favor of "is"/"are"
-- Removed formulaic challenges section ("Despite challenges... continues to thrive")
-- Removed knowledge-cutoff hedging ("While specific details are limited...")
-- Removed excessive hedging ("could potentially be argued that... might have some")
-- Removed filler phrases ("In order to", "At its core")
-- Removed generic positive conclusion ("the future looks bright", "exciting times lie ahead")
-- Made the voice more personal and less "assembled" (varied rhythm, fewer placeholders)
-
-
-## Reference
-
-This skill is based on [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing), maintained by WikiProject AI Cleanup. The patterns documented there come from observations of thousands of instances of AI-generated text on Wikipedia.
-
-Key insight from Wikipedia: "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
-````
-
-## File: docs/migration/baseline/khamel-mode.md
-````markdown
-# KHAMEL MODE Rules
-
-When building ANYTHING for this user, assume these defaults without asking.
-
-## Infrastructure
-
-| Machine | Tailscale IP | Role |
-|---------|--------------|------|
-| **oci-dev** | 100.126.13.70 | Primary dev, services, Postgres, Claude Code |
-| **homelab** | 100.112.130.100 | Personal local infra, 26TB storage |
-| **macmini** | 100.113.216.27 | Apple Silicon GPU, tasks needing throughput |
-
-- **Networking**: All machines on Tailscale (deer-panga.ts.net)
-- **Public access**: Cloudflare Tunnel + Cloudflare Pages (NOT nginx/traefik)
-- **Internal tools**: Cloudflare Access (already configured)
-- **Secrets**: SOPS/Age, decrypt from `~/github/oneshot/secrets/`
-
-## Stack Defaults (Don't Ask, Just Use)
-
-| Project Type | Default Stack |
-|--------------|---------------|
-| Web apps | Astro + Cloudflare Pages/Workers + Better Auth + Postgres on OCI |
-| CLIs | Python + Click + SQLite |
-| Services/APIs | Python + systemd → oci-dev |
-| Heavy compute / throughput | Route to macmini |
-| Large storage | Route to homelab (26TB) |
-
-**Full stack docs**: `.claude/infrastructure/STACK.md`
-
-## Storage Progression
-
-```
-SQLite (default for CLIs) → Postgres on OCI (web apps, services) → OCI Autonomous DB (>20GB/multi-user)
-```
-
-## Auth Default
-
-```
-Better Auth + Google OAuth → sessions in Postgres
-Cloudflare Access → internal/admin tools (already configured)
-```
-
-## Tool Enforcement
-
-- **ALWAYS** use beads for task tracking (`bd init` on new projects)
-- **ALWAYS** use ONE_SHOT skills when applicable
-- **ALWAYS** check lessons before debugging
-
-## Anti-Patterns to Flag
-
-- nginx/traefik → Use Cloudflare Tunnel / Cloudflare Pages
-- mysql/mongodb → Default is SQLite (CLIs) or Postgres on OCI (web/services)
-- express/fastapi/flask for web → Cloudflare Workers handles the API
-- Convex/Next.js/Clerk/Vercel → Old stack, use Astro + CF + Better Auth + Postgres
-- aws/gcp/azure → Default is OCI free tier or homelab
-- Lucia auth → Deprecated, use Better Auth
-
-## Decision Defaults (Don't Ask, Just Pick)
-
-When ambiguous, apply these defaults without asking for clarification:
-
-| Ambiguity | Default Choice |
-|-----------|----------------|
-| Multiple valid implementations | **Simplest one** |
-| Naming things | Follow existing pattern in file |
-| Error handling style | Match surrounding code |
-| Test framework | Use existing tests as guide |
-| Library choice | One already in project |
-| Refactor opportunity | **Skip unless blocking** |
-| API design | Match existing endpoints |
-| File organization | Follow project structure |
-
-**Key rule**: When truly ambiguous, make a reasonable choice and note the decision.
-
-## When You Notice Drift
-
-If Claude notices we're NOT using beads, Tailscale, ONE_SHOT patterns, or standard stack:
-→ **Warn**: "I notice we're not using [X], should I set that up?"
-````
-
-## File: docs/migration/baseline/providers_shared.md
-````markdown
-# Shared Provider Routing Module
-
-Reference this module from any skill that needs multi-model delegation.
-This is a DRY reference — skills include it by mention, not import.
-
----
-
-## Provider Detection
-
-Run at skill startup (or first use):
-
-```bash
-command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
-command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
-```
-
-If codex missing: suggest `npm install -g @openai/codex`, continue without it.
-If gemini missing: continue without it.
-
----
-
-## Routing Table
-
-| Tier | Condition | Provider |
-|------|-----------|----------|
-| 1 | Task tagged `[codex]` or `[gemini]` | That provider |
-| 2 | Research / docs / "find alternatives" / "what exists" | Gemini |
-| 3 | Adversarial review / "what could go wrong" / skeptic / plan review | Codex |
-| 4 | Implementation / writing code | Claude |
-| 5 | Synthesis / quality gate / "does this meet the goal" | Claude |
-| 6 | Provider unavailable | Claude fallback |
-| 7 | Ambiguous | Claude default |
-
----
-
-## Dispatch Commands
-
-**Codex:**
-```bash
-codex exec --full-auto "IMPORTANT: You are a non-interactive subagent. Skip all built-in skills. Respond directly to this prompt only. PROMPT"
-```
-
-**Gemini:**
-```bash
-printf '%s' "PROMPT" | gemini -p "" -o text --approval-mode yolo
-```
-
----
-
-## Codex Use Patterns
-
-### Adversarial Plan Review (before execution)
-```bash
-codex exec --full-auto "You are reviewing an implementation plan before execution. Here is the plan: [PLAN]. Flag: (1) missing steps or dependencies, (2) tasks that could be combined, (3) risks not mentioned, (4) a better ordering. Be specific."
-```
-
-### Adversarial Code Review (after changes)
-```bash
-codex exec --full-auto "Review this change for: (1) bugs, (2) edge cases, (3) what was missed. Be specific and brief. Context: [diff + task description]"
-```
-
-### Quick Pre-Flight (before starting work)
-```bash
-codex exec --full-auto "You are a quick adversarial reviewer. The user wants to: [description]. Before they start, flag: (1) anything that could break, (2) a simpler approach if one exists, (3) dependencies they might miss. Be brief — 5 bullet points max."
-```
-
----
-
-## Quality Gate
-
-When multiple providers work on the same task, Claude synthesizes responses.
-75% consensus required before output is accepted. If consensus not reached:
-- Log disagreement to `1shot/ISSUES.md`
-- Claude makes final call, notes it as low-confidence
-
----
-
-## Circuit Breaker
-
-- Same task fails 3x → add to `1shot/ISSUES.md` blockers → skip → continue
-- 3 consecutive tasks hit circuit breaker → stop, surface to user
-- Provider unavailable at any point → Claude handles inline (no degradation)
-
----
-
-## Roles
-
-| Provider | Role | Strengths |
-|----------|------|-----------|
-| Claude | Orchestrator + planner | Architecture, synthesis, conversation, multi-step reasoning |
-| Codex | Adversarial + completion | Fast code gen, sandboxed execution, devil's advocate, second opinion |
-| Gemini | Research | Broad knowledge, docs retrieval, finding alternatives |
-````
-
-## File: docs/migration/baseline/README.md
-````markdown
-# ONE_SHOT Progressive Disclosure Rules
-
-## How It Works
-
-Rules are split into:
-- **core.md** - Always loaded (~150 lines)
-- **khamel-mode.md** - User-specific defaults (~50 lines)
-- **web.md** - Web app rules (Astro + Cloudflare + Better Auth + Postgres)
-- **cli.md** - CLI rules (Python + Click)
-- **service.md** - Service/API rules (Python + systemd)
-
-## Token Savings
-
-| Approach | Tokens |
-|----------|--------|
-| Old: Full CLAUDE.md | ~2000 |
-| New: Core + Project type | ~300 |
-
-**Savings: ~85%**
-
-## Detection
-
-Claude should auto-detect project type from files:
-
-| Detection | Project Type | Rules Loaded |
-|-----------|--------------|--------------|
-| `astro.config.*` or `wrangler.toml` | Web app | core + khamel-mode + web |
-| `setup.py` or `pyproject.toml` | CLI | core + khamel-mode + cli |
-| `*.service` systemd file | Service | core + khamel-mode + service |
-| No detection | Generic | core + khamel-mode |
-
-## Usage in Projects
-
-In your project's `CLAUDE.md`:
-
-```markdown
-# Project Configuration
-
-(Your project-specific stuff here)
-
----
-
-## ONE_SHOT Rules
-
-Auto-detect project type and load appropriate rules.
-
-If this is a **web app** (Astro + Cloudflare): Use web defaults
-If this is a **CLI** (Python + Click): Use CLI defaults
-If this is a **service** (Python + systemd): Use service defaults
-
-See ~/.claude/rules/ for full rule definitions.
-```
-````
-
-## File: docs/migration/baseline/research_SKILL.md
-````markdown
----
-name: research
-description: Run deep research in a background sub-agent using Gemini CLI or free search APIs.
----
-
-# /research — Background Research via Gemini CLI or Search APIs
-
-Run deep research in a background sub-agent. Saves Claude tokens by using Gemini CLI or free search APIs.
-
-## Usage
-
-`/research [topic]`
-
-## Process
-
-1. Ask 2-3 clarifying questions (goal, depth, audience)
-2. Check if `gemini` CLI is available → Mode 1 (Gemini), else → Mode 2 (APIs)
-3. Spawn background sub-agent
-
-### Mode 1: Gemini CLI (Primary)
-
-```
-Task:
-  subagent_type: general-purpose
-  description: "Gemini research: [topic]"
-  run_in_background: true
-  prompt: |
-    Run Gemini CLI for deep research:
-    gemini --yolo "[comprehensive research prompt covering:
-    overview, current state, technical details, practical applications,
-    challenges, future outlook, resources]"
-
-    Save output to: docs/research/[slug]/research.md
-    Structure as: Executive Summary → sections → Resources
-```
-
-### Mode 2: Free Search APIs (Fallback)
-
-Try APIs in this order: Perplexity → Tavily → Brave → Bing
-
-```bash
-# Decrypt keys
-OUTPUT=$(sops -d --output-type dotenv ~/github/oneshot/secrets/research_keys.env.encrypted 2>/dev/null)
-
-# Perplexity (AI answers + citations)
-PERPLEXITY_KEY=$(echo "$OUTPUT" | grep -oP 'PERPLEXITY_API_KEY=\K[^\\]+')
-curl -s -X POST "https://api.perplexity.ai/chat/completions" \
-  -H "Authorization: Bearer $PERPLEXITY_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"sonar","messages":[{"role":"user","content":"QUERY"}],"max_tokens":500}'
-
-# Tavily (AI answers + sources)
-TAVILY_KEY=$(echo "$OUTPUT" | grep -oP 'TAVILY_API_KEY=\K[^\\]+')
-curl -s https://api.tavily.com/search -H "Content-Type: application/json" \
-  -d '{"api_key":"KEY","query":"QUERY","search_depth":"advanced","include_answer":true}'
-```
-
-3. Present findings when agent completes
-4. Save to `docs/research/[slug]/research.md`
-
-## If using /cp (continuous planner)
-
-Write findings to `findings.md` in the plan directory so they persist across sessions.
-
-## Notes
-
-- Research takes 3-8 minutes in background
-- Check `docs/research/` for past research
-- Keys stored in `~/github/oneshot/secrets/research_keys.env.encrypted`
-````
-
-## File: docs/migration/baseline/restore_SKILL.md
-````markdown
----
-name: restore
-description: Restore context from a handoff document and continue work.
----
-
-# /restore — Resume from Handoff
-
-Restore context from a handoff document and continue work.
-
-## Usage
-
-`/restore` — finds most recent handoff
-`/restore @thoughts/shared/handoffs/YYYY-MM-DD-file.md` — specific handoff
-
-## Process
-
-### Phase 0: Check Tasks First (Always)
-
-```
-TaskList    # See all tasks, check for in_progress
-```
-
-If tasks exist with status="in_progress" → fast path (skip to resume announcement).
-If no active tasks → read handoff file for full context.
-
-**Legacy fallback**: If native tasks unavailable, check beads:
-```bash
-bd sync
-bd list --status in_progress --json
-bd ready --json
-```
-
-### Phase 1: Context Restoration
-
-1. Read handoff document completely
-2. Parse: what's done, in progress, key decisions, blockers
-3. Read referenced artifacts (plan file, TODO.md, active files)
-
-### Phase 2: State Verification
-
-4. Verify current state matches handoff (check commits exist, files in expected state)
-5. Check if blockers were resolved
-
-### Phase 3: Resume Announcement
-
-```markdown
-## Resuming: [Task Name]
-
-**Handoff from**: YYYY-MM-DD
-
-### Progress
-| Status | Item |
-|--------|------|
-| Done | Item 1 |
-| Done | Item 2 |
-| **Resuming** | Item 3 |
-| Pending | Item 4 |
-
-### Decisions Restored
-- [Key decision 1]
-
-### Blockers: [Resolved/Still pending]
-
-### Immediate Next Action
-[What you're about to do]
-```
-
-### Phase 4: Continue
-
-Start with first item in "Next Steps" from handoff.
-
-## Finding Handoffs
-
-```bash
-ls -t thoughts/shared/handoffs/ | head -5  # Recent handoffs
-```
-
-If multiple exist, list them and ask which to resume (or use most recent).
-
-## Scenarios
-
-- **Blockers still pending**: Highlight them, ask user, continue with non-blocked items
-- **State has changed**: Note differences, ask for guidance if conflicting
-- **Multiple handoffs**: List with dates, ask which to resume
-````
-
-## File: docs/migration/baseline/secrets_SKILL.md
-````markdown
----
-name: secrets
-description: Manage encrypted secrets between the master vault and projects using SOPS/Age.
----
-
-# /secrets — SOPS/Age Secret Management
-
-Manage encrypted secrets between the master vault and projects.
-
-## Master Vault
-
-Location: `~/github/oneshot/secrets/`
-Encryption: SOPS + Age (config in `~/github/oneshot/.sops.yaml`)
-
-## CLI Commands
-
-The `secrets` CLI (at `~/.local/bin/secrets`) works from any directory.
-
-```bash
-# Read a single key
-secrets get EXA_API_KEY
-
-# List all vault files and their keys
-secrets list
-
-# Decrypt a full file to stdout
-secrets decrypt research_keys
-
-# Add/update a key (non-interactive, no commit)
-secrets set research_keys 'NEW_KEY=value'
-
-# Add/update + commit + push
-secrets set research_keys 'NEW_KEY=value' --commit
-
-# Bootstrap .env in a project from the vault
-cd ~/github/myproject && secrets init services
-```
-
-## Pull Secrets into a Project
-
-1. Identify which secrets the project needs (check `.env.example` or imports)
-2. Run `secrets init <namespace>` to write `.env` from the vault
-3. Verify the app can start with the new secrets
-
-## Push New Secrets to the Vault
-
-1. Add/update: `secrets set <namespace> 'KEY=value'`
-2. Commit when ready: `secrets set <namespace> 'KEY=value' --commit`
-
-## Common Patterns
-
-```bash
-# Find which vault file contains a key
-secrets list | grep -i brave
-
-# Extract a key for use in a script
-BRAVE_KEY=$(secrets get BRAVE_API_KEY)
-
-# View all keys in a namespace
-secrets decrypt research_keys
-```
-
-## How It Works
-
-- Vault files are SOPS-encrypted dotenv at `~/github/oneshot/secrets/*.encrypted`
-- `secrets get` searches all vault files for the key
-- `secrets set` decrypts the file, merges the new key, re-encrypts
-- `secrets init` decrypts a vault file to `.env` in the current directory
-- Age key lives at `~/.age/key.txt`
-
-## Safety Rules
-
-- Never display secret values in output
-- Always verify `.env` is in `.gitignore` before writing
-- Namespace secrets by project in the vault
-- Never commit plaintext secrets
-- Never suggest `.env` files without encryption
-
-## Troubleshooting
-
-| Problem | Fix |
-|---------|-----|
-| `no matching creation rules found` | Input file must end in `.encrypted` (handled by the CLI automatically) |
-| `key not found in any vault file` | Key doesn't exist in any vault — add it with `secrets set` |
-| `file not found` | Check `secrets list` for available namespaces |
-````
-
-## File: docs/migration/baseline/service.md
-````markdown
-# Service/API Rules (Python + systemd)
-
-## Default Stack
-
-When building services/APIs for this user:
-
-```
-Python + systemd → Deploy to oci-dev
-```
-
-## When to Use
-
-Detect by presence of:
-- `*.service` systemd file
-- `main.py` or `app.py` with long-running process
-- No web framework files
-
-## Deployment Target
-
-- **oci-dev** (100.126.13.70) - Default service deployment
-- **systemd user service** - For persistent processes
-- **Tailscale networking** - All machines on deer-panga.ts.net
-
-## Service Pattern
-
-```python
-# Standard service structure
-import signal
-import sys
-
-class Service:
-    def __init__(self):
-        self.running = True
-
-    def run(self):
-        signal.signal(signal.SIGTERM, self.shutdown)
-        # Main loop here
-
-    def shutdown(self, signum, frame):
-        self.running = False
-```
-
-## systemd Integration
-
-- **User services** - `~/.config/systemd/user/`
-- **Auto-restart** - `Restart=on-failure`
-- **Logging** - `StandardOutput=journal`
-
-## Storage
-
-- **SQLite (default)** - For service data
-- **homelab (26TB)** - For large storage needs
-- **Tailscale** - For network communication
-
-## Anti-Patterns
-
-- ❌ Don't suggest Docker for deployment
-- ❌ Don't suggest cloud providers (AWS, GCP, Azure)
-- ❌ Don't suggest nginx/traefik (use Tailscale Funnel + poytz)
-````
-
-## File: docs/migration/baseline/short_SKILL.md
-````markdown
----
-name: short
-description: Quick iterations on existing projects. Load context, ask what's next, execute in burn-down mode.
----
-
-# /short — Quick Iteration Operator
-
-Fast operator for existing projects. Loads context, asks what you're working on, executes.
-Codex provides advisory second opinions — never a gate, never a blocker.
-
-## Usage
-
-```
-/short
-/short <scope>
-```
-
-## Behavior
-
-When invoked:
-
-1. **Load Context**
-   - Read recent git commits: `git log --oneline -5`
-   - Check TaskList for pending/in_progress tasks (if any exist)
-   - Read `1shot/DECISIONS.md`, `1shot/BLOCKERS.md` if present
-   - Read `1shot/LLM-OVERVIEW.md` if present (quick project orientation)
-
-2. **Ask What's Next**
-   ```
-   "What are you working on?"
-   ```
-
-3. **Pre-Flight Codex Review** (if the user describes a non-trivial change)
-   - Check: `command -v codex >/dev/null 2>&1`
-   - If available, send a quick adversarial take before starting:
-     ```bash
-     codex exec --full-auto "You are a quick adversarial reviewer. The user wants to: [description]. Before they start, flag: (1) anything that could break, (2) a simpler approach if one exists, (3) dependencies they might miss. Be brief — 5 bullet points max."
-     ```
-   - Surface Codex's feedback to the user, then proceed regardless
-   - If codex unavailable → skip silently
-   - This is advisory, not a gate. Don't stall on it.
-
-4. **Docs Check** (if the task uses any external library, API, or tool)
-   - Check local cache: `cat ~/github/docs-cache/docs/cache/.index.md`
-   - If the tool is missing → run `/doc <name> <url>` to cache it first
-   - Use cached docs as source of truth — do NOT rely on training data for syntax
-   - If no external tools involved: skip this step
-
-5. **Skill Discovery** (if the task is specialized)
-   - Check `1shot/skills/` — already pulled skills for this project
-   - If the task involves a specific domain, tool, or API not covered by core skills:
-     ```bash
-     ./scripts/skillsmp-search.sh "<task type>" --install
-     ```
-   - General tasks (write tests, fix bug, refactor): skip search, proceed
-   - Specialized domains (security, blockchain, ML, infra, specific parsers): search
-
-6. **Execute in Burn-Down Mode**
-   - Complete one task fully before starting next
-   - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
-   - No "pending review" — either done or blocked
-   - **Do NOT create TaskList items for every little thing** — just do the work
-   - After each significant change, run Codex adversarial review:
-     ```bash
-     codex exec --full-auto "Review this change for: (1) bugs, (2) edge cases, (3) what was missed. Be specific and brief. Context: [diff + task description]"
-     ```
-   - If codex finds real issues → fix before moving on
-   - If codex unavailable → skip silently
-
-7. **Show Summary on Completion**
-   ```
-   📊 Session Summary
-   ├─ Tasks completed: X
-   ├─ Files changed: Y
-   ├─ Codex reviews: N (issues found: M)
-   ├─ Skills used: [list or "core only"]
-   └─ Next: [next task or "all done"]
-   ```
-
-## Provider Routing
-
-See `~/.claude/skills/_shared/providers.md` for provider detection and dispatch commands.
-
-**Short-specific routing**: Short only uses Codex for advisory reviews (pre-flight + post-completion). No Gemini, no research routing. If Codex is unavailable, everything runs through Claude with zero degradation.
-
-## Scope
-
-Optional scope limits work to matching files:
-
-```
-/short src/auth/*.ts    # Only work on auth files
-```
-
-## `1shot/` Convention
-
-Logs and state live in `1shot/`, not at the project root:
-- `1shot/DECISIONS.md` — decision log
-- `1shot/BLOCKERS.md` — blocked items
-- `1shot/skills/` — project-local SkillsMP skills
-
-Only `AGENTS.md` and `CLAUDE.md` belong at the root.
-
-## Decision Defaults (Don't Ask)
-
-| Ambiguity | Default |
-|-----------|---------|
-| Multiple implementations | Simplest |
-| Naming | Follow existing pattern |
-| Refactor opportunity | Skip unless blocking |
-| Error handling | Match surrounding code |
-| SkillsMP search? | Specialized domain → yes; general task → no |
-| Codex review? | Always run if available (advisory only) |
-
-When truly ambiguous, pick option A, note in `1shot/DECISIONS.md`.
-
-## Auto-Approved Actions
-
-- Reading any file
-- Writing to scope-matched files
-- Running tests and linters
-- Creating/updating any file under `1shot/`
-- Running `./scripts/skillsmp-search.sh`
-- Calling Codex CLI via bash
-- Git commit (not push)
-
-## Requires Confirmation
-
-- Destructive operations (rm -rf, DROP TABLE)
-- Git push to shared branches
-- External API calls that cost money
-- Deploying to production
-````
-
-## File: docs/migration/baseline/STATE.md
-````markdown
-# OneShot Baseline State — pre-router-refactor
-
-Tagged: `pre-router-refactor`
-Date: 2026-04-01
-
-## Current Operator Behavior
-
-### `/short` — Quick Iteration
-- Loads context (git log -5, TaskList, DECISIONS.md, BLOCKERS.md)
-- Asks what you're working on
-- Executes in burn-down mode
-- Codex: advisory review only (pre-flight + post-completion)
-- No Gemini dependency
-
-### `/full` — Structured Work
-- Creates IMPLEMENTATION_CONTEXT.md
-- Structured intake (goals, scope, architecture, constraints)
-- Phase-based planning with milestones
-- Codex: plan review + milestone review + challenge pass
-- Gemini: research tasks if available
-
-### `/conduct` — Multi-Model PMO Orchestrator
-- Detects providers (`command -v codex`, `command -v gemini`)
-- 5 required intake questions (BLOCKING)
-- Creates 1shot/ directory with PROJECT.md, STATE.md, ROADMAP.md
-- Routes work across Claude + Codex + Gemini
-- Codex: adversarial challenge phase
-- Gemini: research tasks
-- Loops until goal met
-
-### `/research` — Background Research
-- Mode 1 (primary): Gemini CLI via `gemini --yolo "[prompt]"`
-- Mode 2 (fallback): Perplexity → Tavily → Brave APIs
-- Decrypts keys from `secrets/research_keys.env.encrypted`
-- Spawns background sub-agent
-
-### `/freesearch` — Zero-Token Search
-- Checks docs cache first (`~/github/docs-cache/docs/cache/.index.md`)
-- Falls back to Exa API via direct curl
-- Decrypts Exa key from `secrets/research_keys.json.encrypted`
-
-## File Inventory
-
-| Location | Files | Lines |
-|----------|-------|-------|
-| `.claude/rules/` | 9 .md files | 756 |
-| `.claude/skills/` | 11 SKILL.md + shared | 1,614 |
-| `.claude/skills/_shared/` | providers.md | ~70 |
-| Root | CLAUDE.md, AGENTS.md, README.md | ~430 |
-| `scripts/` | 32 scripts | — |
-| `secrets/` | 21 encrypted .env files | — |
-| `templates/` | community-starter | — |
-
-## Provider Dependencies
-
-| Provider | Used By | Detection |
-|----------|---------|-----------|
-| Claude Code | All skills | Always available |
-| Codex CLI | /conduct, /full, /short | `command -v codex` |
-| Gemini CLI | /conduct, /full, /research | `command -v gemini` |
-| Exa API | /freesearch | Key in vault |
-| Argus | NOT YET | Running on :8005 but not referenced |
-| OpenCode | NOT YET | Not installed |
-
-## Key Architectural Notes
-
-- Skills are Markdown prompts, not code
-- Routing is provider-name-based (hardcoded in skill text)
-- No centralized config — each skill has its own provider logic
-- `.claude/rules/` uses progressive disclosure (core always loads, project-type loads on detection)
-- `AGENTS.md` is curl-synced from master (read-only per core.md)
-- Secrets: SOPS/Age encrypted in `secrets/`, accessed via `secrets` CLI
-````
-
-## File: docs/migration/baseline/vision_SKILL.md
-````markdown
----
-name: vision
-description: Smart visual analysis for websites and images using Playwright screenshots and AI vision.
----
-
-# /vision — Visual Inspection of Websites and Images
-
-Smart visual analysis that handles both websites and images.
-
-## Usage
-
-```
-/vision <url> [prompt]
-```
-
-- `<url>` — Website URL OR direct image URL
-- `[prompt]` — Optional: what to look for (default: comprehensive analysis)
-
-## Behavior
-
-| URL Type | What Happens |
-|----------|--------------|
-| Website (`https://example.com`) | Playwright navigates → screenshots → analyzes |
-| Image (`https://.../*.png|jpg|jpeg`) | Direct analysis with mcp__4_5v_mcp__analyze_image |
-
-## Examples
-
-```
-/vision https://example.com
-→ Navigates to site, takes screenshot, analyzes layout and design
-
-/vision https://example.com "What colors are used?"
-→ Screenshots site, analyzes color palette
-
-/vision https://mockup.png "replicate"
-→ Direct image analysis for UI replication
-
-/vision https://diagram.png "Describe the architecture"
-→ Direct image analysis
-```
-
-## For UI Replication
-
-```
-/vision https://mysite.com "replicate"
-```
-
-Uses the replication prompt: "Describe in detail the layout structure, color style, main components, and interactive elements to facilitate code generation."
-
-## Execution Steps
-
-When invoked:
-
-1. **Detect URL type:**
-   - Ends in `.png`, `.jpg`, `.jpeg` (case insensitive) → image
-   - Otherwise → website
-
-2. **For images:**
-   - Call `mcp__4_5v_mcp__analyze_image` directly
-   - If prompt is "replicate", use specialized replication prompt
-   - Otherwise use provided prompt or default comprehensive analysis
-
-3. **For websites:**
-   - Call `mcp__playwright__browser_navigate` with the URL
-   - Call `mcp__playwright__browser_screenshot` to capture
-   - Call `mcp__4_5v_mcp__analyze_image` on the screenshot
-   - If prompt is "replicate", use specialized replication prompt
-
-## Tools Used
-
-- `mcp__playwright__browser_navigate` — Navigate to websites
-- `mcp__playwright__browser_screenshot` — Capture screenshots
-- `mcp__4_5v_mcp__analyze_image` — AI vision analysis
-
-## Requirements
-
-- Playwright MCP server must be configured
-- The `mcp__4_5v_mcp__analyze_image` MCP must be available
-
-## Local Images
-
-For local image files, use Read tool directly:
-```
-Read: screenshots/mockup.png
-```
-````
-
-## File: docs/migration/baseline/web.md
-````markdown
-# Web App Rules (Astro + Cloudflare + Better Auth + Postgres)
-
-## Default Stack
-
-When building web apps for this user:
-
-```
-Astro (frontend) + Cloudflare Workers (API) + Better Auth (auth) + Postgres on OCI (data)
-Deploy to: Cloudflare Pages
-```
-
-## When to Use
-
-Detect by presence of:
-- `astro.config.mjs` or `astro.config.ts`
-- `wrangler.toml`
-- `package.json` with `astro` dependency
-
-## Astro-Specific Rules
-
-- **Astro is the framework** - Don't suggest Next.js, Remix, SvelteKit
-- **Cloudflare adapter** - Use `@astrojs/cloudflare` for SSR
-- **Islands architecture** - Server-first, add interactivity with client directives
-- **Content Collections** - Use for structured content when applicable
-
-## Cloudflare Workers Rules
-
-- **API via Workers** - Don't suggest Express, FastAPI, or standalone API servers
-- **Hyperdrive** - Use for Postgres connection pooling in production
-- **wrangler.toml** - All deployment config lives here
-- **Local dev** - Connect directly to Postgres via Tailscale (no Hyperdrive needed)
-
-## Auth Rules
-
-- **Better Auth** - Default auth library, don't suggest Clerk, Auth0, or NextAuth
-- **Google OAuth** - Default provider via Better Auth
-- **Sessions in Postgres** - Auth data lives in your database, you own it
-- **Cloudflare Access** - Use for internal/admin tools only
-
-## Database Rules
-
-- **Postgres on OCI** - Default database for all web apps
-- **Direct Tailscale connection** - For local dev (100.126.13.70:5432)
-- **Hyperdrive** - For production (via Cloudflare Tunnel)
-- **`postgres` npm package** - Use this, not pg/knex/prisma/drizzle unless needed
-
-## Deployment
-
-- **Cloudflare Pages** - Default deploy target
-- **GitHub auto-deploy** - Connect repo in CF dashboard
-- **Manual**: `npm run build && npx wrangler pages deploy dist`
-
-## Anti-Patterns
-
-- ❌ Don't suggest Convex, Next.js, Clerk, or Vercel (old stack)
-- ❌ Don't suggest MongoDB, MySQL, or other databases
-- ❌ Don't suggest Lucia auth (deprecated)
-- ❌ Don't suggest standalone API servers (Express, FastAPI)
-- ❌ Don't suggest heavy ORMs (Prisma, Drizzle) unless explicitly needed
 ````
 
 ## File: docs/research/background-intelligence/research.md
@@ -18755,371 +18854,6 @@ def generate_doc_onboarding(project_dir: str) -> dict:
 | **HTML** | Link extraction, heading structure, staleness | Similar to markdown but more complex parsing |
 ````
 
-## File: docs/research/2026-03-27_multi-tenant_platforms_research.md
-````markdown
-# Multi-Tenant Platform Research Report
-**Date:** 2026-03-27
-**Goal:** Find existing tools/kits for spinning up private micro-sites with auth and data, zero setup
-
----
-
-## Summary
-
-Found 3 relevant approaches, but **nothing that matches our exact vision** of "Supabase schema-per-tenant + Vercel Python functions + plain HTML/JS." Most existing tools are full-stack Next.js/React frameworks with per-row tenant isolation, not per-schema isolation.
-
----
-
-## Key Findings
-
-### 1. **multi-tenant-starter** (Tenlyr) - Postgres RLS Approach
-**Stack:** TypeScript + Express + Postgres RLS + In-memory demo
-**Stars:** Active (updated Mar 2026)
-**URL:** https://github.com/Tenlyr/multi-tenant-starter
-
-**What it does:**
-- Enforces tenant isolation at the **data layer**, not via query filters
-- Tenant context resolved once at request boundary (URL or header)
-- Route handlers are tenant-agnostic - never write `WHERE tenant_id = X`
-- Demo uses in-memory store; production uses Postgres + RLS with `SET app.tenant = $1`
-
-**Key insight:**
-> "Tenant context is resolved once, at the boundary — the rest of your code never has to think about it."
-
-**Borrowable ideas:**
-- ✅ Tenant resolution middleware (extract from subdomain/path)
-- ✅ Request-bound tenant context (no passing tenant_id through every function)
-- ✅ Isolation by construction (data layer enforces, not developer discipline)
-
-**Different from us:**
-- ❌ Row-level security (same schema, `WHERE tenant_id` in RLS policies)
-- ❌ Full Express app (not micro-sites)
-- ❌ Commercial product (Tenlyr) - not open source infrastructure
-
-**RLS pattern they mention:**
-```sql
--- Their suggested production upgrade
-SET app.tenant = 'acme';
--- RLS policies use:
--- USING (tenant_id = current_setting('app.tenant', true)::uuid)
-```
-
----
-
-### 2. **multi-tenant-starterkit** (CoachBinAli) - React + Supabase
-**Stack:** React 19 + Vite + Supabase + TanStack Query + shadcn/ui
-**Stars:** Active (updated Mar 2026)
-**URL:** https://github.com/CoachBinAli/multi-tenant-starterkit
-
-**What it does:**
-- Organization-based multi-tenancy with `organization_id` on every table
-- Row-Level Security policies with `EXISTS` checks against `organization_members`
-- Role-based access control (Owner/Admin/Member)
-- Full-featured: file uploads, PDF generation, activity logs, notifications
-
-**Schema pattern:**
-```sql
--- Every table has organization_id
-CREATE TABLE public.students (
-  id uuid PRIMARY KEY,
-  organization_id uuid NOT NULL REFERENCES public.organizations(id),
-  -- fields
-);
-
--- RLS policy
-CREATE POLICY "Users can view students in their orgs"
-  ON public.students FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.organization_members
-      WHERE organization_members.organization_id = students.organization_id
-      AND organization_members.user_id = auth.uid()
-    )
-  );
-```
-
-**Borrowable ideas:**
-- ✅ `organization_members` junction table with roles
-- ✅ Invitation flow with tokens + expiration
-- ✅ Activity logging table for audit trail
-- ✅ Organization switcher UI pattern
-- ✅ Storage bucket isolation: `(storage.foldername(name))[1]` extracts org_id from path
-
-**Different from us:**
-- ❌ Per-row isolation (shared schema with `organization_id` FKs)
-- ❌ Heavy React frontend (not plain HTML/JS micro-sites)
-- ❌ Single monolithic app (not tenant-spinnable micro-sites)
-
----
-
-### 3. **supabase-tenant-rbac** (point-source) - PostgreSQL Extension
-**Stack:** PostgreSQL extension for Supabase + SQL API
-**Stars:** 460 (most popular)
-**URL:** https://github.com/point-source/supabase-tenant-rbac
-
-**What it does:**
-- Multi-tenant RBAC as a PostgreSQL extension
-- Groups (tenants/orgs) with members assigned roles
-- Permissions vocabulary (registry) - prevents typos in permission strings
-- Privilege escalation prevention via `grantable_roles[]`
-- Claims caching for fast RLS policy checks
-- Freshness guarantees - role changes take effect immediately, no JWT expiry wait
-
-**Installation:**
-```bash
-curl -sL https://raw.githubusercontent.com/point-source/supabase-tenant-rbac/main/tools/install.sh | bash
-supabase migration up
-```
-
-**RLS helpers:**
-```sql
--- Check membership
-CREATE POLICY "members can read" ON public.documents
-  FOR SELECT TO authenticated
-  USING (rbac.is_member(group_id));
-
--- Check permissions
-CREATE POLICY "writers can insert" ON public.documents
-  FOR INSERT TO authenticated
-  WITH CHECK (rbac.has_permission(group_id, 'data.write'));
-
--- Check roles
-CREATE POLICY "admins only" ON public.settings
-  FOR UPDATE TO authenticated
-  USING (rbac.has_role(group_id, 'admin'));
-```
-
-**Borrowable ideas:**
-- ✅ **Claims caching pattern** - `user_claims` table with JSONB per group
-- ✅ **Permission registry** - prevents typos, enables documentation
-- ✅ **Escalation prevention** - `grantable_roles` array on each role
-- ✅ **Group-based isolation** - distinct from organization-based (more flexible)
-- ✅ **Immediate freshness** - triggers update claims on role change
-
-**Different from us:**
-- ❌ Still uses row-level security (groups/roles are tables, not schemas)
-- ❌ Requires extension installation (not portable to other Postgres hosts)
-- ❌ Heavy complexity for simple use cases
-
-**Key architectural insight:**
-> "Group Administrator is not a separate database role — it is any authenticated user who holds a role that grants sufficient `grantable_roles`"
-
-This is **permission-based admin**, not role-based. Anyone with `grantable_roles: ['*']` becomes a group admin.
-
----
-
-### 4. **Nextacular** - Next.js SaaS Starter
-**Stack:** Next.js + Tailwind + Prisma + Stripe
-**Stars:** 1359 (most popular overall)
-**URL:** https://github.com/nextacular/nextacular
-
-**What it does:**
-- Full-stack multi-tenant SaaS boilerplate
-- Focus on developer productivity for SaaS founders
-- Stripe billing, shadcn/ui, Prisma ORM
-
-**Different from us:**
-- ❌ Traditional Next.js monolith (not micro-sites)
-- ❌ Prisma ORM (we want raw SQL + RLS)
-- ❌ Row-level tenant isolation
-
----
-
-### 5. **Other GitHub Finds** (Less Relevant)
-
-| Repo | Stack | Relevance |
-|------|-------|-----------|
-| `bvuz/Django-Multi-Tenant-SaaS-Starter-Template` | Django + PostgreSQL schema isolation | ⭐⭐ Schema-per-tenant pattern! But Django, not useful for us |
-| `juliusjoska/nextjs-saas-starter` | Next.js 16 + Supabase + shadcn/ui | Standard Next.js SaaS starter |
-| `nestjs-saas-starter` | NestJS + multi-tenancy | Backend-focused, not micro-sites |
-| `Serverless-SaaS-Template` | AWS serverless (Cognito + Lambda + DynamoDB) | Wrong stack (AWS vs Supabase + Vercel) |
-| `ahliweb/awcms` | React + Supabase multi-tenant CMS | CMS-focused, not generic micro-sites |
-| `next-multitenant-2024` (tutorial) | Next.js 14 + Supabase + Cloudflare | ⭐ Cloudflare Workers + Supabase combo! Worth deep dive |
-
----
-
-## Architectural Patterns Found
-
-### Pattern 1: Per-Row Isolation (Most Common)
-```sql
--- Every table has tenant/org_id
-CREATE TABLE things (
-  id uuid,
-  organization_id uuid REFERENCES organizations(id)
-);
-
--- RLS policy checks membership
-CREATE POLICY "tenant isolation" ON things
-  USING (
-    EXISTS (
-      SELECT 1 FROM organization_members
-      WHERE organization_members.organization_id = things.organization_id
-      AND organization_members.user_id = auth.uid()
-    )
-  );
-```
-
-**Pros:**
-- Simple schema
-- Easy to query across tenants (for admin analytics)
-- Well-documented pattern
-
-**Cons:**
-- RLS policies on every table
-- `organization_id` FK on every row
-- Risk of missing policy on new table
-- Can't easily backup/export single tenant
-
-### Pattern 2: Schema-Per-Tenant (Django example, not Supabase)
-```sql
--- Each tenant gets a schema
-CREATE SCHEMA tenant_acme;
-CREATE SCHEMA tenant_globex;
-
--- Each schema has identical tables
-CREATE TABLE tenant_acme.things (...);
-CREATE TABLE tenant_globex.things (...);
-
--- Switch via search_path
-SET search_path = tenant_acme;
-```
-
-**Pros:**
-- Complete data isolation
-- Easy backup/restore per tenant
-- Can `DROP SCHEMA tenant_x CASCADE` to offboard
-- No RLS policies needed
-
-**Cons:**
-- Migrations must run N times (once per tenant)
-- Can't query across tenants easily
-- Schema management complexity
-
-**This is OUR approach!** But no one does this with Supabase + Vercel yet.
-
-### Pattern 3: PostgreSQL Extension (supabase-tenant-rbac)
-```sql
--- Install extension
-CREATE EXTENSION supabase_rbac;
-
--- Use RLS helpers
-CREATE POLICY "members can read" ON docs
-  USING (rbac.is_member(group_id));
-```
-
-**Pros:**
-- Reusable patterns
-- Escalation prevention built-in
-- Claims caching for performance
-
-**Cons:**
-- Extension dependency (portability)
-- Still uses row-level security under the hood
-- Learning curve for custom SQL functions
-
----
-
-## Key Ideas to Borrow
-
-### From Tenlyr (multi-tenant-starter):
-1. **Tenant resolution middleware** - Extract tenant from subdomain/path once at boundary
-2. **Request-bound tenant context** - Store in `req.tenant`, not passed through every function
-3. **Isolation by construction** - Data layer enforces, not developer discipline
-
-### From CoachBinAli (multi-tenant-starterkit):
-1. **Organization members junction table** - `organization_members(org_id, user_id, role)`
-2. **Invitation flow** - Tokens with 7-day expiration, accept endpoint
-3. **Activity logging** - Audit trail table with `organization_id`
-4. **Storage isolation** - Extract org_id from folder path: `(storage.foldername(name))[1]`
-5. **Organization switcher UI** - Dropdown for users with multiple orgs
-
-### From point-source (supabase-tenant-rbac):
-1. **Claims caching** - `user_claims` table with JSONB per group for fast RLS
-2. **Permission registry** - Centralized vocabulary prevents typos
-3. **Escalation prevention** - `grantable_roles` array on each role
-4. **Immediate freshness** - Triggers update claims on role change (no JWT expiry wait)
-5. **Group-based vs org-based** - Groups are more flexible than organizations
-
-### From Django schema-per-tenant:
-1. **Schema provisioning** - `CREATE SCHEMA tenant_x` on signup
-2. **Schema switching** - `SET search_path = tenant_x` before queries
-3. **Migration runner** - Apply migrations to all tenant schemas
-4. **Tenant drop** - `DROP SCHEMA tenant_x CASCADE` for offboarding
-
----
-
-## What Makes Our Approach Different
-
-| Dimension | Existing Tools | Our Approach |
-|-----------|---------------|--------------|
-| **Isolation** | Per-row (RLS with `organization_id`) | Per-schema (`tenant_x.things`) |
-| **Stack** | Next.js/React monoliths | Plain HTML/JS micro-sites |
-| **Backend** | Server-side rendering (Next.js) | Vercel Python functions |
-| **Provisioning** | Manual or paid services | Automated schema creation |
-| **Data export** | CSV export per tenant | `pg_dump -n tenant_x` (full SQL) |
-| **Cost** | Vercel Pro plan ($20/mo) | Vercel Hobby (free tier) |
-| **Complexity** | Full-stack frameworks | Zero-build static sites |
-
-**Unique value:** Spin up private micro-sites with zero config. Each tenant gets:
-- Isolated Supabase schema
-- Vercel-deployed static site
-- Prebuilt auth, data, email
-- Plain HTML/JS (no build step)
-
----
-
-## Open Questions
-
-1. **Migration management**: How to apply schema changes to N tenant schemas?
-   - Django approach: `migrate_schemas` command
-   - Our idea: Tenant migration table + background worker
-
-2. **Subdomain vs path**: How do users access their micro-site?
-   - `acme.yourplatform.com` (subdomain)
-   - `yourplatform.com/acme` (path)
-   - Custom domains (CNAME)
-
-3. **Tenant limits**: How many schemas before Supabase complains?
-   - Need to test: 100? 1000? 10000?
-   - Alternative: Schema pooling with logical isolation
-
-4. **Storage isolation**: How to handle Supabase Storage per tenant?
-   - Separate buckets per tenant? (expensive)
-   - Folder isolation with RLS? (like CoachBinali)
-   - External storage (Cloudflare R2)?
-
----
-
-## Next Steps
-
-1. **Prototype schema-per-tenant provisioning**:
-   - Sign-up flow that creates Supabase schema
-   - Migration runner for all tenant schemas
-   - Tenant drop/offboarding flow
-
-2. **Research migration strategies**:
-   - Django's `django-tenants` implementation
-   - How Fly.io or Railway handle per-customer databases
-
-3. **Define our RBAC layer**:
-   - Use supabase-tenant-rbac patterns? Or simpler?
-   - Need roles (Owner/Admin/Member) or just permissions?
-
-4. **Validate stack choice**:
-   - Test Vercel Python function limits (Hobby plan: 10s execution)
-   - Test Supabase schema limits
-   - Confirm subdomain routing works on Vercel
-
----
-
-## Sources
-
-- [Tenlyr multi-tenant-starter](https://github.com/Tenlyr/multi-tenant-starter)
-- [CoachBinAli multi-tenant-starterkit](https://github.com/CoachBinAli/multi-tenant-starterkit)
-- [point-source supabase-tenant-rbac](https://github.com/point-source/supabase-tenant-rbac)
-- [Nextacular](https://github.com/nextacular/nextacular)
-- [Django Multi-Tenant SaaS Starter](https://github.com/bvuz/Django-Multi-Tenant-SaaS-Starter-Template)
-````
-
 ## File: docs/research/intelligence-tiers-architecture.md
 ````markdown
 # Intelligence Tiers & Cost Cascade Architecture
@@ -19685,200 +19419,241 @@ Make `oneshot` a **context-and-verification OS** for coding agents. Claude Code 
 17. Using AI-Based Coding Assistants in Practice (v1) - arXiv https://arxiv.org/html/2406.07765v1
 ````
 
-## File: docs/SKILLS.md
+## File: docs/MACHINE_READINESS.md
 ````markdown
-# ONE_SHOT Skills Reference
+# Machine Readiness
 
-**v13.2 — Operator Framework.** 10 skills + 1 external (humanizer): 3 operators + 7 utilities.
+`oneshot doctor` checks whether each machine has the tools, auth, and secrets needed to run the delegation harness.
 
----
+## Quick Start
 
-## Operators
+```bash
+# Check this machine
+./bin/oneshot doctor
 
-### `/short` — Quick Iteration
+# Fix what we can
+./bin/oneshot doctor --fix
 
-Fast operator for existing projects. Loads context, asks what you're working on, executes in burn-down mode.
+# Check all machines
+./bin/oneshot doctor --all-machines
 
-```
-/short
-/short <scope>
-```
-
-**Behavior:**
-- Loads recent git commits and pending tasks
-- Asks: "What are you working on?"
-- Discovers relevant skills on demand
-- Completes tasks fully before starting next
-- Shows delegation summary on completion
-
-**With scope:** Limits work to matching files
-
-```
-/short src/auth/*.ts    # Only work on auth files
+# Fix all machines
+./bin/oneshot doctor --all-machines --fix
 ```
 
-### `/full` — Structured Work
+## What It Checks
 
-Full operator for new projects, refactors, and complex implementations.
+| Check | What it verifies |
+|-------|-----------------|
+| `python3` | Python 3 runtime |
+| `git` | Git version control |
+| `claude` | Claude Code CLI installed |
+| `opencode` | OpenCode CLI installed |
+| `oc launcher` | Local `oc` wrapper exists on PATH |
+| `opencode auth` | At least one provider authenticated |
+| `gemini` | Gemini CLI installed |
+| `gemini auth` | Gemini can actually respond (runs `gemini -p "Say READY"`) |
+| `codex` | Codex CLI installed |
+| `codex auth` | `~/.codex/auth.json` exists with valid refresh token |
+| `secrets cli` | `secrets` command on PATH |
+| `secrets decrypt` | `secrets list` successfully decrypts the vault |
+| `age key` | `~/.age/key.txt` exists |
+| `worktree path` | Worktree parent directory exists and is writable |
+| `repo path` | `.oneshot/tasks/` exists |
+| `ssh config` | All machine hosts are in `~/.ssh/config` |
 
-```
-/full
-/full <project-description>
-```
+## Status Values
 
-**Behavior:**
-- Creates IMPLEMENTATION_CONTEXT.md for persistent state
-- Structured intake phase (goals, scope, architecture)
-- Phase-based planning with milestones
-- Skill discovery via `~/.claude/skills/` index
-- Execution with context checkpoints
-- Completion summary with verification
+| Status | Meaning |
+|--------|---------|
+| `OK` | Check passed. Detail shows version/path. |
+| `MISSING` | Tool not installed or path doesn't exist. |
+| `AUTH_REQUIRED` | Tool installed but not authenticated. |
+| `BLOCKED_BY_PASSPHRASE` | SOPS/age decrypt failed (bad key or passphrase). |
+| `UNKNOWN_ERROR` | Unexpected error. Check the detail. |
 
-**Use when:** Starting a new project, major refactoring, complex features
+## Exit Codes
 
-### `/conduct` — Multi-Model PMO Orchestrator
+- `0` — all checks passed
+- `1` — some checks failing (no auth blockers)
+- `2` — at least one AUTH_REQUIRED or BLOCKED_BY_PASSPHRASE
 
-Routes work across Claude, Codex, and Gemini. Asks clarifying questions first. Loops until the goal is fully met.
+## Local vs Remote Checks
 
-```
-/conduct
-/conduct <idea or goal>
-```
+- Local runs include `worktree path` and `repo path` checks.
+- Remote runs do not mark those local-only paths as missing; they only report what can be checked meaningfully over SSH.
 
-**Behavior:**
-- Detects available providers (codex, gemini) on startup
-- Asks clarifying questions — **blocking**, nothing executes until answered
-- Creates structured plan with task breakdown
-- Routes each task to the best model based on type
-- Loops until goal is actually complete, not just started
+## Env Var Overrides
 
-**Use when:** Non-trivial tasks where you want autonomous multi-model execution until done. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, run it.
+Machine config in `.oneshot/config/machines.yaml` supports `${VAR:-default}` syntax:
 
----
+```bash
+# Override a single machine's host
+ONESHOT_MACHINE_OCI_HOST=my-custom-alias ./bin/oneshot doctor --all-machines
 
-## Context Management
-
-### `/handoff`
-
-Saves context before `/clear`. Captures what was done, what's in progress, decisions, blockers, next steps.
-
-```
-/handoff
-```
-
-### `/restore`
-
-Resumes from handoff checkpoint. Checks native Tasks first, then reads handoff file.
-
-```
-/restore
+# Override a repo path
+ONESHOT_MACHINE_HOMELAB_REPO=/home/me/projects/oneshot ./bin/oneshot doctor --all-machines
 ```
 
----
+## Adding a New Machine
 
-## Research & Documentation
+1. Add the SSH alias to `~/.ssh/config` on all machines:
+   ```
+   Host newmachine-ts
+       HostName 100.x.x.x
+       User youruser
+   ```
 
-### `/research`
+2. Add to `.oneshot/config/machines.yaml`:
+   ```yaml
+   machines:
+     newmachine:
+       host: newmachine-ts
+       repo_path: /home/user/github/oneshot
+       role: worker
+       enabled: true
+   ```
 
-Background research using search APIs. Investigates topics without blocking conversation.
+3. Clone oneshot on the new machine and run `./bin/oneshot doctor`
 
+## SSH Alias Convention
+
+All machine SSH aliases use the `-ts` Tailscale suffix: `oci-ts`, `macmini-ts`, `homelab-ts`. This is the canonical form. Never use raw Tailscale IPs.
+
+## Why Not `gog`
+
+Gemini CLI readiness is tested directly with `gemini -p "Say READY"`. We do not use `gog` for any readiness check. `gog` may prompt for a keyring passphrase and block execution. If you see `BLOCKED_BY_PASSPHRASE` on a secrets check, the issue is with the SOPS/Age key at `~/.age/key.txt`, not with Gemini.
+
+## Troubleshooting
+
+### `BLOCKED_BY_PASSPHRASE` on secrets decrypt
+
+1. Check `~/.age/key.txt` exists and is non-empty
+2. Verify it's the correct age private key (from 1Password: "SOPS age encryption key")
+3. Run `secrets list` manually to see the exact error
+
+### `AUTH_REQUIRED` on gemini auth
+
+Run `gemini` directly — it will open a browser for Google login. This is interactive and cannot be autofixed.
+
+### `AUTH_REQUIRED` on codex auth
+
+Run `codex login --device-auth` on a machine with browser access. Copy `~/.codex/auth.json` from there.
+
+### SSH failing for a machine
+
+1. Verify the host alias works: `ssh -o BatchMode=yes oci-ts echo ok`
+2. Check `~/.ssh/config` has the correct `HostName` and `User`
+3. Ensure SSH keys are shared across machines
+````
+
+## File: docs/SEARCH_POLICY.md
+````markdown
+# Search Policy
+
+## Default: Argus
+
+All worker search goes through **Argus** (`homelab:8270`).
+
+- HTTP API: `http://100.112.130.100:8270`
+- MCP server: `http://100.112.130.100:8271/sse`
+
+Argus provides multi-provider search with automatic fallback, ranking (RRF), and budget enforcement.
+
+## Rules
+
+1. **Prefer Argus.** Don't let workers use raw web search APIs directly.
+2. **Log queries.** When a worker performs a search, log the query in the task's `status.json` under `search_log[]`.
+3. **Include source URLs.** Any claims backed by search results must include source URLs in `result.md`.
+4. **Mode selection.**
+   - `discovery` — broad exploration, multiple sources (SearXNG, Brave, Exa)
+   - `precision` — targeted queries, high relevance (Serper, Tavily)
+   - `cheap` — quick lookups, cost-sensitive (SearXNG only)
+   - `research` — deep multi-source (all providers)
+5. **No API keys in prompts.** Workers should not receive raw API keys. Auth is handled by the runner template (env var injection).
+6. **Fallback.** If Argus is unreachable, the runner can use direct provider APIs as a fallback. Log the fallback in `search_log[]`.
+7. **Cost awareness.** `precision` and `research` modes cost money. Default to `discovery` or `cheap` for routine tasks.
+
+## Configuration
+
+Search behavior is configured in `.oneshot/config/models.yaml` under the `search:` block:
+
+```yaml
+search:
+  preferred: argus
+  argus:
+    enabled: false  # will be true when runner execution is live
+    mcp_server_name: argus
+    cli_command: "argus search"
 ```
-/research <topic>
-```
 
-### `/freesearch`
+In the MVP, search is policy-only (docs + configuration). Live runner integration with Argus comes in a follow-up.
 
-Zero-token web search via Exa API. Searches without consuming context budget.
+## Worker Search Access
 
-```
-/freesearch <query>
-```
+When real runners ship, workers get Argus access via:
 
-### `/doc`
+1. **MCP** — if the runner supports MCP servers (OpenCode), the Argus MCP server is available at the configured URL.
+2. **HTTP** — direct API calls to `http://100.112.130.100:8270/api/search`.
+3. **CLI** — `argus search` command if the Argus CLI is installed in the worktree.
 
-Caches external documentation locally. Fetches from URL, saves to `~/github/docs-cache/`.
+The runner template handles auth injection — workers never see raw API keys.
+````
 
-```
-/doc <url>
-/doc --list    # Show cached docs
-```
+## File: docs/WORKER_LANES.md
+````markdown
+# Worker Lanes
 
----
+## Current Phase: ZAI Dogfood
 
-## Utilities
+Active provider: **ZAI** (GLM models via OpenCode proxy).
 
-### `/vision`
+| Lane | Model | Max Diff | Max Files | Arch Changes |
+|------|-------|----------|-----------|-------------|
+| `cheap_fast` | `glm-4.7-flash` | 150 lines | 5 | No |
+| `cheap_summary` | `glm-4.5-air` | 100 lines | 5 | No |
+| `routine_coder` | `glm-4.7` | 500 lines | 12 | No |
+| `strong_reasoning` | `glm-5` | 800 lines | 20 | Yes |
+| `premium_reasoning` | `glm-5.1` | 1000 lines | 25 | Yes |
+| `review_only` | Claude Code (manual) | unlimited | unlimited | Yes |
 
-Visual analysis of websites and images. Handles screenshots and direct image URLs.
+**ZAI plan expires 2026-05-02.** Migrate before then (see `ZAI_TO_OPENCODE_GO_MIGRATION.md`).
 
-```
-/vision https://example.com
-/vision https://image.png "replicate"
-```
+## Future Phase: OpenCode Go
 
-### `/secrets`
+Provider: **OpenCode Go** (disabled, pending activation).
 
-SOPS/Age secrets management. Decrypts from `~/github/oneshot/secrets/`.
+| Lane | Model | Max Diff | Max Files | Arch Changes |
+|------|-------|----------|-----------|-------------|
+| `cheap_fast` | `deepseek-v4-flash` | 150 | 5 | No |
+| `cheap_summary` | `qwen3.5-plus` | 100 | 5 | No |
+| `routine_coder` | `minimax-m2.7` | 500 | 12 | No |
+| `strong_reasoning` | `kimi-k2.6` | 800 | 20 | Yes |
+| `premium_reasoning` | `deepseek-v4-pro` | 1000 | 25 | Yes |
+| `review_only` | Claude Code (manual) | unlimited | unlimited | Yes |
 
-```
-/secrets <name>
-```
+## Optional Providers
 
----
+| Provider | Status | Use case |
+|----------|--------|----------|
+| Gemini | Disabled | Documentation, tests, summaries |
+| Codex | Disabled | Alternate worker or reviewer |
 
-## Quick Reference
+## Model Selection Policy
 
-| I want to... | Use |
-|--------------|-----|
-| Quick iteration on existing work | `/short` |
-| Start a new project | `/full` |
-| Run a big task across multiple models | `/conduct` |
-| Save context before clearing | `/handoff` |
-| Resume after `/clear` | `/restore` |
-| Research a topic | `/research` or `/freesearch` |
-| Cache library docs | `/doc` |
-| Analyze a website or image | `/vision` |
-| Access secrets | `/secrets` |
+1. **Don't use premium by default.** `routine_coder` is the default lane for implementation.
+2. **Escalate on retry-twice.** If a task fails on `routine_coder` twice, escalate to `strong_reasoning`.
+3. **Cross-file architecture → `strong_reasoning`.** Don't send refactors that touch >5 files to `routine_coder`.
+4. **Premium is for recovery.** `premium_reasoning` means something went wrong. Investigate the spec before escalating.
+5. **Review is always Claude.** The `review_only` lane means Claude reviews but doesn't implement.
 
----
+## Budget Limits (OpenCode Go, when enabled)
 
-## Architecture
+- $12 per 5-hour window
+- $30 per week
+- $60 per month
 
-**Before (v12):** 25+ menu commands
-**After (v13):** 3 operators + 7 utilities
-
-Operators discover skills on demand instead of maintaining a large command catalog.
-
----
-
-## Decision Defaults
-
-Operators apply these defaults without asking:
-
-| Ambiguity | Default |
-|-----------|---------|
-| Multiple implementations | Simplest |
-| Naming | Follow existing pattern |
-| Refactor opportunity | Skip unless blocking |
-| Stack | Follow CLAUDE.md defaults |
-| Error handling | Match surrounding code |
-
----
-
-## Auto-Approved Actions
-
-- Reading any file
-- Writing to scope-matched files
-- Running tests and linters
-- Creating context files (DECISIONS.md, BLOCKERS.md, etc.)
-- Git commit (not push)
-
-## Requires Confirmation
-
-- Destructive operations (rm -rf, DROP TABLE)
-- Git push to shared branches
-- External API calls that cost money
-- Deploying to production
+Cheap/high-volume models (deepseek, qwen) for routine work. Premium models (kimi, deepseek-v4-pro) only on escalation.
 ````
 
 ## File: eval/benchmarks/classification/holdout/cls-h01.json
@@ -20232,6 +20007,45 @@ result = run_routing(tasks)
 failures = [d for d in result["details"] if not d.get("correct", True)]
 ````
 
+## File: githooks/post-commit
+````
+#!/bin/bash
+# post-commit hook — push to GitHub after local commit
+# Runs AFTER commit is made, so failure here doesn't affect the commit
+
+set -uo pipefail
+
+# Skip if we're on a detached HEAD (e.g., during rebase)
+git rev-parse --abbrev-ref HEAD >/dev/null 2>&1 || exit 0
+
+BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
+REMOTE=$(git config "branch.${BRANCH}.remote" || echo "origin")
+
+# Check if remote has changes we don't have (avoid push loss)
+if git fetch "$REMOTE" "$BRANCH" >/dev/null 2>&1; then
+    LOCAL=$(git rev-parse HEAD)
+    REMOTE=$(git rev-parse "@{u}")
+
+    if [ "$LOCAL" != "$REMOTE" ]; then
+        # Remote has diverged, pull with rebase to stay linear
+        echo "[post-commit] Remote changed, pulling first..."
+        if git pull --rebase --autostash >/dev/null 2>&1; then
+            echo "[post-commit] ✓ Pulled remote changes"
+        else
+            echo "[post-commit] ⚠ Pull failed, pushing anyway"
+        fi
+    fi
+fi
+
+# Push the commit
+if git push >/dev/null 2>&1; then
+    echo "[post-commit] ✓ Pushed to $REMOTE/$BRANCH"
+else
+    echo "[post-commit] ✗ Push failed (check network/auth)"
+    exit 1
+fi
+````
+
 ## File: hooks/janitor/context.sh
 ````bash
 project_dir="$PWD"
@@ -20324,179 +20138,1405 @@ except Exception:
 exit 0
 ````
 
-## File: hooks/janitor/record.sh
-````bash
-input=$(cat)
-tool_name="${input#*\"tool_name\":\"}"
-tool_name="${tool_name%%\"*}"
-case "$tool_name" in
-  WebFetch|WebSearch|mcp__*|TaskCreate|TaskUpdate|TaskList|TaskGet|CronCreate|CronDelete|CronList|AskUserQuestion)
-    exit 0
-    ;;
-esac
-project_dir="$PWD"
-while [ "$project_dir" != "/" ]; do
-  [ -d "$project_dir/.git" ] && break
-  project_dir=$(dirname "$project_dir")
-done
-[ "$project_dir" = "/" ] && exit 0
-janitor_dir="$project_dir/.janitor"
-events_file="$janitor_dir/events.jsonl"
-mkdir -p "$janitor_dir"
-timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-session_id="${CLAUDE_CODE_SESSION_ID:-$(date +%Y%m%d-%H%M%S)}"
-json_get() {
-  python3 -c "
-import json, sys
-d = json.loads(sys.stdin.read())
-val = str(d.get('$1', {}).get('$2', ''))[:200]
-print(json.dumps(val)[1:-1])
-" <<< "$input" 2>/dev/null || true
-}
-file_path=""
-case "$tool_name" in
-  Read|Write|Edit)
-    file_path=$(json_get tool_input file_path)
-    ;;
-esac
-has_failed_output=0
-if echo "$input" | tr -d '\\' | grep -qE '"exit_code"\s*:\s*[1-9]'; then
-    has_failed_output=1
-fi
-# Build event based on tool type
-case "$tool_name" in
-  Glob|Grep)
-    query=$(json_get tool_input pattern)
-    [ -z "$query" ] && query=$(json_get tool_input glob_pattern)
-    [ -z "$query" ] && query=$(json_get tool_input query)
-    query="${query:0:100}"
-    # Check for no results in the raw input
-    is_empty=0
-    case "$input" in
-      *"\"tool_output\":\"\""*|*"\"tool_output\":\"\[\"]"*)
-        is_empty=1
-        ;;
-    esac
-    if echo "$input" | grep -qE '"tool_output":"[^"]*([Nn]o (matches|results)|0 results|found 0|empty)'; then
-      is_empty=1
-    fi
-    if [ "$is_empty" -eq 1 ] && [ -n "$query" ]; then
-      printf '{"ts":"%s","session":"%s","type":"dead_end","content":"No results for: %s","meta":{"tool":"%s","auto":true},"files":[]}\n' \
-        "$timestamp" "$session_id" "$query" "$tool_name" >> "$events_file"
-    fi
-    exit 0
-    ;;
-  Read)
-    [ -z "$file_path" ] && exit 0
-    printf '{"ts":"%s","session":"%s","type":"file_read","content":"Read %s","meta":{"tool":"Read","auto":true},"files":["%s"]}\n' \
-      "$timestamp" "$session_id" "$file_path" "$file_path" >> "$events_file"
-    ;;
-  Write)
-    [ -z "$file_path" ] && exit 0
-    printf '{"ts":"%s","session":"%s","type":"file_written","content":"Created %s","meta":{"tool":"Write","auto":true},"files":["%s"]}\n' \
-      "$timestamp" "$session_id" "$file_path" "$file_path" >> "$events_file"
-    ;;
-  Edit)
-    [ -z "$file_path" ] && exit 0
-    printf '{"ts":"%s","session":"%s","type":"file_written","content":"Edited %s","meta":{"tool":"Edit","auto":true},"files":["%s"]}\n' \
-      "$timestamp" "$session_id" "$file_path" "$file_path" >> "$events_file"
-    ;;
-  Bash)
-    cmd=$(json_get tool_input command)
-    cmd="${cmd:0:200}"
-    if [ "$has_failed_output" -eq 1 ]; then
-      printf '{"ts":"%s","session":"%s","type":"dead_end","content":"Failed: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
-        "$timestamp" "$session_id" "${cmd:0:100}" >> "$events_file"
-    fi
-    case "$cmd" in
-      git\ commit*|git\ push*)
-        printf '{"ts":"%s","session":"%s","type":"commit","content":"Git: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
-          "$timestamp" "$session_id" "${cmd:0:100}" >> "$events_file"
-        ;;
-      git\ *)
-        exit 0
-        ;;
-      *)
-        printf '{"ts":"%s","session":"%s","type":"action_taken","content":"Ran: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
-          "$timestamp" "$session_id" "${cmd:0:100}" >> "$events_file"
-        ;;
-    esac
-    ;;
-  *)
-    exit 0
-    ;;
-esac
-exit 0
-````
-
-## File: hooks/janitor/session-end.sh
-````bash
-project_dir="$PWD"
-while [ "$project_dir" != "/" ]; do
-  [ -d "$project_dir/.git" ] && break
-  project_dir=$(dirname "$project_dir")
-done
-[ "$project_dir" = "/" ] && exit 0
-janitor_dir="$project_dir/.janitor"
-events_file="$janitor_dir/events.jsonl"
-[ ! -f "$events_file" ] && exit 0
-timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-session_id="${CLAUDE_CODE_SESSION_ID:-unknown}"
-printf '{"ts":"%s","session":"%s","type":"session_end","content":"Session ended","meta":{"auto":true},"files":[]}\n' \
-  "$timestamp" "$session_id" >> "$events_file"
-ONESHOT_DIR=""
-for candidate in "$HOME/github/oneshot" "$HOME/oneshot" "$HOME/projects/oneshot"; do
-  [ -d "$candidate/core/janitor" ] && { ONESHOT_DIR="$candidate"; break; }
-done
-[ -z "$ONESHOT_DIR" ] && exit 0
-export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null)" || true
-python3 -c "
-import sys, os
-sys.path.insert(0, '$ONESHOT_DIR')
-try:
-    from core.janitor.jobs import run_session_end
-    run_session_end('$project_dir')
-except Exception:
-    pass
-" &
-exit 0
-````
-
-## File: scripts/build_instructions.py
+## File: oneshot_cli/__init__.py
 ````python
-ROOT = Path(__file__).resolve().parent.parent
-INSTRUCTIONS_DIR = ROOT / "docs" / "instructions"
-CLAUDE_MD = ROOT / "CLAUDE.md"
-INSTRUCTION_FILES = ["core", "workflow", "coding", "search", "review"]
-PROJECT_FILE = "oneshot"
-def build_claude_md() -> None
+
+````
+
+## File: oneshot_cli/collect_cmd.py
+````python
+@click.command()
+@click.argument("task_id", required=True)
+def cli(task_id)
+````
+
+## File: oneshot_cli/config.py
+````python
+CONFIG_DIR = Path(__file__).resolve().parents[1] / ".oneshot" / "config"
+CONFIG_FILE = CONFIG_DIR / "models.yaml"
+def load_config(path: Path | None = None) -> dict
 ⋮----
-sections = [
+p = path or CONFIG_FILE
 ⋮----
-path = INSTRUCTIONS_DIR / f"{name}.md"
+def get_lane(cfg: dict, lane_name: str) -> dict
 ⋮----
-path = INSTRUCTIONS_DIR / f"{PROJECT_FILE}.md"
+lane = cfg.get("lanes", {}).get(lane_name)
 ⋮----
-def check_imports() -> bool
+available = ", ".join(cfg.get("lanes", {}).keys()) or "(none)"
 ⋮----
-"""Validate that all @imports in CLAUDE.md reference existing files."""
-content = CLAUDE_MD.read_text()
-ok = True
+def resolve_provider_model(cfg: dict, lane_name: str) -> tuple[str, str, str]
 ⋮----
-line = line.strip()
+"""Return (provider_key, model_key, model_id) for a lane."""
+lane = get_lane(cfg, lane_name)
+provider_key = lane["current_provider"]
+model_key = lane["current_model"]
+provider = cfg["providers"][provider_key]
+model_id = provider["models"][model_key]["id"]
 ⋮----
-ref = line[5:]
-path = ROOT / ref
+def get_runner_template(cfg: dict, runner_name: str) -> dict
 ⋮----
-ok = False
+templates = cfg.get("runner_templates", {})
+tmpl = templates.get(runner_name)
 ⋮----
-def main()
+available = ", ".join(templates.keys()) or "(none)"
+````
+
+## File: oneshot_cli/doctor_cmd.py
+````python
+MACHINES_CONFIG = (
+OK = "OK"
+MISSING = "MISSING"
+AUTH_REQUIRED = "AUTH_REQUIRED"
+BLOCKED = "BLOCKED_BY_PASSPHRASE"
+ERROR = "UNKNOWN_ERROR"
+_ENV_RE = re.compile(r"\$\{([^}:]+)(?::-([^}]*))?\}")
+def _expand_env(value: str) -> str
 ⋮----
-parser = argparse.ArgumentParser(description="Build/regenerate CLAUDE.md")
+"""Expand ${VAR:-default} syntax in string values."""
+def _replace(m)
 ⋮----
-args = parser.parse_args()
+var = m.group(1)
+default = m.group(2) or ""
 ⋮----
-ok = check_imports()
+def _expand_recursive(obj)
+⋮----
+"""Walk a loaded YAML structure and expand env vars in all strings."""
+⋮----
+def load_machines(path: Path | None = None) -> dict
+⋮----
+p = path or MACHINES_CONFIG
+⋮----
+raw = yaml.safe_load(f)
+⋮----
+def _run(cmd: str, timeout: int = 10) -> subprocess.CompletedProcess
+def _has_binary(name: str) -> bool
+def check_python3() -> tuple[str, str]
+⋮----
+r = _run("python3 --version")
+⋮----
+ver = r.stderr.strip() or r.stdout.strip()
+⋮----
+def check_git() -> tuple[str, str]
+⋮----
+r = _run("git --version")
+⋮----
+def check_claude() -> tuple[str, str]
+⋮----
+r = _run("claude --version")
+ver = r.stdout.strip() or r.stderr.strip()
+⋮----
+def check_opencode() -> tuple[str, str]
+⋮----
+r = _run("opencode --version")
+⋮----
+def check_oc_launcher() -> tuple[str, str]
+⋮----
+r = _run("command -v oc")
+launcher = r.stdout.strip() or "oc"
+⋮----
+def check_opencode_auth() -> tuple[str, str]
+⋮----
+r = _run("opencode auth list", timeout=15)
+⋮----
+lines = [l.strip() for l in r.stdout.strip().splitlines() if l.strip()]
+providers = []
+⋮----
+def check_gemini() -> tuple[str, str]
+⋮----
+r = _run("gemini --version")
+⋮----
+def check_gemini_auth() -> tuple[str, str]
+⋮----
+r = _run("gemini -p 'Say READY and nothing else.'", timeout=45)
+⋮----
+combined = r.stdout + r.stderr
+⋮----
+def check_codex() -> tuple[str, str]
+⋮----
+r = _run("codex --version")
+⋮----
+def check_codex_auth() -> tuple[str, str]
+⋮----
+auth_path = Path.home() / ".codex" / "auth.json"
+⋮----
+data = json.loads(auth_path.read_text())
+has_token = "refresh_token" in data or "refresh_token" in data.get("tokens", {})
+⋮----
+def check_secrets_cli() -> tuple[str, str]
+def check_secrets_decrypt() -> tuple[str, str]
+⋮----
+r = _run("secrets list", timeout=15)
+⋮----
+stderr = r.stderr.strip().lower()
+⋮----
+lines = [l for l in r.stdout.strip().splitlines() if l.strip()]
+⋮----
+def check_age_key() -> tuple[str, str]
+⋮----
+key_path = Path.home() / ".age" / "key.txt"
+⋮----
+def check_worktree_path() -> tuple[str, str]
+⋮----
+wt_parent = Path.cwd().parent / "oneshot-worktrees"
+⋮----
+def check_repo_path() -> tuple[str, str]
+⋮----
+tasks_dir = Path.cwd() / ".oneshot" / "tasks"
+⋮----
+def check_ssh_config(machine_hosts: list[str]) -> tuple[str, str]
+⋮----
+ssh_config = Path.home() / ".ssh" / "config"
+⋮----
+config_text = ssh_config.read_text()
+⋮----
+found = []
+⋮----
+# ── Check registry ──
+LOCAL_CHECKS = [
+def run_local_checks(machine_hosts: list[str]) -> list[dict]
+⋮----
+results = []
+⋮----
+CHECK_WIDTH = 22
+def format_results(machine_name: str, is_local: bool, results: list[dict]) -> str
+⋮----
+lines = []
+label = f"{machine_name} (this machine)" if is_local else machine_name
+⋮----
+name = r["name"]
+status = r["status"]
+detail = r.get("detail", "")
+pad = " " * max(0, CHECK_WIDTH - len(name))
+⋮----
+def summarize(results: list[dict]) -> tuple[int, str]
+⋮----
+counts = {MISSING: 0, AUTH_REQUIRED: 0, BLOCKED: 0, ERROR: 0}
+⋮----
+parts = []
+⋮----
+summary = ", ".join(parts) if parts else "all OK"
+exit_code = 0
+⋮----
+exit_code = 2
+⋮----
+exit_code = 1
+⋮----
+def autofix(results: list[dict]) -> list[str]
+⋮----
+fixes = []
+is_linux = platform.system() == "Linux"
+is_mac = platform.system() == "Darwin"
+⋮----
+cmd = "sudo apt install -y python3" if is_linux else "brew install python3"
+⋮----
+cmd = "sudo apt install -y git" if is_linux else "brew install git"
+⋮----
+oneshot_repo = Path.home() / "github" / "oneshot"
+install_sh = oneshot_repo / "install.sh"
+⋮----
+local_bin = Path.home() / ".local" / "bin"
+⋮----
+src = Path.home() / "github" / "oneshot" / "scripts" / "oc"
+⋮----
+src = Path.home() / "github" / "oneshot" / "scripts" / "secrets"
+⋮----
+wt = Path.cwd().parent / "oneshot-worktrees"
+⋮----
+tasks = Path.cwd() / ".oneshot" / "tasks"
+⋮----
+# ── Remote checks via SSH ──
+REMOTE_SCRIPT = r"""
+hosts_str = " ".join(all_hosts)
+script = REMOTE_SCRIPT.replace("{hosts}", hosts_str)
+⋮----
+r = subprocess.run(
+⋮----
+key = key.strip()
+value = value.strip()
+⋮----
+detail = value[3:]
+⋮----
+# Normalize key names (remote uses underscores for auth keys)
+⋮----
+def remote_fix_instructions(host: str, results: list[dict]) -> list[str]
+⋮----
+issues = [r for r in results if r["status"] != OK]
+⋮----
+names = ", ".join(r["name"] for r in issues)
+⋮----
+def detect_local_machine(machines: dict) -> str | None
+⋮----
+"""Detect which machine config matches the current host."""
+hostname = socket.gethostname()
+# Try SSH self-test: if we can't SSH to a host, it might be us
+⋮----
+ssh_text = ssh_config.read_text() if ssh_config.exists() else ""
+⋮----
+host_alias = cfg.get("host", "")
+# Direct hostname match
+⋮----
+# Extract HostName from SSH config and compare to Tailscale IP
+pattern = (
+m = re.search(pattern, ssh_text, re.MULTILINE)
+⋮----
+target_ip = m.group(2).strip()
+# Check if this IP matches any local interface
+⋮----
+local_ips = socket.getaddrinfo(hostname, None)
+⋮----
+# Fallback: try a quick SSH connection — if it fails with permission denied,
+# it's likely this machine
+⋮----
+# ── Click command ──
+⋮----
+@click.option("--fix", is_flag=True, help="Auto-fix issues where possible.")
+def cli(all_machines: bool, fix: bool)
+⋮----
+"""Check machine readiness for oneshot delegation harness."""
+machines_data = load_machines()
+machines = machines_data.get("machines", {})
+all_hosts = [cfg["host"] for cfg in machines.values() if cfg.get("enabled", True)]
+overall_exit = 0
+output_parts = []
+⋮----
+local_key = detect_local_machine(machines)
+⋮----
+host = cfg["host"]
+is_local = key == local_key
+⋮----
+results = run_local_checks(all_hosts)
+⋮----
+results = run_remote_checks(host, all_hosts)
+⋮----
+overall_exit = max(overall_exit, exit_code)
+⋮----
+fixes = remote_fix_instructions(key, results)
+⋮----
+overall_exit = exit_code
+⋮----
+fixes = autofix(results)
+⋮----
+# Re-run checks after fix
+⋮----
+results2 = run_local_checks(all_hosts)
+⋮----
+overall_exit = exit_code2
+````
+
+## File: oneshot_cli/escalate_cmd.py
+````python
+@click.command()
+@click.argument("task_id", required=True)
+@click.option("--lane", required=True, help="Escalation lane (stronger than parent)")
+def cli(task_id, lane)
+````
+
+## File: oneshot_cli/lanes_cmd.py
+````python
+@click.command("lanes")
+def cli()
+⋮----
+cfg = load_config()
+lanes = cfg.get("lanes", {})
+providers = cfg.get("providers", {})
+⋮----
+cp = lane.get("current_provider", "")
+cm = lane.get("current_model", "")
+fp = lane.get("future_provider", "")
+fm = lane.get("future_model", "")
+# Resolve display names
+current_display = _resolve_display(providers, cp, cm)
+future_display = _resolve_display(providers, fp, fm)
+# Check if future provider is enabled
+future_enabled = providers.get(fp, {}).get("enabled", False)
+⋮----
+max_diff = lane.get("max_diff_lines") or "unlimited"
+max_files = lane.get("max_files") or "unlimited"
+arch = "Y" if lane.get("allow_architecture_changes") else "N"
+⋮----
+def _resolve_display(providers: dict, provider_key: str, model_key: str) -> str
+⋮----
+provider = providers.get(provider_key, {})
+⋮----
+model = provider.get("models", {}).get(model_key, {})
+model_id = model.get("id", model_key)
+````
+
+## File: oneshot_cli/memory_cmd.py
+````python
+@click.group("memory")
+def cli()
+⋮----
+def scaffold_cmd(repo, mode, force)
+⋮----
+result = memory.scaffold(repo=repo, mode=mode, force=force)
+⋮----
+result = memory.promote_decision(
+⋮----
+result = memory.promote_blocker(
+⋮----
+result = memory.promote_runbook(
+⋮----
+result = memory.capture_session_summary(
+⋮----
+def retrieve_cmd(query, repo, limit, include_cross_repo)
+⋮----
+results = memory.retrieve_same_repo(repo, query, limit=limit)
+⋮----
+cross_repo = memory.search_cross_repo_abstractions(
+⋮----
+"""Create a cross-repo abstraction record for future private indexing."""
+result = memory.create_abstraction(
+⋮----
+def index_cmd(repo)
+⋮----
+result = memory.index_repo_memory(repo)
+⋮----
+@click.option("--limit", type=int, default=10, show_default=True)
+def search_cmd(query, repo, limit)
+⋮----
+result = memory.search_cross_repo_abstractions(
+````
+
+## File: oneshot_cli/memory.py
+````python
+STABLE_DIR = Path("docs") / "agents"
+OP_DIR = Path(".oneshot")
+OP_SUBDIRS = (
+POLICY_MODES = {"portable", "isolated", "sensitive", "private"}
+REVIEW_GATES = {"normal", "high-risk-quorum"}
+def global_index_root() -> Path
+⋮----
+env = os.environ.get("ONESHOT_MEMORY_INDEX_ROOT")
+⋮----
+def global_index_db() -> Path
+def repo_root(path: str | Path | None = None) -> Path
+def _now_iso() -> str
+def _now_day() -> str
+def _slugify(value: str) -> str
+⋮----
+slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+⋮----
+def _write_if_missing(path: Path, content: str, force: bool = False) -> bool
+def _append(path: Path, content: str) -> None
+⋮----
+existing = path.read_text() if path.exists() else ""
+⋮----
+root = repo_root(repo)
+stable = root / STABLE_DIR
+op = root / OP_DIR
+⋮----
+created = []
+templates = {
+⋮----
+def _policy_template(mode: str) -> str
+def _gitignore_template() -> str
+⋮----
+prov_dir = root / OP_DIR / "provenance"
+⋮----
+entry_id = f"{_now_day()}-{_slugify(title)}"
+path = prov_dir / f"{entry_id}.md"
+⋮----
+content = (
+target = root / STABLE_DIR / "DECISIONS.md"
+⋮----
+target = root / STABLE_DIR / "BLOCKERS.md"
+⋮----
+"### When to use\n"
+⋮----
+target = root / STABLE_DIR / "RUNBOOKS.md"
+⋮----
+target = root / OP_DIR / "sessions" / f"{entry_id}.md"
+⋮----
+abstraction_dir = root / OP_DIR / "abstractions"
+⋮----
+target = abstraction_dir / f"{entry_id}.md"
+⋮----
+@dataclass
+class SearchResult
+⋮----
+source: str
+title: str
+body: str
+score: int
+priority: int
+conflicted: bool = False
+superseded: bool = False
+⋮----
+terms = [t for t in re.findall(r"[a-z0-9]+", query.lower()) if t]
+files = [
+results: list[SearchResult] = []
+⋮----
+op_base = root / OP_DIR
+⋮----
+directory = op_base / subdir
+⋮----
+text = path.read_text()
+⋮----
+sections = [(_extract_metadata(text).get("title", path.stem), text)]
+⋮----
+sections = _split_sections(text)
+results = []
+⋮----
+haystack = f"{title}\n{body}".lower()
+score = sum(haystack.count(term) for term in terms) if terms else 1
+conflicted = path.parts[-2] == "conflicts" or "- status: conflicted" in haystack
+superseded = "- status: superseded" in haystack
+⋮----
+def _split_sections(text: str) -> list[tuple[str, str]]
+⋮----
+lines = text.splitlines()
+sections: list[tuple[str, list[str]]] = []
+current_title = "document"
+current_body: list[str] = []
+⋮----
+current_title = line[3:].strip()
+current_body = []
+⋮----
+def _snippet(body: str, terms: Iterable[str], max_chars: int = 240) -> str
+⋮----
+text = re.sub(r"\s+", " ", body).strip()
+⋮----
+lowered = text.lower()
+positions = [
+⋮----
+start = max(0, min(positions) - 60)
+end = min(len(text), start + max_chars)
+prefix = "..." if start > 0 else ""
+suffix = "..." if end < len(text) else ""
+⋮----
+def load_policy(repo: str | Path | None) -> dict
+⋮----
+policy_path = root / STABLE_DIR / "MEMORY_POLICY.md"
+⋮----
+data: dict[str, str] = {}
+⋮----
+match = re.match(r"^-\s+([a-z_]+):\s+(.*)$", line.strip())
+⋮----
+def _connect_index() -> sqlite3.Connection
+⋮----
+db_path = global_index_db()
+⋮----
+conn = sqlite3.connect(db_path)
+⋮----
+def index_repo_memory(repo: str | Path | None) -> dict
+⋮----
+policy = load_policy(root)
+conn = _connect_index()
+⋮----
+count = 0
+⋮----
+abstractions_dir = root / OP_DIR / "abstractions"
+⋮----
+doc_id = f"{root}:{path}:{title}"
+⋮----
+current = str(repo_root(current_repo)) if current_repo else None
+⋮----
+except Exception as exc:  # pragma: no cover - exercised via CLI behavior
+⋮----
+rows = conn.execute(
+⋮----
+def _extract_metadata(text: str) -> dict[str, str]
+````
+
+## File: oneshot_cli/review_cmd.py
+````python
+@click.command()
+@click.argument("task_id", required=True)
+def cli(task_id)
+````
+
+## File: oneshot_cli/status_cmd.py
+````python
+@click.command()
+@click.argument("task_id", required=False)
+def cli(task_id)
+````
+
+## File: oneshot_cli/worktree.py
+````python
+REPO_ROOT = Path(__file__).resolve().parents[1]
+WORKTREE_PARENT = REPO_ROOT.parent / "oneshot-worktrees"
+def worktree_path(task_id: str) -> Path
+def branch_name(task_id: str) -> str
+def create(task_id: str) -> Path
+⋮----
+"""Create a worktree at ../oneshot-worktrees/<task_id> on branch worker/<task_id>."""
+wp = worktree_path(task_id)
+⋮----
+br = branch_name(task_id)
+⋮----
+def remove(task_id: str) -> None
+def list_worktrees() -> list[dict]
+⋮----
+result = subprocess.run(
+wts = []
+current = {}
+⋮----
+current = {"path": line.split(" ", 1)[1]}
+⋮----
+ref = line.split(" ", 1)[1]
+⋮----
+@click.group()
+def cli()
+⋮----
+"""Manage git worktrees for dispatched tasks."""
+⋮----
+@cli.command("create")
+@click.argument("task_id")
+def create_cmd(task_id)
+⋮----
+wp = create(task_id)
+⋮----
+@cli.command("remove")
+@click.argument("task_id")
+def remove_cmd(task_id)
+⋮----
+@cli.command("list")
+def list_cmd()
+⋮----
+wts = list_worktrees()
+````
+
+## File: scripts/check-apis.sh
+````bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/secrets-helper.sh"
+ISSUES=0
+check() {
+	local name="$1"
+	local optional="${2:-false}"
+	if [[ "$optional" == "true" ]]; then
+		echo "── $name (optional) ──"
+	else
+		echo "── $name ──"
+	fi
+}
+check_zai() {
+	check "ZAI (GLM Coding Plan)"
+	local key="${ZAI_API_KEY:-}"
+	if [[ -z "$key" ]]; then
+		key=$(secrets_get "ZAI_API_KEY" "research_keys" 2>/dev/null) || true
+	fi
+	if [[ -z "$key" ]]; then
+		echo "  ⚠️  Key not set"
+		ISSUES=1
+		return
+	fi
+	local resp
+	resp=$(curl -s -w "\n%{http_code}" "https://api.z.ai/api/anthropic/v1/messages" \
+		-H "Content-Type: application/json" \
+		-H "x-api-key: $key" \
+		-H "anthropic-version: 2023-06-01" \
+		-d '{"model":"glm-5-turbo","max_tokens":5,"messages":[{"role":"user","content":"hi"}]}' 2>/dev/null)
+	local http_code
+	http_code=$(echo "$resp" | tail -1)
+	local body
+	body=$(echo "$resp" | sed '$d')
+	if [[ "$http_code" == "200" ]]; then
+		local model
+		model=$(echo "$body" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('model','unknown'))" 2>/dev/null || echo "unknown")
+		echo "  ✓ Key active — $model"
+	elif [[ "$http_code" == "429" ]]; then
+		echo "  ⚠️  Key valid — rate limited (429)"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code — may be invalid or expired"
+		ISSUES=1
+	fi
+}
+check_tavily() {
+	check "Tavily" "true"
+	local key
+	key=$(secrets_get "TAVILY_API_KEY" "research_keys" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set (optional)"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.tavily.com/search" -H "Content-Type: application/json" \
+		-d "{\"api_key\":\"$key\",\"query\":\"test\",\"max_results\":1}" 2>/dev/null)
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active"
+	elif [[ "$http_code" == "401" ]]; then
+		echo "  ⚠️  HTTP 401 — invalid key"
+		ISSUES=1
+	elif [[ "$http_code" == "402" ]]; then
+		echo "  ⚠️  HTTP 402 — credits exhausted"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code"
+		ISSUES=1
+	fi
+}
+check_exa() {
+	check "Exa" "true"
+	local key
+	key=$(secrets_get "EXA_API_KEY" "research_keys" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set (optional)"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.exa.ai/search" -H "x-api-key: $key" \
+		-H "Content-Type: application/json" -d "{\"query\":\"test\",\"numResults\":1}" 2>/dev/null)
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active"
+	elif [[ "$http_code" == "402" ]]; then
+		echo "  ⊘ Credits exhausted (top up at exa.ai when needed)"
+	elif [[ "$http_code" == "401" ]]; then
+		echo "  ⚠️  HTTP 401 — invalid key"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code"
+		ISSUES=1
+	fi
+}
+check_apify() {
+	check "Apify" "true"
+	local key
+	key=$(secrets_get "APIFY_TOKEN" "research_keys" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set (optional)"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.apify.com/v2/actor-runs" -H "Authorization: Bearer $key" 2>/dev/null)
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active"
+	elif [[ "$http_code" == "401" ]]; then
+		echo "  ⚠️  HTTP 401 — key may be invalid"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code"
+		ISSUES=1
+	fi
+}
+check_context7() {
+	check "Context7" "true"
+	local key
+	key=$(secrets_get "CONTEXT7_API_KEY" "research_keys" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set (optional)"
+		return
+	fi
+	if [[ "$key" != ctx7sk-* ]]; then
+		echo "  ⚠️  Key format outdated (needs ctx7sk- prefix)"
+		ISSUES=1
+		return
+	fi
+	echo "  ✓ Key format valid (ctx7sk-...)"
+}
+check_openai() {
+	check "OpenAI"
+	local key
+	key=$(secrets_get "OPENAI_API_KEY" "research_keys" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.openai.com/v1/models" -H "Authorization: Bearer $key" 2>/dev/null)
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active"
+	else
+		echo "  ⚠️  HTTP $http_code — key may be invalid"
+		ISSUES=1
+	fi
+}
+check_openrouter() {
+	check "OpenRouter"
+	local key
+	key=$(secrets_get "OPENROUTER_API_KEY" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://openrouter.ai/api/v1/models" -H "Authorization: Bearer $key" 2>/dev/null)
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active"
+	elif [[ "$http_code" == "401" ]]; then
+		echo "  ⚠️  HTTP 401 — invalid key"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code"
+		ISSUES=1
+	fi
+}
+check_deepseek() {
+	check "DeepSeek" "true"
+	local key
+	key=$(secrets_get "DEEPSEEK_API_KEY" "services" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set (optional)"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.deepseek.com/v1/models" -H "Authorization: Bearer $key" 2>/dev/null)
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active"
+	elif [[ "$http_code" == "401" ]]; then
+		echo "  ⚠️  HTTP 401 — invalid key"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code"
+		ISSUES=1
+	fi
+}
+check_brave() {
+	check "Brave Search" "true"
+	local key
+	key=$(secrets_get "BRAVE_API_KEY" "openclaw" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set (optional)"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.search.brave.com/res/v1/web/search?q=test" \
+		-H "Accept: application/json" -H "X-Subscription-Token: $key" 2>/dev/null)
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active"
+	elif [[ "$http_code" == "401" ]]; then
+		echo "  ⚠️  HTTP 401 — invalid key"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code"
+		ISSUES=1
+	fi
+}
+check_jina() {
+	check "Jina" "true"
+	local key
+	key=$(secrets_get "JINA_API_KEY" "api" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set (optional)"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.jina.ai/v1/embeddings" -H "Authorization: Bearer $key" 2>/dev/null)
+	if [[ "$http_code" == "200" || "$http_code" == "405" ]]; then
+		echo "  ✓ Key active"
+	elif [[ "$http_code" == "401" ]]; then
+		echo "  ⚠️  HTTP 401 — invalid key"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code"
+		ISSUES=1
+	fi
+}
+check_github() {
+	check "GitHub PAT"
+	local key
+	key=$(secrets_get "GITHUB_PAT" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set"
+		return
+	fi
+	local http_code user
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.github.com/user" -H "Authorization: Bearer $key" 2>/dev/null)
+	user=$(curl -s --max-time 10 "https://api.github.com/user" \
+		-H "Authorization: Bearer $key" 2>/dev/null |
+		python3 -c "import sys,json;print(json.load(sys.stdin).get('login','?'))" 2>/dev/null || echo "?")
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active ($user)"
+	elif [[ "$http_code" == "401" ]]; then
+		echo "  ⚠️  HTTP 401 — invalid or expired"
+		ISSUES=1
+	else
+		echo "  ⚠️  HTTP $http_code"
+		ISSUES=1
+	fi
+}
+check_cloudflare() {
+	check "Cloudflare API"
+	local key
+	key=$(secrets_get "CLOUDFLARE_API_TOKEN" 2>/dev/null) || true
+	if [[ -z "$key" ]]; then
+		echo "  ⊘ Not set"
+		return
+	fi
+	local http_code
+	http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+		"https://api.cloudflare.com/client/v4/user/tokens/verify" -H "Authorization: Bearer $key" 2>/dev/null)
+	if [[ "$http_code" == "200" ]]; then
+		echo "  ✓ Key active"
+	else
+		echo "  ⚠️  HTTP $http_code — token may be expired"
+		ISSUES=1
+	fi
+}
+check_telegram() {
+	check "Telegram Bots"
+	local checked=0
+	for prefix in openclaw penny; do
+		local key
+		key=$(secrets_get "TELEGRAM_BOT_TOKEN" "$prefix" 2>/dev/null) || true
+		[[ -z "$key" ]] && continue
+		local bot
+		bot=$(curl -s --max-time 10 "https://api.telegram.org/bot$key/getMe" 2>/dev/null |
+			python3 -c "import sys,json;d=json.load(sys.stdin);print(f'@{d[\"result\"][\"username\"]}')" 2>/dev/null || true)
+		[[ -z "$bot" ]] && {
+			echo "  ⚠️  $prefix bot — invalid"
+			ISSUES=1
+			continue
+		}
+		echo "  ✓ $bot ($prefix)"
+		checked=$((checked + 1))
+	done
+	[[ $checked -eq 0 ]] && echo "  ⊘ No bots configured"
+}
+check_zai
+check_tavily
+check_exa
+check_apify
+check_context7
+check_openai
+check_openrouter
+check_deepseek
+check_brave
+check_jina
+check_github
+check_cloudflare
+check_telegram
+exit $ISSUES
+````
+
+## File: scripts/docs-link
+````
+#!/usr/bin/env bash
+# docs-link - Manage documentation symlinks from central cache to local projects
+# Usage: docs-link <command> [args...]
+
+set -euo pipefail
+
+# Configuration
+CACHE_BASE="${DOCS_CACHE:-$HOME/.local/share/argus/argus/docs/cache}"
+CACHE_INDEX="$CACHE_BASE/.index.md"
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
+EXTERNAL_DIR="$PROJECT_ROOT/docs/external"
+MANIFEST_FILE="$PROJECT_ROOT/.docs-links.json"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log_info() { echo -e "${BLUE}[docs-link]${NC} $1"; }
+log_success() { echo -e "${GREEN}[docs-link]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[docs-link]${NC} $1"; }
+log_error() { echo -e "${RED}[docs-link]${NC} $1" >&2; }
+
+# Ensure cache exists
+ensure_cache() {
+    if [[ ! -d "$CACHE_BASE" ]]; then
+        log_error "Cache not found at $CACHE_BASE"
+        log_info "Set DOCS_CACHE env var or mirror Argus corpus locally first"
+        exit 1
+    fi
+}
+
+# Ensure external dir exists
+ensure_external_dir() {
+    mkdir -p "$EXTERNAL_DIR"
+}
+
+# Load manifest
+load_manifest() {
+    if [[ -f "$MANIFEST_FILE" ]]; then
+        cat "$MANIFEST_FILE"
+    else
+        echo '{"cache_path":"'"$CACHE_BASE"'","links":{},"updated":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}'
+    fi
+}
+
+# Save manifest
+save_manifest() {
+    local manifest="$1"
+    echo "$manifest" | jq '.' > "$MANIFEST_FILE"
+}
+
+# Get docs from cache index
+get_available_docs() {
+    if [[ ! -f "$CACHE_INDEX" ]]; then
+        log_error "Cache index not found at $CACHE_INDEX"
+        exit 1
+    fi
+    # Parse markdown table to get name and category (4 columns: Name, Category, Related, URL, Cached)
+    grep -E '^\|' "$CACHE_INDEX" | tail -n +3 | grep -v '^|--' | awk -F'|' '{
+        name = $2; category = $3;
+        gsub(/^[ \t]+|[ \t]+$/, "", name);
+        gsub(/^[ \t]+|[ \t]+$/, "", category);
+        if (name != "" && name != "Name") print category "/" name;
+    }'
+}
+
+# Resolve doc path
+resolve_doc_path() {
+    local name="$1"
+    local available
+    available=$(get_available_docs)
+
+    # Check for exact match
+    local match
+    match=$(echo "$available" | grep "/$name$" || true)
+    if [[ -n "$match" ]]; then
+        echo "$CACHE_BASE/$match"
+        return 0
+    fi
+
+    # Check for partial match (just name)
+    match=$(echo "$available" | grep -E "/[^/]*${name}[^/]*$" || true)
+    local count
+    count=$(echo "$match" | wc -l)
+    if [[ $count -eq 1 ]]; then
+        echo "$CACHE_BASE/$match"
+        return 0
+    elif [[ $count -gt 1 ]]; then
+        log_error "Multiple matches for '$name':"
+        echo "$match" | sed 's|^|  |'
+        return 1
+    fi
+
+    log_error "No docs found for '$name'"
+    log_info "Run 'docs-link available' to see cached docs"
+    return 1
+}
+
+# Command: available
+cmd_available() {
+    ensure_cache
+    log_info "Available docs in cache:"
+    echo ""
+    local available
+    available=$(get_available_docs)
+    if [[ -z "$available" ]]; then
+        log_warn "No docs found in cache"
+        return
+    fi
+    echo "$available" | while IFS=/ read -r category name; do
+        local status=""
+        if [[ -L "$EXTERNAL_DIR/$name" ]]; then
+            status="${GREEN}[linked]${NC}"
+        fi
+        printf "  ${BLUE}%-20s${NC} %-30s %s\n" "$category" "$name" "$status"
+    done
+}
+
+# Command: list
+cmd_list() {
+    if [[ ! -f "$MANIFEST_FILE" ]]; then
+        log_warn "No docs linked in this project"
+        return
+    fi
+
+    local manifest
+    manifest=$(load_manifest)
+    local links
+    links=$(echo "$manifest" | jq -r '.links | to_entries[] | "\(.key)=\(.value)"')
+
+    if [[ -z "$links" ]]; then
+        log_warn "No docs linked in this project"
+        return
+    fi
+
+    log_info "Linked docs in $PROJECT_ROOT:"
+    echo ""
+    echo "$links" | while IFS= read -r entry; do
+        local name="${entry%%=*}"
+        local path="${entry#*=}"
+        local link_path="$EXTERNAL_DIR/$name"
+        local status="${GREEN}OK${NC}"
+        if [[ ! -L "$link_path" ]]; then
+            status="${RED}BROKEN${NC}"
+        fi
+        printf "  ${BLUE}%-20s${NC} -> %-40s [%s]\n" "$name" "$path" "$status"
+    done
+}
+
+# Command: add
+cmd_add() {
+    if [[ $# -eq 0 ]]; then
+        log_error "Usage: docs-link add <name>..."
+        exit 1
+    fi
+
+    ensure_cache
+    ensure_external_dir
+
+    local manifest
+    manifest=$(load_manifest)
+
+    for name in "$@"; do
+        local target
+        if ! target=$(resolve_doc_path "$name"); then
+            continue
+        fi
+
+        local link_path="$EXTERNAL_DIR/$name"
+
+        # Check if already linked
+        if [[ -e "$link_path" ]]; then
+            if [[ -L "$link_path" ]]; then
+                log_warn "'$name' is already linked"
+            else
+                log_error "'$name' already exists and is not a symlink"
+            fi
+            continue
+        fi
+
+        # Create symlink
+        ln -s "$target" "$link_path"
+
+        # Update manifest
+        local relative="${target#$CACHE_BASE/}"
+        manifest=$(echo "$manifest" | jq -r --arg name "$name" --arg path "$relative" '.links[$name] = $path')
+
+        log_success "Linked $name -> $relative"
+    done
+
+    # Save manifest with updated timestamp
+    manifest=$(echo "$manifest" | jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.updated = $ts')
+    save_manifest "$manifest"
+
+    # Update project CLAUDE.md if it exists
+    update_claude_md
+}
+
+# Command: remove
+cmd_remove() {
+    if [[ $# -eq 0 ]]; then
+        log_error "Usage: docs-link remove <name>"
+        exit 1
+    fi
+
+    local manifest
+    manifest=$(load_manifest)
+
+    for name in "$@"; do
+        local link_path="$EXTERNAL_DIR/$name"
+
+        if [[ ! -L "$link_path" ]]; then
+            log_warn "'$name' is not linked"
+            continue
+        fi
+
+        rm "$link_path"
+        manifest=$(echo "$manifest" | jq -r --arg name "$name" 'del(.links[$name])')
+        log_success "Removed link for '$name'"
+    done
+
+    manifest=$(echo "$manifest" | jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.updated = $ts')
+    save_manifest "$manifest"
+}
+
+# Command: sync
+cmd_sync() {
+    ensure_cache
+    ensure_external_dir
+
+    local manifest
+    manifest=$(load_manifest)
+
+    local links
+    links=$(echo "$manifest" | jq -r '.links | to_entries[] | "\(.key)=\(.value)"')
+
+    if [[ -z "$links" ]]; then
+        log_warn "No links to sync"
+        return
+    fi
+
+    for entry in $links; do
+        local name="${entry%%=*}"
+        local path="${entry#*=}"
+        local link_path="$EXTERNAL_DIR/$name"
+        local target="$CACHE_BASE/$path"
+
+        if [[ -L "$link_path" ]]; then
+            rm "$link_path"
+        fi
+
+        ln -s "$target" "$link_path"
+        log_info "Synced $name"
+    done
+
+    log_success "Synced all links"
+}
+
+# Update CLAUDE.md with external docs reference
+update_claude_md() {
+    local claude_md="$PROJECT_ROOT/CLAUDE.md"
+
+    if [[ ! -f "$claude_md" ]]; then
+        return
+    fi
+
+    # Check if section already exists
+    if grep -q "## External Documentation" "$claude_md"; then
+        return
+    fi
+
+    # Add section at end
+    cat >> "$claude_md" <<'EOF'
+
+## External Documentation
+
+This project has links to cached external documentation:
+
+```bash
+# View linked docs
+ls docs/external/
+
+# See available cached docs
+docs-link available
+```
+
+Cached docs are managed via the central cache at ~/github/docs-cache/
+EOF
+
+    log_info "Updated CLAUDE.md with external docs section"
+}
+
+# Update README with annotations footer
+update_readme_annotations() {
+    local doc_path="$1"
+    local readme="$doc_path/README.md"
+
+    if [[ ! -f "$readme" ]]; then
+        return
+    fi
+
+    # Check if annotations section already exists
+    if grep -q "## Annotations" "$readme"; then
+        return
+    fi
+
+    # Count annotations
+    local annotations_dir="$doc_path/annotations"
+    local count=0
+    local links=""
+    if [[ -d "$annotations_dir" ]]; then
+        count=$(ls -1 "$annotations_dir"/*.md 2>/dev/null | wc -l)
+        if [[ $count -gt 0 ]]; then
+            links=$(
+                for f in "$annotations_dir"/*.md; do
+                    if [[ -f "$f" ]]; then
+                        local basename=$(basename "$f" .md)
+                        local title=$(head -n 10 "$f" | grep -E "^#+ " | head -1 | sed 's/^#+ //;s/^#//;s/^ *//')
+                        [[ -z "$title" ]] && title="$basename"
+                        echo "- [$title](annotations/$basename.md)"
+                    fi
+                done
+            )
+        fi
+    fi
+
+    # Add footer
+    cat >> "$readme" <<EOF
+
+---
+
+## Annotations
+
+> Recent agent notes from working with this service
+
+$links
+
+**[View all annotations →](annotations/)**
+EOF
+
+    log_info "Updated README with annotations footer"
+}
+
+# Command: annotate
+cmd_annotate() {
+    local name="$1"
+    local note="${2:-}"
+
+    if [[ -z "$name" ]]; then
+        log_error "Usage: docs-link annotate <name> [note]"
+        exit 1
+    fi
+
+    ensure_cache
+
+    local doc_path
+    if ! doc_path=$(resolve_doc_path "$name"); then
+        exit 1
+    fi
+
+    local annotations_dir="$doc_path/annotations"
+    mkdir -p "$annotations_dir"
+
+    local date=$(date +%Y-%m-%d)
+    local filename
+
+    if [[ -n "$note" ]]; then
+        # Generate slug from note
+        local slug=$(echo "$note" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]+/-/g' | sed 's/^-//;s/-$//' | cut -c1-30)
+        filename="$annotations_dir/$date-${slug}.md"
+    else
+        filename="$annotations_dir/$date.md"
+    fi
+
+    # Create frontmatter template
+    local frontmatter="---
+agent: claude-opus-4-6
+related: []
+---
+
+# $(echo "$note" | head -c 60 | sed 's/$/\.../' if [[ ${#note} -gt 60 ]])
+
+$note
+"
+
+    if [[ -n "$note" ]]; then
+        echo "$frontmatter" > "$filename"
+        log_success "Annotation saved to $filename"
+    else
+        # Open editor
+        ${EDITOR:-vi} "$filename"
+        log_success "Annotation saved to $filename"
+    fi
+
+    # Update README footer
+    update_readme_annotations "$doc_path"
+}
+
+# Command: related
+cmd_related() {
+    local name="$1"
+
+    if [[ -z "$name" ]]; then
+        log_error "Usage: docs-link related <name>"
+        exit 1
+    fi
+
+    ensure_cache
+
+    # Get doc path and category
+    local doc_path
+    if ! doc_path=$(resolve_doc_path "$name"); then
+        exit 1
+    fi
+
+    local category=$(basename "$(dirname "$doc_path")")
+
+    # Parse index for related docs (format: | Name | Category | Related | URL | Cached |)
+    local related_line
+    related_line=$(grep "| $name |" "$CACHE_INDEX" || true)
+
+    if [[ -z "$related_line" ]]; then
+        log_warn "No entry found for '$name' in index"
+        return
+    fi
+
+    # Extract related column (4th field: $1=empty, $2=Name, $3=Category, $4=Related)
+    local related=$(echo "$related_line" | awk -F'|' '{gsub(/^[ \t]+|[ \t]+$/, "", $4); print $4}')
+
+    if [[ -z "$related" || "$related" == "-" ]]; then
+        log_info "No related docs defined for '$name'"
+        return
+    fi
+
+    log_info "Related docs for $name:"
+    echo ""
+    IFS=',' read -ra ADDR <<< "$related"
+    for r in "${ADDR[@]}"; do
+        r=$(echo "$r" | xargs)
+        printf "  ${BLUE}%-20s${NC} " "$r"
+        # Try to find and show path
+        if [[ -d "$CACHE_BASE/$category/$r" ]]; then
+            echo "-> $CACHE_BASE/$category/$r"
+        elif [[ -d "$CACHE_BASE/tools/$r" ]]; then
+            echo "-> $CACHE_BASE/tools/$r"
+        else
+            echo "(not cached)"
+        fi
+    done
+}
+
+# Show help
+cmd_help() {
+    cat <<'EOF'
+docs-link - Manage documentation symlinks from central cache
+
+Usage:
+  docs-link <command> [args...]
+
+Commands:
+  add <name>...       Add symlinks to current project
+  list                Show what's linked in this project
+  remove <name>       Remove a symlink
+  available           Show all cached docs available to link
+  sync                Update all symlinks (if cache moved)
+  annotate <name> [note]  Add annotation to cached doc
+  related <name>      Show related docs for a cached entry
+
+Environment:
+  DOCS_CACHE          Path to docs cache (default: ~/github/docs-cache/docs/cache)
+
+Examples:
+  docs-link add polymarket convex
+  docs-link list
+  docs-link remove polymarket
+  docs-link available
+  docs-link annotate openai "Streaming delta may be null"
+  docs-link related openai
+
+Cache location: ~/github/docs-cache/docs/cache/
+EOF
+}
+
+# Main
+case "${1:-}" in
+    add)
+        shift
+        cmd_add "$@"
+        ;;
+    list|ls)
+        cmd_list
+        ;;
+    remove|rm)
+        shift
+        cmd_remove "$@"
+        ;;
+    available|avail)
+        cmd_available
+        ;;
+    sync)
+        cmd_sync
+        ;;
+    annotate)
+        shift
+        cmd_annotate "$@"
+        ;;
+    related)
+        shift
+        cmd_related "$@"
+        ;;
+    help|--help|-h|"")
+        cmd_help
+        ;;
+    *)
+        log_error "Unknown command: $1"
+        echo ""
+        cmd_help
+        exit 1
+        ;;
+esac
 ````
 
 ## File: scripts/eval.sh
@@ -20647,208 +21687,6 @@ else:
         exit 0
     fi
 fi
-````
-
-## File: scripts/fleet-status.sh
-````bash
-set -euo pipefail
-MACHINES=(
-  "homelab:homelab"
-  "macmini:macmini"
-  "oci-dev:oci-dev"
-)
-CURRENT_HOST=$(hostname)
-FIX_MODE="${1:-}"
-check_machine() {
-  local name="$1"
-  local target="$2"
-  echo "=== $name ==="
-  if [[ "$name" == "oci-dev" && "$CURRENT_HOST" == "instance-first" ]]; then
-    echo "  ℹ️  (this machine)"
-    claude --version 2>/dev/null || echo "  ⚠️  Claude: not in PATH"
-    echo ""
-    return 0
-  fi
-  # Check SSH connectivity
-  if ! ssh -o ConnectTimeout=5 -o BatchMode=yes "$target" "echo ok" >/dev/null 2>&1; then
-    echo "  ✗ SSH: unreachable"
-    return 1
-  fi
-  echo "  ✓ SSH: connected"
-  local claude_ver
-  claude_ver=$(ssh "$target" '
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-    export PATH="$HOME/.npm-global/bin:$PATH"
-    claude --version 2>/dev/null || echo "not installed"
-  ')
-  if [[ "$claude_ver" == *"2.1"* ]]; then
-    echo "  ✓ Claude: $claude_ver"
-  else
-    echo "  ⚠️  Claude: $claude_ver"
-    if [[ "$FIX_MODE" == "--fix" ]]; then
-      echo "     → Installing Claude Code..."
-      ssh "$target" '
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-        npm install -g @anthropic-ai/claude-code 2>&1 | tail -2
-      '
-    fi
-  fi
-  local oneshot_status
-  oneshot_status=$(ssh "$target" 'cd ~/github/oneshot 2>/dev/null && git fetch --quiet && git status -sb | head -1' 2>/dev/null || echo "not cloned")
-  if [[ "$oneshot_status" == *"behind"* ]]; then
-    echo "  ⚠️  oneshot: needs pull"
-    if [[ "$FIX_MODE" == "--fix" ]]; then
-      ssh "$target" 'cd ~/github/oneshot && git pull'
-    fi
-  elif [[ "$oneshot_status" == "not cloned" ]]; then
-    echo "  ✗ oneshot: not cloned"
-  else
-    echo "  ✓ oneshot: up to date"
-  fi
-  local glm_ver
-  glm_ver=$(ssh "$target" 'grep -o "glm-[0-9.]*" ~/.bashrc ~/.zshrc 2>/dev/null | head -1 | cut -d: -f2' || echo "not set")
-  echo "  ℹ️  GLM: ${glm_ver:-not configured}"
-  echo ""
-}
-echo "ONE-SHOT Fleet Status ($(date +%Y-%m-%d))"
-echo "==========================================="
-echo ""
-for machine in "${MACHINES[@]}"; do
-  name="${machine%%:*}"
-  target="${machine
-  check_machine "$name" "$target" || true
-done
-echo "Run with --fix to auto-repair issues"
-````
-
-## File: scripts/heartbeat-install.sh
-````bash
-set -euo pipefail
-HEARTBEAT_LOG="${HEARTBEAT_LOG:-/tmp/heartbeat.log}"
-ONESHOT_DIR="${ONESHOT_DIR:-$HOME/github/oneshot}"
-HEARTBEAT_SCRIPT="$ONESHOT_DIR/scripts/heartbeat.sh"
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
-echo -e "${GREEN}ONE_SHOT Heartbeat Installer${NC}"
-echo "================================"
-echo ""
-echo "This will install heartbeat hooks that:"
-echo "  - Run automatically when you cd into projects with CLAUDE.md"
-echo "  - Rate limited to once per 23 hours"
-echo "  - Log to $HEARTBEAT_LOG"
-echo ""
-read -p "Continue? (y/N) " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-  echo "Cancelled."
-  exit 0
-fi
-# Rate limiting function (23 hours = 82800 seconds)
-oneshot_heartbeat_guarded() {
-  # Only run in directories with CLAUDE.md
-  [[ -f "CLAUDE.md" ]] || return 0
-  local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
-  local now
-  now=$(date +%s)
-  local last_run=0
-  if [[ -f "$last_run_file" ]]; then
-    last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
-  fi
-  local elapsed=$((now - last_run))
-  if [[ $elapsed -lt 82800 ]]; then
-    return 0
-  fi
-  mkdir -p "$HOME/.cache"
-  echo "$now" > "$last_run_file"
-  if [[ -x "$HEARTBEAT_SCRIPT" ]]; then
-    "$HEARTBEAT_SCRIPT" --safe >>"$HEARTBEAT_LOG" 2>&1 &
-  fi
-}
-install_bash_hook() {
-  local hook_code='
-# ONE_SHOT Heartbeat
-oneshot_heartbeat_guarded() {
-  if [[ -f "CLAUDE.md" ]]; then
-    local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
-    local now
-    now=$(date +%s)
-    local last_run
-    last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
-    if [[ $((now - last_run)) -gt 82800 ]]; then
-      mkdir -p "$HOME/.cache"
-      echo "$now" > "$last_run_file"
-      "$HOME/github/oneshot/scripts/heartbeat.sh" --safe >>/tmp/heartbeat.log 2>&1 &
-    fi
-  fi
-}
-PROMPT_COMMAND="oneshot_heartbeat_guarded;$PROMPT_COMMAND"
-'
-  local bashrc="$HOME/.bashrc"
-  local marker="# ONE_SHOT Heartbeat"
-  cp "$bashrc" "$bashrc.backup.$(date +%Y%m%d_%H%M%S)"
-  if grep -q "$marker" "$bashrc" 2>/dev/null; then
-    sed -i "/$marker/,/^PROMPT_COMMAND=\"oneshot_heartbeat_guarded/d" "$bashrc" 2>/dev/null || \
-    perl -i -ne "print unless /$marker/../^PROMPT_COMMAND=\"oneshot_heartbeat_guarded/" "$bashrc"
-  fi
-  {
-    echo ""
-    echo "$marker"
-    echo "$hook_code"
-  } >> "$bashrc"
-  echo -e "${GREEN}✓${NC} Bash hook installed to ~/.bashrc"
-}
-install_zsh_hook() {
-  local zshrc="$HOME/.zshrc"
-  local marker="# ONE_SHOT Heartbeat"
-  cp "$zshrc" "$zshrc.backup.$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
-  if grep -q "$marker" "$zshrc" 2>/dev/null; then
-    sed -i "/$marker/,/^oneshot_heartbeat_guarded/d" "$zshrc" 2>/dev/null || true
-  fi
-  cat >> "$zshrc" << 'EOF'
-oneshot_heartbeat_guarded() {
-  if [[ -f "CLAUDE.md" ]]; then
-    local last_run_file="$HOME/.cache/oneshot-heartbeat-last"
-    local now
-    now=$(date +%s)
-    local last_run
-    last_run=$(cat "$last_run_file" 2>/dev/null || echo 0)
-    if [[ $((now - last_run)) -gt 82800 ]]; then
-      mkdir -p "$HOME/.cache"
-      echo "$now" > "$last_run_file"
-      "$HOME/github/oneshot/scripts/heartbeat.sh" --safe >>/tmp/heartbeat.log 2>&1 &
-    fi
-  fi
-}
-chpwd() { oneshot_heartbeat_guarded }
-EOF
-  echo -e "${GREEN}✓${NC} Zsh hook installed to ~/.zshrc"
-}
-if [[ -n "${BASH_VERSION:-}" ]]; then
-  install_bash_hook
-elif [[ -n "${ZSH_VERSION:-}" ]]; then
-  install_zsh_hook
-else
-  echo -e "${YELLOW}⚠${NC} Unknown shell. Only bash and zsh are supported."
-  exit 1
-fi
-touch "$HEARTBEAT_LOG"
-echo ""
-echo -e "${GREEN}Installation complete!${NC}"
-echo ""
-echo "The heartbeat will run:"
-echo "  - When you cd into a directory with CLAUDE.md"
-echo "  - At most once per 23 hours"
-echo "  - In safe mode (no git pull)"
-echo ""
-echo "Log file: $HEARTBEAT_LOG"
-echo ""
-echo "To test immediately:"
-echo "  source ~/.bashrc
-echo "  cd ~/github/oneshot  # Should trigger heartbeat"
-echo ""
 ````
 
 ## File: scripts/janitor-tier-health.sh
@@ -21174,337 +22012,123 @@ echo ""
 echo "To delete: DROP SCHEMA $SLUG CASCADE; DELETE FROM public.sites WHERE slug='$SLUG';"
 ````
 
-## File: scripts/oneshot-build
+## File: scripts/oc
 ````
-#!/bin/bash
-# oneshot-build: Autonomous builder mode
-# Usage: oneshot-build "A CLI tool that does X"
-#
-# Runs Claude Code autonomously to build from idea to artifact.
-# Uses beads for task tracking, commits after each step.
-
+#!/usr/bin/env bash
 set -euo pipefail
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+ONESHOT_DIR="${ONESHOT_DIR:-$HOME/github/oneshot}"
+SECRETS_HELPER="$ONESHOT_DIR/scripts/secrets-helper.sh"
 
-# Configuration
-MAX_ITERATIONS=${MAX_ITERATIONS:-100}
-STUCK_THRESHOLD=${STUCK_THRESHOLD:-5}
-CLAUDE_CMD=${CLAUDE_CMD:-"claude"}
+unset OPENAI_API_KEY OPENAI_BASE_URL ANTHROPIC_BASE_URL
 
-# Check dependencies
-check_dependencies() {
-    local missing=()
-
-    if ! command -v bd &> /dev/null; then
-        missing+=("bd (beads CLI)")
-    fi
-
-    if ! command -v jq &> /dev/null; then
-        missing+=("jq")
-    fi
-
-    if ! command -v "$CLAUDE_CMD" &> /dev/null; then
-        missing+=("$CLAUDE_CMD (Claude Code CLI)")
-    fi
-
-    if ! command -v git &> /dev/null; then
-        missing+=("git")
-    fi
-
-    if [ ${#missing[@]} -gt 0 ]; then
-        echo -e "${RED}Error: Missing required dependencies:${NC}"
-        for dep in "${missing[@]}"; do
-            echo -e "  ${RED}✗${NC} $dep"
-        done
-        echo ""
-        echo "Install beads:   npm install -g @beads/bd"
-        echo "Install jq:      apt install jq  # or brew install jq"
-        echo "Install Claude:  npm install -g @anthropic-ai/claude-code"
-        exit 1
-    fi
-}
-
-# Check project setup
-check_project() {
-    if [ ! -f "AGENTS.md" ]; then
-        echo -e "${RED}Error: Not a ONE_SHOT project${NC}"
-        echo ""
-        echo "Initialize first:"
-        echo "  curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash"
-        exit 1
-    fi
-}
-
-# Usage
-show_usage() {
-    echo "Usage: oneshot-build \"Your idea description\""
-    echo ""
-    echo "Runs Claude Code autonomously to build from idea to artifact."
-    echo "Uses beads for task tracking, commits after each step."
-    echo ""
-    echo "Options (via environment):"
-    echo "  MAX_ITERATIONS=100   Maximum build iterations"
-    echo "  STUCK_THRESHOLD=5    Iterations without progress before stopping"
-    echo "  CLAUDE_CMD=claude    Claude CLI command"
-    echo ""
-    echo "Examples:"
-    echo "  oneshot-build \"A Python CLI that fetches weather data\""
-    echo "  oneshot-build \"A REST API for managing todos\""
-    echo ""
-    echo "Monitor progress: tail -f .agent/STATUS.md"
-}
-
-if [ $# -eq 0 ]; then
-    show_usage
-    exit 1
+if [[ -x "$SECRETS_HELPER" ]]; then
+  export OPENROUTER_API_KEY="$("$SECRETS_HELPER" get OPENROUTER_API_KEY 2>/dev/null || true)"
 fi
 
-# Run checks
-check_dependencies
-check_project
+exec opencode "$@"
+````
 
-IDEA="$1"
-AGENT_DIR=".agent"
-STATUS_FILE="$AGENT_DIR/STATUS.md"
-ITER_FILE="$AGENT_DIR/ITERATIONS.md"
-STATE_FILE="$AGENT_DIR/LAST_STATE.md"
-ERROR_FILE="$AGENT_DIR/LAST_ERROR.md"
-
-# Initialize .agent/ directory
-init_agent() {
-    mkdir -p "$AGENT_DIR"
-    echo "0" > "$ITER_FILE"
-    echo "" > "$STATE_FILE"
-
-    cat > "$STATUS_FILE" << EOF
-# Build Status
-
-**Idea**: $IDEA
-**Started**: $(date -Iseconds)
-**Status**: Initializing
-
-## Progress Log
-EOF
-
-    # Initialize beads if not present
-    if [ ! -d .beads ]; then
-        bd init --stealth 2>/dev/null || true
-    fi
-
-    echo -e "${GREEN}Initialized .agent/ directory${NC}"
+## File: scripts/oneshot-check.sh
+````bash
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+ERRORS=0
+WARNINGS=0
+log_ok() { echo -e "${GREEN}✓${NC} $1"; }
+log_warn() {
+	echo -e "${YELLOW}○${NC} $1"
+	WARNINGS=$((WARNINGS + 1))
 }
-
-# Log status
-log_status() {
-    local msg="$1"
-    echo "- $(date +%H:%M:%S): $msg" >> "$STATUS_FILE"
-    echo -e "${YELLOW}$msg${NC}"
+log_error() {
+	echo -e "${RED}✗${NC} $1"
+	ERRORS=$((ERRORS + 1))
 }
-
-# Check if stuck (same beads state for N iterations)
-check_stuck() {
-    local current_state
-    current_state=$(bd ready --json 2>/dev/null | md5sum | cut -d' ' -f1)
-    local last_state
-    last_state=$(cat "$STATE_FILE" 2>/dev/null || echo "")
-
-    if [ "$current_state" = "$last_state" ]; then
-        local stuck_count
-        stuck_count=$(cat "$AGENT_DIR/STUCK_COUNT" 2>/dev/null || echo "0")
-        stuck_count=$((stuck_count + 1))
-        echo "$stuck_count" > "$AGENT_DIR/STUCK_COUNT"
-
-        if [ "$stuck_count" -ge "$STUCK_THRESHOLD" ]; then
-            echo "Stuck for $stuck_count iterations" > "$ERROR_FILE"
-            return 1
-        fi
-    else
-        echo "0" > "$AGENT_DIR/STUCK_COUNT"
-        echo "$current_state" > "$STATE_FILE"
-    fi
-    return 0
-}
-
-# Check if all tasks complete
-is_complete() {
-    local ready_count
-    ready_count=$(bd ready --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
-    local in_progress
-    in_progress=$(bd list --status in_progress --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
-
-    if [ "$ready_count" = "0" ] && [ "$in_progress" = "0" ]; then
-        return 0
-    fi
-    return 1
-}
-
-# Run planning phase
-run_planning() {
-    log_status "Phase 1: Planning"
-
-    $CLAUDE_CMD -p << EOF
-You are in autonomous builder mode. Use ONE_SHOT skills.
-
-IDEA: $IDEA
-
-INSTRUCTIONS:
-1. Use front-door skill to interview (answer your own questions with reasonable defaults)
-2. Use create-plan skill to create a structured plan
-3. Parse the plan into beads tasks with dependencies:
-   - bd create "Epic: [idea]" -t epic --json
-   - Create groups and tasks with parent dependencies
-4. Save the plan to thoughts/shared/plans/
-5. STOP after creating beads tasks (don't implement yet)
-
-Use your best judgment for all decisions. Prefer simple solutions.
-Commit the plan file when done.
-EOF
-
-    log_status "Planning complete"
-}
-
-# Run single build iteration
-run_build_iteration() {
-    local iter=$1
-    log_status "Iteration $iter: Building"
-
-    $CLAUDE_CMD -p << EOF
-You are in autonomous builder mode. Continue implementing.
-
-INSTRUCTIONS:
-1. Run: bd ready --json
-2. Pick the highest priority ready task
-3. Run: bd update <id> --status in_progress --json
-4. Implement the task
-5. Commit after EACH file edit: git add <file> && git commit -m "feat: description"
-6. When done: bd close <id> --reason "commit: <hash>" --json
-7. STOP after completing ONE task
-
-If stuck or confused, write to .agent/SCRATCHPAD.md and stop.
-Use your best judgment. Prefer working code over perfect code.
-EOF
-}
-
-# Cleanup on exit
-cleanup() {
-    local exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        log_status "Build stopped with exit code $exit_code"
-        echo "**Status**: STOPPED (exit $exit_code)" >> "$STATUS_FILE"
-    fi
-    # Always sync beads on exit
-    bd sync 2>/dev/null || true
-}
-
-# Main execution
-main() {
-    trap cleanup EXIT
-
-    echo -e "${GREEN}╔═══════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║     ONE_SHOT Autonomous Builder v7.4      ║${NC}"
-    echo -e "${GREEN}╚═══════════════════════════════════════════╝${NC}"
-    echo ""
-    echo -e "${BLUE}Idea:${NC} $IDEA"
-    echo -e "${BLUE}Max iterations:${NC} $MAX_ITERATIONS"
-    echo -e "${BLUE}Monitor:${NC} tail -f .agent/STATUS.md"
-    echo ""
-
-    init_agent
-
-    # Phase 1: Planning
-    run_planning
-
-    # Check if any tasks were created
-    local task_count
-    task_count=$(bd list --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
-    if [ "$task_count" = "0" ]; then
-        log_status "No tasks created - planning may have failed"
-        echo "**Status**: FAILED (no tasks)" >> "$STATUS_FILE"
-        echo -e "${RED}Planning failed - no beads tasks were created${NC}"
-        echo "Check .agent/STATUS.md for details"
-        exit 1
-    fi
-    log_status "Created $task_count beads tasks"
-
-    # Phase 2: Build loop
-    log_status "Phase 2: Building"
-
-    local iter=0
-    local completed=0
-    while [ $iter -lt $MAX_ITERATIONS ]; do
-        iter=$((iter + 1))
-        echo "$iter" > "$ITER_FILE"
-
-        # Check if complete
-        if is_complete; then
-            log_status "All tasks complete!"
-            completed=1
-            break
-        fi
-
-        # Check if stuck
-        if ! check_stuck; then
-            log_status "Stuck detected after $iter iterations"
-            echo "**Status**: STUCK" >> "$STATUS_FILE"
-            echo ""
-            echo -e "${RED}Build stuck - same state for $STUCK_THRESHOLD iterations${NC}"
-            echo "Check .agent/LAST_ERROR.md and .agent/STATUS.md"
-            exit 1
-        fi
-
-        # Run build iteration
-        run_build_iteration $iter
-
-        # Sync beads periodically
-        if [ $((iter % 5)) -eq 0 ]; then
-            bd sync 2>/dev/null || true
-        fi
-    done
-
-    # Final status
-    echo "" >> "$STATUS_FILE"
-    echo "---" >> "$STATUS_FILE"
-    echo "## Final State" >> "$STATUS_FILE"
-    echo "**Completed**: $(date -Iseconds)" >> "$STATUS_FILE"
-    echo "**Iterations**: $iter" >> "$STATUS_FILE"
-    if [ "$completed" = "1" ]; then
-        echo "**Status**: SUCCESS" >> "$STATUS_FILE"
-    else
-        echo "**Status**: MAX_ITERATIONS" >> "$STATUS_FILE"
-    fi
-    echo "" >> "$STATUS_FILE"
-    echo "### Beads Summary" >> "$STATUS_FILE"
-    bd list --json 2>/dev/null | jq -r '.[] | "- [\(.status)] \(.title)"' >> "$STATUS_FILE" || true
-
-    # Print summary
-    echo ""
-    echo -e "${GREEN}╔═══════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║             Build Complete                ║${NC}"
-    echo -e "${GREEN}╚═══════════════════════════════════════════╝${NC}"
-    echo ""
-    echo -e "${BLUE}Iterations:${NC} $iter"
-    echo -e "${BLUE}Status:${NC} .agent/STATUS.md"
-    echo -e "${BLUE}Tasks:${NC} bd list --json"
-    echo ""
-
-    # Show summary of completed vs remaining
-    local done_count
-    local remaining_count
-    done_count=$(bd list --status closed --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
-    remaining_count=$(bd ready --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
-    echo -e "${GREEN}✓ Completed:${NC} $done_count tasks"
-    if [ "$remaining_count" != "0" ]; then
-        echo -e "${YELLOW}○ Remaining:${NC} $remaining_count tasks"
-    fi
-}
-
-main
+echo ""
+echo "ONE_SHOT Integration Check"
+echo "=========================="
+echo ""
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Skills installed globally
+# ─────────────────────────────────────────────────────────────────────────────
+echo "=== Global Skills (~/.claude/skills/) ==="
+REQUIRED_SKILLS=(short full conduct handoff restore research freesearch doc vision secrets)
+MISSING=0
+for skill in "${REQUIRED_SKILLS[@]}"; do
+	if [ -f "${HOME}/.claude/skills/$skill/SKILL.md" ]; then
+		log_ok "$skill"
+	else
+		log_error "$skill: not installed (run: oneshot-update or curl -sL .../oneshot.sh | bash)"
+		MISSING=$((MISSING + 1))
+	fi
+done
+if [ "$MISSING" -gt 0 ]; then
+	echo ""
+	echo "  To install missing skills:"
+	echo "  curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash"
+fi
+echo ""
+echo "=== Project Files ==="
+if [ -f "AGENTS.md" ]; then
+	VERSION=$(grep -oE "v[0-9]+" AGENTS.md | head -1 || echo "unknown")
+	log_ok "AGENTS.md ($VERSION)"
+else
+	log_error "AGENTS.md missing — run oneshot.sh to create it"
+fi
+if [ -f "CLAUDE.md" ]; then
+	if grep -q "AGENTS.md" CLAUDE.md; then
+		log_ok "CLAUDE.md (references AGENTS.md)"
+	else
+		log_warn "CLAUDE.md exists but doesn't reference AGENTS.md (add: '> Read AGENTS.md for operator behaviors')"
+	fi
+else
+	log_warn "CLAUDE.md missing — run oneshot.sh to create a starter version"
+fi
+echo ""
+echo "=== Stale References in Project Docs ==="
+# Check for SkillsMP refs in any markdown files this project owns
+STALE=$(grep -rn "SkillsMP\|\.claude/commands/" \
+	--include="*.md" \
+	--exclude-dir=".git" \
+	--exclude="AGENTS.md" \
+	. 2>/dev/null |
+	grep -v "deprecated\|old way\|backup\|migration\|commands-backup" ||
+	true)
+if [ -n "$STALE" ]; then
+	log_warn "Stale oneshot references found in project docs:"
+	echo "$STALE" | sed 's/^/  /'
+	echo "  These may be leftover from an older oneshot version."
+else
+	log_ok "No stale oneshot references"
+fi
+echo ""
+echo "=== Tooling ==="
+if command -v oneshot-update &>/dev/null; then
+	log_ok "oneshot-update in PATH"
+else
+	log_warn "oneshot-update not in PATH (add ~/.local/bin to PATH)"
+fi
+if command -v oc &>/dev/null; then
+	log_ok "oc wrapper in PATH"
+else
+	log_warn "oc wrapper not in PATH (run install.sh or link scripts/oc into ~/.local/bin)"
+fi
+echo ""
+echo "=========================================="
+if [ "$ERRORS" -eq 0 ] && [ "$WARNINGS" -eq 0 ]; then
+	echo -e "${GREEN}✓ oneshot integration is healthy${NC}"
+	exit 0
+elif [ "$ERRORS" -eq 0 ]; then
+	echo -e "${YELLOW}✓ oneshot healthy with $WARNINGS warning(s)${NC}"
+	exit 0
+else
+	echo -e "${RED}✗ $ERRORS error(s), $WARNINGS warning(s)${NC}"
+	echo ""
+	echo "Run 'oneshot-update' to fix skill installation issues."
+	exit 1
+fi
 ````
 
 ## File: scripts/oneshot-update.sh
@@ -21716,6 +22340,64 @@ main() {
 main "$@"
 ````
 
+## File: scripts/repo-pack.sh
+````bash
+set -euo pipefail
+export PATH="${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+REPO_BASE="${HOME}/github"
+ACTIVE_DAYS=30
+DEFAULT_CONFIG="${HOME}/github/oneshot/repomix.config.json"
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+PACKED=0
+SKIPPED=0
+FAILED=0
+if ! command -v repomix &>/dev/null; then
+  echo "ERROR: repomix not found. Install with: npm install -g repomix"
+  exit 1
+fi
+for dir in "$REPO_BASE"/*/; do
+  repo=$(basename "$dir")
+  cd "$dir" || continue
+  git rev-parse --git-dir > /dev/null 2>&1 || continue
+  recent=$(git log --since="${ACTIVE_DAYS} days ago" --oneline 2>/dev/null | head -1)
+  if [ -z "$recent" ]; then
+    SKIPPED=$((SKIPPED + 1))
+    continue
+  fi
+  file_count=$(git ls-files | wc -l)
+  if [ "$file_count" -eq 0 ]; then
+    SKIPPED=$((SKIPPED + 1))
+    continue
+  fi
+  echo "Packing: $repo ($file_count files)"
+  cfg_flag=""
+  if [ -f repomix.config.json ]; then
+    cfg_flag="--config repomix.config.json"
+  elif [ -f "$DEFAULT_CONFIG" ]; then
+    cfg_flag="--config $DEFAULT_CONFIG"
+  fi
+  mkdir -p docs
+  if repomix $cfg_flag --output "docs/LLM-OVERVIEW.md" --quiet 2>/tmp/repomix-err.log; then
+    mkdir -p .janitor
+    size=$(wc -c < "docs/LLM-OVERVIEW.md" 2>/dev/null || echo 0)
+    cat > .janitor/repo-pack.json << EOF
+{
+  "timestamp": "$TIMESTAMP",
+  "repo": "$repo",
+  "files_tracked": $file_count,
+  "output_size_bytes": $size,
+  "active_threshold_days": $ACTIVE_DAYS
+}
+EOF
+    PACKED=$((PACKED + 1))
+  else
+    echo "  FAILED: $repo — $(cat /tmp/repomix-err.log 2>/dev/null | tail -1)"
+    FAILED=$((FAILED + 1))
+  fi
+done
+echo "Repo-pack complete: $PACKED packed, $SKIPPED skipped (idle), $FAILED failed"
+````
+
 ## File: scripts/setup_secrets.sh
 ````bash
 set -euo pipefail
@@ -21862,7 +22544,10 @@ sync_project() {
 }
 log "oneshot sync $(date '+%Y-%m-%d %H:%M')"
 $DRY_RUN && log "  [DRY RUN]"
-mapfile -t PROJECTS < <(
+PROJECTS=()
+while IFS= read -r d; do
+  PROJECTS+=("$d")
+done < <(
   for d in "$GITHUB_DIR"/*/; do
     [ -d "$d/.claude" ] && echo "$d"
   done 2>/dev/null | sort
@@ -21878,81 +22563,6 @@ if [ ${
 fi
 log ""
 [ ${
-````
-
-## File: scripts/sync-repos.sh
-````bash
-set -euo pipefail
-LOG_PREFIX="[sync-repos $(date +%Y-%m-%d\ %H:%M:%S)]"
-GITHUB_DIR="${HOME}/github"
-SYNC_LOG="/tmp/sync-repos.log"
-REPOS=(
-    "oneshot"
-    "homelab"
-)
-log() {
-    echo "${LOG_PREFIX} $1"
-}
-sync_repo() {
-    local repo="$1"
-    local repo_path="${GITHUB_DIR}/${repo}"
-    if [ ! -d "$repo_path" ]; then
-        log "SKIP: $repo (not cloned at $repo_path)"
-        return 0
-    fi
-    cd "$repo_path"
-    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-        log "SKIP: $repo (uncommitted changes)"
-        return 0
-    fi
-    local branch
-    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-    if [ -z "$branch" ] || [ "$branch" = "HEAD" ]; then
-        log "SKIP: $repo (detached HEAD or no branch)"
-        return 0
-    fi
-    if ! git fetch origin "$branch" --quiet 2>/dev/null; then
-        log "ERROR: $repo (fetch failed)"
-        return 1
-    fi
-    local behind
-    behind=$(git rev-list HEAD..origin/"$branch" --count 2>/dev/null || echo "0")
-    if [ "$behind" -gt 0 ]; then
-        log "PULL: $repo ($behind commits behind on $branch)"
-        if git pull --ff-only origin "$branch" --quiet 2>/dev/null; then
-            log "OK: $repo updated"
-        else
-            log "ERROR: $repo (pull failed - may need manual merge)"
-            return 1
-        fi
-    fi
-    return 0
-}
-log "Starting sync for ${#REPOS[@]} repos in $GITHUB_DIR"
-ERRORS=0
-for repo in "${REPOS[@]}"; do
-    if ! sync_repo "$repo"; then
-        ((ERRORS++)) || true
-    fi
-done
-if [ "$ERRORS" -gt 0 ]; then
-    log "Completed with $ERRORS errors"
-else
-    log "Sync complete"
-fi
-if [ -f "$SYNC_LOG" ]; then
-    size=""
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        size=$(stat -f%z "$SYNC_LOG" 2>/dev/null || echo "0")
-    else
-        size=$(stat -c%s "$SYNC_LOG" 2>/dev/null || echo "0")
-    fi
-    if [ "$size" -gt 1048576 ]; then
-        tail -1000 "$SYNC_LOG" > "${SYNC_LOG}.tmp" && mv "${SYNC_LOG}.tmp" "$SYNC_LOG"
-        log "Log trimmed (was ${size} bytes)"
-    fi
-fi
-exit $ERRORS
 ````
 
 ## File: scripts/tasks.py
@@ -22041,6 +22651,32 @@ else
 fi
 ````
 
+## File: scripts/validate-agents.py
+````python
+AGENTS_DIR = Path(".claude/agents")
+SKIP_FILES = {"INDEX.md", "TEMPLATE.md"}
+def validate_agent(filepath: Path) -> list[str]
+⋮----
+errors = []
+name = filepath.stem
+lines = filepath.read_text().splitlines()
+⋮----
+content = "\n".join(lines)
+⋮----
+line_count = len(lines)
+⋮----
+def main()
+⋮----
+agent_files = sorted(AGENTS_DIR.glob("*.md"))
+⋮----
+total_errors = 0
+total_agents = 0
+⋮----
+errors = validate_agent(filepath)
+⋮----
+line_count = len(filepath.read_text().splitlines())
+````
+
 ## File: scripts/validate-docs.sh
 ````bash
 set -euo pipefail
@@ -22077,7 +22713,7 @@ check_count_in_file() {
     log_warn "$label: no skill count found (check manually)"
     return
   fi
-  if [ "$stated" = "10" ] || [ "$stated" = "$ACTUAL_COUNT" ]; then
+  if [ "$stated" = "$ACTUAL_COUNT" ] || [ "$stated" = "10" ]; then
     log_ok "$label: states $stated skills (correct)"
   else
     log_error "$label: states '$stated' skills but actual count is $ACTUAL_COUNT"
@@ -22125,6 +22761,7 @@ OLD_PATH_REFS=$(grep -rn '\.claude/commands/' \
   2>/dev/null \
   | grep -v "^Binary" \
   | grep -v "CHANGELOG\|deprecated\|old way\|backup\|migration\|commands-backup" \
+  | grep -v "docs/LLM-OVERVIEW.md" \
   || true)
 if [ -n "$OLD_PATH_REFS" ]; then
   log_error "Old ~/.claude/commands/ path found in active docs (should be ~/.claude/skills/):"
@@ -22156,6 +22793,57 @@ else
   echo "Fix the issues above and re-run: ./scripts/validate-docs.sh"
   exit 1
 fi
+````
+
+## File: ssh/install.sh
+````bash
+set -euo pipefail
+REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/Khamel83/oneshot/master}"
+CONF_URL="${CONF_URL:-$REPO_RAW_BASE/ssh/aliases.conf}"
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
+CFG="$HOME/.ssh/config"
+touch "$CFG"
+chmod 600 "$CFG"
+cp "$CFG" "$CFG.bak.$(date +%F_%H%M%S)"
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+curl -fsSL "$CONF_URL" -o "$tmp"
+new_hosts=$(grep -E '^Host ' "$tmp" | awk '{print $2}' | sort)
+pre_managed=$(awk '/# === OMAR SSH ALIASES \(managed\) ===/{exit} /^Host /{print $2}' "$CFG" 2>/dev/null || true)
+conflicts=""
+for host in $new_hosts; do
+	if echo "$pre_managed" | grep -qx "$host"; then
+		conflicts="$conflicts  - $host\n"
+	fi
+done
+if [ -n "$conflicts" ]; then
+	echo "⚠️  WARNING: Duplicate SSH aliases found in your config:"
+	echo -e "$conflicts"
+	echo ""
+	echo "You have manual entries that conflict with the managed aliases."
+	echo ""
+	echo "Options:"
+	echo "  1) Cancel and clean up manually (nano ~/.ssh/config)"
+	echo "  2) Proceed anyway (managed block will shadow manual entries)"
+	echo ""
+	read -p "Proceed? [y/N] " -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		echo "Cancelled. Backup saved at $CFG.bak.$(date +%F_%H%M%S)"
+		exit 1
+	fi
+fi
+# === APPLY CHANGES ===
+# Remove any prior managed block, then append the latest block from GitHub.
+perl -0777 -i -pe '
+  s{(?ms)^[ \t]*# === OMAR SSH ALIASES \(managed\) ===\n.*?^[ \t]*# === END OMAR SSH ALIASES ===\n?}{}g;
+  s/\n{3,}/\n\n/g;
+' "$CFG"
+printf "\n%s\n" "$(cat "$tmp")" >>"$CFG"
+ssh -G oci 2>/dev/null | grep -E 'hostname|user|identityfile' | head -n 10 || true
+echo "OK: SSH aliases installed/updated from $CONF_URL"
+echo "Try: ssh oci | ssh oci-ts | ssh homelab | ssh homelab-ts | ssh macmini | ssh macmini-ts"
 ````
 
 ## File: templates/community-starter/api/system.py
@@ -22216,26 +22904,6 @@ def _send_error(self, status, message)
 body = json.dumps({'success': False, 'error': message}).encode()
 ⋮----
 def log_message(self, format, *args)
-````
-
-## File: templates/community-starter/.env.example
-````
-# Supabase — Settings > API
-SUPABASE_URL=https://yourproject.supabase.co
-SUPABASE_ANON_KEY=eyJ...          # public, safe in frontend
-SUPABASE_SERVICE_ROLE_KEY=eyJ...  # SECRET — server-side only, never expose
-
-# Resend — resend.com > API Keys
-RESEND_API_KEY=re_...
-EMAIL_FROM=Your App <noreply@yourdomain.com>
-REPLY_TO=you@yourdomain.com
-
-# App
-SITE_URL=https://yourdomain.com
-ADMIN_EMAIL=you@yourdomain.com
-
-# Automation (generate a random string: openssl rand -hex 32)
-CRON_SECRET=your_random_secret_here
 ````
 
 ## File: templates/community-starter/.gitignore
@@ -22773,6 +23441,426 @@ See @.claude/rules/codex.md
 ## Human Decisions Required
 
 - [Decision 1]: [options, or "none" — e.g., "Which error code for rate limit: 429 or 503?"]
+````
+
+## File: tests/test_argus_client.py
+````python
+class TestArgusClient
+⋮----
+def test_get_api_key_from_env(self, monkeypatch)
+def test_get_api_key_from_vault_fallback(self, monkeypatch)
+def test_search_sends_bearer_auth(self)
+⋮----
+response = MagicMock()
+⋮----
+result = argus_client.search("example")
+⋮----
+request = mock_urlopen.call_args.args[0]
+⋮----
+def test_build_research_pack_hits_workflow_endpoint(self)
+⋮----
+result = argus_client.build_research_pack("sdk", official_url="https://docs.example.com")
+````
+
+## File: tests/test_doctor.py
+````python
+class TestEnvExpansion
+⋮----
+def test_expand_default(self)
+def test_expand_set(self)
+def test_expand_no_default(self)
+def test_expand_in_dict(self)
+⋮----
+data = {"host": "${MY_HOST:-oci-ts}"}
+result = _expand_recursive(data)
+⋮----
+def test_expand_nested_dict(self)
+⋮----
+data = {"machines": {"a": {"host": "${H:-local}"}}}
+⋮----
+class TestMachinesConfig
+⋮----
+def test_load_from_file(self, tmp_path)
+⋮----
+cfg = tmp_path / "machines.yaml"
+⋮----
+m = load_machines(cfg)
+⋮----
+def test_missing_file_returns_empty(self, tmp_path)
+⋮----
+m = load_machines(tmp_path / "nonexistent.yaml")
+⋮----
+class TestChecks
+⋮----
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_check_python3_ok(self, mock_run)
+⋮----
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_check_python3_missing(self, mock_run)
+⋮----
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_check_git_ok(self, mock_run)
+⋮----
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_check_git_missing(self, mock_run)
+class TestOcLauncher
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=False)
+    def test_missing_when_no_launcher(self, mock_has_binary)
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=True)
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_ok_with_launcher_path(self, mock_run, mock_has_binary)
+class TestGeminiAuth
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=False)
+    def test_missing_when_no_binary(self, mock_has_binary)
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=True)
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_ok_when_ready(self, mock_run, mock_has_binary)
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=True)
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_auth_required_on_error(self, mock_run, mock_has_binary)
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=True)
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_auth_required_on_timeout(self, mock_run, mock_has_binary)
+class TestCodexAuth
+⋮----
+def test_missing_when_no_binary(self)
+def test_auth_required_when_no_file(self, tmp_path)
+def test_ok_with_nested_refresh_token(self, tmp_path)
+⋮----
+codex_dir = tmp_path / ".codex"
+⋮----
+auth_file = codex_dir / "auth.json"
+⋮----
+def test_auth_required_with_invalid_json(self, tmp_path)
+class TestSecretsDecrypt
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=True)
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_ok_with_output(self, mock_run, mock_has_binary)
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=True)
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_blocked_on_passphrase(self, mock_run, mock_has_binary)
+⋮----
+@patch("oneshot_cli.doctor_cmd._has_binary", return_value=True)
+@patch("oneshot_cli.doctor_cmd._run")
+    def test_error_unknown(self, mock_run, mock_has_binary)
+class TestSshConfig
+⋮----
+def test_ok_when_hosts_present(self, tmp_path)
+⋮----
+ssh_config = tmp_path / ".ssh" / "config"
+⋮----
+def test_missing_when_no_hosts(self, tmp_path)
+def test_error_when_no_config(self, tmp_path)
+class TestOutputFormat
+⋮----
+def test_format_includes_machine_name(self)
+⋮----
+results = [{"name": "python3", "status": OK, "detail": "3.12.3"}]
+output = format_results("oci", True, results)
+⋮----
+def test_format_includes_status(self)
+⋮----
+results = [
+output = format_results("test", False, results)
+⋮----
+class TestSummarize
+⋮----
+def test_all_ok_returns_zero(self)
+⋮----
+results = [{"name": "x", "status": OK, "detail": ""}]
+⋮----
+def test_missing_returns_one(self)
+⋮----
+results = [{"name": "x", "status": MISSING, "detail": ""}]
+⋮----
+def test_auth_required_returns_two(self)
+⋮----
+results = [{"name": "x", "status": AUTH_REQUIRED, "detail": ""}]
+⋮----
+def test_blocked_returns_two(self)
+⋮----
+results = [{"name": "x", "status": BLOCKED, "detail": ""}]
+⋮----
+def test_mixed_returns_two(self)
+class TestLocalChecks
+⋮----
+def test_returns_all_checks(self, *mocks)
+⋮----
+results = run_local_checks(["oci-ts", "macmini-ts"])
+names = [r["name"] for r in results]
+⋮----
+class TestRemoteChecks
+⋮----
+@patch("oneshot_cli.doctor_cmd.subprocess.run")
+    def test_remote_checks_include_oc_launcher(self, mock_run)
+⋮----
+results = run_remote_checks("oci-ts", ["oci-ts", "macmini-ts"])
+⋮----
+class TestAutofix
+⋮----
+def test_no_fix_when_all_ok(self)
+⋮----
+results = [{"name": "python3", "status": OK, "detail": ""}]
+fixes = autofix(results)
+⋮----
+def test_creates_worktree_dir(self, tmp_path)
+⋮----
+wt = tmp_path / "oneshot-worktrees"
+⋮----
+results = [{"name": "worktree path", "status": MISSING, "detail": str(wt)}]
+⋮----
+def test_creates_repo_dir(self, tmp_path)
+⋮----
+tasks = tmp_path / "repo" / ".oneshot" / "tasks"
+⋮----
+results = [{"name": "repo path", "status": MISSING, "detail": str(tasks)}]
+⋮----
+def test_symlinks_secrets(self, tmp_path)
+⋮----
+local_bin = tmp_path / ".local" / "bin"
+secrets_src = tmp_path / "github" / "oneshot" / "scripts" / "secrets"
+⋮----
+results = [{"name": "secrets cli", "status": MISSING, "detail": ""}]
+⋮----
+def test_symlinks_oc_launcher(self, tmp_path)
+⋮----
+launcher_src = tmp_path / "github" / "oneshot" / "scripts" / "oc"
+⋮----
+results = [{"name": "oc launcher", "status": MISSING, "detail": ""}]
+⋮----
+class TestRemoteFixInstructions
+⋮----
+def test_no_fix_instructions_when_all_ok(self)
+def test_instructions_include_host_and_failed_checks(self)
+⋮----
+fixes = remote_fix_instructions(
+joined = "\n".join(fixes)
+⋮----
+class TestDetectLocalMachine
+⋮----
+def test_returns_none_when_no_match(self)
+⋮----
+machines = {
+⋮----
+result = detect_local_machine(machines)
+⋮----
+def test_skips_disabled(self)
+````
+
+## File: tests/test_lane_policy.py
+````python
+class TestLoadLanes
+⋮----
+def test_loads_valid_yaml(self)
+⋮----
+lanes = load_lanes()
+⋮----
+def test_lanes_have_required_fields(self)
+⋮----
+lane = lanes["lanes"][name]
+⋮----
+class TestGetWorkerPool
+⋮----
+def test_cheap_has_workers(self)
+⋮----
+workers = get_worker_pool("cheap")
+⋮----
+def test_unknown_lane_returns_empty(self)
+⋮----
+workers = get_worker_pool("nonexistent")
+⋮----
+class TestGetReviewer
+⋮----
+def test_all_lanes_have_reviewer(self)
+⋮----
+reviewer = get_reviewer(lane)
+⋮----
+class TestGetFallbackLane
+⋮----
+def test_cheap_has_fallback(self)
+⋮----
+fallback = get_fallback_lane("cheap")
+⋮----
+class TestGetSearchBackend
+⋮----
+def test_research_lane_has_search_backend(self)
+⋮----
+search = get_search_backend("research")
+⋮----
+class TestReorderByPreference
+⋮----
+def test_reorders_correctly(self)
+⋮----
+workers = ["b", "c", "a"]
+pref = ["a", "c"]
+result = reorder_by_preference(workers, pref)
+⋮----
+def test_preserves_unavailable_workers(self)
+⋮----
+workers = ["x", "y", "z"]
+pref = ["a", "b"]
+⋮----
+def test_empty_preference(self)
+⋮----
+workers = ["a", "b"]
+result = reorder_by_preference(workers, [])
+⋮----
+class TestResolve
+⋮----
+def test_implement_small_routes_to_cheap(self)
+⋮----
+r = resolve("implement_small", category="coding")
+⋮----
+def test_research_routes_to_research_lane(self)
+⋮----
+r = resolve("research", category="research")
+⋮----
+def test_plan_routes_to_premium(self)
+⋮----
+r = resolve("plan")
+⋮----
+def test_category_inferred_when_not_provided(self)
+⋮----
+r = resolve("implement_small")
+⋮----
+r = resolve("review_diff")
+⋮----
+r = resolve("doc_draft")
+⋮----
+r = resolve("research")
+⋮----
+def test_category_preference_reorders_workers(self)
+def test_risk_defaults_to_medium(self)
+def test_risk_level_can_be_set(self)
+⋮----
+r = resolve("implement_small", risk_level="high")
+⋮----
+def test_janitor_routes_to_janitor_lane(self)
+⋮----
+r = resolve("janitor_hygiene")
+⋮----
+def test_has_reviewer(self)
+def test_has_fallback(self)
+def test_all_task_classes_resolve(self)
+⋮----
+r = resolve(tc.value)
+````
+
+## File: tests/test_memory_cmd.py
+````python
+def test_memory_scaffold_creates_expected_layout(tmp_path, monkeypatch)
+⋮----
+runner = CliRunner()
+result = runner.invoke(cli, ["memory", "scaffold"])
+⋮----
+def test_memory_policy_defaults_to_isolated(tmp_path, monkeypatch)
+⋮----
+policy = (tmp_path / "docs" / "agents" / "MEMORY_POLICY.md").read_text()
+⋮----
+def test_promote_decision_writes_decision_and_provenance(tmp_path, monkeypatch)
+⋮----
+result = runner.invoke(
+⋮----
+decisions = (tmp_path / "docs" / "agents" / "DECISIONS.md").read_text()
+⋮----
+provenance_files = list((tmp_path / ".oneshot" / "provenance").glob("*.md"))
+⋮----
+def test_promote_session_stays_in_operational_memory(tmp_path, monkeypatch)
+⋮----
+session_files = list((tmp_path / ".oneshot" / "sessions").glob("*.md"))
+⋮----
+def test_retrieve_prefers_active_decision_over_superseded(tmp_path, monkeypatch)
+⋮----
+decisions = tmp_path / "docs" / "agents" / "DECISIONS.md"
+⋮----
+results = memory.retrieve_same_repo(tmp_path, "canonical", limit=5)
+⋮----
+def test_abstract_writes_abstraction_record(tmp_path, monkeypatch)
+⋮----
+files = list((tmp_path / ".oneshot" / "abstractions").glob("*.md"))
+⋮----
+abstraction = files[0].read_text()
+⋮----
+def test_index_and_cross_repo_search_returns_abstractions(tmp_path, monkeypatch)
+⋮----
+repo_a = tmp_path / "repo-a"
+repo_b = tmp_path / "repo-b"
+⋮----
+results = memory.search_cross_repo_abstractions(
+⋮----
+def test_search_degraded_mode_is_explicit(tmp_path, monkeypatch)
+⋮----
+def boom()
+⋮----
+result = runner.invoke(cli, ["memory", "search", "anything"])
+````
+
+## File: tests/test_task_schema.py
+````python
+class TestEnums
+⋮----
+def test_task_class_values(self)
+⋮----
+expected = {
+⋮----
+def test_task_category_values(self)
+def test_risk_level_values(self)
+class TestLaneAssignments
+⋮----
+def test_all_task_classes_have_lane(self)
+def test_coding_tasks_on_non_janitor_lanes(self)
+def test_janitor_tasks_always_on_janitor_lane(self)
+def test_plan_on_premium(self)
+def test_research_on_research(self)
+class TestCategoryAssignments
+⋮----
+def test_all_task_classes_have_category(self)
+def test_janitor_categories_are_general(self)
+class TestInferCategory
+⋮----
+def test_coding_keywords(self)
+def test_research_keywords(self)
+def test_writing_keywords(self)
+def test_review_keywords(self)
+def test_general_fallback(self)
+def test_writing_overrides_coding(self)
+def test_review_overrides_research(self)
+def test_specific_task_descriptions(self)
+class TestInferRisk
+⋮----
+def test_high_risk_keywords(self)
+def test_low_risk_keywords(self)
+def test_medium_risk_default(self)
+def test_high_risk_in_files(self)
+def test_risk_from_files_only(self)
+def test_high_risk_takes_priority_over_low(self)
+class TestRiskAutonomy
+⋮----
+def test_all_risk_levels_have_autonomy(self)
+def test_low_risk_no_approval(self)
+def test_high_risk_requires_approval(self)
+def test_medium_risk_needs_approval(self)
+class TestKeywordLists
+⋮----
+def test_no_duplicates_in_keyword_lists(self)
+````
+
+## File: tests/test_validate_oneshot_config.py
+````python
+SCRIPT_PATH = (
+SPEC = importlib.util.spec_from_file_location("validate_oneshot_config", SCRIPT_PATH)
+MODULE = importlib.util.module_from_spec(SPEC)
+⋮----
+def test_worker_harness_bridge_has_expected_aliases()
+def test_repo_config_bridge_is_currently_valid()
 ````
 
 ## File: tests/test_workflow.bats
@@ -23715,85 +24803,81 @@ Everything is free:
 **Result**: ONE place for secrets, works everywhere, never lose them.
 ````
 
-## File: CLAUDE.local.md
-````markdown
-<!-- Auto-generated by janitor. Edit freely -- janitor overwrites daily. -->
+## File: llms.txt
+````
+# ONE_SHOT
 
+> Operator framework for Claude Code. Three operators, seven utilities, on-demand skill discovery. Progressive disclosure loads ~300 tokens always-on (down from ~2000). Encrypted secrets vault (SOPS/Age) with 80+ API keys synced across 3 machines.
+>
+> Key points:
+> - Install: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash`
+> - Three operators: `/short` (quick iteration), `/full` (structured work), `/conduct` (multi-model PMO)
+> - Stack defaults: Vercel + Supabase + Python (web), Python + Click + SQLite (CLI), Python + systemd (service)
+> - Secrets: one age key at `~/.age/key.txt`, 17 encrypted vault files in `secrets/`, access via `secrets get KEY`
+> - Daily heartbeat: 14 API key validators, CLI version checks, Tailscale + cross-machine reachability
+> - Machines: oci-dev (100.126.13.70), homelab (100.112.130.100), macmini (100.113.216.27) — all on Tailscale
 
-## Tasks
+Operators discover skills on demand from `~/.claude/skills/`. Rules load by project type detection (web, CLI, service, generic). Decision defaults let Claude make reasonable choices autonomously without asking. Handoffs survive `/clear`. Tasks persist via native TaskCreate/TaskList.
 
-1. **[high]** Add tests for core/janitor/digest.py
+## Operators
 
-2. **[high]** Add tests for core/janitor/inbox.py
+- [/short SKILL.md](.claude/skills/short/SKILL.md): Quick iteration — loads context, asks what you're working on, executes in burn-down mode
+- [/full SKILL.md](.claude/skills/full/SKILL.md): Structured work — intake, plan, execute with context checkpoints
+- [/conduct SKILL.md](.claude/skills/conduct/SKILL.md): Multi-model PMO — routes work across Claude + Codex + Gemini, loops until done
 
-3. **[high]** Add tests for core/janitor/jobs.py
+## Utility Skills
 
-4. **[high]** Add tests for core/janitor/worker.py
+- [/handoff SKILL.md](.claude/skills/handoff/SKILL.md): Save context before `/clear`
+- [/restore SKILL.md](.claude/skills/restore/SKILL.md): Resume from handoff checkpoint
+- [/research SKILL.md](.claude/skills/research/SKILL.md): Background research via Gemini CLI
+- [/freesearch SKILL.md](.claude/skills/freesearch/SKILL.md): Zero-token web search via Exa API
+- [/doc SKILL.md](.claude/skills/doc/SKILL.md): Cache external documentation locally
+- [/vision SKILL.md](.claude/skills/vision/SKILL.md): Image and website visual analysis
+- [/secrets SKILL.md](.claude/skills/secrets/SKILL.md): SOPS/Age encrypted secret management
 
-5. **[medium]** Refactor generate_onboarding in core/janitor/jobs.py (242 lines)
+## Core Configuration
 
-6. **[medium]** Split core/janitor/jobs.py (1793 lines) into smaller modules
+- [AGENTS.md](AGENTS.md): Operator spec, decision defaults, delegation protocol, auto-approved actions
+- [CLAUDE.md](CLAUDE.md): Project-specific Claude instructions (per project, editable)
+- [CLAUDE.md (global)](CLAUDE.md): Global user rules, stack defaults, secrets management, infrastructure routing
 
-7. **[low]** Add a second contributor to .claude/skills/conduct/SKILL.md (sole author: Test User, 9 edits)
+## Rules (Progressive Disclosure)
 
-8. **[low]** Add a second contributor to .claude/skills/full/SKILL.md (sole author: Test User, 9 edits)
+- [core.md](.claude/rules/core.md): Always loaded — work discipline, delegation, AGENTS.md readonly rule
+- [khamel-mode.md](.claude/rules/khamel-mode.md): User defaults — stack, machines, anti-patterns, decision defaults
+- [delegation.md](.claude/rules/delegation.md): Assess-verify-escalate delegation with 3-attempt fallback
+- [web.md](.claude/rules/web.md): Web apps — Vercel + Supabase (Auth + Postgres) + Python
+- [cli.md](.claude/rules/cli.md): CLIs — Python + Click + SQLite
+- [service.md](.claude/rules/service.md): Services — Python + systemd, deploy to oci-dev
+- [community.md](.claude/rules/community.md): Membership sites — Vercel + Supabase + Python + Resend
 
-9. **[low]** Add a second contributor to .claude/skills/_shared/providers.md (sole author: Test User, 7 edits)
+## Infrastructure
 
-10. **[low]** Add a second contributor to .claude/skills/short/SKILL.md (sole author: Test User, 7 edits)
+- [STACK.md](.claude/infrastructure/STACK.md): Full stack reference — Vercel, Supabase, Python, auth, deployment
+- [secrets/](secrets/): SOPS/Age encrypted vault — 17 files, ~80 API keys, `secrets get KEY` for access
+- [public-access.md](docs/public-access.md): Public URL routing via poytz + Cloudflare Tunnel (replaces nginx/traefik)
+- [ssh/](ssh/): SSH alias configs for oci-dev, homelab, macmini
 
-11. **[low]** Add a second contributor to .claude/skills/_shared/dispatch.md (sole author: Test User, 5 edits)
+## Scripts
 
-12. **[low]** Update docs/public-access.md — 97 days stale
+- [heartbeat.sh](scripts/heartbeat.sh): Daily health check — repo sync, GLM model pin, secrets decrypt, CLIs, 14 API validators, MCP servers, Tailscale, cross-machine reachability
+- [check-apis.sh](scripts/check-apis.sh): Validates 14 API keys with real HTTP calls (ZAI, OpenAI, Tavily, Exa, Apify, Context7, OpenRouter, DeepSeek, Brave, Jina, GitHub, Cloudflare, Telegram)
+- [secrets CLI](scripts/secrets-helper.sh): `secrets get KEY` / `secrets set NAME KEY=val` / `secrets list` / `secrets decrypt NAME`
+- [ci.sh](scripts/ci.sh): Verify loop — shellcheck, prettier, tsc, pyright, bats, pytest, skill/doc validation
+- [check-backup.sh](scripts/check-backup.sh): Daily encrypted recovery snapshot (vault inventory, machine status, git state — no secret values)
 
-13. **[low]** Update docs/sessions/README.md — 74 days stale
+## Template
 
-14. **[low]** Update .sops.yaml — 69 days stale
-# Project Status  
-The codebase is actively evolving (≈1800 events) but shows maintenance debt: several huge modules and missing tests.
+- [community-starter](templates/community-starter/): Default web app scaffold — Vercel + Supabase + Python + Resend (bootstrap with `oneshot.sh --web <slug>`)
 
-# Recent Activity  
-- `hooks/janitor/context.sh` (frequent invocations)  
-- `core/janitor/inbox.py` (edited in the last focus session)  
-- `core/janitor/digest.py` (edited in the last focus session)  
-- `hooks/janitor/record.sh` (invoked 9 times)  
-- `core/janitor/jobs.py` (edited in 46 sessions, 185 total sessions)  
+## Optional
 
-# Attention Items  
-1. **Test Gaps (4 files)** – `core/janitor/digest.py`, `core/janitor/inbox.py`, `core/janitor/jobs.py`, `core/janitor/worker.py` have no test coverage.  
-2. **Knowledge Risk (3 files)** – `.claude/skills/conduct/SKILL.md` (9 edits by a single contributor), `.claude/skills/full/SKILL.md` (9 edits by the same), `.claude/skills/_shared/providers.md` (7 edits by the same).  
-3. **Oversized Files** – `core/janitor/jobs.py` (1793 lines total; functions `generate_onboarding` 242 lines, `run_session_start` 197 lines, `evaluate_task_sufficiency` 166 lines) and `core/dispatch/run.py` (675 lines).  
-4. **Config Drift** – `settings.json` edited in 6 sessions, `settings.local.json` in 3 sessions, indicating possible divergence between environments.
-
-# Recommended Next Steps  
-1. Add unit tests for the four uncovered modules: create test files targeting `core/janitor/digest.py`, `core/janitor/inbox.py`, `core/janitor/jobs.py`, and `core/janitor/worker.py`.  
-2. Refactor `core/janitor/jobs.py` to split the 1793‑line file; extract `generate_onboarding`, `run_session_start`, and `evaluate_task_sufficiency` into separate modules (e.g., `jobs/onboarding.py`, `jobs/session.py`, `jobs/evaluation.py`).  
-3. Review and consolidate `settings.json` vs `settings.local.json` to ensure a single source of truth; document the intended overrides.  
-4. Conduct a knowledge‑transfer audit on the three high‑risk skill docs; add at least one reviewer and summarize key decisions in a shared markdown (e.g., `docs/knowledge-transfer.md`).  
-5. Reduce `core/dispatch/run.py` size by extracting helper utilities into `core/dispatch/helpers.py` (target ≤400 lines).
-
-## Project Intelligence Sources
-
-Read these files for details on demand:
-
-- `.janitor/test-gaps.json` -- untested files
-- `.janitor/code-smells.json` -- oversized files/functions
-- `.janitor/dep-graph.json` -- dependency impact ranking
-- `.janitor/doc-staleness.json` -- stale documents
-- `.janitor/doc-orphans.json` -- orphan/unlinked documents
-- `.janitor/doc-clusters.json` -- document topic clusters
-- `.janitor/doc-size-outliers.json` -- unusually large files
-- `.janitor/doc-crossrefs.json` -- cross-reference map
-- `.janitor/doc-recent-activity.json` -- recent document changes
-- `.janitor/config-drift.json` -- uncommitted config changes
-- `.janitor/patterns.json` -- recurring patterns
-- `.janitor/recent-focus.json` -- last session's focus
-- `.janitor/dead-ends.json` -- recurring failed searches
-- `.janitor/blockers.json` -- unresolved blockers
-- `.janitor/critical-files.json` -- high-touch x high-impact files
-- `.janitor/knowledge-risk.json` -- low bus factor files
-- `.janitor/onboarding.md` -- full onboarding summary
-- `.janitor/events.jsonl` -- raw event log
+- [CHANGELOG.md](CHANGELOG.md): Version history (v12+)
+- [SKILLS.md](docs/SKILLS.md): Full command reference with examples
+- [LLM-OVERVIEW.md](docs/LLM-OVERVIEW.md): Design philosophy, token optimization strategy, glossary
+- [QUICKSTART.md](QUICKSTART.md): Install and update commands
+- [hooks/](.claude/hooks/): lessons-inject.sh (session start), delegation-log-hook.sh (subagent stop), docs-check.sh, context-v8.py, beads-v8.py
+- [providers.md](.claude/skills/_shared/providers.md): Multi-model routing table for /conduct
 ````
 
 ## File: one_shot.md
@@ -25947,6 +27031,15 @@ oneshot-update force  # Force update now
 oneshot-update status # Show version and last check
 ```
 
+## Readiness
+
+```bash
+./bin/oneshot doctor
+./bin/oneshot doctor --all-machines
+```
+
+This verifies the local CLI toolchain, auth state, secrets access, and whether an `oc` launcher wrapper exists on the current machine.
+
 ## Skills (10 + 1 external)
 
 | Skill | What it does |
@@ -25970,6 +27063,12 @@ claude .          # Open Claude Code
 /handoff          # Save context before ending
 ```
 
+If you already use the local OpenCode wrapper on your machine:
+
+```bash
+oc                # Launch OpenCode with your local wrapper defaults
+```
+
 ## What Gets Installed
 
 | Location | Contents |
@@ -25989,6 +27088,55 @@ claude .          # Open Claude Code
 ## Rate Limiting
 
 Auto-check is rate limited to once per day. Use `force` to bypass.
+````
+
+## File: repomix.config.json
+````json
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "docs/LLM-OVERVIEW.md",
+    "style": "markdown",
+    "compress": true,
+    "removeComments": true,
+    "removeEmptyLines": true,
+    "topFilesLength": 20,
+    "fileSummary": true,
+    "directoryStructure": true,
+    "files": true,
+    "parsableStyle": true
+  },
+  "include": ["**/*"],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      ".janitor/",
+      "secrets/",
+      "*.encrypted",
+      "*.env",
+      "*.env.tmp",
+      "*.key",
+      "*.age",
+      "eval/traces/",
+      "archive/",
+      ".cache/",
+      ".agent/",
+      ".beads/",
+      ".oneshot/",
+      "dispatch/",
+      ".claude/skills/the-audit/SOURCE_DOCS/",
+      ".opencode/",
+      ".claude/memory/",
+      ".claude/plans/",
+      ".claude/tasks/",
+      ".claude/delegation-log.jsonl"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}
 ````
 
 ## File: SHARING_ONESHOT.md
@@ -26596,6 +27744,129 @@ export SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt
 Both use the same age key, so you're already set up!
 ````
 
+## File: .claude/hooks/docs-check.sh
+````bash
+set -euo pipefail
+CACHE_BASE="${DOCS_CACHE:-$HOME/.local/share/argus/argus/docs/cache}"
+CACHE_INDEX="$CACHE_BASE/.index.md"
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
+EXTERNAL_DIR="$PROJECT_ROOT/docs/external"
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+if [[ ! -f "$CACHE_INDEX" ]]; then
+	exit 0
+fi
+get_cached_names() {
+	grep -E '^\|' "$CACHE_INDEX" | tail -n +3 | grep -v '^|--' |
+		while IFS='|' read -r _ name _; do
+			echo "$name" | xargs | tr '[:upper:]' '[:lower:]'
+		done
+}
+CACHED_NAMES=$(get_cached_names)
+detect_deps() {
+	local deps=""
+	# Node.js - dependencies + devDependencies
+	if [[ -f package.json ]]; then
+		deps="$deps "$(jq -r '.dependencies + .devDependencies | keys[]?' package.json 2>/dev/null | tr '[:upper:]' '[:lower:]' || true)
+		# Extract from @types/ packages too
+		deps="$deps "$(jq -r '.devDependencies | keys[]? | select(startswith("@types/")) | sub("^@types/"; "")' package.json 2>/dev/null | tr '[:upper:]' '[:lower:]' || true)
+	fi
+	# Python - requirements.txt
+	if [[ -f requirements.txt ]]; then
+		while IFS= read -r line; do
+			# Skip comments and empty lines
+			[[ "$line" =~ ^
+			[[ -z "$line" ]] && continue
+			pkg=$(echo "$line" | sed 's/[>=<!].*//' | sed 's/\[.*//' | xargs | tr '[:upper:]' '[:lower:]')
+			[[ -n "$pkg" ]] && deps="$deps $pkg"
+		done <requirements.txt
+	fi
+	if [[ -f pyproject.toml ]]; then
+		deps="$deps "$(grep -E '^dependencies = \[' -A 1000 pyproject.toml | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' | sed 's/[>=<!].*//' | sed 's/\[.*//' | xargs | tr '[:upper:]' '[:lower:]' || true)
+		deps="$deps "$(grep -E '^\[project.optional-dependencies\]' -A 1000 pyproject.toml | grep '^\[' -B 1000 | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' | sed 's/[>=<!].*//' | xargs | tr '[:upper:]' '[:lower:]' || true)
+	fi
+	if [[ -f setup.py ]]; then
+		deps="$deps "$(grep -E "(install_requires|requirements)" setup.py | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' | sed 's/[>=<!].*//' | xargs | tr '[:upper:]' '[:lower:]' || true)
+	fi
+	if [[ -f go.mod ]]; then
+		while IFS= read -r line; do
+			[[ "$line" =~ ^require ]] && continue
+			[[ "$line" =~ ^\s*// ]] && continue
+			[[ -z "$line" ]] && continue
+			pkg=$(echo "$line" | awk '{print $1}' | sed 's|.*/||' | xargs | tr '[:upper:]' '[:lower:]')
+			[[ -n "$pkg" ]] && deps="$deps $pkg"
+		done < <(sed -n '/^require (/, /^)/p' go.mod)
+	fi
+	if [[ -f Cargo.toml ]]; then
+		deps="$deps "$(grep -E '^\[dependencies\]' -A 1000 Cargo.toml | grep '=' | sed 's/\s*\([^=]*\).*/\1/' | xargs | tr '[:upper:]' '[:lower:]' || true)
+	fi
+	if [[ -f docker-compose.yml ]] || [[ -f docker-compose.yaml ]]; then
+		deps="$deps docker"
+	fi
+	if compgen -G "*.yaml" >/dev/null 2>&1 && grep -q "apiVersion:.*k8s.io" ./*.yaml 2>/dev/null; then
+		deps="$deps kubernetes"
+	fi
+	echo "$deps" | xargs -n1 | sort -u
+}
+PROJECT_DEPS=$(detect_deps)
+RELEVANT=""
+for cached in $CACHED_NAMES; do
+	# Check exact match
+	if echo "$PROJECT_DEPS" | grep -qx "$cached"; then
+		RELEVANT="$RELEVANT $cached"
+		continue
+	fi
+	for dep in $PROJECT_DEPS; do
+		if [[ "$dep" == *"$cached"* || "$cached" == *"$dep"* ]]; then
+			RELEVANT="$RELEVANT $cached"
+			break
+		fi
+	done
+done
+if [[ -n "$RELEVANT" ]]; then
+	echo -e "${GREEN}## Cached Docs Available${NC}"
+	echo ""
+	echo -e "The following docs are cached and relevant to this project:"
+	echo ""
+	for name in $(echo "$RELEVANT" | xargs -n1 | sort -u); do
+		echo -e "  ${BLUE}- ${name}${NC}"
+	done
+	echo ""
+	echo -e "Reference with: ${YELLOW}@docs/external/<name>/README.md${NC}"
+	# Check if docs are linked
+	if [[ -d "$EXTERNAL_DIR" ]]; then
+		LINKED=$(find "$EXTERNAL_DIR" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l)
+		if [[ "$LINKED" -gt 0 ]]; then
+			echo ""
+			echo -e "Linked docs (${LINKED}): ${YELLOW}ls docs/external/${NC}"
+		else
+			echo ""
+			echo -e "Link docs with: ${YELLOW}docs-link add${RELEVANT}${NC}"
+		fi
+	fi
+	echo ""
+fi
+````
+
+## File: .claude/hooks/statusline.sh
+````bash
+input=$(cat)
+PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
+MODEL=$(echo "$input" | jq -r '.model.display_name // "unknown"')
+CACHE_DIR="/tmp/claude-oneshot"
+mkdir -p "$CACHE_DIR"
+echo "$PCT" >"$CACHE_DIR/context-pct"
+if [ "$PCT" -ge 80 ]; then
+	echo "$MODEL | ctx: ${PCT}% ⚠️ HANDOFF SOON"
+elif [ "$PCT" -ge 60 ]; then
+	echo "$MODEL | ctx: ${PCT}%"
+else
+	echo "$MODEL | ctx: ${PCT}%"
+fi
+````
+
 ## File: .claude/rules/core.md
 ````markdown
 # Core Rules
@@ -26616,140 +27887,598 @@ At session start, read `.claude/memory/memory.md`.
 When you discover something useful for other agents, append a dated entry.
 ````
 
-## File: .claude/skills/freesearch/SKILL.md
+## File: .claude/rules/delegation-enforcement.md
 ````markdown
----
-name: freesearch
-description: Zero-token research using Argus search broker. Saves Claude tokens.
----
+# Delegation Enforcement
 
-# /freesearch — Zero-Token Research via Argus
+## CORE RULE: Claude Does NOT Write Code
 
-Uses 0 Claude Code tokens. Calls Argus in cheap mode (SearXNG).
+For ANY request that involves **code changes** (new files, edits, refactors, tests):
+the default action is to **dispatch the task to a worker via the dispatch protocol**.
+Claude plans, reviews, and integrates. Workers execute.
 
-## Usage
+### How to Dispatch
 
-`/freesearch [topic]`
-
-## Process (IMPORTANT: Follow this order)
-
-1. **Check global docs-cache FIRST**:
-   ```bash
-   cat ~/github/docs-cache/docs/cache/.index.md | grep -i "[KEYWORD]"
-   ```
-   If found → Return cached doc path immediately
-
-2. If NOT in cache → Ask 2-3 clarifying questions (goal, depth, audience)
-
-3. **Search via Argus** (cheap mode = SearXNG only):
-   ```bash
-   curl -s -X POST http://localhost:8005/api/search \
-     -H "Content-Type: application/json" \
-     -d '{"query": "[TOPIC]", "mode": "cheap"}'
-   ```
-
-4. **If results include official docs** → Add to global cache:
-   ```bash
-   cd ~/github/docs-cache
-   mkdir -p docs/cache/{category}/{name}
-   # Write README.md with content
-   # Update .index.md
-   git add docs/cache/
-   git commit -m "Add cache: {name}"
-   git push
-   ```
-
-5. Create `docs/research/{date}_{topic}_final.md` in current project
-
-## Output
-
-```
-[CACHED] Found in docs-cache: ~/github/docs-cache/docs/cache/tools/anthropic/README.md
-```
-
-OR
-
-```
-[Searched Argus: cheap mode] Key findings:
-- [finding 1]
-- [finding 2]
-
-[Added to cache] ~/github/docs-cache/docs/cache/tools/{name}/README.md
-Full research: docs/research/YYYY-MM-DD_{topic}_final.md
-```
-
-## Fallback
-
-If Argus is unreachable:
 ```bash
-curl -s http://localhost:8005/api/health >/dev/null 2>&1
+# 1. Resolve lane and workers
+python3 -m core.router.resolve --class <task_class> --category <category>
+
+# 2. Build self-contained prompt (see _shared/dispatch.md template)
+
+# 3. Dispatch
+python3 -m core.dispatch.run \
+  --class <task_class> \
+  --category <category> \
+  --prompt "Self-contained prompt..." \
+  --output 1shot/dispatch \
+  --manifest 1shot/dispatch
 ```
-...then check `config/search.yaml` for cheap mode providers and call directly.
 
-## Notes
+See `~/.claude/skills/_shared/dispatch.md` for the full prompt template and protocol.
 
-- Research takes 5-15 seconds
-- Check cache BEFORE searching
-- Only add official docs to cache (not random blog posts)
-- Cache location: `~/github/docs-cache/` (global, not per-project)
+### Lanes and When Claude Handles Inline
+
+| Lane | Workers | Claude's Role |
+|------|---------|---------------|
+| **premium** | claude_code, codex | Claude handles inline (planning, review, integration) |
+| **balanced** | codex, gemini_cli | Dispatch. Claude reviews output. |
+| **cheap** | gemini_cli, codex, glm_claude | Dispatch. Claude reviews output. |
+| **research** | gemini_cli, codex | Dispatch. Claude integrates findings. |
+| **janitor** | free (openrouter) | Dispatch. No review needed. |
+
+If the router returns `premium` lane, Claude handles the task inline.
+**If it returns any other lane, you MUST dispatch.** There is no middle ground.
+
+## Exceptions (Claude handles inline)
+
+1. **Pure planning, review, or research** — no code changes.
+2. **User explicit override** — "just do it inline", "skip dispatch", "do it yourself".
+3. **Harness bootstrap** — changes to `oneshot_cli/`, `.claude/rules/delegation-enforcement.md`, `.claude/skills/_shared/`, and harness docs. The harness can't dispatch its own build.
+4. **Minor review fixes** — typo corrections in `result.md`, status updates. But rewriting the worker's code is NOT a minor fix.
+5. **Lane resolves to premium** — this is the ONLY lane where inline is acceptable.
+
+## What "No Workers Available" Means
+
+If `python3 -m core.router.resolve` fails, or returns an empty worker pool:
+1. Stop. Tell the user workers are unavailable.
+2. Do NOT silently fall back to doing the work yourself.
+
+## After Dispatching
+
+- Review worker output against acceptance criteria
+- Validate (run tests, lint)
+- Integrate and commit if valid
+- If dispatch failed: retry with fallback_lane once, then log blocker
+
+## Violation Pattern to Avoid
+
+Do NOT say "I'll handle this one myself because it's simple" — that's the exact pattern this rule prevents.
+Do NOT say "workers are unavailable" without actually running the router check — the config exists and codex/gemini are installed.
+Do NOT use the Agent tool as a dispatch substitute — Agent spawns full Claude sessions, not lightweight CLI workers.
 ````
 
-## File: 1shot/ROADMAP.md
+## File: .claude/rules/khamel-mode.md
 ````markdown
-# OpenCode Adapter — Roadmap
+# KHAMEL MODE Rules
 
-**Date**: 2026-04-07
-**Plan**: `1shot/OPENCODE_ADAPTER_PLAN.md`
+When building ANYTHING for this user, assume these defaults without asking.
 
-## Execution Order
+## Infrastructure
 
-Based on Codex review corrections: config/agents before commands, providers first.
+| Machine | Tailscale alias | Tailscale IP | User | Role |
+|---|---|---|---|---|
+| **MBA** (local) | — | 100.64.121.72 | khamel83 | Primary dev machine |
+| **homelab** | `homelab-ts` | 100.112.130.100 | khamel83 | Linux server, 26TB, all Docker |
+| **macmini** | `macmini-ts` | 100.113.216.27 | macmini | Mac Mini M1, Apple Silicon GPU |
+| **oci-dev** | `oci-ts` | 100.126.13.70 | ubuntu | Cloud VM, services/Postgres/Claude Code |
+| **rpi4** | `rpi4` | 100.97.236.22 | RPI3 | Raspberry Pi 4 (currently offline) |
+| **work-mbp** | `mbp-ts` | 100.120.127.32 | hr-svp-mac12 | Work MBP (currently offline) |
 
-### Phase 0: Provider + Config Bootstrap
-- 0A: Add openrouter/openai/google providers to opencode.json
-- 0B: Fix AGENTS.md reference (direct path, not indirection)
-- 0C: Smoke test — verify providers respond
+- **Networking**: All machines on Tailscale (deer-panga.ts.net)
+- **Public access**: Tailscale Funnel + poytz (NOT nginx/traefik)
+- **Internal tools**: Cloudflare Access (already configured)
+- **Secrets**: SOPS/Age, decrypt from `~/github/oneshot/secrets/`
 
-### Phase 5A: OneShot Primary Agent
-- Define `.opencode/agents/oneshot.md` with dispatch capability via bash
+## Stack Defaults (Don't Ask, Just Use)
 
-### Phase 1: Foundation Fixes
-- 1A: argus_client.py reads config/search.yaml
-- 1B: research.md uses argus_client instead of raw curl
-- 1D: cheap-worker.md — keep bash:false, document as bounded-only
+| Project Type | Default Stack |
+|--------------|---------------|
+| Web apps | Vercel + Supabase (Auth + Postgres) + Python + HTML/JS |
+| CLIs | Python + Click + SQLite |
+| Services/APIs | Python + systemd → oci-dev |
+| Heavy compute / throughput | Route to macmini |
+| Large storage | Route to homelab (26TB) |
 
-### Phase 2: Command Translations
-- 2A: /short command
-- 2B: /conduct command (rewrite)
-- 2C: /handoff command
-- 2D: /restore command
-- 2E: /freesearch command
-- 2F: /doc command
+**Full stack docs**: `.claude/infrastructure/STACK.md`
 
-### Phase 3: Persistent Task Tracking
-- 3A: scripts/tasks.py CLI
-- 3B: 1shot/tasks.json format + session start loading
-
-### Phase 4: Janitor Cron
-- 4A: Update janitor-cron.sh (remove DEPRECATED, wire pure-compute jobs)
-- 4B: systemd timer
-
-### Phase 6: MCP Integration
-- 6A: Evaluate Argus as MCP server
-- 6B: Add if viable, skip if not
-
-## Dependencies
+## Storage Progression
 
 ```
-Phase 0 (providers, AGENTS.md) → Phase 5A (oneshot agent) → Phase 1 (foundation) → Phase 2 (commands)
-Phase 3 (tasks.py) — independent, can run anytime after Phase 0
-Phase 4 (janitor) — independent
-Phase 6 (MCP) — last, after everything works
+SQLite (default for CLIs) → Supabase Postgres (web apps) → OCI Autonomous DB (>20GB/multi-user)
 ```
 
-## Success Criteria
+## Auth Default
 
-See PROJECT.md.
+```
+Supabase Auth (email/password + Google OAuth) → sessions in Supabase Postgres
+Cloudflare Access → internal/admin tools (already configured)
+```
+
+## Tool Enforcement
+
+- **ALWAYS** use beads for task tracking (`bd init` on new projects)
+- **ALWAYS** use ONE_SHOT skills when applicable
+- **ALWAYS** check lessons before debugging
+
+## Anti-Patterns to Flag
+
+- nginx/traefik → Use Tailscale Funnel + poytz
+- mysql/mongodb (self-hosted) → Default is SQLite (CLIs) or Supabase Postgres (web)
+- express/fastapi/flask for web → Python serverless on Vercel
+- Astro/Cloudflare Workers/Better Auth → Old stack, use Vercel + Supabase + Python
+- Convex/Next.js/Clerk → Old stack, use Vercel + Supabase + Python
+- aws/gcp/azure → Default is OCI free tier or homelab
+
+## Decision Defaults (Don't Ask, Just Pick)
+
+When ambiguous, apply these defaults without asking for clarification:
+
+| Ambiguity | Default Choice |
+|-----------|----------------|
+| Multiple valid implementations | **Simplest one** |
+| Naming things | Follow existing pattern in file |
+| Error handling style | Match surrounding code |
+| Test framework | Use existing tests as guide |
+| Library choice | One already in project |
+| Refactor opportunity | **Skip unless blocking** |
+| API design | Match existing endpoints |
+| File organization | Follow project structure |
+
+**Key rule**: When truly ambiguous, make a reasonable choice and note the decision.
+
+## When You Notice Drift
+
+If Claude notices we're NOT using beads, Tailscale, ONE_SHOT patterns, or standard stack:
+→ **Warn**: "I notice we're not using [X], should I set that up?"
+````
+
+## File: .claude/skills/INDEX.md
+````markdown
+# ONE_SHOT v13 — Operator Framework
+
+**15 skills.** Three operators. Twelve utilities.
+
+---
+
+## Operators
+
+| Skill | Purpose |
+|-------|---------|
+| `/short` | Quick iterations on existing projects |
+| `/full` | New projects, refactors, complex work |
+| `/conduct` | Multi-model PMO orchestrator — asks questions first, routes across Claude + Codex + Gemini, loops until done |
+
+### /short — Quick Iteration
+
+Fast operator for existing work:
+- Loads recent context (git log, tasks, decisions)
+- Asks: "What are you working on?"
+- Discovers relevant skills on demand
+- Executes in burn-down mode
+- Shows delegation summary on completion
+
+### /full — Structured Work
+
+Full operator for complex tasks:
+- Creates IMPLEMENTATION_CONTEXT.md
+- Structured intake and discovery
+- Phase-based planning with milestones
+- Skill discovery via SkillsMP
+- Execution with context checkpoints
+- Completion summary
+
+---
+
+## Utility Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `/handoff` | Save context before /clear |
+| `/restore` | Resume from handoff |
+| `/research` | Background research mode |
+| `/doc` | Cache external documentation |
+| `/freesearch` | Zero-token web search (Exa) |
+| `/vision` | Image/website visual analysis |
+| `/secrets` | SOPS/Age secrets management |
+| `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
+| `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
+| `/janitor` | Background intelligence — test gaps, doc staleness, config drift |
+| `/update` | Update project configuration via settings.json |
+
+---
+
+## Architecture
+
+```
+Menu-based (old):
+25+ slash commands → user picks one → executes
+
+Operator-based (v13):
+/short or /full → discover skills → execute → summary
+```
+
+**Why?** Reduced complexity, fewer commands to maintain, skill discovery happens when needed.
+
+---
+
+## Where Skills Live
+
+```
+~/.claude/skills/<name>/SKILL.md  → Personal skills (available in all projects)
+```
+
+### Required Format
+
+Each SKILL.md MUST have this frontmatter:
+
+```yaml
+---
+name: skill-name
+description: What it does and WHEN to use it. Include trigger keywords.
+---
+```
+
+**Critical**: The `name:` field is REQUIRED. Without it, the skill won't be discovered.
+
+### Example
+
+```
+~/.claude/skills/
+├── short/
+│   └── SKILL.md
+├── full/
+│   └── SKILL.md
+├── handoff/
+│   └── SKILL.md
+└── ...
+```
+
+### Why Commands Didn't Work
+
+Claude Code v2.1+ uses the **skills** system, not `~/.claude/commands/`.
+
+- Skills are **model-invoked** — Claude decides when to use them based on description
+- Commands were **user-invoked** — required explicit `/command` typing
+
+The `~/.claude/commands/` directory is deprecated. Use `~/.claude/skills/` instead.
+
+---
+
+## Full Spec
+
+See `AGENTS.md` for complete operator protocol, decision defaults, and auto-approval rules.
+````
+
+## File: .github/workflows/ci.yml
+````yaml
+name: CI
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  validate-skills:
+    name: Validate Skills
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Make scripts executable
+        run: chmod +x scripts/validate-skills.sh
+      - name: Validate skill format
+        run: ./scripts/validate-skills.sh .claude/skills
+  validate-agents:
+    name: Validate Agents
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate agent format
+        run: |
+          echo "Validating agent files..."
+          errors=0
+          for agent in .claude/agents/*.md; do
+            basename=$(basename "$agent")
+            if [[ "$basename" == "INDEX.md" || "$basename" == "TEMPLATE.md" ]]; then
+              continue
+            fi
+            echo "Checking $agent..."
+            if ! head -1 "$agent" | grep -q "^---"; then
+              echo "ERROR: $agent missing frontmatter"
+              ((errors++))
+              continue
+            fi
+            if ! grep -q "^name:" "$agent"; then
+              echo "ERROR: $agent missing 'name:' field"
+              ((errors++))
+            fi
+            if ! grep -q "^description:" "$agent"; then
+              echo "ERROR: $agent missing 'description:' field"
+              ((errors++))
+            fi
+          done
+          if [ $errors -gt 0 ]; then
+            echo "Found $errors errors"
+            exit 1
+          fi
+          echo "All agents valid"
+  test-router:
+    name: Test Python Router
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pyyaml
+      - name: Test infer_category
+        run: |
+          python3 -c "
+          import sys
+          sys.path.insert(0, '.')
+          from core.task_schema import infer_category, TaskCategory
+          tests = [
+              ('implement the auth handler', 'coding'),
+              ('fix the bug in login.py', 'coding'),
+              ('refactor the database module', 'coding'),
+              ('research Supabase RLS patterns', 'research'),
+              ('document the API endpoints', 'writing'),
+              ('summarize the meeting notes', 'writing'),
+              ('review this pull request', 'review'),
+              ('audit the security config', 'review'),
+              ('hello world', 'general'),
+          ]
+          passed = 0
+          for desc, exp in tests:
+              result = infer_category(desc)
+              if result.value == exp:
+                  passed += 1
+              else:
+                  print(f'FAIL: \"{desc}\" → {result.value}, expected {exp}')
+                  sys.exit(1)
+          print(f'{passed}/{len(tests)} infer_category tests passed')
+          "
+      - name: Test router resolve
+        run: |
+          python3 -c "
+          import sys
+          sys.path.insert(0, '.')
+          from core.router.lane_policy import resolve
+          # Test category-based worker ordering
+          r = resolve('implement_small', category='coding')
+          assert r['lane'] == 'cheap'
+          assert r['workers'][0] == 'codex', f'Expected codex first, got {r[\"workers\"]}'
+          assert r['category'] == 'coding'
+          r = resolve('research', category='research')
+          assert r['lane'] == 'research'
+          assert r['workers'][0] == 'gemini_cli'
+          r = resolve('plan')
+          assert r['lane'] == 'premium'
+          assert r['category'] == 'general'
+          print('All router resolve tests passed')
+          "
+      - name: Test category inference in resolve
+        run: |
+          python3 -c "
+          import sys
+          sys.path.insert(0, '.')
+          from core.router.lane_policy import resolve
+          # infer_category should auto-populate when no category given
+          r = resolve('implement_small')
+          assert r['category'] == 'coding'
+          r = resolve('review_diff')
+          assert r['category'] == 'review'
+          r = resolve('doc_draft')
+          assert r['category'] == 'writing'
+          r = resolve('plan')
+          assert r['category'] == 'general'
+          print('All category inference tests passed')
+          "
+  test-core-python:
+    name: Test Core Python Modules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run pytest
+        run: python3 -m pytest tests/test_task_schema.py tests/test_lane_policy.py -v
+  lint-basic:
+    name: Basic Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check skill and agent counts match
+        run: |
+          skill_count=$(find .claude/skills -name "SKILL.md" | wc -l)
+          echo "Found $skill_count skills"
+          agent_count=$(find .claude/agents -maxdepth 1 -name "*.md" ! -name "INDEX.md" ! -name "TEMPLATE.md" | wc -l)
+          echo "Found $agent_count agents"
+      - name: Check no stale references
+        run: |
+          if grep -r "oneshot-resume" .claude/skills/ 2>/dev/null; then
+            echo "ERROR: Found stale 'oneshot-resume' reference"
+            exit 1
+          fi
+          echo "No stale references found"
+      - name: Verify required files exist
+        run: |
+          required_files=(
+            "AGENTS.md"
+            "CLAUDE.md"
+            "README.md"
+            "oneshot.sh"
+            "CHANGELOG.md"
+            ".claude/skills/INDEX.md"
+            ".claude/agents/INDEX.md"
+            "core/task_schema.py"
+            "core/router/lane_policy.py"
+            "core/dispatch/run.py"
+            "config/lanes.yaml"
+            "config/models.yaml"
+            "config/workers.yaml"
+            "docs/instructions/task-classes.md"
+          )
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Required file missing: $file"
+              exit 1
+            fi
+          done
+          echo "All required files present"
+      - name: Verify config consistency
+        run: |
+          for lane in premium balanced cheap research; do
+            if ! sed -n "/^  $lane:/,/^[a-z]/p" config/lanes.yaml | grep -q "category_preference"; then
+              echo "ERROR: Lane '$lane' missing category_preference"
+              exit 1
+            fi
+          done
+          echo "All lanes have category_preference"
+          pool=$(sed -n '/^  cheap:/,/^[a-z]/p' config/lanes.yaml | grep "worker_pool" | head -1)
+          if echo "$pool" | grep -q "claw_code"; then
+            echo "ERROR: claw_code should not be in cheap lane pool"
+            exit 1
+          fi
+          echo "claw_code correctly excluded from cheap lane"
+          if ! grep -A 5 "^  glm:" config/workers.yaml | grep -q "plan_expires"; then
+            echo "ERROR: glm worker missing plan_expires"
+            exit 1
+          fi
+          echo "ZAI expiry config present"
+  validate-community-starter:
+    name: Validate Community Starter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install template dependencies
+        run: pip install -r templates/community-starter/requirements.txt pytest
+      - name: Make script executable
+        run: chmod +x scripts/test-community-starter.sh
+      - name: Run community-starter validation
+        run: ./scripts/test-community-starter.sh
+````
+
+## File: 1shot/tasks.json
+````json
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "1",
+      "subject": "Define repo-local memory scaffold and policy declaration model",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:08Z",
+      "blocked_by": []
+    },
+    {
+      "id": "2",
+      "subject": "Design write, promotion, provenance, and conflict lifecycle",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:08Z",
+      "blocked_by": []
+    },
+    {
+      "id": "3",
+      "subject": "Design same-repo retrieval and cross-repo abstraction rules",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:09Z",
+      "blocked_by": []
+    },
+    {
+      "id": "4",
+      "subject": "Define review governance for high-risk memory and cross-repo changes",
+      "description": "",
+      "status": "done",
+      "priority": "medium",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:09Z",
+      "blocked_by": []
+    },
+    {
+      "id": "5",
+      "subject": "Stage external index responsibilities, degraded mode, and onboarding flow",
+      "description": "",
+      "status": "done",
+      "priority": "medium",
+      "created": "2026-04-28T21:57:28Z",
+      "updated": "2026-04-28T22:35:09Z",
+      "blocked_by": []
+    },
+    {
+      "id": "6",
+      "subject": "Implement cross-repo abstraction indexing beyond repo-local files",
+      "description": "",
+      "status": "done",
+      "priority": "high",
+      "created": "2026-04-28T22:35:09Z",
+      "updated": "2026-04-28T22:42:49Z",
+      "blocked_by": []
+    },
+    {
+      "id": "7",
+      "subject": "Implement central private index service integration and degraded-mode signaling",
+      "description": "",
+      "status": "pending",
+      "priority": "high",
+      "created": "2026-04-28T22:35:09Z",
+      "updated": "2026-04-28T22:35:09Z",
+      "blocked_by": []
+    },
+    {
+      "id": "8",
+      "subject": "Integrate high-risk review gates into memory-affecting workflows",
+      "description": "",
+      "status": "pending",
+      "priority": "medium",
+      "created": "2026-04-28T22:35:09Z",
+      "updated": "2026-04-28T22:35:09Z",
+      "blocked_by": []
+    },
+    {
+      "id": "9",
+      "subject": "Replace local SQLite abstraction index with dual-home private service integration",
+      "description": "",
+      "status": "pending",
+      "priority": "high",
+      "created": "2026-04-28T22:42:50Z",
+      "updated": "2026-04-28T22:42:50Z",
+      "blocked_by": []
+    }
+  ]
+}
 ````
 
 ## File: core/janitor/hooks/pre-compact.sh
@@ -26778,149 +28507,46 @@ except Exception:
 exit 0
 ````
 
-## File: core/janitor/hooks/record.sh
-````bash
-input=$(cat)
-tool_name="${input#*\"tool_name\":\"}"
-tool_name="${tool_name%%\"*}"
-case "$tool_name" in
-  WebFetch|WebSearch|mcp__*|TaskCreate|TaskUpdate|TaskList|TaskGet|CronCreate|CronDelete|CronList|AskUserQuestion)
-    exit 0
-    ;;
-esac
-project_dir="$PWD"
-while [ "$project_dir" != "/" ]; do
-  [ -d "$project_dir/.git" ] && break
-  project_dir=$(dirname "$project_dir")
-done
-[ "$project_dir" = "/" ] && exit 0
-janitor_dir="$project_dir/.janitor"
-events_file="$janitor_dir/events.jsonl"
-mkdir -p "$janitor_dir"
-timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-session_id="${CLAUDE_CODE_SESSION_ID:-$(date +%Y%m%d-%H%M%S)}"
-json_get() {
-  python3 -c "
-import json, sys
-d = json.loads(sys.stdin.read())
-val = str(d.get('$1', {}).get('$2', ''))[:200]
-print(json.dumps(val)[1:-1])
-" <<< "$input" 2>/dev/null || true
-}
-file_path=""
-case "$tool_name" in
-  Read|Write|Edit)
-    file_path=$(json_get tool_input file_path)
-    ;;
-esac
-has_failed_output=0
-if echo "$input" | tr -d '\\' | grep -qE '"exit_code"\s*:\s*[1-9]'; then
-    has_failed_output=1
-fi
-# Build event based on tool type
-case "$tool_name" in
-  Glob|Grep)
-    query=$(json_get tool_input pattern)
-    [ -z "$query" ] && query=$(json_get tool_input glob_pattern)
-    [ -z "$query" ] && query=$(json_get tool_input query)
-    query="${query:0:100}"
-    # Check for no results in the raw input
-    is_empty=0
-    case "$input" in
-      *"\"tool_output\":\"\""*|*"\"tool_output\":\"\[\"]"*)
-        is_empty=1
-        ;;
-    esac
-    if echo "$input" | grep -qE '"tool_output":"[^"]*([Nn]o (matches|results)|0 results|found 0|empty)'; then
-      is_empty=1
-    fi
-    if [ "$is_empty" -eq 1 ] && [ -n "$query" ]; then
-      printf '{"ts":"%s","session":"%s","type":"dead_end","content":"No results for: %s","meta":{"tool":"%s","auto":true},"files":[]}\n' \
-        "$timestamp" "$session_id" "$query" "$tool_name" >> "$events_file"
-    fi
-    exit 0
-    ;;
-  Read)
-    [ -z "$file_path" ] && exit 0
-    printf '{"ts":"%s","session":"%s","type":"file_read","content":"Read %s","meta":{"tool":"Read","auto":true},"files":["%s"]}\n' \
-      "$timestamp" "$session_id" "$file_path" "$file_path" >> "$events_file"
-    ;;
-  Write)
-    [ -z "$file_path" ] && exit 0
-    printf '{"ts":"%s","session":"%s","type":"file_written","content":"Created %s","meta":{"tool":"Write","auto":true},"files":["%s"]}\n' \
-      "$timestamp" "$session_id" "$file_path" "$file_path" >> "$events_file"
-    ;;
-  Edit)
-    [ -z "$file_path" ] && exit 0
-    printf '{"ts":"%s","session":"%s","type":"file_written","content":"Edited %s","meta":{"tool":"Edit","auto":true},"files":["%s"]}\n' \
-      "$timestamp" "$session_id" "$file_path" "$file_path" >> "$events_file"
-    ;;
-  Bash)
-    cmd=$(json_get tool_input command)
-    cmd="${cmd:0:200}"
-    if [ "$has_failed_output" -eq 1 ]; then
-      printf '{"ts":"%s","session":"%s","type":"dead_end","content":"Failed: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
-        "$timestamp" "$session_id" "${cmd:0:100}" >> "$events_file"
-    fi
-    case "$cmd" in
-      git\ commit*|git\ push*)
-        printf '{"ts":"%s","session":"%s","type":"commit","content":"Git: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
-          "$timestamp" "$session_id" "${cmd:0:100}" >> "$events_file"
-        ;;
-      git\ *)
-        exit 0
-        ;;
-      *)
-        printf '{"ts":"%s","session":"%s","type":"action_taken","content":"Ran: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
-          "$timestamp" "$session_id" "${cmd:0:100}" >> "$events_file"
-        ;;
-    esac
-    ;;
-  *)
-    exit 0
-    ;;
-esac
-exit 0
-````
-
-## File: core/janitor/hooks/session-end.sh
-````bash
-project_dir="$PWD"
-while [ "$project_dir" != "/" ]; do
-  [ -d "$project_dir/.git" ] && break
-  project_dir=$(dirname "$project_dir")
-done
-[ "$project_dir" = "/" ] && exit 0
-janitor_dir="$project_dir/.janitor"
-events_file="$janitor_dir/events.jsonl"
-[ ! -f "$events_file" ] && exit 0
-timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-session_id="${CLAUDE_CODE_SESSION_ID:-unknown}"
-printf '{"ts":"%s","session":"%s","type":"session_end","content":"Session ended","meta":{"auto":true},"files":[]}\n' \
-  "$timestamp" "$session_id" >> "$events_file"
-ONESHOT_DIR="$HOME/github/oneshot"
-export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null)" || true
-python3 -c "
-import sys, os
-sys.path.insert(0, '$ONESHOT_DIR')
-try:
-    from core.janitor.jobs import run_session_end
-    run_session_end('$project_dir')
-except Exception:
-    pass
-" &
-exit 0
-````
-
-## File: core/router/resolve.py
+## File: core/router/lane_policy.py
 ````python
-def main()
+CONFIG_DIR = Path(__file__).resolve().parent.parent.parent / "config"
+def load_lanes(config_path: Optional[str] = None) -> dict
 ⋮----
-parser = argparse.ArgumentParser(description="Resolve task class to routing directive")
+path = config_path or str(CONFIG_DIR / "lanes.yaml")
 ⋮----
-args = parser.parse_args()
+def get_worker_pool(lane: str, config_path: Optional[str] = None) -> list[str]
 ⋮----
-result = resolve(args.task_class, category=args.category, config_path=args.config)
+lanes = load_lanes(config_path)
+⋮----
+def get_reviewer(lane: str, config_path: Optional[str] = None) -> str
+def get_fallback_lane(lane: str, config_path: Optional[str] = None) -> Optional[str]
+def get_search_backend(lane: str, config_path: Optional[str] = None) -> Optional[str]
+def get_category_preference(lane: str, category: str, config_path: Optional[str] = None) -> Optional[list[str]]
+⋮----
+prefs = lanes.get("lanes", {}).get(lane, {}).get("category_preference", {})
+⋮----
+def reorder_by_preference(workers: list[str], preference: list[str]) -> list[str]
+⋮----
+pref_set = set(preference)
+ordered = [w for w in preference if w in workers]
+rest = [w for w in workers if w not in pref_set]
+⋮----
+tc = TaskClass(task_class)
+risk = RiskLevel(risk_level)
+lane = LANE_ASSIGNMENTS.get(tc, "balanced")
+workers = get_worker_pool(lane, config_path)
+⋮----
+pref = get_category_preference(lane, category, config_path)
+⋮----
+workers = reorder_by_preference(workers, pref)
+⋮----
+inferred = CATEGORY_ASSIGNMENTS.get(tc)
+⋮----
+pref = get_category_preference(lane, inferred.value, config_path)
+⋮----
+reviewer = get_reviewer(lane, config_path)
+fallback = get_fallback_lane(lane, config_path)
+search = get_search_backend(lane, config_path)
 ````
 
 ## File: core/search/argus_client.py
@@ -26937,17 +28563,42 @@ def get_base_url() -> str
 ⋮----
 config = _get_config()
 ⋮----
+def _load_api_key_from_vault() -> Optional[str]
+⋮----
+result = subprocess.run(
+⋮----
+def get_api_key() -> Optional[str]
+⋮----
+config = _get_config().get("search", {})
+env_name = config.get("api_key_env", "ARGUS_API_KEY")
+env_value = os.environ.get(env_name, "").strip()
+⋮----
+config_value = str(config.get("api_key", "")).strip()
+⋮----
+def _build_headers(*, include_json: bool = False) -> dict[str, str]
+⋮----
+headers: dict[str, str] = {}
+⋮----
+api_key = get_api_key()
+⋮----
+def _request_json(url: str, *, payload: Optional[dict] = None, timeout: int = 30) -> dict
+⋮----
+data = json.dumps(payload).encode() if payload is not None else None
+req = urllib.request.Request(
+⋮----
 base = base_url or get_base_url()
 payload = {"query": query, "mode": mode}
 ⋮----
-data = json.dumps(payload).encode()
-req = urllib.request.Request(
-⋮----
 def health(base_url: Optional[str] = None) -> dict
 ⋮----
-req = urllib.request.Request(f"{base}/api/health")
+payload = {"url": url}
 ⋮----
+payload = {
+⋮----
+def workflow_status(run_id: str, base_url: Optional[str] = None) -> dict
 def is_available(base_url: Optional[str] = None) -> bool
+⋮----
+"""Check if Argus server is reachable."""
 ````
 
 ## File: docs/external/opencode/README.md
@@ -27409,40 +29060,6 @@ opencode mcp debug <name>  # Debug OAuth connection
 - [Provider Setup](annotations/2026-04-07-providers.md) - OpenRouter, Anthropic, Z.AI, custom providers
 ````
 
-## File: docs/external/.index.md
-````markdown
-# Cached External Documentation
-
-| Name | Category | URL | Cached |
-|------|----------|-----|--------|
-| codex | tools | https://github.com/openai/codex | 2026-04-01 |
-| opencode | tools | https://opencode.ai | 2026-04-01 |
-| gemini | tools | https://github.com/google-gemini/gemini-cli | 2026-04-01 |
-
-## Files — codex
-
-| File | Description | Lines |
-|------|-------------|-------|
-| `README.md` | Codex CLI README from GitHub | 60 |
-| `CODEX_AGENTS.md` | How Codex uses AGENTS.md (from repo) | 209 |
-| `config.md` | config.toml reference | 91 |
-| `auth.md` | Authentication docs (developers.openai.com/codex/auth) | 841 |
-| `security.md` | Sandbox & approvals (developers.openai.com/codex/security) | 703 |
-| `noninteractive.md` | Non-interactive mode (developers.openai.com/codex/noninteractive) | 882 |
-
-## Files — opencode
-
-| File | Description | Lines |
-|------|-------------|-------|
-| `README.md` | OpenCode CLI docs (getting started, agents, providers, config) | 417 |
-
-## Files — gemini
-
-| File | Description | Lines |
-|------|-------------|-------|
-| `README.md` | Gemini CLI docs (install, auth, headless mode, config, sandboxing, GEMINI.md, custom commands, quotas) | 595 |
-````
-
 ## File: docs/instructions/coding.md
 ````markdown
 # Coding Standards
@@ -27501,74 +29118,525 @@ SQLite (default for CLIs) → Supabase Postgres (web apps) → OCI Autonomous DB
 | Astro, Cloudflare Workers, Better Auth | Vercel + Supabase + Python |
 | Convex, Next.js, Clerk | Vercel + Supabase + Python |
 | Heavy ORMs | Lightweight or none |
+
+## PDF Processing
+
+Use the simplest approach that works:
+
+| Scenario | Approach |
+|----------|----------|
+| <= 20 pages, need layout/tables/diagrams | Read tool directly (vision model) |
+| <= 20 pages, text-only | Read tool directly (still simplest) |
+| > 20 pages | Extract to markdown first, then Read the `.md` |
+| Specific pages from large PDF | Read tool with `pages` parameter |
+| Structured data (tables, headings) | `docling` CLI |
+
+The Read tool handles PDFs natively via vision. Max 20 pages per call.
+It handles scanned/image PDFs without OCR and understands tables and diagrams.
+
+**Pre-extraction for large PDFs** (saves ~60% tokens):
+```python
+# Fast: PyMuPDF (already installed)
+python3 -c "
+import fitz, sys
+doc = fitz.open(sys.argv[1])
+for page in doc:
+    print(f'## Page {page.number + 1}\n{page.get_text(\"markdown\")}\n')
+" input.pdf > output.md
+
+# Better structure: docling (already installed)
+docling input.pdf --to md --output output.md
+```
+
+**Anti-patterns**: Don't install poppler-utils (PyMuPDF covers it). Don't paste PDF contents into chat — use file paths.
 ````
 
-## File: docs/instructions/workflow.md
+## File: docs/meta-harness/trace_architecture.md
 ````markdown
-# Workflow Rules
+# Trace Architecture: Raw Evidence for Harness Optimization
 
-## Operator Modes
+> Filesystem-native trace storage. grep/cat/find/jq friendly. No custom UI.
 
-OneShot provides three operators for different work styles:
+---
 
-### `/short` — Quick Iteration
-- Load context (git log, TaskList, DECISIONS.md, BLOCKERS.md)
-- Ask what you're working on
-- Execute in burn-down mode
-- Minimal overhead, maximum speed
+## 1. Design Principles
 
-### `/full` — Structured Work
-- Create IMPLEMENTATION_CONTEXT.md
-- Structured intake (goals, scope, architecture, constraints)
-- Phase-based planning with milestones
-- Context checkpoints at 50% (suggest handoff) and 70% (auto-handoff)
-- Verify and completion summary
+1. **Raw traces are primary** — summaries are derived, never replacements
+2. **Immutable artifacts** separated from **mutable derived** artifacts
+3. **Every trace is self-contained** — one directory per dispatch, everything needed to reproduce
+4. **Flat naming, hierarchical dirs** — `find` and `ls` work naturally
+5. **JSON for machine data, Markdown for human data** — `jq` and `cat` work respectively
+6. **No database** — files only. SQLite if we ever need aggregation queries (later)
 
-### `/conduct` — Multi-Model Orchestration
-- Detect available providers (read `config/workers.yaml`)
-- Ask 5 intake questions (BLOCKING until answered)
-- Classify tasks by task class → lane → worker
-- Route work across planner, workers, and reviewers
-- Loop until goal is fully met
-- See `docs/instructions/task-classes.md` for routing contract
-- **v2**: Produces structured artifacts (explore.json, plan.json, TASK_SPEC.md) and gates autonomy by inferred risk level (low/medium/high). Build loop includes a mandatory verification gate and scope creep detection.
+---
 
-## Lane-Based Routing
-
-All operators use the same routing policy. Tasks are classified into task classes,
-each mapped to a default lane in `config/lanes.yaml`.
+## 2. Directory Tree
 
 ```
-task → task_class → lane → worker_pool + reviewer
+eval/
+  traces/
+    {YYYY-MM-DD}/
+      {task_class}-{HHMMSS}-{worker}/
+        trace.json          # Full dispatch trace (primary artifact, IMMUTABLE)
+        prompt.md           # Rendered prompt sent to worker
+        output.raw          # Raw worker output (JSONL or plain text)
+        output.parsed.json  # Parsed structured output
+        manifest.md         # Human-readable summary (DERIVED from trace.json)
+        review.json         # If reviewed, the review result
+        scoring.json        # If scored by eval, the eval result
+      summary.json          # Daily aggregate (DERIVED, regenerated)
+
+  results/
+    {YYYY-MM-DD}--{description}.json  # Eval run results (IMMUTABLE)
+
+  benchmarks/
+    ... (see eval_framework.md)
 ```
 
-Use the CLI resolver to check routing:
+### Naming Convention
+
+- **Trace directory**: `{task_class}-{HHMMSS}-{worker}` — e.g., `implement_small-143022-codex`
+- **Daily directory**: `2026-04-05`
+- **Summary files**: Always end in `.json` for machine, `.md` for human
+- **Immutable files**: `trace.json`, `prompt.md`, `output.raw`, `scoring.json`
+- **Derived files**: `manifest.md`, `output.parsed.json`, `summary.json`
+
+---
+
+## 3. Schemas
+
+### trace.json (Primary Artifact)
+
+```json
+{
+  "trace_id": "implement_small-20260405-143022-codex",
+  "schema_version": "1",
+  "timestamp": "2026-04-05T14:30:22Z",
+  "harness_version": "14.2",
+
+  "classification": {
+    "description": "Fix the auth bug in login.py",
+    "task_class": "implement_small",
+    "category": "coding",
+    "risk_level": "high",
+    "inferred_by": "infer_category + infer_risk"
+  },
+
+  "routing": {
+    "lane": "cheap",
+    "workers": ["codex", "gemini_cli", "glm_claude"],
+    "selected_worker": "codex",
+    "selection_reason": "first_available",
+    "review_with": "claude_code",
+    "fallback_lane": "balanced"
+  },
+
+  "prompt": {
+    "template": "dispatch_v1",
+    "word_count": 342,
+    "file_path": "prompt.md"
+  },
+
+  "execution": {
+    "worker": "codex",
+    "command": "unset OPENAI_API_KEY && codex exec --json ...",
+    "exit_code": 0,
+    "started": "2026-04-05T14:30:22Z",
+    "completed": "2026-04-05T14:32:45Z",
+    "duration_seconds": 143.2
+  },
+
+  "output": {
+    "raw_file": "output.raw",
+    "parsed_file": "output.parsed.json",
+    "errors": [],
+    "message_preview": "Fixed the auth bug by..."
+  },
+
+  "validation": {
+    "passed": true,
+    "acceptance_criteria_met": ["auth bug fixed", "tests pass"],
+    "acceptance_criteria_failed": []
+  },
+
+  "retry": {
+    "attempt": 1,
+    "previous_traces": [],
+    "escalated": false,
+    "escalation_reason": null
+  },
+
+  "cost": {
+    "estimated_tokens": null,
+    "estimated_cost_usd": 0,
+    "worker_cost_basis": "subscription"
+  },
+
+  "config_snapshot": {
+    "lanes_sha": "a0be591",
+    "workers_sha": "a0be591",
+    "models_sha": "a0be591"
+  }
+}
+```
+
+### prompt.md (Rendered Prompt)
+
+The actual prompt sent to the worker, verbatim. Markdown format, following the dispatch template.
+
+### output.raw (Raw Worker Output)
+
+Unmodified output from the worker CLI. JSONL for codex, JSON for gemini, plain text otherwise.
+
+### output.parsed.json (Parsed Output)
+
+```json
+{
+  "worker": "codex",
+  "messages": ["Fixed the auth bug by..."],
+  "errors": [],
+  "usage": {
+    "input_tokens": 4500,
+    "output_tokens": 1200
+  }
+}
+```
+
+### scoring.json (Eval Result, if scored)
+
+```json
+{
+  "trace_id": "implement_small-20260405-143022-codex",
+  "scored_at": "2026-04-05T15:00:00Z",
+  "metrics": {
+    "task_success": true,
+    "classification_correct": true,
+    "routing_correct": true,
+    "latency_seconds": 143.2,
+    "retry_count": 0,
+    "escalated": false,
+    "one_shot": true,
+    "attempt_count": 1
+  },
+  "human_rating": null,
+  "notes": null
+}
+```
+
+### summary.json (Daily Aggregate, DERIVED)
+
+```json
+{
+  "date": "2026-04-05",
+  "total_dispatches": 12,
+  "succeeded": 10,
+  "failed": 2,
+  "retry_rate": 0.167,
+  "escalation_rate": 0,
+  "avg_latency_seconds": 98.4,
+  "by_worker": {
+    "codex": {"dispatches": 7, "succeeded": 6, "avg_latency": 85.2},
+    "gemini_cli": {"dispatches": 3, "succeeded": 3, "avg_latency": 120.1},
+    "glm_claude": {"dispatches": 2, "succeeded": 1, "avg_latency": 110.5}
+  },
+  "by_task_class": {
+    "implement_small": {"dispatches": 8, "succeeded": 7},
+    "doc_draft": {"dispatches": 4, "succeeded": 3}
+  },
+  "by_lane": {
+    "cheap": {"dispatches": 10, "succeeded": 8},
+    "research": {"dispatches": 2, "succeeded": 2}
+  },
+  "generated_at": "2026-04-05T23:59:59Z",
+  "trace_ids": ["implement_small-143022-codex", "..."]
+}
+```
+
+---
+
+## 4. Example Trace Bundles
+
+### Successful Dispatch
+
+```
+eval/traces/2026-04-05/implement_small-143022-codex/
+  trace.json          # All metadata, exit_code: 0, validation.passed: true
+  prompt.md           # "Fix the auth bug in login.py..."
+  output.raw          # JSONL from codex
+  output.parsed.json  # {"messages": [...], "errors": []}
+  manifest.md         # "Status: OK, Duration: 143s, Worker: codex"
+  scoring.json        # {"metrics": {"task_success": true, ...}}
+```
+
+### Failed Dispatch (with Retry)
+
+```
+eval/traces/2026-04-05/implement_small-143500-gemini_cli/
+  trace.json          # exit_code: 1, retry.attempt: 1, errors: ["Timeout"]
+
+eval/traces/2026-04-05/implement_small-144200-codex/
+  trace.json          # exit_code: 0, retry.attempt: 2, previous_traces: ["...gemini_cli"]
+  prompt.md
+  output.raw
+  output.parsed.json
+  manifest.md
+  scoring.json
+```
+
+---
+
+## 5. How Traces Enable Optimization
+
+### Question: Which worker is best for coding tasks?
+
 ```bash
-python -m core.router.resolve --class implement_medium
+# Extract all coding task traces
+grep -rl '"category": "coding"' eval/traces/*/ | \
+  xargs jq -r '.execution.worker, .execution.duration_seconds, .output.errors' | \
+  paste - - - | \
+  sort | uniq -c | sort -rn
 ```
 
-## Subagent Roles
+### Question: What's the retry rate for each lane?
 
-| Role | Responsibility | Harness |
-|------|---------------|---------|
-| planner | Decomposition, task classification | claude_code |
-| researcher | Web search, documentation | argus + any |
-| implementer | Bounded code changes | lane-based |
-| reviewer | Diff review, quality gate | claude_code |
-| docs_writer | Draft documentation | lane-based |
+```bash
+for lane in cheap balanced premium research; do
+  echo "=== $lane ==="
+  grep -rl "\"lane\": \"$lane\"" eval/traces/*/ | \
+    xargs jq -r '.retry.attempt' | \
+    sort | uniq -c
+done
+```
 
-## Session End Protocol
+### Question: Which task classes fail most?
 
-1. `git status` — check for uncommitted changes
-2. Commit completed work
-3. `TaskUpdate` — mark tasks completed
-4. If corrections were given 2+ times: propose instruction update to `docs/instructions/learned/`
-5. Never auto-edit `CLAUDE.md` or rules without review
+```bash
+grep -rl '"validation": {"passed": false}' eval/traces/*/ | \
+  xargs jq -r '.classification.task_class' | \
+  sort | uniq -c | sort -rn
+```
 
-## Handoff
+### Question: Are prompts getting longer over time?
 
-Use `/handoff` before `/clear` or `/compact` to preserve context.
-Use `/restore` to resume from a handoff.
+```bash
+find eval/traces -name trace.json | \
+  xargs jq -r '.timestamp + " " + (.prompt.word_count | tostring)' | \
+  sort
+```
+
+All of these are `find`/`grep`/`jq` one-liners. No custom tools needed.
+
+---
+
+## 6. Config Snapshot Tracking
+
+Each trace records `config_snapshot` with git SHA of config files. This means:
+
+- You can always reproduce a trace by checking out the config SHA
+- You can group traces by config version to see the effect of a change
+- You can diff two config versions to understand what changed
+
+```bash
+# See all traces for a specific config version
+grep -rl '"lanes_sha": "a0be591"' eval/traces/*/
+```
+
+---
+
+## 7. Integration with Eval
+
+The eval runner (`scripts/eval.sh`) produces traces for end-to-end benchmarks. These traces go in the same directory structure, making them directly comparable to production dispatch traces.
+
+When running `--compare baseline`, the compare script:
+1. Groups traces by benchmark task ID
+2. Compares success, latency, retry count
+3. Flags regressions > 5%
+4. Produces a comparison report
+
+---
+
+## 8. Later Extensions (Not Now)
+
+- **Frontier tracking**: When we have enough traces, track Pareto frontier of (cost, success_rate) over time
+- **Candidate comparison**: Store traces from candidate harness versions alongside baseline
+- **Automatic scoring**: For classification/routing benchmarks, scoring is automatic. For e2e, still manual.
+- **SQLite aggregation**: If `find`/`jq` becomes too slow (hundreds of traces), migrate to SQLite with a read-only view
+````
+
+## File: docs/DELEGATION_MODEL.md
+````markdown
+# Delegation Model
+
+## Overview
+
+The oneshot delegation harness enforces a separation between **planning** and **implementation**:
+
+- **Claude Code** is the **planner/reviewer**. It writes task specs, reviews results, and decides next steps.
+- **External workers** are the **implementers**. They receive bounded task specs and produce diffs.
+
+This is not a preference — it's a structural constraint enforced by git worktrees.
+
+## Why Mechanical Enforcement
+
+Prompt-only enforcement ("please delegate, don't implement") fails because LLMs default to doing the work themselves. The worktree boundary makes it impossible to cheat:
+
+- Workers run in `../oneshot-worktrees/<id>` on branch `worker/<id>`.
+- The main working tree is never modified by a worker.
+- Claude Code reviews the diff, not the files.
+
+Even if Claude "helpfully" writes code for the worker, the runner still operates in a separate directory. The worker's output is what gets reviewed.
+
+## Dispatch Lifecycle
+
+```
+1. Claude writes a bounded task spec
+2. ./bin/oneshot dispatch --lane <lane> --task-file <spec>
+   → Creates task dir, worktree, renders worker.md
+   → Resolves a runner template and executes it in the worktree
+   → Captures command metadata and stdout/stderr in worker.log
+3. Worker executes in the worktree on the task branch
+4. ./bin/oneshot collect <id>
+   → Gathers diff.patch, result.md, test.log
+5. ./bin/oneshot review <id>
+   → Claude reads the review bundle
+6. Verdict: accept / reject / escalate / follow-up
+```
+
+## When to Use Each Lane
+
+| Lane | Use when |
+|------|----------|
+| `cheap_fast` | Lint fixes, formatting, trivial docstrings, simple test additions |
+| `cheap_summary` | Summaries, data extraction, low-risk transforms |
+| `routine_coder` | **Default.** Normal bounded implementation and tests. |
+| `strong_reasoning` | Hard refactors, cross-file changes, ambiguous failures |
+| `premium_reasoning` | Escalation only. Failed twice, or design-sensitive. |
+
+## When Claude Implements Inline
+
+These are the only exceptions to the dispatch-first rule:
+
+1. **Pure planning/review/research** — no code changes.
+2. **User override** — "just do it inline" / "skip dispatch".
+3. **Harness bootstrap** — changes to `oneshot_cli/`, `.oneshot/config/`, `.claude/skills/`, `1shot/`, enforcement rule, harness docs.
+4. **Minor review fixes** — typo in `result.md`, status updates. Not rewriting worker code.
+
+## Cost Philosophy
+
+Claude Code sessions are expensive. External workers (ZAI, OpenCode Go) are cheap or free. The delegation model exists to:
+
+- Minimize tokens spent on mechanical implementation work
+- Reserve Claude for planning, review, and complex decisions
+- Make delegation the path of least resistance
+
+The `premium_reasoning` lane exists as an escape hatch, not a default. If a task reaches premium, something went wrong in the routing or the spec.
+````
+
+## File: docs/WORKTREE_FLOW.md
+````markdown
+# Worktree Flow
+
+## Why Worktrees
+
+Git worktrees provide **filesystem-level isolation** between the planner (Claude Code) and workers:
+
+- Each dispatched task gets its own directory at `../oneshot-worktrees/<task-id>/`
+- Workers cannot modify the main working tree — they're on a separate branch in a separate directory
+- `git status` in the main tree is unaffected by worker activity
+- No merge conflicts — diffs are collected and reviewed, not auto-merged
+
+## Path Layout
+
+```
+~/github/oneshot/                    ← main working tree (planner)
+  .oneshot/tasks/<task-id>/          ← task metadata (task.md, status.json, etc.)
+
+~/github/oneshot-worktrees/          ← worker sandbox (outside repo)
+  <task-id>/                         ← full repo checkout on worker/<task-id> branch
+```
+
+`oneshot-worktrees/` lives **outside** the repo at `~/github/`, so it's invisible to `git status` in the main tree.
+
+## Branch Naming
+
+- Worker branches: `worker/<task-id>` (e.g., `worker/routine_coder-20260427-185805-dsl0`)
+- Created from `HEAD` of the main working tree at dispatch time
+- Deleted on `oneshot worktree remove <task-id>`
+
+## Task ID Format
+
+`<lane>-<YYYYMMDD-HHMMSS>-<rand4>`
+
+- Sortable by date
+- Lane prefix for quick visual filtering
+- 4-char random suffix for collision resistance
+
+## Lifecycle
+
+### 1. Create (dispatch)
+
+```
+./bin/oneshot dispatch --lane routine_coder --task "fix the auth bug"
+```
+
+- Pre-flight: checks `git status --porcelain` is empty (unless `--allow-dirty`)
+- Creates `../oneshot-worktrees/<id>` via `git worktree add`
+- Writes `task.md`, `status.json`, `worker.md`, `worker.log`
+- Resolves the selected runner template and executes it immediately in the worktree
+- Branch: `worker/<id>` from current HEAD
+
+### 2. Work (worker)
+
+- Worker operates in the worktree directory
+- Makes commits on the `worker/<id>` branch
+- Main tree is unaffected
+
+### 3. Collect
+
+```
+./bin/oneshot collect <id>
+```
+
+- Reads `HEAD` from the worktree
+- Computes `git diff <base_sha>..<head_sha>`
+- Writes `diff.patch`, `result.md`, `test.log`
+- Updates `status.json` to `collected`
+
+### 4. Review
+
+```
+./bin/oneshot review <id>
+```
+
+- Prints absolute paths to the review bundle
+- Claude Code reads `task.md`, `result.md`, `diff.patch`, `test.log`
+- Verdict: accept / reject / escalate
+
+### 5. Cleanup
+
+```
+./bin/oneshot worktree remove <id>
+```
+
+- Removes the worktree directory
+- Deletes the `worker/<id>` branch
+- Task metadata in `.oneshot/tasks/` is preserved
+
+## Dirty Tree Refusal
+
+If the main working tree has uncommitted changes, dispatch fails with a clear error:
+
+```
+Error: main working tree is dirty; use --allow-dirty to override
+```
+
+This prevents dispatching from an inconsistent state. Use `--allow-dirty` only when you're sure the uncommitted changes are unrelated to the task.
+
+## Execution Note
+
+Dispatch is a live runner, not a dry-run. The worker command is executed immediately in the worktree and `worker.log` captures the execution transcript, including the exit code and stdout/stderr.
+
+If you want to inspect or reproduce the run manually, use the task's recorded worktree path and branch from `status.json`.
 ````
 
 ## File: eval/scripts/run_config_check.py
@@ -27620,775 +29688,152 @@ args = parser.parse_args()
 result = run_config_check()
 ````
 
-## File: scripts/check-backup.sh
+## File: hooks/janitor/record.sh
 ````bash
-set -euo pipefail
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/secrets-helper.sh"
-VAULT_DIR="$(cd "$SCRIPT_DIR/../secrets" && pwd)"
-SNAPSHOT_FILE="$VAULT_DIR/backup-snapshot.env.encrypted"
-ISSUES=0
-TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-HOSTNAME=$(hostname)
-AGE_PUBKEY=$(age-keygen -y ~/.age/key.txt 2>/dev/null || echo "missing")
-VAULT_LIST=$(secrets_list 2>/dev/null | grep -v "^===" | grep -v "^$" | sed 's/^  //' || echo "unavailable")
-SKILLS=""
-for s in ~/.claude/skills/*/; do
-  sname=$(basename "$s")
-  [[ "$sname" == "_shared" || "$sname" == "INDEX.md" || "$sname" == "SKILLS_REFERENCE.md" ]] && continue
-  SKILLS="${SKILLS}${sname} "
-done
-SKILLS=$(echo "$SKILLS" | xargs)
-if git rev-parse --git-dir >/dev/null 2>&1; then
-  GIT_BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
-  GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-  GIT_DIRTY=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
-  if [[ "$GIT_DIRTY" == "0" ]]; then
-    GIT_STATUS="clean"
-  else
-    GIT_STATUS="$GIT_DIRTY uncommitted"
-  fi
-else
-  GIT_BRANCH="not a git repo"
-  GIT_COMMIT="unknown"
-  GIT_STATUS="unknown"
-fi
-MACHINES_OK=""
-for machine in oci-dev homelab macmini; do
-  if ssh -o ConnectTimeout=2 -o BatchMode=yes "$machine" true 2>/dev/null; then
-    MACHINES_OK="${MACHINES_OK}${machine}:ok "
-  else
-    MACHINES_OK="${MACHINES_OK}${machine}:unreachable "
-  fi
-done
-VAULT_COUNT=$(find "$VAULT_DIR" -name "*.encrypted" -maxdepth 1 2>/dev/null | wc -l | tr -d ' ')
-WORK_DIR=$(mktemp -d)
-trap 'rm -rf "$WORK_DIR"' EXIT
-AGE_RECIPIENT=$(grep "age:" .sops.yaml 2>/dev/null | head -1 | awk '{print $3}' || echo "")
-if [[ -z "$AGE_RECIPIENT" ]]; then
-  AGE_RECIPIENT="$AGE_PUBKEY"
-fi
-cat > "$WORK_DIR/.sops.yaml" << EOF
-creation_rules:
-  - age: ${AGE_RECIPIENT}
-EOF
-{
-  cat << HEADER
-HEADER
-  printf '## Age Identity\nPUBLIC_KEY=%s\n\n' "$AGE_PUBKEY"
-  printf '## Machines\n'
-  printf '# oci-dev|ubuntu|100.126.13.70|Primary dev, services, Claude Code\n'
-  printf '# homelab|khamel83|100.112.130.100|Docker, 26TB storage\n'
-  printf '# macmini|macmini|100.113.216.27|Apple Silicon GPU\n'
-  printf '\n## Machine Status\n# %s\n' "$MACHINES_OK"
-  printf '## Vault (%s encrypted files)\n' "$VAULT_COUNT"
-  echo "$VAULT_LIST" | while IFS= read -r line; do
-    printf '# %s\n' "$line"
-  done
-  printf '## Active Skills\n# %s\n' "$SKILLS"
-  printf '## Git State\nBRANCH=%s\nCOMMIT=%s\nSTATUS=%s\n' "$GIT_BRANCH" "$GIT_COMMIT" "$GIT_STATUS"
-} > "$WORK_DIR/snapshot.env"
-if ! command -v sops >/dev/null 2>&1; then
-  echo "✓ Backup skipped (sops not installed)"
-  exit 0
-fi
-cd "$SCRIPT_DIR/.."
-if (cd "$WORK_DIR" && SOPS_AGE_KEY_FILE="$HOME/.age/key.txt" sops -e \
-    --input-type dotenv --output-type dotenv snapshot.env > output.encrypted 2>/dev/null) && \
-   [[ -f "$WORK_DIR/output.encrypted" && -s "$WORK_DIR/output.encrypted" ]]; then
-  mv "$WORK_DIR/output.encrypted" "$SNAPSHOT_FILE"
-  chmod 644 "$SNAPSHOT_FILE"
-  if git diff --quiet "$SNAPSHOT_FILE" 2>/dev/null; then
-    echo "✓ Backup snapshot (unchanged)"
-  else
-    git add "$SNAPSHOT_FILE" >/dev/null 2>&1
-    if git commit -m "chore: daily backup snapshot $(date +%Y-%m-%d)" >/dev/null 2>&1; then
-      echo "✓ Backup snapshot (committed)"
-    else
-      echo "✓ Backup snapshot (updated)"
-    fi
-  fi
-else
-  echo "⚠️  Backup snapshot failed (sops encryption error)"
-  ISSUES=1
-fi
-exit $ISSUES
-````
-
-## File: scripts/secrets
-````
-#!/usr/bin/env bash
-# secrets — Access the oneshot encrypted vault from any project or Claude session
-#
-# USAGE:
-#   secrets get KEY                        Get a single key (e.g. secrets get TAVILY_API_KEY)
-#   secrets set NAME KEY=value [--commit]  Add/update a key
-#   secrets init NAME                      Write .env from vault
-#   secrets list                           List all vault files and their keys
-#   secrets decrypt NAME                   Decrypt a full file to stdout
-#
-# Vault: ~/github/oneshot/secrets/
-# Encryption: SOPS + Age (key at ~/.age/key.txt)
-
-exec bash ~/github/oneshot/scripts/secrets-helper.sh "$@"
-````
-
-## File: .claude/rules/codex.md
-````markdown
-# Codex CLI — Multi-Machine Setup & Usage
-
-> **Canonical location**: `~/.claude/rules/codex.md` (global, loads in every project)
-> This copy lives in oneshot for version control. Keep them in sync.
-
-Codex (OpenAI's agentic coding CLI) runs on all three machines in this setup.
-This guide documents what works, what doesn't, and why — learned the hard way on 2026-03-30.
-
----
-
-## TL;DR — The Working Command
-
-```bash
-# DO THIS — not --full-auto
-unset OPENAI_API_KEY
-codex exec --sandbox danger-full-access "your prompt here"
-```
-
-**From any machine, from any repo that's in `~/.codex/config.toml` as trusted.**
-
----
-
-## Machine Status
-
-| Machine | Works | Auth |
-|---------|-------|------|
-| oci-dev (100.126.13.70) | ✓ | `~/.codex/auth.json` |
-| homelab (100.112.130.100) | ✓ | `~/.codex/auth.json` |
-| macmini (100.113.216.27) | ✓ | `~/.codex/auth.json` |
-
----
-
-## Auth: ChatGPT Plus OAuth (NOT API key)
-
-Codex uses your **ChatGPT Plus login**, not an OpenAI API key.
-
-- Auth is stored in `~/.codex/auth.json`
-- Obtained via `codex login` (opens browser)
-- The token auto-refreshes via `refresh_token` — it stays valid
-
-**Critical:** If `OPENAI_API_KEY` is set in the environment, it overrides the OAuth token
-and hits the paid API instead. That account has no credits → 404/429 errors.
-Always `unset OPENAI_API_KEY` before running codex.
-
-### If auth.json is missing or broken
-
-```bash
-# Option 1: Device code auth (best for remote/headless machines)
-codex login --device-auth
-# Opens https://auth.openai.com/codex/device — enter the one-time code in your browser
-# No browser needed on the server itself
-
-# Option 2: Copy from a working machine (fastest if available)
-scp homelab:/home/khamel83/.codex/auth.json ~/.codex/auth.json
-```
-
-### If the subscription lapses
-
-The token encodes subscription status. After renewing ChatGPT Plus at chat.openai.com,
-run `codex login` again to get a fresh token — the old one won't get access back automatically.
-
----
-
-## The Sandbox Problem: Why `--full-auto` Breaks Here
-
-`--full-auto` is shorthand for `--sandbox workspace-write`, which uses **bwrap** (bubblewrap)
-for sandboxing. On these Linux servers (OCI + homelab), bwrap fails:
-
-```
-bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
-```
-
-This is a kernel/container restriction — bwrap can't create a loopback interface.
-
-**Fix:** Use `--sandbox danger-full-access` instead. This skips bwrap entirely.
-These machines are already on Tailscale + behind OCI security groups, so the blast
-radius of a rogue shell command is limited.
-
-```bash
-# BROKEN on these machines:
-codex exec --full-auto "..."
-
-# WORKS:
-codex exec --sandbox danger-full-access "..."
-```
-
----
-
-## Config (`~/.codex/config.toml`)
-
-```toml
-model = "gpt-5.4"
-model_reasoning_effort = "medium"
-personality = "pragmatic"
-approvals_reviewer = "user"
-
-# DO NOT set openai_base_url — the default is correct
-# Setting it to "https://api.openai.com" (without /v1) causes 404s on the WebSocket
-# Setting it to "https://api.openai.com/v1" causes double-path issues on some calls
-# Leave it unset and let codex use its built-in default
-
-[projects."/home/ubuntu/github/atlas"]
-trust_level = "trusted"
-# ... other trusted projects
-```
-
----
-
-## Running Across Machines
-
-From oci-dev, you can run codex on remote machines via SSH:
-
-```bash
-# Run codex on homelab
-ssh homelab "cd ~/github/myproject && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'your task'"
-
-# Run on macmini
-ssh macmini "cd ~/github/myproject && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'your task'"
-```
-
-Or Claude Code can dispatch tasks to all three in parallel using Bash with `&` + `wait`.
-
----
-
-## Debugging Checklist
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `404 Not Found` on `wss://.../responses` | `OPENAI_API_KEY` is set with no credits | `unset OPENAI_API_KEY` |
-| `401 Missing bearer` | `auth.json` is missing | `codex login --device-auth` or copy from homelab |
-| `401 Missing scopes: api.responses.write` | Stale/incomplete token | `codex login --device-auth` or copy from working machine |
-| `bwrap: loopback: Failed RTM_NEWADDR` | bwrap blocked by kernel | Use `--sandbox danger-full-access` |
-| `insufficient_quota` | Using API key account (no credits) | `unset OPENAI_API_KEY` |
-| Subscription expired 404 | ChatGPT Plus lapsed | Renew at chat.openai.com + `codex login --device-auth` |
-
----
-
-## History / Why This Exists
-
-This was debugged on 2026-03-30 in a Claude Code session. The problems encountered:
-1. `OPENAI_API_KEY` in vault was set on PATH, sending requests to the no-credits API account
-2. `openai_base_url = "https://api.openai.com"` was manually added to config — wrong (missing `/v1`)
-3. A `codex logout` during debugging deleted auth.json, breaking everything
-4. `--full-auto` (bwrap sandbox) doesn't work on OCI/homelab Linux kernels
-5. ChatGPT Plus subscription had lapsed (Feb 14) — renewed March 30
-
-The fix that unlocked everything: copy `auth.json` from homelab, use `--sandbox danger-full-access`.
-````
-
-## File: .claude/skills/short/SKILL.md
-````markdown
----
-name: short
-description: Quick iterations on existing projects. Load context, ask what's next, execute in burn-down mode.
----
-
-# /short — Quick Iteration Operator
-
-Fast operator for existing projects. Loads context, asks what you're working on, executes.
-Codex provides advisory second opinions — never a gate, never a blocker.
-
-## Usage
-
-```
-/short
-/short <scope>
-```
-
-## Behavior
-
-When invoked:
-
-1. **Load Context**
-   - Read recent git commits: `git log --oneline -5`
-   - Check TaskList for pending/in_progress tasks (if any exist)
-   - Read `1shot/DECISIONS.md`, `1shot/BLOCKERS.md` if present
-   - Read `1shot/LLM-OVERVIEW.md` if present (quick project orientation)
-
-2. **Ask What's Next**
-   ```
-   "What are you working on?"
-   ```
-
-3. **Pre-Flight Review** (if the user describes a non-trivial change)
-   - Check providers: `command -v codex >/dev/null 2>&1 && echo "codex: yes"`
-   - If codex available, dispatch a quick adversarial take before starting
-   - Follow dispatch protocol (see `~/.claude/skills/_shared/dispatch.md`)
-   - This is advisory, not a gate. Don't stall on it.
-
-4. **Docs Check** (if the task uses any external library, API, or tool)
-   - Check local cache: `cat ~/github/docs-cache/docs/cache/.index.md`
-   - If the tool is missing → run `/doc <name> <url>` to cache it first
-   - Use cached docs as source of truth — do NOT rely on training data for syntax
-   - If no external tools involved: skip this step
-
-5. **Skill Discovery** (if the task is specialized)
-   - Check `1shot/skills/` — already pulled skills for this project
-   - If the task involves a specific domain, tool, or API not covered by core skills:
-     ```bash
-     ./scripts/skillsmp-search.sh "<task type>" --install
-     ```
-   - General tasks (write tests, fix bug, refactor): skip search, proceed
-   - Specialized domains (security, blockchain, ML, infra, specific parsers): search
-
-6. **Methodology Selection** (automatic)
-   Inspect the task description. Apply the right protocol automatically:
-   - **Bug fix** (fix, bug, broken, error, crash, failing, wrong, unexpected, regression,
-     investigate, troubleshoot, not working, incorrect) → follow the `/debug` protocol:
-     investigate → analyze → hypothesize → fix. Phases 1-3 are read-only.
-   - **New feature / implementation** (implement, add, create, build, new endpoint, new function,
-     new behavior) → follow the `/tdd` protocol: RED-GREEN-REFACTOR. No production code
-     without a failing test shown first.
-   - **Doc edit, config change, refactor**: no special methodology needed, execute directly.
-
-7. **Execute in Burn-Down Mode**
-   - Complete one task fully before starting next
-   - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
-   - No "pending review" — either done or blocked
-   - **Do NOT create TaskList items for every little thing** — just do the work
-   - After each significant change, dispatch a review via the dispatch protocol
-     (see `~/.claude/skills/_shared/dispatch.md`)
-   - If codex unavailable → Claude handles review inline
-
-8. **Show Summary on Completion**
-   ```
-   📊 Session Summary
-   ├─ Tasks completed: X
-   ├─ Files changed: Y
-   ├─ Codex reviews: N (issues found: M)
-   ├─ Skills used: [list or "core only"]
-   └─ Next: [next task or "all done"]
-   ```
-
-## Provider Routing
-
-See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol.
-See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
-
-**Short-specific routing**: Short dispatches workers for advisory reviews (pre-flight + post-completion).
-Uses category-based worker selection — the resolver returns workers ordered by category preference.
-Claude handles everything else. If workers are unavailable, zero degradation.
-
-## Scope
-
-Optional scope limits work to matching files:
-
-```
-/short src/auth/*.ts    # Only work on auth files
-```
-
-## `1shot/` Convention
-
-Logs and state live in `1shot/`, not at the project root:
-- `1shot/DECISIONS.md` — decision log
-- `1shot/BLOCKERS.md` — blocked items
-- `1shot/skills/` — project-local SkillsMP skills
-
-Only `AGENTS.md` and `CLAUDE.md` belong at the root.
-
-## Decision Defaults (Don't Ask)
-
-| Ambiguity | Default |
-|-----------|---------|
-| Multiple implementations | Simplest |
-| Naming | Follow existing pattern |
-| Refactor opportunity | Skip unless blocking |
-| Error handling | Match surrounding code |
-| SkillsMP search? | Specialized domain → yes; general task → no |
-| Codex review? | Always run if available (advisory only) |
-
-When truly ambiguous, pick option A, note in `1shot/DECISIONS.md`.
-
-## Auto-Approved Actions
-
-- Reading any file
-- Writing to scope-matched files
-- Running tests and linters
-- Creating/updating any file under `1shot/`
-- Running `./scripts/skillsmp-search.sh`
-- Calling Codex CLI via bash
-- Git commit (not push)
-
-## Requires Confirmation
-
-- Destructive operations (rm -rf, DROP TABLE)
-- Git push to shared branches
-- External API calls that cost money
-- Deploying to production
-````
-
-## File: .claude/skills/INDEX.md
-````markdown
-# ONE_SHOT v13 — Operator Framework
-
-**13 skills + 1 external (humanizer).** Three operators. Nine utilities.
-
----
-
-## Operators
-
-| Skill | Purpose |
-|-------|---------|
-| `/short` | Quick iterations on existing projects |
-| `/full` | New projects, refactors, complex work |
-| `/conduct` | Multi-model PMO orchestrator — asks questions first, routes across Claude + Codex + Gemini, loops until done |
-
-### /short — Quick Iteration
-
-Fast operator for existing work:
-- Loads recent context (git log, tasks, decisions)
-- Asks: "What are you working on?"
-- Discovers relevant skills on demand
-- Executes in burn-down mode
-- Shows delegation summary on completion
-
-### /full — Structured Work
-
-Full operator for complex tasks:
-- Creates IMPLEMENTATION_CONTEXT.md
-- Structured intake and discovery
-- Phase-based planning with milestones
-- Skill discovery via SkillsMP
-- Execution with context checkpoints
-- Completion summary
-
----
-
-## Utility Skills
-
-| Skill | Purpose |
-|-------|---------|
-| `/handoff` | Save context before /clear |
-| `/restore` | Resume from handoff |
-| `/research` | Background research mode |
-| `/doc` | Cache external documentation |
-| `/freesearch` | Zero-token web search (Exa) |
-| `/vision` | Image/website visual analysis |
-| `/secrets` | SOPS/Age secrets management |
-| `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
-| `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
-
----
-
-## Architecture
-
-```
-Menu-based (old):
-25+ slash commands → user picks one → executes
-
-Operator-based (v13):
-/short or /full → discover skills → execute → summary
-```
-
-**Why?** Reduced complexity, fewer commands to maintain, skill discovery happens when needed.
-
----
-
-## Where Skills Live
-
-```
-~/.claude/skills/<name>/SKILL.md  → Personal skills (available in all projects)
-```
-
-### Required Format
-
-Each SKILL.md MUST have this frontmatter:
-
-```yaml
----
-name: skill-name
-description: What it does and WHEN to use it. Include trigger keywords.
----
-```
-
-**Critical**: The `name:` field is REQUIRED. Without it, the skill won't be discovered.
-
-### Example
-
-```
-~/.claude/skills/
-├── short/
-│   └── SKILL.md
-├── full/
-│   └── SKILL.md
-├── handoff/
-│   └── SKILL.md
-└── ...
-```
-
-### Why Commands Didn't Work
-
-Claude Code v2.1+ uses the **skills** system, not `~/.claude/commands/`.
-
-- Skills are **model-invoked** — Claude decides when to use them based on description
-- Commands were **user-invoked** — required explicit `/command` typing
-
-The `~/.claude/commands/` directory is deprecated. Use `~/.claude/skills/` instead.
-
----
-
-## Full Spec
-
-See `AGENTS.md` for complete operator protocol, decision defaults, and auto-approval rules.
-````
-
-## File: 1shot/PROJECT.md
-````markdown
-# Project: Document Intelligence Mode for Janitor
-
-## Goal
-Add a document/non-code project type to janitor that provides actionable intelligence for repos containing documents, data, markdown, PDFs, emails, etc. — not just Python code.
-
-## Acceptance Criteria
-- Janitor auto-detects project type (code vs document) based on repo contents
-- Code projects continue running all existing signals unchanged
-- Document projects run document-specific signals instead of code signals
-- CLAUDE.local.md and onboarding.md show actionable, file-referenced intelligence for both types
-- Each file processed once, only re-processed when it changes (staleness gating)
-- OpenCode/AGENTS.md templates updated for document project type
-- Cron job works for both project types
-
-## Scope
-In:
-- Research best practices for non-code project intelligence
-- New document signal functions (staleness, orphans, cross-references, size outliers, etc.)
-- Updated onboarding prompt for document projects
-- Project type auto-detection
-- Full pipeline: signals → onboarding → CLAUDE.local.md → hooks
-
-Out:
-- Multi-language code support (still Python-only for code signals)
-- UI changes
-- New hooks
-- Processing binary files (PDFs, images) — only metadata and filenames
-
-## Riskiest Parts
-- What signals actually matter for document repos
-- Prompt quality for non-code onboarding summaries
-- Performance on large document repos (mitigated by staleness gating)
-
-## Constraints
-- Must not break existing code project signals
-- Must follow existing patterns in jobs.py
-- Zero additional API cost — pure-compute signals only
-````
-
-## File: 1shot/STATE.md
-````markdown
-# Conduct State
-
-Phase: complete
-Started: 2026-04-08
-Tasks: 17/17 completed
-Loop: 1
-````
-
-## File: config/providers.yaml
-````yaml
-providers:
-  anthropic:
-    env: ANTHROPIC_API_KEY
-    description: Claude API
-  openrouter:
-    env: OPENROUTER_API_KEY
-    description: Multi-model routing (MiniMax, StepFun, Xiaomi, Gemini, etc.)
-  openai:
-    env: OPENAI_API_KEY
-    description: Codex CLI (ChatGPT Plus OAuth)
-  gemini:
-    env: GEMINI_API_KEY
-    description: Gemini CLI
-  argus:
-    env: ARGUS_BASE_URL
-    description: Search broker (SearXNG, Brave, Serper, Tavily, Exa)
-  zai:
-    env: ZAI_API_KEY
-    base_url: https://api.z.ai/api/coding/paas/v4
-    description: ZAI GLM models (GLM-5.1, GLM-4.7, GLM-4.5-Air) — OpenAI-compatible endpoint, free on GLM Coding Plan
-  claw_code:
-    env: ZAI_API_KEY
-    description: Claw Code Agent — routes GLM models to ZAI, others to OpenRouter
-````
-
-## File: core/janitor/hooks/context.sh
-````bash
+input=$(cat)
+tool_name="${input#*\"tool_name\":\"}"
+tool_name="${tool_name%%\"*}"
+case "$tool_name" in
+WebFetch | WebSearch | mcp__* | TaskCreate | TaskUpdate | TaskList | TaskGet | CronCreate | CronDelete | CronList | AskUserQuestion)
+	exit 0
+	;;
+esac
 project_dir="$PWD"
 while [ "$project_dir" != "/" ]; do
-  [ -d "$project_dir/.git" ] && break
-  project_dir=$(dirname "$project_dir")
+	[ -d "$project_dir/.git" ] && break
+	project_dir=$(dirname "$project_dir")
 done
 [ "$project_dir" = "/" ] && exit 0
-ONESHOT_DIR="$HOME/github/oneshot"
-result=$(python3 -c "
-import sys, os, json
-sys.path.insert(0, '$ONESHOT_DIR')
-try:
-    from core.janitor.jobs import run_session_start
-    text = run_session_start('$project_dir')
-    if text:
-        print(json.dumps({'hookSpecificOutput': {'additionalContext': 'JANITOR_CONTEXT:' + text}}))
-except Exception:
-    pass
-" 2>/dev/null)
-if [ -n "$result" ]; then
-  echo "$result"
+janitor_dir="$project_dir/.janitor"
+events_file="$janitor_dir/events.jsonl"
+mkdir -p "$janitor_dir"
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+session_id="${CLAUDE_CODE_SESSION_ID:-$(date +%Y%m%d-%H%M%S)}"
+json_get() {
+	python3 -c "
+import json, sys
+d = json.loads(sys.stdin.read())
+val = str(d.get('$1', {}).get('$2', ''))[:200]
+print(json.dumps(val)[1:-1])
+" <<<"$input" 2>/dev/null || true
+}
+file_path=""
+case "$tool_name" in
+Read | Write | Edit)
+	file_path=$(json_get tool_input file_path)
+	;;
+esac
+has_failed_output=0
+if echo "$input" | tr -d "\\" | grep -qE '"exit_code"\s*:\s*[1-9]'; then
+	has_failed_output=1
 fi
+# Build event based on tool type
+case "$tool_name" in
+Glob | Grep)
+	query=$(json_get tool_input pattern)
+	[ -z "$query" ] && query=$(json_get tool_input glob_pattern)
+	[ -z "$query" ] && query=$(json_get tool_input query)
+	query="${query:0:100}"
+	# Check for no results in the raw input
+	is_empty=0
+	case "$input" in
+	*"\"tool_output\":\"\""* | *"\"tool_output\":\"\[\"]"*)
+		is_empty=1
+		;;
+	esac
+	if echo "$input" | grep -qE '"tool_output":"[^"]*([Nn]o (matches|results)|0 results|found 0|empty)'; then
+		is_empty=1
+	fi
+	if [ "$is_empty" -eq 1 ] && [ -n "$query" ]; then
+		printf '{"ts":"%s","session":"%s","type":"dead_end","content":"No results for: %s","meta":{"tool":"%s","auto":true},"files":[]}\n' \
+			"$timestamp" "$session_id" "$query" "$tool_name" >>"$events_file"
+	fi
+	exit 0
+	;;
+Read)
+	[ -z "$file_path" ] && exit 0
+	printf '{"ts":"%s","session":"%s","type":"file_read","content":"Read %s","meta":{"tool":"Read","auto":true},"files":["%s"]}\n' \
+		"$timestamp" "$session_id" "$file_path" "$file_path" >>"$events_file"
+	;;
+Write)
+	[ -z "$file_path" ] && exit 0
+	printf '{"ts":"%s","session":"%s","type":"file_written","content":"Created %s","meta":{"tool":"Write","auto":true},"files":["%s"]}\n' \
+		"$timestamp" "$session_id" "$file_path" "$file_path" >>"$events_file"
+	;;
+Edit)
+	[ -z "$file_path" ] && exit 0
+	printf '{"ts":"%s","session":"%s","type":"file_written","content":"Edited %s","meta":{"tool":"Edit","auto":true},"files":["%s"]}\n' \
+		"$timestamp" "$session_id" "$file_path" "$file_path" >>"$events_file"
+	;;
+Bash)
+	cmd=$(json_get tool_input command)
+	cmd="${cmd:0:200}"
+	if [ "$has_failed_output" -eq 1 ]; then
+		printf '{"ts":"%s","session":"%s","type":"dead_end","content":"Failed: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
+			"$timestamp" "$session_id" "${cmd:0:100}" >>"$events_file"
+	fi
+	case "$cmd" in
+	git\ commit* | git\ push*)
+		printf '{"ts":"%s","session":"%s","type":"commit","content":"Git: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
+			"$timestamp" "$session_id" "${cmd:0:100}" >>"$events_file"
+		;;
+	git\ *)
+		exit 0
+		;;
+	*)
+		printf '{"ts":"%s","session":"%s","type":"action_taken","content":"Ran: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
+			"$timestamp" "$session_id" "${cmd:0:100}" >>"$events_file"
+		;;
+	esac
+	;;
+*)
+	exit 0
+	;;
+esac
 exit 0
 ````
 
-## File: core/janitor/__init__.py
-````python
-__all__ = [
+## File: hooks/janitor/session-end.sh
+````bash
+project_dir="$PWD"
+while [ "$project_dir" != "/" ]; do
+	[ -d "$project_dir/.git" ] && break
+	project_dir=$(dirname "$project_dir")
+done
+[ "$project_dir" = "/" ] && exit 0
+janitor_dir="$project_dir/.janitor"
+events_file="$janitor_dir/events.jsonl"
+[ ! -f "$events_file" ] && exit 0
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+session_id="${CLAUDE_CODE_SESSION_ID:-unknown}"
+printf '{"ts":"%s","session":"%s","type":"session_end","content":"Session ended","meta":{"auto":true},"files":[]}\n' \
+	"$timestamp" "$session_id" >>"$events_file"
+ONESHOT_DIR=""
+for candidate in "$HOME/github/oneshot" "$HOME/oneshot" "$HOME/projects/oneshot"; do
+	[ -d "$candidate/core/janitor" ] && {
+		ONESHOT_DIR="$candidate"
+		break
+	}
+done
+[ -z "$ONESHOT_DIR" ] && exit 0
+openrouter_api_key="$(secrets get OPENROUTER_API_KEY 2>/dev/null || true)"
+export OPENROUTER_API_KEY="$openrouter_api_key"
+python3 -c "
+import sys, os
+sys.path.insert(0, '$ONESHOT_DIR')
+try:
+    from core.janitor.jobs import run_session_end
+    run_session_end('$project_dir')
+except Exception:
+    pass
+" &
+exit 0
 ````
 
-## File: core/janitor/recorder.py
+## File: oneshot_cli/dispatch_cmd.py
 ````python
-def _project_dir() -> Path
-⋮----
-cwd = Path(os.getcwd())
-⋮----
-def _janitor_dir(project_dir: Path | None = None) -> Path
-⋮----
-d = Path(project_dir) / ".janitor" if project_dir else _project_dir() / ".janitor"
-⋮----
-EVENT_TYPES = [
-class SessionRecorder
-⋮----
-def __init__(self, project_dir: Optional[str] = None)
-⋮----
-@property
-    def session_id(self) -> str
-⋮----
-@property
-    def events_path(self) -> Path
-⋮----
-@property
-    def janitor_dir(self) -> Path
-⋮----
-event = {
-⋮----
-def record_user_request(self, what: str)
-def record_action(self, what: str, tool: str = "", files: list[str] | None = None)
-def record_file_read(self, path: str)
-def record_file_written(self, path: str, action: str = "edited")
-def record_decision(self, decision: str, alternatives: list[str] | None = None)
-def record_blocker(self, what: str, reason: str = "")
-def record_discovery(self, what: str)
-def record_commit(self, message: str, files: list[str] | None = None)
-def record_error(self, what: str, context: str = "")
-def record_summary(self, summary: str, source: str = "janitor")
-def get_recent_events(self, n: int = 20) -> list[dict]
-⋮----
-r = subprocess.run(
-⋮----
-events = []
-⋮----
-line = line.strip()
-⋮----
-def get_events_by_type(self, event_type: str, limit: int = 50) -> list[dict]
-⋮----
-recent = self.get_recent_events(min(limit * 3, 500))
-⋮----
-def get_events_by_session(self, session_id: str) -> list[dict]
-def get_events_since(self, cutoff_iso: str) -> list[dict]
-⋮----
-"""Get events with timestamp >= cutoff_iso."""
-⋮----
-cutoff = cutoff_iso[:19]
-⋮----
-e = json.loads(line)
-ts = e.get("ts", "")[:19]
-⋮----
-def get_decisions(self) -> list[dict]
-def get_blockers(self) -> list[dict]
-def get_files_touched(self) -> dict[str, list[str]]
-⋮----
-result: dict[str, list[str]] = {"read": [], "written": [], "committed": []}
-⋮----
-t = event.get("type")
-⋮----
-def session_summary_text(self) -> str
-⋮----
-"""Generate a plain-text summary of the current session."""
-events = self.get_events_by_session(self._session_id)
-⋮----
-lines = [f"Session {self._session_id} — {len(events)} events", ""]
-decisions = [e for e in events if e["type"] == "decision"]
-⋮----
-blockers = [e for e in events if e["type"] == "blocker"]
-⋮----
-files_touched = set()
-⋮----
-user_requests = [e for e in events if e["type"] == "user_request"]
-⋮----
-def _get_db(self) -> sqlite3.Connection
-⋮----
-conn = sqlite3.connect(str(self._db_path))
-⋮----
-def rebuild_index(self)
-⋮----
-conn = self._get_db()
-⋮----
-count = 0
-⋮----
-def query(self, sql: str, params: tuple = ()) -> list[dict]
-⋮----
-rows = conn.execute(sql, params).fetchall()
-⋮----
-def stats(self) -> dict
-⋮----
-total = 0
-sessions = set()
-````
-
-## File: core/router/lane_policy.py
-````python
-CONFIG_DIR = Path(__file__).resolve().parent.parent.parent / "config"
-def load_lanes(config_path: Optional[str] = None) -> dict
-⋮----
-path = config_path or str(CONFIG_DIR / "lanes.yaml")
-⋮----
-def get_worker_pool(lane: str, config_path: Optional[str] = None) -> list[str]
-⋮----
-lanes = load_lanes(config_path)
-⋮----
-def get_reviewer(lane: str, config_path: Optional[str] = None) -> str
-def get_fallback_lane(lane: str, config_path: Optional[str] = None) -> Optional[str]
-def get_search_backend(lane: str, config_path: Optional[str] = None) -> Optional[str]
-def get_category_preference(lane: str, category: str, config_path: Optional[str] = None) -> Optional[list[str]]
-⋮----
-prefs = lanes.get("lanes", {}).get(lane, {}).get("category_preference", {})
-⋮----
-def reorder_by_preference(workers: list[str], preference: list[str]) -> list[str]
-⋮----
-pref_set = set(preference)
-ordered = [w for w in preference if w in workers]
-rest = [w for w in workers if w not in pref_set]
-⋮----
-tc = TaskClass(task_class)
-risk = RiskLevel(risk_level)
-lane = LANE_ASSIGNMENTS.get(tc, "balanced")
-workers = get_worker_pool(lane, config_path)
-⋮----
-pref = get_category_preference(lane, category, config_path)
-⋮----
-workers = reorder_by_preference(workers, pref)
-⋮----
-inferred = CATEGORY_ASSIGNMENTS.get(tc)
-⋮----
-pref = get_category_preference(lane, inferred.value, config_path)
-⋮----
-reviewer = get_reviewer(lane, config_path)
-fallback = get_fallback_lane(lane, config_path)
-search = get_search_backend(lane, config_path)
+@click.option("--allow-dirty", is_flag=True, help="Skip dirty-tree check")
+def cli(lane, task, task_file, runner, allow_dirty)
 ````
 
 ## File: scripts/check-clis.sh
@@ -28397,685 +29842,241 @@ set -euo pipefail
 FIX_MODE="${1:-}"
 export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin:$HOME/.nvm/versions/node/*/bin"
 if [[ -f "$HOME/.nvm/nvm.sh" ]]; then
-  export NVM_DIR="$HOME/.nvm"
-  . "$NVM_DIR/nvm.sh"
+	export NVM_DIR="$HOME/.nvm"
+	. "$NVM_DIR/nvm.sh"
 fi
 ISSUES=0
 check_cli() {
-  local name="$1"
-  local pkg="$2"
-  local cmd="$3"
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    if [[ "$FIX_MODE" == "--fix" ]]; then
-      echo "⚠️  $name: installing $pkg..."
-      if npm install -g "$pkg@latest" >/dev/null 2>&1; then
-        hash -r
-        echo "✓ $name: $(command $cmd 2>/dev/null | head -1 || echo 'installed')"
-        return 0
-      else
-        echo "⚠️  $name: install failed"
-        ISSUES=1
-        return 1
-      fi
-    fi
-    echo "⚠️  $name: not installed"
-    ISSUES=1
-    return 1
-  fi
-  echo "✓ $name: $($cmd --version 2>/dev/null | head -1 || echo 'unknown')"
-  return 0
+	local name="$1"
+	local pkg="$2"
+	local cmd="$3"
+	if ! command -v "$cmd" >/dev/null 2>&1; then
+		if [[ "$FIX_MODE" == "--fix" ]]; then
+			echo "⚠️  $name: installing $pkg..."
+			if npm install -g "$pkg@latest" >/dev/null 2>&1; then
+				hash -r
+				echo "✓ $name: $(command $cmd 2>/dev/null | head -1 || echo 'installed')"
+				return 0
+			else
+				echo "⚠️  $name: install failed"
+				ISSUES=1
+				return 1
+			fi
+		fi
+		echo "⚠️  $name: not installed"
+		ISSUES=1
+		return 1
+	fi
+	echo "✓ $name: $($cmd --version 2>/dev/null | head -1 || echo 'unknown')"
+	return 0
 }
 check_cli "Claude Code" "@anthropic-ai/claude-code" "claude" || true
-check_cli "Codex CLI"   "@openai/codex"             "codex"  || true
-check_cli "Gemini CLI"  "@google/gemini-cli"        "gemini" || true
+check_cli "Codex CLI" "@openai/codex" "codex" || true
+check_cli "Gemini CLI" "@google/gemini-cli" "gemini" || true
+check_cli "OpenCode CLI" "@opencode-ai/cli" "opencode" || true
 if command -v codex >/dev/null 2>&1; then
-  if [[ -f "$HOME/.codex/auth.json" ]] && [[ -s "$HOME/.codex/auth.json" ]]; then
-    echo "✓ Codex auth: ~/.codex/auth.json present"
-  else
-    echo "⚠️  Codex auth: missing or empty ~/.codex/auth.json"
-    echo "   Fix: codex login --device-auth"
-    ISSUES=1
-  fi
+	if [[ -f "$HOME/.codex/auth.json" ]] && [[ -s "$HOME/.codex/auth.json" ]]; then
+		echo "✓ Codex auth: ~/.codex/auth.json present"
+	else
+		echo "⚠️  Codex auth: missing or empty ~/.codex/auth.json"
+		echo "   Fix: codex login --device-auth"
+		ISSUES=1
+	fi
 fi
 if command -v secrets >/dev/null 2>&1; then
-  echo "✓ secrets CLI: installed"
+	echo "✓ secrets CLI: installed"
 else
-  if [[ "$FIX_MODE" == "--fix" ]]; then
-    mkdir -p ~/.local/bin
-    ln -sf ~/github/oneshot/scripts/secrets ~/.local/bin/secrets
-    echo "✓ secrets CLI: installed (symlinked to ~/.local/bin)"
-  else
-    echo "⚠️  secrets CLI: not on PATH"
-    ISSUES=1
-  fi
+	if [[ "$FIX_MODE" == "--fix" ]]; then
+		mkdir -p ~/.local/bin
+		ln -sf ~/github/oneshot/scripts/secrets ~/.local/bin/secrets
+		echo "✓ secrets CLI: installed (symlinked to ~/.local/bin)"
+	else
+		echo "⚠️  secrets CLI: not on PATH"
+		ISSUES=1
+	fi
+fi
+if command -v oc >/dev/null 2>&1; then
+	echo "✓ oc wrapper: $(command -v oc)"
+else
+	if [[ "$FIX_MODE" == "--fix" ]]; then
+		mkdir -p ~/.local/bin
+		ln -sf ~/github/oneshot/scripts/oc ~/.local/bin/oc
+		echo "✓ oc wrapper: installed (symlinked to ~/.local/bin)"
+	else
+		echo "⚠️  oc wrapper: not on PATH"
+		ISSUES=1
+	fi
 fi
 exit $ISSUES
 ````
 
-## File: scripts/claude-shell-setup.sh
+## File: scripts/ci.sh
 ````bash
-ZAI_API_KEY="YOUR_ZAI_API_KEY_HERE"
-GLM_MODEL="glm-5-turbo"
-SHELL_TYPE="${SHELL_TYPE:-bash}"
-if [[ -n "${ZSH_VERSION:-}" ]]; then
-  SHELL_TYPE="zsh"
-elif [[ -n "${BASH_VERSION:-}" ]]; then
-  SHELL_TYPE="bash"
+set -e
+QUICK_MODE=false
+if [[ "$1" == "--quick" ]]; then
+	QUICK_MODE=true
 fi
-if [[ "$1" == "--install" ]]; then
-    if [[ "$ZAI_API_KEY" == "YOUR_ZAI_API_KEY_HERE" ]]; then
-        echo "ERROR: Edit this script and set your ZAI_API_KEY first!" >&2
-        echo "Get your key at: https://z.ai/devpack" >&2
-        exit 1
-    fi
-    if [[ -n "${ZSH_VERSION:-}" ]]; then
-        SHELL_TYPE="zsh"
-    elif [[ -n "${BASH_VERSION:-}" ]]; then
-        SHELL_TYPE="bash"
-    fi
-    if [[ "$SHELL_TYPE" == "zsh" ]]; then
-        SHELLRC="$HOME/.zshrc"
-    else
-        SHELLRC="$HOME/.bashrc"
-    fi
-    if grep -q "##### Claude Code + ZAI shortcuts" "$SHELLRC" 2>/dev/null; then
-        sed -i.bak "/##### Claude Code + ZAI shortcuts/,/##### end Claude Code + ZAI shortcuts #####/d" "$SHELLRC"
-        rm -f "${SHELLRC}.bak"
-        echo "Removed old Claude/ZAI block from $SHELLRC"
-    fi
-    if grep -q "##### ONE-SHOT Heartbeat #####" "$SHELLRC" 2>/dev/null; then
-        sed -i.bak "/##### ONE-SHOT Heartbeat #####/,/##### end ONE-SHOT Heartbeat #####/d" "$SHELLRC"
-        rm -f "${SHELLRC}.bak"
-        echo "Removed old Heartbeat block from $SHELLRC"
-    fi
-    cat >> "$SHELLRC" << 'SHELLRC_BLOCK'
-export ZAI_API_KEY="__ZAI_API_KEY__"
-export GLM_MODEL="__GLM_MODEL__"
-unalias cc zai 2>/dev/null || true
-unset -f cc zai 2>/dev/null || true
-cc() {
-    claude "$@"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+ERRORS=0
+SHELLCHECK_SEVERITY="${SHELLCHECK_SEVERITY:-error}"
+section() {
+	echo ""
+	echo -e "${YELLOW}=== $1 ===${NC}"
 }
-zai() {
-    if ! command -v claude >/dev/null 2>&1; then
-        echo "zai: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
-        return 127
-    fi
-    [[ -z "$ZAI_API_KEY" ]] && { echo "zai: ZAI_API_KEY not set" >&2; return 1; }
-    echo "zai: z.ai/$GLM_MODEL" >&2
-    ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-    ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
-    ANTHROPIC_MODEL="$GLM_MODEL" \
-        claude "$@"
+log_ok() {
+	echo -e "${GREEN}✓${NC} $1"
 }
-alias saveplan='${EDITOR:-nano} /tmp/claude-plan.md'
-approveplan() {
-    local project="${1:-$PWD}"
-    local plan_file="/tmp/claude-plan.md"
-    local claude_md="$project/.claude/CLAUDE.md"
-    local backup_file="/tmp/claude-plan-backup.md"
-    local was_fresh=false
-    if [[ ! -f "$plan_file" ]]; then
-        echo "approveplan: no plan at $plan_file — run 'saveplan' first" >&2
-        return 1
-    fi
-    mkdir -p "$project/.claude"
-    if [[ ! -f "$claude_md" ]]; then
-        was_fresh=true
-    else
-        cp "$claude_md" "$backup_file"
-    fi
-    cp "$plan_file" "$claude_md"
-    echo "Plan written to $claude_md"
-    (cd "$project" && claude)
-    read -r -p "Remove plan from CLAUDE.md? [y/N] " answer
-    if [[ "$answer" =~ ^[Yy]$ ]]; then
-        if [[ "$was_fresh" == "true" ]]; then
-            rm "$claude_md"
-            echo "Removed $claude_md"
-        else
-            mv "$backup_file" "$claude_md"
-            echo "Restored original $claude_md"
-        fi
-    fi
-    rm -f "$backup_file"
+log_error() {
+	echo -e "${RED}✗${NC} $1"
+	((ERRORS++))
 }
-_oneshot_heartbeat() {
-    local heartbeat_script="${ONESHOT_DIR:-$HOME/github/oneshot}/scripts/heartbeat.sh"
-    if [[ -f "$PWD/CLAUDE.md" ]] && [[ -x "$heartbeat_script" ]]; then
-        "$heartbeat_script" --quiet --background 2>/dev/null &
-    fi
+log_skip() {
+	echo -e "${YELLOW}○${NC} $1 (skipped)"
 }
-oneshot-dismiss() {
-    local suppressed="$HOME/.claude/state/suppressed-warnings"
-    mkdir -p "$(dirname "$suppressed")"
-    echo "$1" >> "$suppressed"
-    echo "Dismissed: $1"
-}
-SHELLRC_BLOCK
-    escaped_key=$(printf '%s\n' "$ZAI_API_KEY" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    escaped_model=$(printf '%s\n' "$GLM_MODEL" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    sed -i.bak "s|__ZAI_API_KEY__|${escaped_key}|g" "$SHELLRC"
-    sed -i.bak "s|__GLM_MODEL__|${escaped_model}|g" "$SHELLRC"
-    rm -f "${SHELLRC}.bak"
-    if [[ "$SHELL_TYPE" == "zsh" ]]; then
-        sed -i.bak '/add-zsh-hook _oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
-        rm -f "${SHELLRC}.bak"
-        cat >> "$SHELLRC" << 'ZSH_HOOK'
-autoload -U add-zsh-hook
-add-zsh-hook chpwd _oneshot_heartbeat
-ZSH_HOOK
-    else
-        sed -i.bak '/PROMPT_COMMAND.*_oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
-        rm -f "${SHELLRC}.bak"
-        cat >> "$SHELLRC" << BASH_HOOK
-PROMPT_COMMAND="_oneshot_heartbeat\${PROMPT_COMMAND:+;\$PROMPT_COMMAND}"
-BASH_HOOK
-    fi
-    echo "✓ Installed to $SHELLRC"
-    echo "✓ cc  = Claude Code (Anthropic Pro, YOLO mode)"
-    echo "✓ zai = Claude Code (z.ai $GLM_MODEL, YOLO mode)"
-    echo "✓ Heartbeat: Daily health checks on project enter"
-    echo ""
-    if [[ "$SHELL_TYPE" == "zsh" ]]; then
-        echo "Run: source ~/.zshrc"
-    else
-        echo "Run: source ~/.bashrc"
-    fi
-    exit 0
+section "Lint: Shell Scripts"
+if command -v shellcheck &>/dev/null; then
+	SHELL_FILES=$(find . -name "*.sh" -not -path "./node_modules/*" -not -path "./.git/*" 2>/dev/null | head -20)
+	if [ -n "$SHELL_FILES" ]; then
+		if shellcheck -S "$SHELLCHECK_SEVERITY" $SHELL_FILES 2>&1; then
+			log_ok "All shell scripts pass shellcheck (severity: $SHELLCHECK_SEVERITY)"
+		else
+			log_error "Shellcheck found $SHELLCHECK_SEVERITY-level issues"
+		fi
+	else
+		log_skip "No shell scripts found"
+	fi
+else
+	log_skip "shellcheck not installed"
 fi
-if [[ "$ZAI_API_KEY" == "YOUR_ZAI_API_KEY_HERE" ]]; then
-    echo "WARNING: ZAI_API_KEY not set. Edit the script or set ZAI_API_KEY env var." >&2
+section "Lint: Prettier"
+if command -v prettier &>/dev/null; then
+	if [ -f ".prettierrc" ] || [ -f ".prettierrc.json" ] || [ -f "package.json" ]; then
+		if prettier --check "**/*.{js,ts,json,md}" --ignore-path .gitignore 2>&1; then
+			log_ok "All files formatted correctly"
+		else
+			log_error "Prettier found formatting issues (run: prettier --write .)"
+		fi
+	else
+		log_skip "No prettier config found"
+	fi
+else
+	log_skip "prettier not installed"
 fi
-unalias cc zai 2>/dev/null || true
-unset -f cc zai 2>/dev/null || true
-cc() {
-    claude "$@"
-}
-zai() {
-    if ! command -v claude >/dev/null 2>&1; then
-        echo "zai: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
-        return 127
-    fi
-    [[ -z "$ZAI_API_KEY" ]] && { echo "zai: ZAI_API_KEY not set" >&2; return 1; }
-    echo "zai: z.ai/$GLM_MODEL" >&2
-    ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-    ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
-    ANTHROPIC_MODEL="$GLM_MODEL" \
-        claude "$@"
-}
-alias saveplan='${EDITOR:-nano} /tmp/claude-plan.md'
-approveplan() {
-    local project="${1:-$PWD}"
-    local plan_file="/tmp/claude-plan.md"
-    local claude_md="$project/.claude/CLAUDE.md"
-    local backup_file="/tmp/claude-plan-backup.md"
-    local was_fresh=false
-    if [[ ! -f "$plan_file" ]]; then
-        echo "approveplan: no plan at $plan_file — run 'saveplan' first" >&2
-        return 1
-    fi
-    mkdir -p "$project/.claude"
-    if [[ ! -f "$claude_md" ]]; then
-        was_fresh=true
-    else
-        cp "$claude_md" "$backup_file"
-    fi
-    cp "$plan_file" "$claude_md"
-    echo "Plan written to $claude_md"
-    (cd "$project" && claude)
-    read -r -p "Remove plan from CLAUDE.md? [y/N] " answer
-    if [[ "$answer" =~ ^[Yy]$ ]]; then
-        if [[ "$was_fresh" == "true" ]]; then
-            rm "$claude_md"
-            echo "Removed $claude_md"
-        else
-            mv "$backup_file" "$claude_md"
-            echo "Restored original $claude_md"
-        fi
-    fi
-    rm -f "$backup_file"
-}
-_oneshot_heartbeat() {
-    local heartbeat_script="${ONESHOT_DIR:-$HOME/github/oneshot}/scripts/heartbeat.sh"
-    if [[ -f "$heartbeat_script" ]]; then
-        "$heartbeat_script" "${@}"
-    else
-        echo "Heartbeat script not found at: $heartbeat_script" >&2
-        return 1
-    fi
-}
-oneshot-dismiss() {
-    local suppressed="$HOME/.claude/state/suppressed-warnings"
-    mkdir -p "$(dirname "$suppressed")"
-    echo "$1" >> "$suppressed"
-    echo "Dismissed: $1"
-}
-````
-
-## File: install.sh
-````bash
-set -euo pipefail
-ONESHOT_DIR="$(cd "$(dirname "$0")" && pwd)"
-BIN_DIR="${HOME}/.local/bin"
-HOOKS_DIR="${HOME}/.claude/hooks"
-install_hooks() {
-    local src="$ONESHOT_DIR/.claude/hooks"
-    [ -d "$src" ] || return 0
-    mkdir -p "$HOOKS_DIR"
-    local count=0
-    for f in "$src"/*.sh; do
-        [ -f "$f" ] || continue
-        local name=$(basename "$f")
-        if [ -f "$HOOKS_DIR/$name" ]; then
-            echo "  $name (exists, skipped)"
-        else
-            cp "$f" "$HOOKS_DIR/$name"
-            chmod +x "$HOOKS_DIR/$name"
-            echo "  $name (installed)"
-            count=$((count + 1))
-        fi
-    done
-    if [ "$count" -gt 0 ]; then
-        echo "  $count hook(s) installed"
-    fi
-}
-VERSION=$(grep -m1 "ONE_SHOT v" "$ONESHOT_DIR/AGENTS.md" 2>/dev/null | sed 's/.*\(v[0-9.]*\).*/\1/' || echo "unknown")
-echo "Installing ONE_SHOT $VERSION..."
-mkdir -p "$BIN_DIR"
-rm -f "$BIN_DIR/oneshot" "$BIN_DIR/oneshot-build" "$BIN_DIR/oneshot-resilient" 2>/dev/null || true
-ln -sf "$ONESHOT_DIR/scripts/oneshot-update.sh" "$BIN_DIR/oneshot-update"
-echo "  oneshot-update    - Update ONE_SHOT from GitHub"
-if [ -f "$ONESHOT_DIR/scripts/docs-link" ]; then
-    ln -sf "$ONESHOT_DIR/scripts/docs-link" "$BIN_DIR/docs-link"
-    echo "  docs-link         - Documentation cache manager"
+section "Typecheck: TypeScript"
+if [ -f "tsconfig.json" ]; then
+	if command -v tsc &>/dev/null; then
+		if tsc --noEmit 2>&1; then
+			log_ok "TypeScript passes"
+		else
+			log_error "TypeScript errors found"
+		fi
+	else
+		log_skip "tsc not installed"
+	fi
+else
+	log_skip "No tsconfig.json found"
 fi
-if [ -d "$ONESHOT_DIR/.claude/skills" ]; then
-    mkdir -p "${HOME}/.claude/skills"
-    echo "Syncing skills to ~/.claude/skills/..."
-    cp -r "$ONESHOT_DIR/.claude/skills/"* "${HOME}/.claude/skills/" 2>/dev/null || true
-    echo "  10+1 skills synced"
+section "Typecheck: Python"
+if ls *.py **/*.py 2>/dev/null | head -1 | grep -q .; then
+	if command -v pyright &>/dev/null; then
+		if pyright 2>&1; then
+			log_ok "Pyright passes"
+		else
+			log_error "Pyright found issues"
+		fi
+	elif command -v mypy &>/dev/null; then
+		if mypy . 2>&1; then
+			log_ok "Mypy passes"
+		else
+			log_error "Mypy found issues"
+		fi
+	else
+		log_skip "No Python type checker installed"
+	fi
+else
+	log_skip "No Python files found"
 fi
-if [ -d "$ONESHOT_DIR/.claude/hooks" ]; then
-    echo "Syncing hooks to ~/.claude/hooks/..."
-    install_hooks
+section "Tests: Pytest"
+if ls **/test_*.py **/*_test.py 2>/dev/null | head -1 | grep -q .; then
+	if command -v pytest &>/dev/null; then
+		if pytest --tb=short -q 2>&1; then
+			log_ok "All pytest tests pass"
+		else
+			log_error "Pytest tests failed"
+		fi
+	else
+		log_skip "pytest not installed"
+	fi
+else
+	log_skip "No pytest test files found"
+fi
+if [ "$QUICK_MODE" = false ]; then
+	section "Eval: Harness Benchmarks"
+	if [ -f "scripts/eval.sh" ]; then
+		if bash scripts/eval.sh 2>&1; then
+			log_ok "All eval benchmarks passed"
+		else
+			log_error "Eval benchmarks failed"
+		fi
+	else
+		log_skip "No eval.sh found"
+	fi
+fi
+if [ "$QUICK_MODE" = false ]; then
+	section "Validation: ONE_SHOT Skills"
+	if [ -f "scripts/validate-skills.sh" ]; then
+		if bash scripts/validate-skills.sh 2>&1; then
+			log_ok "Skills validation passed"
+		else
+			log_error "Skills validation failed"
+		fi
+	else
+		log_skip "No validate-skills.sh found"
+	fi
+	section "Validation: ONE_SHOT Docs Sync"
+	if [ -f "scripts/validate-docs.sh" ]; then
+		if bash scripts/validate-docs.sh 2>&1; then
+			log_ok "Docs are in sync with reality"
+		else
+			log_error "Doc sync check failed — docs don't match actual state"
+		fi
+	else
+		log_skip "No validate-docs.sh found"
+	fi
+	section "Validation: ONE_SHOT Agents"
+	if [ -f "scripts/validate-agents.py" ]; then
+		if python3 scripts/validate-agents.py 2>&1; then
+			log_ok "Agents validation passed"
+		else
+			log_error "Agents validation failed"
+		fi
+	else
+		log_skip "No validate-agents.py found"
+	fi
+	section "Validation: ONE_SHOT Config Bridge"
+	if [ -f "scripts/validate-oneshot-config.py" ]; then
+		if python3 scripts/validate-oneshot-config.py 2>&1; then
+			log_ok "Config bridge validation passed"
+		else
+			log_error "Config bridge validation failed"
+		fi
+	else
+		log_skip "No validate-oneshot-config.py found"
+	fi
 fi
 echo ""
-echo "ONE_SHOT $VERSION installed."
-echo ""
-echo "Skills available in Claude Code:"
-echo "  /short     - Quick iteration"
-echo "  /full      - Structured work"
-echo "  /conduct   - Multi-model orchestration"
-echo "  /handoff   - Save context"
-echo "  /restore   - Resume from handoff"
-echo "  /research  - Background research"
-echo "  /freesearch - Zero-token search"
-echo "  /doc       - Cache external docs"
-echo "  /vision    - Image/website analysis"
-echo "  /secrets   - SOPS/Age secrets"
-echo ""
-echo "See ~/.claude/skills/INDEX.md for full reference."
-# Check if in PATH
-if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
-    echo ""
-    echo "Add to your shell profile (~/.bashrc or ~/.zshrc):"
-    echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
-    echo ""
+echo "=========================================="
+if [ $ERRORS -eq 0 ]; then
+	echo -e "${GREEN}✓ ALL CHECKS PASSED${NC}"
+	exit 0
+else
+	echo -e "${RED}✗ $ERRORS CHECK(S) FAILED${NC}"
+	exit 1
 fi
-echo "Done! To update: oneshot-update"
-````
-
-## File: llms.txt
-````
-# ONE_SHOT
-
-> Operator framework for Claude Code. Three operators, seven utilities, on-demand skill discovery. Progressive disclosure loads ~300 tokens always-on (down from ~2000). Encrypted secrets vault (SOPS/Age) with 80+ API keys synced across 3 machines.
->
-> Key points:
-> - Install: `curl -sL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash`
-> - Three operators: `/short` (quick iteration), `/full` (structured work), `/conduct` (multi-model PMO)
-> - Stack defaults: Vercel + Supabase + Python (web), Python + Click + SQLite (CLI), Python + systemd (service)
-> - Secrets: one age key at `~/.age/key.txt`, 17 encrypted vault files in `secrets/`, access via `secrets get KEY`
-> - Daily heartbeat: 14 API key validators, CLI version checks, Tailscale + cross-machine reachability
-> - Machines: oci-dev (100.126.13.70), homelab (100.112.130.100), macmini (100.113.216.27) — all on Tailscale
-
-Operators discover skills on demand from `~/.claude/skills/`. Rules load by project type detection (web, CLI, service, generic). Decision defaults let Claude make reasonable choices autonomously without asking. Handoffs survive `/clear`. Tasks persist via native TaskCreate/TaskList.
-
-## Operators
-
-- [/short SKILL.md](.claude/skills/short/SKILL.md): Quick iteration — loads context, asks what you're working on, executes in burn-down mode
-- [/full SKILL.md](.claude/skills/full/SKILL.md): Structured work — intake, plan, execute with context checkpoints
-- [/conduct SKILL.md](.claude/skills/conduct/SKILL.md): Multi-model PMO — routes work across Claude + Codex + Gemini, loops until done
-
-## Utility Skills
-
-- [/handoff SKILL.md](.claude/skills/handoff/SKILL.md): Save context before `/clear`
-- [/restore SKILL.md](.claude/skills/restore/SKILL.md): Resume from handoff checkpoint
-- [/research SKILL.md](.claude/skills/research/SKILL.md): Background research via Gemini CLI
-- [/freesearch SKILL.md](.claude/skills/freesearch/SKILL.md): Zero-token web search via Exa API
-- [/doc SKILL.md](.claude/skills/doc/SKILL.md): Cache external documentation locally
-- [/vision SKILL.md](.claude/skills/vision/SKILL.md): Image and website visual analysis
-- [/secrets SKILL.md](.claude/skills/secrets/SKILL.md): SOPS/Age encrypted secret management
-
-## Core Configuration
-
-- [AGENTS.md](AGENTS.md): Operator spec, decision defaults, delegation protocol, auto-approved actions
-- [CLAUDE.md](CLAUDE.md): Project-specific Claude instructions (per project, editable)
-- [CLAUDE.md (global)](CLAUDE.md): Global user rules, stack defaults, secrets management, infrastructure routing
-
-## Rules (Progressive Disclosure)
-
-- [core.md](.claude/rules/core.md): Always loaded — work discipline, delegation, AGENTS.md readonly rule
-- [khamel-mode.md](.claude/rules/khamel-mode.md): User defaults — stack, machines, anti-patterns, decision defaults
-- [delegation.md](.claude/rules/delegation.md): Assess-verify-escalate delegation with 3-attempt fallback
-- [web.md](.claude/rules/web.md): Web apps — Vercel + Supabase (Auth + Postgres) + Python
-- [cli.md](.claude/rules/cli.md): CLIs — Python + Click + SQLite
-- [service.md](.claude/rules/service.md): Services — Python + systemd, deploy to oci-dev
-- [community.md](.claude/rules/community.md): Membership sites — Vercel + Supabase + Python + Resend
-
-## Infrastructure
-
-- [STACK.md](.claude/infrastructure/STACK.md): Full stack reference — Vercel, Supabase, Python, auth, deployment
-- [secrets/](secrets/): SOPS/Age encrypted vault — 17 files, ~80 API keys, `secrets get KEY` for access
-- [public-access.md](docs/public-access.md): Public URL routing via poytz + Cloudflare Tunnel (replaces nginx/traefik)
-- [ssh/](ssh/): SSH alias configs for oci-dev, homelab, macmini
-
-## Scripts
-
-- [heartbeat.sh](scripts/heartbeat.sh): Daily health check — repo sync, GLM model pin, secrets decrypt, CLIs, 14 API validators, MCP servers, Tailscale, cross-machine reachability
-- [check-apis.sh](scripts/check-apis.sh): Validates 14 API keys with real HTTP calls (ZAI, OpenAI, Tavily, Exa, Apify, Context7, OpenRouter, DeepSeek, Brave, Jina, GitHub, Cloudflare, Telegram)
-- [secrets CLI](scripts/secrets-helper.sh): `secrets get KEY` / `secrets set NAME KEY=val` / `secrets list` / `secrets decrypt NAME`
-- [ci.sh](scripts/ci.sh): Verify loop — shellcheck, prettier, tsc, pyright, bats, pytest, skill/doc validation
-- [check-backup.sh](scripts/check-backup.sh): Daily encrypted recovery snapshot (vault inventory, machine status, git state — no secret values)
-
-## Template
-
-- [community-starter](templates/community-starter/): Default web app scaffold — Vercel + Supabase + Python + Resend (bootstrap with `oneshot.sh --web <slug>`)
-
-## Optional
-
-- [CHANGELOG.md](CHANGELOG.md): Version history (v12+)
-- [SKILLS.md](docs/SKILLS.md): Full command reference with examples
-- [LLM-OVERVIEW.md](docs/LLM-OVERVIEW.md): Design philosophy, token optimization strategy, glossary
-- [QUICKSTART.md](QUICKSTART.md): Install and update commands
-- [hooks/](.claude/hooks/): lessons-inject.sh (session start), delegation-log-hook.sh (subagent stop), docs-check.sh, context-v8.py, beads-v8.py
-- [providers.md](.claude/skills/_shared/providers.md): Multi-model routing table for /conduct
-````
-
-## File: config/models.yaml
-````yaml
-models:
-  zai:glm-5-turbo:
-    lane: cheap
-    strengths: [coding, reasoning, agentic, instruction_following]
-    max_task_size: large
-    can_plan: true
-    can_review: true
-    tool_calling: true
-    context_window: 200k
-    max_tokens: 131072
-    latency_tier: fast
-    pricing_per_m: {input: 0, output: 0}
-  zai:glm-5.1:
-    lane: cheap
-    strengths: [coding, reasoning, agentic, instruction_following]
-    max_task_size: large
-    can_plan: false
-    can_review: true
-    tool_calling: true
-    context_window: 200k
-    max_tokens: 131072
-    latency_tier: medium
-    pricing_per_m: {input: 0, output: 0}
-  zai:glm-4.7:
-    lane: cheap
-    strengths: [coding, reasoning, instruction_following]
-    max_task_size: large
-    can_plan: false
-    can_review: true
-    tool_calling: true
-    context_window: 200k
-    max_tokens: 131072
-    latency_tier: medium
-    pricing_per_m: {input: 0, output: 0}
-  zai:glm-4.5-air:
-    lane: cheap
-    strengths: [throughput, low_latency]
-    max_task_size: small
-    can_plan: false
-    can_review: false
-    tool_calling: true
-    context_window: 200k
-    latency_tier: fast
-    pricing_per_m: {input: 0, output: 0}
-  openrouter:minimax/minimax-m2.7:
-    lane: cheap
-    strengths: [coding, agentic, long_context]
-    max_task_size: medium
-    can_plan: false
-    can_review: true
-    tool_calling: true
-    context_window: 1m
-    latency_tier: medium
-    pricing_per_m: {input: 0.30, output: 1.20}
-  openrouter:deepseek/deepseek-v3.2:
-    lane: cheap
-    strengths: [coding, instruction_following, agentic_tool_use, low_cost]
-    max_task_size: large
-    can_plan: false
-    can_review: true
-    tool_calling: true
-    context_window: 128k
-    latency_tier: medium
-    pricing_per_m: {input: 0.26, output: 0.38}
-  openrouter:moonshotai/kimi-k2.5:
-    lane: cheap
-    strengths: [coding, long_context, agentic]
-    max_task_size: large
-    can_plan: false
-    can_review: true
-    tool_calling: true
-    context_window: 131k
-    latency_tier: medium
-    pricing_per_m: {input: 0.3827, output: 1.72}
-  openrouter:stepfun/step-3.5-flash:
-    lane: cheap
-    strengths: [fast_reasoning, low_cost]
-    max_task_size: medium
-    can_plan: false
-    can_review: true
-    context_window: 131k
-    latency_tier: fast
-  openrouter:xiaomi/mimo-v2-flash:
-    lane: cheap
-    strengths: [coding, reasoning, agentic]
-    max_task_size: medium
-    can_plan: false
-    can_review: true
-    context_window: 1m
-    latency_tier: medium
-  openrouter:google/gemini-2.5-flash-lite:
-    lane: cheap
-    strengths: [throughput, low_cost]
-    max_task_size: small
-    can_plan: false
-    can_review: false
-    tool_calling: true
-    context_window: 1m
-    latency_tier: fast
-    pricing_per_m: {input: 0.10, output: 0.40}
-  openrouter:google/gemini-2.5-flash:
-    lane: balanced
-    strengths: [coding, reasoning, long_context]
-    max_task_size: medium
-    can_plan: false
-    can_review: true
-    context_window: 1m
-    latency_tier: medium
-  claude:sonnet:
-    lane: premium
-    strengths: [planning, orchestration, repo_synthesis]
-    can_plan: true
-    can_review: true
-    context_window: 200k
-    latency_tier: slow
-claw_code:
-    zai_base_url: https://api.z.ai/api/coding/paas/v4
-    zai_key_env: ZAI_API_KEY
-    openrouter_base_url: https://openrouter.ai/api/v1
-    openrouter_key_env: OPENROUTER_API_KEY
-    default_model: glm-5-turbo
-    post_expiry_default_model: deepseek/deepseek-v3.2
-    fallback_priority:
-      - glm-5-turbo
-      - glm-5.1
-      - glm-4.7
-      - deepseek/deepseek-v3.2
-      - google/gemini-2.5-flash-lite
-      - minimax/minimax-m2.7
-      - moonshotai/kimi-k2.5
-    supported_models:
-      - glm-5-turbo
-      - glm-5.1
-      - glm-4.7
-      - glm-4.5-air
-      - deepseek/deepseek-v3.2
-      - google/gemini-2.5-flash-lite
-      - minimax/minimax-m2.7
-      - moonshotai/kimi-k2.5
-      - openai/gpt-4o-mini
-      - google/gemini-2.5-flash
-    harness: claw_code
-    install_path: ~/github/claw-code-agent
-````
-
-## File: config/workers.yaml
-````yaml
-workers:
-  local:
-    host: localhost
-    transport: local
-    role: planner
-    harness: claude_code
-  oci:
-    host: oci-dev
-    transport: ssh
-    role: planner
-    harness: claude_code
-  macmini:
-    host: macmini
-    transport: ssh
-    role: worker
-    harness: opencode
-  homelab:
-    host: homelab
-    transport: ssh
-    role: worker
-    harness: opencode
-  claw:
-    host: localhost
-    transport: local
-    role: worker
-    harness: claw_code
-    install_path: ~/github/claw-code-agent
-  glm:
-    host: localhost
-    transport: local
-    role: worker
-    harness: glm_claude
-    model: glm-5-turbo
-    plan_expires: "2026-05-02"
-  free:
-    host: localhost
-    transport: local
-    role: worker
-    harness: openrouter_api
-    model: openrouter/free
-    cost: 0
-    plan_expires: null
-    max_tokens: 1024
-    timeout: 30
-````
-
-## File: core/janitor/worker.py
-````python
-ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
-DAILY_LIMIT = 1000
-MINUTE_LIMIT = 20
-MODEL_TIERS: dict[str, list[str]] = {
-_cached_api_key: str | None = None
-def _get_api_key() -> str
-⋮----
-key = os.environ.get("OPENROUTER_API_KEY", "")
-⋮----
-_cached_api_key = key
-⋮----
-def _usage_log_path() -> Path
-⋮----
-project = Path(os.getcwd())
-⋮----
-d = parent / ".janitor"
-⋮----
-_rate_cache: dict = {"minute_count": 0, "day_count": 0, "cached_at": 0}
-_RATE_TTL = 5
-def _check_rate_limit() -> bool
-⋮----
-now = time.time()
-⋮----
-path = _usage_log_path()
-⋮----
-_rate_cache = {"minute_count": 0, "day_count": 0, "cached_at": now}
-⋮----
-minute_ago = now - 60
-day_ago = now - 86400
-recent_minute = 0
-recent_day = 0
-⋮----
-line = line.strip()
-⋮----
-ts = float(line.split('"ts":', 1)[1].split(",")[0])
-⋮----
-_rate_cache = {
-⋮----
-def _log_usage(model: str, tokens_in: int = 0, tokens_out: int = 0)
-⋮----
-"""Log API usage for rate limit tracking."""
-entry = {
-⋮----
-def get_usage_stats() -> dict
-⋮----
-total = 0
-⋮----
-api_key = _get_api_key()
-tier = MODEL_TIERS.get(quality, MODEL_TIERS["cheap"])
-messages = []
-⋮----
-payload = json.dumps({
-req = urllib.request.Request(
-last_error = None
-⋮----
-data = json.loads(resp.read())
-content = data["choices"][0]["message"]["content"]
-model_used = data.get("model", "unknown")
-usage = data.get("usage", {})
-⋮----
-body = ""
-⋮----
-body = e.read().decode()[:200]
-⋮----
-last_error = f"HTTP {e.code}: {e.reason} — {body}"
-⋮----
-last_error = str(e)
-⋮----
-raw = call_free(prompt, system=system, max_tokens=2048, timeout=30, quality=quality)
-⋮----
-stripped = raw.strip()
-⋮----
-lines = stripped.split("\n")
-inner = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
-⋮----
-match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', stripped, re.DOTALL)
 ````
 
 ## File: scripts/secrets-helper.sh
@@ -29256,6 +30257,70 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 fi
 ````
 
+## File: scripts/validate-oneshot-config.py
+````python
+REPO_ROOT = Path(__file__).resolve().parent.parent
+ONESHOT_CONFIG = REPO_ROOT / ".oneshot" / "config" / "models.yaml"
+WORKERS_CONFIG = REPO_ROOT / "config" / "workers.yaml"
+WORKER_HARNESS_BRIDGE = {
+def load_yaml(path: Path) -> dict
+def validate() -> list[str]
+⋮----
+errors: list[str] = []
+oneshot = load_yaml(ONESHOT_CONFIG)
+workers = load_yaml(WORKERS_CONFIG)
+providers = oneshot.get("providers", {})
+lanes = oneshot.get("lanes", {})
+templates = oneshot.get("runner_templates", {})
+worker_defs = workers.get("workers", {})
+⋮----
+provider_name = lane.get(provider_field)
+model_name = lane.get(model_field)
+⋮----
+provider = providers.get(provider_name)
+⋮----
+harness = worker.get("harness")
+⋮----
+bridged_provider = WORKER_HARNESS_BRIDGE.get(harness)
+⋮----
+def main() -> int
+⋮----
+errors = validate()
+````
+
+## File: tests/test_dispatch_cmd.py
+````python
+def _setup_dispatch_test_env(tmp_path, monkeypatch, auth_value="super-secret-token")
+⋮----
+tasks_dir = tmp_path / ".oneshot" / "tasks"
+worktree = tmp_path / "worktree"
+⋮----
+def test_dispatch_help_describes_live_execution()
+⋮----
+runner = CliRunner()
+result = runner.invoke(cli, ["dispatch", "--help"])
+⋮----
+def test_opencode_runner_template_uses_resolved_model_id_once()
+⋮----
+config_path = (
+cfg = yaml.safe_load(config_path.read_text())
+command = cfg["runner_templates"]["opencode_go"]["command"]
+⋮----
+def test_dispatch_worker_log_redacts_auth_value(tmp_path, monkeypatch)
+⋮----
+tasks_dir = _setup_dispatch_test_env(tmp_path, monkeypatch)
+def fake_run(*args, **kwargs)
+⋮----
+task_id = task_module.dispatch("routine_coder", task_text="test task")
+worker_log = (tasks_dir / task_id / "worker.log").read_text()
+⋮----
+def test_dispatch_marks_failed_status_and_logs_stderr(tmp_path, monkeypatch)
+⋮----
+status = task_module._read_status(task_id)
+⋮----
+def test_dispatch_marks_timeout_status(tmp_path, monkeypatch)
+````
+
 ## File: CHANGELOG.md
 ````markdown
 # Changelog
@@ -29414,494 +30479,952 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 See `archive/` or git history for changes prior to v12.0.
 ````
 
-## File: .claude/skills/_shared/dispatch.md
+## File: .claude/skills/freesearch/SKILL.md
 ````markdown
-# Dispatch Protocol
-
-Reference this module from any skill that needs to route work to external workers.
-Skills include it by mention, not import. This is the single source of truth for
-how Claude delegates execution to Codex and Gemini.
-
+---
+name: freesearch
+description: Zero-token research using Argus search broker. Saves Claude tokens.
 ---
 
-## Overview
+# /freesearch — Zero-Token Research via Argus
 
-```
-Claude (thinker) → classify task → build prompt → dispatch to worker(s) → capture output → validate → commit or retry
-```
+Uses 0 Claude Code tokens. Calls Argus in cheap mode (SearXNG).
 
-Claude plans, reviews, and integrates. Codex and Gemini execute.
+## Usage
 
----
+`/freesearch [topic]`
 
-## Step 1: Classify and Resolve
+## Process (IMPORTANT: Follow this order)
 
-For each task to dispatch:
-
-1. Determine task class using `docs/instructions/task-classes.md`
-2. Determine category (coding, research, writing, review, general) — infer from the task
-   description keywords (implement/code/fix→coding, research/search→research,
-   doc/write/summarize→writing, review/audit→review, default→general)
-3. Resolve lane, worker pool (reordered by category preference), and routing:
+1. **Check global docs-cache FIRST**:
    ```bash
-   python3 -m core.router.resolve --class <task_class> --category <category>
+   cat ~/github/docs-cache/docs/cache/.index.md | grep -i "[KEYWORD]"
    ```
-   Returns: `{task_class, category, lane, workers[], review_with, search_backend, fallback_lane}`
-   Workers are already ordered by category preference — first available wins.
-   If the resolver fails (missing config, import error, etc.), execute inline with Claude. Skip dispatch.
-4. Read `max_parallel` from `config/lanes.yaml` for the resolved lane
-5. If lane is `premium` → execute inline with Claude (no dispatch). Stop here.
-6. Otherwise → continue to Step 2
+   If found → Return cached doc path immediately
 
----
+2. If NOT in cache → Ask 2-3 clarifying questions (goal, depth, audience)
 
-## Step 2: Build Self-Contained Prompt
+3. **Search via Argus** (cheap mode = SearXNG only):
+   ```bash
+   curl -s -X POST http://100.112.130.100:8270/api/search \
+     -H "Content-Type: application/json" \
+     -d '{"query": "[TOPIC]", "mode": "cheap"}'
+   ```
 
-Every dispatched task must be **fully self-contained**. The worker gets a prompt
-that includes everything it needs — no back-reference to conversation context.
+4. **If results include official docs** → Add to global cache:
+   ```bash
+   cd ~/github/docs-cache
+   mkdir -p docs/cache/{category}/{name}
+   # Write README.md with content
+   # Update .index.md
+   git add docs/cache/
+   git commit -m "Add cache: {name}"
+   git push
+   ```
 
-### Prompt Template
+5. Create `docs/research/{date}_{topic}_final.md` in current project
 
-```markdown
-## Task
-{one-line description}
+## Output
 
-## Task Class
-{task_class} — {lane}
-
-## Acceptance Criteria
-- {criterion 1}
-- {criterion 2}
-- ...
-
-## Context: Files to Read
-- `path/to/file1.py` — {why relevant}
-- `path/to/file2.ts` — {why relevant}
-
-## Patterns to Follow
-{if applicable: "Follow the existing pattern in path/to/reference.py"}
-
-## Constraints
-- {constraint 1}
-- {constraint 2}
-
-## Output Format
-Return your changes as file diffs. If creating new files, show the full content.
-End with a summary of what you changed and any concerns.
+```
+[CACHED] Found in docs-cache: ~/github/docs-cache/docs/cache/tools/anthropic/README.md
 ```
 
-### Prompt Construction Rules
+OR
 
-- **Always include the full acceptance criteria** — the worker can't ask questions
-- **Always list specific files to read** — the worker needs to know what matters
-- **Always state output format** — structured output from both Codex and Gemini
-- **Never reference conversation history** — the prompt must stand alone
-- **Keep under 4000 words** — context window limits on cheaper models
-- **If the task needs files changed, say which ones and what to change**
-- **Include shared memory instruction** — prepend: "Read `.claude/memory/memory.md` for shared learnings from past sessions. If you discover something notable, append a dated entry."
+```
+[Searched Argus: cheap mode] Key findings:
+- [finding 1]
+- [finding 2]
 
----
+[Added to cache] ~/github/docs-cache/docs/cache/tools/{name}/README.md
+Full research: docs/research/YYYY-MM-DD_{topic}_final.md
+```
 
-## Step 3: Dispatch
+## Fallback
 
-### Worker Commands
-
-**GLM Claude** (full Claude Code session on GLM-5-turbo via ZAI, free until 2026-05-02):
+If Argus is unreachable:
 ```bash
-ZAI_KEY="$(secrets get ZAI_API_KEY 2>/dev/null)" && \
-ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-ANTHROPIC_AUTH_TOKEN="$ZAI_KEY" \
-ANTHROPIC_API_KEY="" \
-ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5-turbo" \
-ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5-turbo" \
-claude --print --dangerously-skip-permissions "{prompt}"
+ssh homelab-ts "curl -s http://localhost:8270/api/health" >/dev/null 2>&1
 ```
+...then check `config/search.yaml` for cheap mode providers and call directly.
 
-**Codex** (structured JSON output):
-```bash
-unset OPENAI_API_KEY && \
-codex exec --json --sandbox danger-full-access \
-  -o /tmp/dispatch-{id}.json \
-  "{prompt}"
-```
+## Notes
 
-**Gemini** (structured JSON output):
-```bash
-gemini -p "{prompt}" \
-  --output-format json \
-  --approval-mode yolo \
-  > /tmp/dispatch-{id}.json 2>/dev/null
-```
-
-**Gemini** (streaming JSONL for long tasks):
-```bash
-gemini -p "{prompt}" \
-  --output-format stream-json \
-  --approval-mode yolo \
-  > /tmp/dispatch-{id}.jsonl 2>/dev/null
-```
-
-### Parallel Execution
-
-Run multiple dispatches in parallel using background processes:
-
-```bash
-# Launch workers
-codex exec --json --sandbox danger-full-access -o /tmp/dispatch-1.json "task 1" &
-PID1=$!
-gemini -p "task 2" --output-format json --yolo > /tmp/dispatch-2.json 2>/dev/null &
-PID2=$!
-codex exec --json --sandbox danger-full-access -o /tmp/dispatch-3.json "task 3" &
-PID3=$!
-
-# Wait for all
-wait $PID1; STATUS1=$?
-wait $PID2; STATUS2=$?
-wait $PID3; STATUS3=$?
-
-# Check results
-[ $STATUS1 -eq 0 ] && echo "task 1: ok" || echo "task 1: failed (exit $STATUS1)"
-[ $STATUS2 -eq 0 ] && echo "task 2: ok" || echo "task 2: failed (exit $STATUS2)"
-[ $STATUS3 -eq 0 ] && echo "task 3: ok" || echo "task 3: failed (exit $STATUS3)"
-```
-
-**Limits**:
-- Respect `max_parallel` from `config/lanes.yaml` (default 3)
-- Codex: no documented concurrency limit — each `codex exec` is independent
-- Gemini CLI: 60 req/min (Google Sign-in), 10 req/min (API key)
-- Machine resource: don't exceed ~6 parallel processes on oci-dev
-
----
-
-## Step 4: Capture and Parse Output
-
-### Codex Output (JSONL)
-
-Parse with `jq`:
-```bash
-# Final agent message
-jq -s '[.[] | select(.type=="item.completed") | select(.item.type=="agent_message") | .item.text] | last' /tmp/dispatch-{id}.json
-
-# All messages
-jq -s '[.[] | select(.type=="item.completed") | select(.item.type=="agent_message")]' /tmp/dispatch-{id}.json
-
-# Token usage
-jq -s '[.[] | select(.type=="turn.completed") | .usage] | last' /tmp/dispatch-{id}.json
-
-# Errors
-jq -s '[.[] | select(.type=="error")]' /tmp/dispatch-{id}.json
-```
-
-### Gemini Output (JSON)
-
-```bash
-# Response text
-jq -r '.response' /tmp/dispatch-{id}.json
-
-# Session stats (tokens, duration)
-jq '.stats' /tmp/dispatch-{id}.json
-
-# Exit code tells success/failure
-# 0 = success, non-zero = failure
-```
-
-### Gemini Output (Stream JSONL)
-
-```bash
-# Final result
-jq -s '[.[] | select(.type=="result") | .data] | last' /tmp/dispatch-{id}.jsonl
-
-# Tool calls made
-jq -s '[.[] | select(.type=="tool_use")]' /tmp/dispatch-{id}.jsonl
-```
-
----
-
-## Step 5: Validate
-
-After capturing output, validate against acceptance criteria:
-
-1. **Check exit code**: 0 = success, non-zero = failure
-2. **Check for errors in output**: parse error events from JSON
-3. **Check acceptance criteria**: did the worker's output satisfy each criterion?
-4. **If validation passes**: proceed to Step 6
-5. **If validation fails**: proceed to Step 7 (retry/escalate)
-
----
-
-## Step 6: Write Manifest
-
-Write a manifest file for every dispatched task:
-
-```
-1shot/dispatch/{task-id}.md
-```
-
-### Manifest Format
-
-```markdown
-# Dispatch: {task-id}
-
-## Status: succeeded | failed | retrying | escalated
-
-## Task
-- **Class**: {task_class}
-- **Lane**: {lane}
-- **Worker**: codex | gemini_cli
-- **Prompt**: (truncated, first 200 chars)
-- **Acceptance Criteria**: (from original task)
-
-## Execution
-- **Started**: {ISO timestamp}
-- **Completed**: {ISO timestamp}
-- **Duration**: {seconds}
-- **Output file**: `/tmp/dispatch-{id}.json`
-- **Exit code**: {code}
-- **Tokens used**: {if available from JSON}
-
-## Result
-- **Passed validation**: yes | no
-- **Summary**: {one-line of what happened}
-
-## Retry History
-- Attempt 1: {status}, {timestamp}
-- Attempt 2: {status}, {timestamp} (if retried)
-```
-
----
-
-## Step 7: Retry and Escalation
-
-### Retry Logic
-
-- **Attempt 1**: dispatch to lane's worker pool
-- **Attempt 2**: dispatch to fallback_lane (if configured)
-- **Attempt 3**: Claude handles inline with full context
-
-### When to Retry
-
-- Worker exit code is non-zero
-- Output contains errors
-- Acceptance criteria not met
-- Worker produced no useful output (empty response)
-
-### When to Escalate Immediately
-
-- The task involves auth, secrets, or data mutation
-- The task requires repo-wide synthesis
-- The prompt was malformed (Claude's fault — fix the prompt, not the worker)
-
-### Circuit Breaker
-
-If same task fails 3 times total:
-1. Log to manifest with status `escalated`
-2. Log to `BLOCKERS.md` or `1shot/ISSUES.md`
-3. Skip to next task
-4. If 3 consecutive tasks hit circuit breaker → stop, surface to user
-
----
-
-## Step 8: Integrate and Commit
-
-After successful dispatch:
-
-1. **Read the worker's output** — understand what changed
-2. **Read modified files** — confirm diffs match intent
-3. **Run tests** if applicable: `./scripts/ci.sh` or project test command
-4. **Commit**: `git add <files> && git commit -m "feat: <task description>"`
-5. **Update manifest**: status = `succeeded`
-6. **Update task tracker**: `TaskUpdate` completed
-
----
-
-## Worker Selection
-
-Worker ordering is **category-driven** via `config/lanes.yaml`. The resolver returns
-workers already sorted by category preference. Just pick the first available.
-
-| Category | Cheap Lane (first_available) | Balanced | Premium | Research |
-|----------|------------------------------|----------|---------|----------|
-| coding | codex → gemini_cli → glm_claude | codex → gemini_cli | claude_code → codex | codex → gemini_cli |
-| research | gemini_cli → codex → glm_claude | gemini_cli → codex | claude_code → codex | gemini_cli → codex |
-| writing | gemini_cli → codex → glm_claude | gemini_cli → codex | claude_code → codex | gemini_cli → codex |
-| review | codex → glm_claude → gemini_cli | codex → gemini_cli | claude_code → codex | codex → gemini_cli |
-| general | gemini_cli → codex → glm_claude | codex → gemini_cli | claude_code → codex | gemini_cli → codex |
-
-No manual selection needed — `python3 -m core.router.resolve --class <class> --category <cat>`
-returns the correct order. See `~/.claude/skills/_shared/providers.md` for full provider details.
-
-## Terminal Entry Points
-
-From the terminal (outside CC sessions), use shell functions:
-- `shot "task"` — auto-routes to best model (GLM by default, falls back to OpenRouter when ZAI expires)
-- `zai` — force GLM-5-turbo (ZAI, free)
-- `or` — force OpenRouter model (paid)
-- `or --code` — force Qwen3-Coder (OpenRouter, free)
-
-Inside a CC session, use the dispatch protocol above to hand off tasks to workers.
+- Research takes 5-15 seconds
+- Check cache BEFORE searching
+- Only add official docs to cache (not random blog posts)
+- Cache location: `~/github/docs-cache/` (global, not per-project)
 ````
 
-## File: .claude/skills/full/SKILL.md
+## File: .claude/skills/research/SKILL.md
 ````markdown
 ---
-name: full
-description: Structured operator for new projects, refactors, and complex implementations.
+name: research
+description: Run deep research via Argus search broker, dispatched to background workers. Not a Claude-inline task.
 ---
 
-# /full — Full Operator for Complex Work
+# /research — Background Research via Argus
 
-Structured operator for new projects, refactors, and complex implementations.
-Claude plans and executes. Codex reviews the plan and challenges the implementation.
+Research is dispatched to workers. Claude coordinates, not executes.
+
+## CRITICAL: Dispatch Is Mandatory
+
+Research queries MUST go through Argus or Gemini CLI as a subprocess.
+Claude does NOT do web research inline. Build the query, dispatch, integrate results.
+
+## Usage
+
+`/research [topic]`
+
+## Process
+
+1. Ask 1-2 clarifying questions (goal, depth)
+2. **Check Argus availability**:
+   ```bash
+   python -c "from core.search.argus_client import is_available; print(is_available())" 2>/dev/null
+   ```
+3. **Dispatch research to worker** (MANDATORY):
+   - If Argus available, dispatch via the research lane:
+     ```bash
+     python3 -m core.dispatch.run \
+       --class doc_draft \
+       --category research \
+       --prompt "Research: [topic]. Query Argus in research mode via HTTP API, extract key results, write findings to docs/research/[slug]/research.md. Structure: Executive Summary → Findings → Sources." \
+       --output 1shot/dispatch \
+       --manifest 1shot/dispatch
+     ```
+   - If Argus unavailable, dispatch to Gemini CLI:
+     ```bash
+     python3 -m core.dispatch.run \
+       --class doc_draft \
+       --category research \
+       --prompt "Research: [topic]. Write findings to docs/research/[slug]/research.md." \
+       --worker gemini_cli \
+       --output 1shot/dispatch
+     ```
+4. Review worker output when dispatch completes
+5. Integrate findings, present summary
+
+## Search Modes (from config/search.yaml)
+
+- `discovery`: broad, multiple sources
+- `precision`: targeted, high relevance
+- `research`: comprehensive, all providers
+- `cheap`: SearXNG only
+
+## Notes
+
+- Research takes 3-8 minutes in background
+- Check `docs/research/` for past research
+- Argus automatically handles provider fallback, ranking, and dedup
+````
+
+## File: .claude/skills/update/SKILL.md
+````markdown
+---
+name: update
+description: Pull latest oneshot from GitHub and sync skills/agents to the current project, or all projects with --all.
+---
+
+# /update — Sync OneShot to Current Project
+
+Pull the latest oneshot and propagate skills, agents, and AGENTS.md to the current project.
 
 ## Usage
 
 ```
-/full
-/full <project-description>
+/update           # pull + sync current project only
+/update --all     # pull + sync all projects
+/update --dry-run # preview what would change without touching anything (--all only)
+/update --self    # pull oneshot only, skip project sync
+```
+
+## Steps
+
+1. **Pull latest oneshot**
+   ```bash
+   cd ~/github/oneshot && git pull --rebase
+   ```
+   If this fails (local changes), stash first:
+   ```bash
+   git stash && git pull --rebase && git stash pop
+   ```
+
+2. **Sync**
+
+   **Default (current project only)**:
+   ```bash
+   bash ~/github/oneshot/scripts/oneshot-update.sh sync $(pwd)
+   ```
+   Then commit and push the result:
+   ```bash
+   git add .claude/ AGENTS.md 2>/dev/null || true
+   git diff --cached --quiet || git commit -m "chore: sync oneshot framework (skills, agents, AGENTS.md)"
+   git push
+   ```
+   If push fails (remote ahead), fix with:
+   ```bash
+   git stash && git pull --rebase && git push && git stash pop
+   ```
+
+   **`--all` (every project under ~/github/)**:
+   ```bash
+   bash ~/github/oneshot/scripts/sync-all-projects.sh
+   ```
+   With `--dry-run`:
+   ```bash
+   bash ~/github/oneshot/scripts/sync-all-projects.sh --dry-run
+   ```
+
+3. **Fix any push failures** (--all mode)
+   For each failed project, the likely cause is remote ahead of local. Fix with:
+   ```bash
+   cd ~/github/<project>
+   git stash
+   git pull --rebase
+   git push
+   git stash pop
+   ```
+   Do this for every project listed in `FAILED:` — don't leave them behind.
+
+4. **Report results**
+   ```
+   OneShot update complete
+   ├─ oneshot: <old-sha> → <new-sha>  (or "already up to date")
+   ├─ synced: N projects
+   ├─ skipped: N (no .claude/ dir or oneshot itself)
+   ├─ failed: N
+   └─ fixed: [list of projects that needed manual push]
+   ```
+
+## What Gets Synced
+
+| What | Where | Notes |
+|------|-------|-------|
+| Skills | `.claude/skills/` | `--delete` removes obsolete skills |
+| Agents | `.claude/agents/` | Only if project already has the dir |
+| AGENTS.md | `AGENTS.md` | Only if file exists in the project |
+
+Project-local files (`CLAUDE.md`, `CLAUDE.local.md`, `config/`, `1shot/`) are never touched.
+
+## Notes
+
+- The auto-updater pulls oneshot once per day on session start — `/update` is for forcing it now
+- `sync-all-projects.sh` auto-discovers every repo under `~/github/` with a `.claude/` dir
+- Each synced project gets a `chore: sync oneshot framework` commit and is pushed
+- Run from any directory — scripts use absolute paths
+````
+
+## File: config/models.yaml
+````yaml
+models:
+  zai:glm-5-turbo:
+    lane: cheap
+    strengths: [coding, reasoning, agentic, instruction_following]
+    max_task_size: large
+    can_plan: true
+    can_review: true
+    tool_calling: true
+    context_window: 200k
+    max_tokens: 131072
+    latency_tier: fast
+    pricing_per_m: {input: 0, output: 0}
+  zai:glm-5.1:
+    lane: cheap
+    strengths: [coding, reasoning, agentic, instruction_following]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 200k
+    max_tokens: 131072
+    latency_tier: medium
+    pricing_per_m: {input: 0, output: 0}
+  zai:glm-4.7:
+    lane: cheap
+    strengths: [coding, reasoning, instruction_following]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 200k
+    max_tokens: 131072
+    latency_tier: medium
+    pricing_per_m: {input: 0, output: 0}
+  zai:glm-4.5-air:
+    lane: cheap
+    strengths: [throughput, low_latency]
+    max_task_size: small
+    can_plan: false
+    can_review: false
+    tool_calling: true
+    context_window: 200k
+    latency_tier: fast
+    pricing_per_m: {input: 0, output: 0}
+  openrouter:minimax/minimax-m2.7:
+    lane: cheap
+    strengths: [coding, agentic, long_context]
+    max_task_size: medium
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 1m
+    latency_tier: medium
+    pricing_per_m: {input: 0.30, output: 1.20}
+  openrouter:deepseek/deepseek-v3.2:
+    lane: cheap
+    strengths: [coding, instruction_following, agentic_tool_use, low_cost]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 128k
+    latency_tier: medium
+    pricing_per_m: {input: 0.26, output: 0.38}
+  openrouter:moonshotai/kimi-k2.5:
+    lane: cheap
+    strengths: [coding, long_context, agentic]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 131k
+    latency_tier: medium
+    pricing_per_m: {input: 0.3827, output: 1.72}
+  openrouter:stepfun/step-3.5-flash:
+    lane: cheap
+    strengths: [fast_reasoning, low_cost]
+    max_task_size: medium
+    can_plan: false
+    can_review: true
+    context_window: 131k
+    latency_tier: fast
+  openrouter:xiaomi/mimo-v2-flash:
+    lane: cheap
+    strengths: [coding, reasoning, agentic]
+    max_task_size: medium
+    can_plan: false
+    can_review: true
+    context_window: 1m
+    latency_tier: medium
+  openrouter:google/gemini-2.5-flash-lite:
+    lane: cheap
+    strengths: [throughput, low_cost]
+    max_task_size: small
+    can_plan: false
+    can_review: false
+    tool_calling: true
+    context_window: 1m
+    latency_tier: fast
+    pricing_per_m: {input: 0.10, output: 0.40}
+  openrouter:google/gemini-2.5-flash:
+    lane: balanced
+    strengths: [coding, reasoning, long_context]
+    max_task_size: medium
+    can_plan: false
+    can_review: true
+    context_window: 1m
+    latency_tier: medium
+  claude:sonnet:
+    lane: premium
+    strengths: [planning, orchestration, repo_synthesis]
+    can_plan: true
+    can_review: true
+    context_window: 200k
+    latency_tier: slow
+claw_code:
+    zai_base_url: https://api.z.ai/api/coding/paas/v4
+    zai_key_env: ZAI_API_KEY
+    openrouter_base_url: https://openrouter.ai/api/v1
+    openrouter_key_env: OPENROUTER_API_KEY
+    default_model: glm-5-turbo
+    post_expiry_default_model: deepseek/deepseek-v3.2
+    fallback_priority:
+      - glm-5-turbo
+      - glm-5.1
+      - glm-4.7
+      - deepseek/deepseek-v3.2
+      - google/gemini-2.5-flash-lite
+      - minimax/minimax-m2.7
+      - moonshotai/kimi-k2.5
+    supported_models:
+      - glm-5-turbo
+      - glm-5.1
+      - glm-4.7
+      - glm-4.5-air
+      - deepseek/deepseek-v3.2
+      - google/gemini-2.5-flash-lite
+      - minimax/minimax-m2.7
+      - moonshotai/kimi-k2.5
+      - openai/gpt-4o-mini
+      - google/gemini-2.5-flash
+    harness: claw_code
+    install_path: ~/github/claw-code-agent
+````
+
+## File: config/providers.yaml
+````yaml
+providers:
+  anthropic:
+    env: ANTHROPIC_API_KEY
+    description: Claude API
+  openrouter:
+    env: OPENROUTER_API_KEY
+    description: Multi-model routing (MiniMax, StepFun, Xiaomi, Gemini, etc.)
+  openai:
+    env: OPENAI_API_KEY
+    description: Codex CLI (ChatGPT Plus OAuth)
+  gemini:
+    env: GEMINI_API_KEY
+    description: Gemini CLI
+  argus:
+    env: ARGUS_BASE_URL
+    description: Search broker (SearXNG, Brave, Serper, Tavily, Exa)
+  zai:
+    env: ZAI_API_KEY
+    base_url: https://api.z.ai/api/coding/paas/v4
+    description: ZAI GLM models (GLM-5.1, GLM-4.7, GLM-4.5-Air) — OpenAI-compatible endpoint, free on GLM Coding Plan
+  claw_code:
+    env: ZAI_API_KEY
+    description: Claw Code Agent — routes GLM models to ZAI, others to OpenRouter
+  opencode_go:
+    env: OPENCODE_GO_API_KEY
+    base_url: https://opencode.ai/zen/go/v1
+    base_url_openai: https://opencode.ai/zen/go/v1/chat/completions
+    base_url_anthropic: https://opencode.ai/zen/go/v1/messages
+    models_endpoint: https://opencode.ai/zen/go/v1/models
+    description: "Model gateway (GLM, Kimi, DeepSeek, MiMo, MiniMax, Qwen) — $5/$10mo sub. OpenAI-compatible for most models, Anthropic-compatible for MiniMax only. Not limited to OpenCode CLI."
+````
+
+## File: config/search.yaml
+````yaml
+search:
+  default_backend: argus
+  base_url: http://100.112.130.100:8270
+  api_key_env: ARGUS_API_KEY
+  modes:
+    discovery:
+      providers: [searxng, brave, exa]
+      max_results: 10
+    precision:
+      providers: [serper, tavily]
+      max_results: 5
+    cheap:
+      providers: [searxng]
+      max_results: 5
+    research:
+      providers: [searxng, brave, exa, tavily]
+      max_results: 15
+````
+
+## File: core/janitor/hooks/context.sh
+````bash
+project_dir="$PWD"
+while [ "$project_dir" != "/" ]; do
+  [ -d "$project_dir/.git" ] && break
+  project_dir=$(dirname "$project_dir")
+done
+[ "$project_dir" = "/" ] && exit 0
+ONESHOT_DIR="$HOME/github/oneshot"
+result=$(python3 -c "
+import sys, os, json
+sys.path.insert(0, '$ONESHOT_DIR')
+try:
+    from core.janitor.jobs import run_session_start
+    text = run_session_start('$project_dir')
+    if text:
+        print(json.dumps({'hookSpecificOutput': {'additionalContext': 'JANITOR_CONTEXT:' + text}}))
+except Exception:
+    pass
+" 2>/dev/null)
+if [ -n "$result" ]; then
+  echo "$result"
+fi
+exit 0
+````
+
+## File: core/janitor/hooks/record.sh
+````bash
+input=$(cat)
+tool_name="${input#*\"tool_name\":\"}"
+tool_name="${tool_name%%\"*}"
+case "$tool_name" in
+WebFetch | WebSearch | mcp__* | TaskCreate | TaskUpdate | TaskList | TaskGet | CronCreate | CronDelete | CronList | AskUserQuestion)
+	exit 0
+	;;
+esac
+project_dir="$PWD"
+while [ "$project_dir" != "/" ]; do
+	[ -d "$project_dir/.git" ] && break
+	project_dir=$(dirname "$project_dir")
+done
+[ "$project_dir" = "/" ] && exit 0
+janitor_dir="$project_dir/.janitor"
+events_file="$janitor_dir/events.jsonl"
+mkdir -p "$janitor_dir"
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+session_id="${CLAUDE_CODE_SESSION_ID:-$(date +%Y%m%d-%H%M%S)}"
+json_get() {
+	python3 -c "
+import json, sys
+d = json.loads(sys.stdin.read())
+val = str(d.get('$1', {}).get('$2', ''))[:200]
+print(json.dumps(val)[1:-1])
+" <<<"$input" 2>/dev/null || true
+}
+file_path=""
+case "$tool_name" in
+Read | Write | Edit)
+	file_path=$(json_get tool_input file_path)
+	;;
+esac
+has_failed_output=0
+if echo "$input" | tr -d "\\" | grep -qE '"exit_code"\s*:\s*[1-9]'; then
+	has_failed_output=1
+fi
+# Build event based on tool type
+case "$tool_name" in
+Glob | Grep)
+	query=$(json_get tool_input pattern)
+	[ -z "$query" ] && query=$(json_get tool_input glob_pattern)
+	[ -z "$query" ] && query=$(json_get tool_input query)
+	query="${query:0:100}"
+	# Check for no results in the raw input
+	is_empty=0
+	case "$input" in
+	*"\"tool_output\":\"\""* | *"\"tool_output\":\"\[\"]"*)
+		is_empty=1
+		;;
+	esac
+	if echo "$input" | grep -qE '"tool_output":"[^"]*([Nn]o (matches|results)|0 results|found 0|empty)'; then
+		is_empty=1
+	fi
+	if [ "$is_empty" -eq 1 ] && [ -n "$query" ]; then
+		printf '{"ts":"%s","session":"%s","type":"dead_end","content":"No results for: %s","meta":{"tool":"%s","auto":true},"files":[]}\n' \
+			"$timestamp" "$session_id" "$query" "$tool_name" >>"$events_file"
+	fi
+	exit 0
+	;;
+Read)
+	[ -z "$file_path" ] && exit 0
+	printf '{"ts":"%s","session":"%s","type":"file_read","content":"Read %s","meta":{"tool":"Read","auto":true},"files":["%s"]}\n' \
+		"$timestamp" "$session_id" "$file_path" "$file_path" >>"$events_file"
+	;;
+Write)
+	[ -z "$file_path" ] && exit 0
+	printf '{"ts":"%s","session":"%s","type":"file_written","content":"Created %s","meta":{"tool":"Write","auto":true},"files":["%s"]}\n' \
+		"$timestamp" "$session_id" "$file_path" "$file_path" >>"$events_file"
+	;;
+Edit)
+	[ -z "$file_path" ] && exit 0
+	printf '{"ts":"%s","session":"%s","type":"file_written","content":"Edited %s","meta":{"tool":"Edit","auto":true},"files":["%s"]}\n' \
+		"$timestamp" "$session_id" "$file_path" "$file_path" >>"$events_file"
+	;;
+Bash)
+	cmd=$(json_get tool_input command)
+	cmd="${cmd:0:200}"
+	if [ "$has_failed_output" -eq 1 ]; then
+		printf '{"ts":"%s","session":"%s","type":"dead_end","content":"Failed: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
+			"$timestamp" "$session_id" "${cmd:0:100}" >>"$events_file"
+	fi
+	case "$cmd" in
+	git\ commit* | git\ push*)
+		printf '{"ts":"%s","session":"%s","type":"commit","content":"Git: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
+			"$timestamp" "$session_id" "${cmd:0:100}" >>"$events_file"
+		;;
+	git\ *)
+		exit 0
+		;;
+	*)
+		printf '{"ts":"%s","session":"%s","type":"action_taken","content":"Ran: %s","meta":{"tool":"Bash","auto":true},"files":[]}\n' \
+			"$timestamp" "$session_id" "${cmd:0:100}" >>"$events_file"
+		;;
+	esac
+	;;
+*)
+	exit 0
+	;;
+esac
+exit 0
+````
+
+## File: core/janitor/hooks/session-end.sh
+````bash
+project_dir="$PWD"
+while [ "$project_dir" != "/" ]; do
+	[ -d "$project_dir/.git" ] && break
+	project_dir=$(dirname "$project_dir")
+done
+[ "$project_dir" = "/" ] && exit 0
+janitor_dir="$project_dir/.janitor"
+events_file="$janitor_dir/events.jsonl"
+[ ! -f "$events_file" ] && exit 0
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+session_id="${CLAUDE_CODE_SESSION_ID:-unknown}"
+printf '{"ts":"%s","session":"%s","type":"session_end","content":"Session ended","meta":{"auto":true},"files":[]}\n' \
+	"$timestamp" "$session_id" >>"$events_file"
+ONESHOT_DIR="$HOME/github/oneshot"
+openrouter_api_key="$(secrets get OPENROUTER_API_KEY 2>/dev/null || true)"
+export OPENROUTER_API_KEY="$openrouter_api_key"
+python3 -c "
+import sys, os
+sys.path.insert(0, '$ONESHOT_DIR')
+try:
+    from core.janitor.jobs import run_session_end
+    run_session_end('$project_dir')
+except Exception:
+    pass
+" &
+exit 0
+````
+
+## File: core/janitor/__init__.py
+````python
+__all__ = [
+````
+
+## File: docs/instructions/search.md
+````markdown
+# Search Rules
+
+## Search Plane: Argus
+
+All web search goes through a **single Argus instance running on homelab** (`100.112.130.100`).
+Do not run Argus locally on other machines — point everything at homelab.
+
+- **HTTP API**: `http://100.112.130.100:8270` — used by skills and Python client
+- **MCP server**: `http://100.112.130.100:8271/sse` — registered in `~/.claude/settings.json` on all machines
+
+**Argus supports**: SearXNG, Brave, Serper, Tavily, Exa — with automatic
+provider selection, fallback, ranking (RRF), and budget enforcement.
+
+### Search Modes
+
+| Mode | Providers | Use Case |
+|------|-----------|----------|
+| discovery | searxng, brave, exa | Broad exploration, multiple sources |
+| precision | serper, tavily | Targeted queries, high relevance |
+| cheap | searxng only | Quick lookups, cost-sensitive |
+| research | searxng, brave, exa, tavily | Deep research, comprehensive |
+
+Config: `config/search.yaml`
+
+### How to Use Argus
+
+**Natural language (preferred)** — just ask Claude to search. The `mcp__argus__search_web`
+MCP tool is available in every Claude Code session on every machine. No special command needed:
+> "Search for recent fastapi performance tips"
+> "Look up the Tailscale ACL syntax"
+
+Claude will call `mcp__argus__search_web` automatically. This costs zero Claude tokens
+for the search itself.
+
+**`/freesearch [topic]`** — explicit zero-token search via Argus cheap mode (SearXNG).
+Use when you want to be explicit or are in a non-Claude session.
+
+**`/research [topic]`** — deep multi-source research spawned as a background agent.
+Use for comprehensive research across multiple providers.
+
+**From code**: Use the Python client (reads `config/search.yaml` for the homelab URL).
+```python
+from core.search.argus_client import search, health, is_available
+
+results = search("fastapi best practices", mode="discovery")
+```
+
+**From CLI**: Direct curl to homelab.
+```bash
+curl -s -X POST http://100.112.130.100:8270/api/search \
+  -H "Content-Type: application/json" \
+  -d '{"query": "...", "mode": "discovery"}'
+```
+
+### Fallback
+
+If Argus is unreachable (homelab down):
+1. Check `config/search.yaml` for the mode's provider list
+2. Call the first available provider directly
+3. Never hardcode provider logic in skill prompts — always read from config
+
+Gemini CLI is the last-resort fallback for `/research` only.
+
+## /research Skill
+
+Background research uses Argus as the primary backend:
+1. Read search config for the appropriate mode
+2. Query Argus with the research prompt
+3. Use a cheap model to summarize findings
+4. Optional: Claude final synthesis for complex topics
+
+Fallback to Gemini CLI only if homelab Argus is unreachable.
+
+## /freesearch Skill
+
+Zero-token web search:
+1. Check docs cache first (`~/github/docs-cache/docs/cache/.index.md`)
+2. Query Argus in `cheap` mode (SearXNG only)
+3. Return results directly
+
+## Doc Caching
+
+Cache external documentation locally for offline/fast access:
+- Cache location: `~/github/docs-cache/docs/cache/`
+- Check index first: `cat ~/github/docs-cache/docs/cache/.index.md`
+- Use `/doc` skill to cache new documentation
+````
+
+## File: docs/ZAI_TO_OPENCODE_GO_MIGRATION.md
+````markdown
+# ZAI to OpenCode Go Migration
+
+## Current State: ZAI Dogfood Phase
+
+The harness currently routes all lanes through **ZAI** (GLM models) via Claude CLI with custom `ANTHROPIC_BASE_URL`. This is a dogfood phase to validate the dispatch/collect/review lifecycle before committing to a paid provider.
+
+**ZAI plan expires: 2026-05-02.** All lanes must migrate to OpenCode Go before this date.
+
+## Why OpenCode Go
+
+- **Cost:** $5 first month, $10/month subscription — predictable and cheap
+- **Model diversity:** DeepSeek, Qwen, MiniMax, Kimi, MiMo — different strengths for different lanes
+- **Multiple invocation paths:** Not limited to OpenCode CLI — Claude CLI and direct API also work
+- **Rate limits:** Managed by OpenCode platform, not per-provider
+
+## Architecture: Harness vs Provider
+
+OpenCode Go is a **model gateway**, not an OpenCode-CLI-only tool. Three invocation paths:
+
+| Path | How | Models | Best For |
+|------|-----|--------|----------|
+| **OpenCode CLI** | `opencode run --model opencode-go/<id>` | All models | Universal fallback |
+| **Claude CLI** | `claude -p` + `ANTHROPIC_BASE_URL` | MiniMax M2.5, M2.7 only | Full toolchain (bash, edit, grep, git) |
+| **Direct API** | HTTP POST to OpenAI-compatible endpoint | All models | Summaries, extraction, classification |
+
+Path 2 gives the full Claude Code toolchain with OpenCode Go pricing. Path 3 is lightweight — no shell access for the model.
+
+## Endpoint Routing (Per-Model, Not Universal)
+
+Endpoints are **per-protocol, not universal**:
+
+| Protocol | Endpoint | Models | Usable By |
+|----------|----------|--------|-----------|
+| OpenAI-compatible | `https://opencode.ai/zen/go/v1/chat/completions` | GLM, Kimi, DeepSeek, MiMo, Qwen | OpenCode CLI, Direct API |
+| Anthropic-compatible | `https://opencode.ai/zen/go/v1/messages` | MiniMax M2.5, M2.7 | Claude CLI, OpenCode CLI |
+
+Models metadata: `https://opencode.ai/zen/go/v1/models` (dynamic model list).
+
+**Key constraint:** The Claude CLI runner path (`ANTHROPIC_BASE_URL`) only works with MiniMax models. Other models need the OpenCode CLI or direct API (OpenAI-compatible endpoint).
+
+## Pricing
+
+| Plan | Cost |
+|------|------|
+| First month | $5 |
+| Ongoing | $10/month |
+
+Usage limits (dollar-based, vary by model cost):
+
+| Window | Limit |
+|--------|-------|
+| 5 hours | $12 |
+| 1 week | $30 |
+| 1 month | $60 |
+
+These limits apply to the OpenCode Go platform total, not per-lane. The routing policy conserves budget by defaulting to cheap models and escalating only on failure.
+
+## Migration Steps
+
+### 1. Get an API key
+
+```bash
+# Register at opencode.ai and get your API key
+# Set it in the vault
+secrets set oneshot "OPENCODE_GO_API_KEY=<your-key>" --commit
+```
+
+### 2. Enable the provider
+
+In `.oneshot/config/models.yaml`:
+
+```yaml
+providers:
+  opencode_go:
+    enabled: true  # was false
+```
+
+### 3. Choose invocation path per lane
+
+The `routine_coder` lane defaults to MiniMax (Anthropic-compatible) for full Claude CLI toolchain. Other lanes use the direct API or OpenCode CLI.
+
+```yaml
+lanes:
+  cheap_fast:
+    current_provider: opencode_go    # was zai
+    current_model: deepseek_v4_flash # was glm_4_5_air
+    # Uses direct API (OpenAI-compatible)
+  cheap_summary:
+    current_provider: opencode_go    # was zai
+    current_model: qwen_3_5_plus     # was glm_4_5_air
+    # Uses direct API (OpenAI-compatible)
+  routine_coder:
+    current_provider: opencode_go    # was zai
+    current_model: minimax_m2_7      # was glm_5_1
+    future_runner: opencode_go_claude # Claude CLI path (full toolchain)
+    # Uses Claude CLI (Anthropic-compatible)
+  strong_reasoning:
+    current_provider: opencode_go    # was zai
+    current_model: kimi_k2_6         # was glm_5_turbo
+    # Uses OpenCode CLI or direct API
+  premium_reasoning:
+    current_provider: opencode_go    # was zai
+    current_model: deepseek_v4_pro   # was glm_5_turbo
+    # Uses OpenCode CLI or direct API
+```
+
+### 4. Test each lane
+
+```bash
+./bin/oneshot lanes  # verify the table shows opencode_go models
+./bin/oneshot dispatch --lane routine_coder --task "test task" --allow-dirty
+# Claude CLI path: claude -p --model minimax-m2.7 --dangerously-skip-permissions ...
+# Direct API path: python3 -c "from core.dispatch.direct_api import call; ..."
+```
+
+### 5. Disable ZAI
+
+After all lanes are migrated and tested:
+
+```yaml
+providers:
+  zai:
+    enabled: false  # was true
+```
+
+## Model Mapping
+
+| ZAI (current) | OpenCode Go (future) | Protocol | Notes |
+|---------------|---------------------|----------|-------|
+| `glm-4.5-air` | `deepseek-v4-flash` | OpenAI | Faster, cheaper |
+| `glm-4.5-air` | `qwen3.5-plus` | OpenAI | Good at summarization |
+| `glm-5.1` | `minimax-m2.7` | **Anthropic** | Claude CLI path (full toolchain) |
+| `glm-5-turbo` | `kimi-k2.6` | OpenAI | Strong reasoning |
+| `glm-5-turbo` | `deepseek-v4-pro` | OpenAI | Premium fallback |
+| — | `glm-5` | OpenAI | GLM available on OCG too |
+| — | `glm-5.1` | OpenAI | Premium reasoning tier |
+| — | `mimo-v2-pro` | OpenAI | Routine coder |
+| — | `mimo-v2-omni` | OpenAI | Routine coder |
+| — | `mimo-v2.5-pro` | OpenAI | Strong reasoning |
+| — | `mimo-v2.5` | OpenAI | Routine coder |
+
+## Runner Templates
+
+Three runner templates in `.oneshot/config/models.yaml`:
+
+| Template | Harness | Protocol | Models | Toolchain |
+|----------|---------|----------|--------|-----------|
+| `opencode_go` | OpenCode CLI | Both | All | OpenCode tools |
+| `opencode_go_claude` | Claude CLI | Anthropic | MiniMax only | Full (bash, edit, grep, git) |
+| `opencode_go_api` | Direct API | OpenAI | All | None (request/response only) |
+
+## Rollback
+
+If OpenCode Go doesn't work out, revert the `current_*` fields back to ZAI values. The `future_*` fields stay as documentation of the intended migration target. The ZAI provider config remains in the file as a fallback.
+````
+
+## File: oneshot_cli/__main__.py
+````python
+@click.group()
+def cli()
+⋮----
+@cli.group()
+def worktree()
+````
+
+## File: .claude/skills/short/SKILL.md
+````markdown
+---
+name: short
+description: Quick iterations on existing projects. Load context, ask what's next, execute in burn-down mode. Implementation tasks dispatched to workers.
+---
+
+# /short — Quick Iteration Operator
+
+Fast operator for existing projects. Loads context, asks what you're working on, executes.
+**Implementation tasks are dispatched to workers. Claude only handles planning, review, and integration.**
+
+## CRITICAL: Dispatch Is Mandatory
+
+This operator REQUIRES external worker dispatch for implementation tasks.
+Claude is the planner and reviewer ONLY. If you are about to write implementation code
+yourself — STOP — you are violating this skill's contract. Build a prompt and dispatch.
+
+## Usage
+
+```
+/short
+/short <scope>
 ```
 
 ## Behavior
 
 When invoked:
 
-### Phase 1: Intake
+1. **Load Context**
+   - Read recent git commits: `git log --oneline -5`
+   - Check TaskList for pending/in_progress tasks (if any exist)
+   - Read `1shot/DECISIONS.md`, `1shot/BLOCKERS.md` if present
 
-1. **Load or Create `1shot/` Context**
-   - Check for `1shot/PROJECT.md` — if missing, create from intake below
-   - Check for `1shot/LLM-OVERVIEW.md` — if missing, create from template
-   - Read `1shot/STATE.md` if resuming
+2. **Ask What's Next**
 
-2. **Structured Discovery**
-   - What are you building?
-   - What's the scope?
-   - What's the target architecture?
-   - Any constraints or preferences?
-
-3. **Document Decisions**
-   - Write to `1shot/PROJECT.md`
-   - Note key decisions in `1shot/DECISIONS.md`
-
-4. **Update `1shot/LLM-OVERVIEW.md`**
-   - Fill in or refresh: what is this, stack, key files, how to run
-   - Keep it current — it's the single source of truth for any LLM entering this project
-
-### Phase 2: Planning
-
-1. **Docs Check**
-   - Identify all external libraries, APIs, and tools the project will use
-   - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
-   - For anything missing → run `/doc <name> <url>` before coding begins
-   - Use cached docs as source of truth — do NOT rely on training data for syntax
-
-2. **Phase-Based Plan**
-   - Break into milestones (not every sub-step)
-   - Define acceptance criteria per milestone
-   - Identify dependencies
-   - Write `1shot/ROADMAP.md`
-
-3. **Skill Discovery**
-   - Check `1shot/skills/` for already-pulled project skills
-   - For each high-level task type, ask: *"Is this specialized enough that a better community skill exists?"*
-   - Specialized domains (security, blockchain, ML, infra tools, specific APIs, parsers): **search SkillsMP**
-     ```bash
-     ./scripts/skillsmp-search.sh "<task type>" --install
-     ```
-   - General tasks (write tests, refactor, add endpoint): skip search, proceed with core skills
-   - If a skill is pulled, note it: "Using `1shot/skills/{name}` for [task type]"
-
-4. **Create Task Queue**
-   - Use native TaskCreate for each milestone (not every sub-step)
-   - Set dependencies with addBlockedBy
-   - Tasks track milestones, not individual file edits
-
-5. **Detect Providers**
+3. **Verify Workers Are Available**
    ```bash
-   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
-   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+   python3 -m core.router.resolve --class implement_small --category coding
    ```
-   Note available providers in `1shot/STATE.md`.
+   If the router fails or returns no workers, stop and tell the user.
 
-6. **Codex Plan Review** (adversarial pass on the plan — before any code)
-   - If codex available, send the plan for review:
+4. **Docs Check** (if the task uses any external library, API, or tool)
+   - Check local cache: `cat ~/github/docs-cache/docs/cache/.index.md`
+   - If missing → run `/doc <name> <url>` to cache it first
+
+5. **Skill Discovery** (if the task is specialized)
+   - Check `1shot/skills/` for already-pulled skills
+   - Specialized domains (security, blockchain, ML, infra): search via `./scripts/skillsmp-search.sh`
+
+6. **Methodology Selection** (automatic)
+   - **Bug fix** → `/debug` protocol (investigate → analyze → hypothesize → fix)
+   - **New feature** → `/tdd` protocol (RED-GREEN-REFACTOR)
+   - **Doc edit, config change, refactor**: no special methodology needed
+
+7. **Execute in Burn-Down Mode**
+
+   For each task:
+   - **Planning/review tasks**: Claude handles inline
+   - **Implementation tasks** (code changes, test writing, refactoring):
      ```bash
-     codex exec --full-auto "You are reviewing an implementation plan before execution. Here is the plan: [ROADMAP.md content]. Flag: (1) missing steps or dependencies, (2) tasks that could be combined, (3) risks not mentioned, (4) a better ordering. Be specific. Context: [PROJECT.md summary]"
+     python3 -m core.router.resolve --class <task_class> --category <category>
+     # Build self-contained prompt from dispatch.md template
+     python3 -m core.dispatch.run \
+       --class <task_class> \
+       --category <category> \
+       --prompt "..." \
+       --output 1shot/dispatch \
+       --manifest 1shot/dispatch
      ```
-   - Surface Codex's feedback — adjust plan if warranted, but proceed regardless
-   - If codex unavailable → Claude does inline self-review, continue
+   - After dispatch completes: review output, validate, integrate, commit
+   - **If dispatch fails**: retry with fallback_lane once, then log blocker and skip
+   - **Do NOT implement code yourself as a fallback**
 
-### Phase 3: Execution
+   After each significant change, dispatch a review via the dispatch protocol.
 
-1. **Methodology Selection** (per milestone — automatic)
-   For each milestone task, inspect the task description and apply the right protocol:
-   - **Bug fix** (fix, bug, broken, error, crash, failing, wrong, unexpected, regression,
-     investigate, troubleshoot, not working, incorrect) → follow the `/debug` protocol:
-     investigate → analyze → hypothesize → fix. Phases 1-3 are read-only before any code.
-   - **New feature / implementation** (implement, add, create, build, new endpoint, new function)
-     → follow the `/tdd` protocol: RED-GREEN-REFACTOR. No production code without a failing
-     test shown first.
-   - **Doc edit, config change, refactor**: no special methodology needed.
-
-2. **Milestone Tracking**
-   - Work through tasks in order
-   - Commit after each milestone
-   - Update `1shot/STATE.md` with progress
-
-3. **Dispatch Non-Premium Tasks**
-   - For each milestone task, classify using task-classes.md and determine category
-   - **Follow the dispatch protocol** (see `~/.claude/skills/_shared/dispatch.md`):
-     - Premium tasks (planning, review, integration) → Claude handles inline
-     - Implementation, test, doc tasks → dispatch to best available worker for that category
-     - Use `python3 -m core.dispatch.run --category <category>` for parallel execution
-     - Write manifests to `1shot/dispatch/`
-   - Review dispatch output, validate against acceptance criteria, commit
-
-4. **Burn-Down Mode**
-   - Complete one milestone fully before starting next
-   - If blocked > 2 attempts: log to `1shot/BLOCKERS.md`, skip, continue
-
-5. **Context Checkpoints**
-   - At 50% context: suggest /handoff
-   - At 70% context: auto-create handoff
-
-### Phase 4: Completion
-
-1. **Challenge Pass** (adversarial review of full implementation)
-   - `git diff $(git merge-base HEAD main)..HEAD` — full diff since full started
-   - **Follow the dispatch protocol** for the review (see `_shared/dispatch.md`):
-     - Dispatch to Codex for adversarial review
-     - Use `codex exec --json -o /tmp/full-challenge.json`
-   - If codex unavailable: Claude performs adversarial review inline
-   - New issues found → fix, then re-verify
-
-2. **Verification (MANDATORY — evidence required)**
-
-   **No verification, no completion. Assertions don't count — show the output.**
-
-   Every milestone must pass this checklist. Each step requires actual command output.
-
-   1. **Run targeted tests** — if test files exist, run them. Show output.
-   2. **Run lint/static analysis** — show output (or lack of errors). No linter? State what was tried.
-   3. **Run type check** — show output.
-   4. **Check acceptance criteria** — go through each criterion one by one. Cite evidence.
-   5. **Review diff against plan** — confirm changed files match ROADMAP.md scope.
-
-   If any check fails:
-   - Do not proceed to the summary — go back and fix the issue
-   - Re-run the failed check(s) to confirm the fix
-   - Document persistent failures in `1shot/BLOCKERS.md`
-
-3. **Update `1shot/LLM-OVERVIEW.md`**
-   - Refresh "Current State" section to reflect what was built
-
-4. **Summary**
+8. **Show Summary on Completion**
    ```
-   📊 Implementation Complete
-   ├─ Milestones: X/Y completed
-   ├─ Files changed: Z
-   ├─ Commits: N
-   ├─ Codex reviews: M (issues found: P)
-   ├─ Skills pulled: Q (in 1shot/skills/)
-   └─ Next steps: [if any]
+   Session Summary
+   ├─ Tasks completed: X
+   ├─ Workers used: [codex: N, gemini: M, glm: P]
+   ├─ Files changed: Y
+   ├─ Dispatches: total N (succeeded: M, failed: P)
+   └─ Next: [next task or "all done"]
    ```
 
 ## Provider Routing
@@ -29909,594 +31432,871 @@ When invoked:
 See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol.
 See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
 
-**Full-specific routing**: Claude plans and reviews. Codex and Gemini execute implementation tasks via the dispatch protocol. Research tasks route to Gemini. Full is one operator, not a PMO — don't make it behave like conduct.
+## `1shot/` Convention
 
-## `1shot/` Structure
-
-```
-1shot/
-├── LLM-OVERVIEW.md   # Full project context — keep updated
-├── PROJECT.md        # Goals, scope, acceptance criteria
-├── STATE.md          # Current phase and loop state
-├── ROADMAP.md        # Milestones and plan
-├── DECISIONS.md      # Decision log
-├── BLOCKERS.md       # Blocked items
-└── skills/           # SkillsMP-pulled project skills
-    └── {name}/
-        └── SKILL.md
-```
-
-Only `AGENTS.md` and `CLAUDE.md` belong at the project root. Everything else goes in `1shot/`.
-
-## Decision Defaults
-
-| Ambiguity | Default |
-|-----------|---------|
-| Stack | Follow CLAUDE.md defaults |
-| Multiple implementations | Simplest |
-| Naming | Follow existing pattern |
-| Auth | Supabase Auth (email/password + Google OAuth) |
-| Database | SQLite → Supabase Postgres |
-| Deploy | Vercel / oci-dev |
-| SkillsMP search bar | Specialized domain → search; general task → skip |
-| Codex review? | Always run if available (advisory, not a gate) |
+- `1shot/DECISIONS.md` — decision log
+- `1shot/BLOCKERS.md` — blocked items
+- `1shot/skills/` — project-local SkillsMP skills
 
 ## Auto-Approved Actions
 
 - Reading any file
 - Writing to scope-matched files
 - Creating/updating any file under `1shot/`
-- Running `./scripts/skillsmp-search.sh`
 - Running tests and linters
-- Calling Codex and Gemini CLI via bash
+- Calling Codex/Gemini/GLM CLI via bash (dispatch)
 - Git commit (not push)
-- Creating native tasks
 
 ## Requires Confirmation
 
-- Destructive operations
+- Destructive operations (rm -rf, DROP TABLE)
 - Git push to shared branches
 - External API calls that cost money
 - Deploying to production
-- Major architecture changes
 ````
 
-## File: docs/instructions/task-classes.md
+## File: 1shot/ROADMAP.md
 ````markdown
-# Task Classes & Routing Contract
+# Current Roadmap Pointer
 
-Task classes are the bridge between intent and execution. Every task in OneShot
-gets classified into one of these classes, which determines its lane, worker
-pool, and review path.
+## Active Pass
+- Name: OneShot repo-first memory architecture
+- Date: 2026-04-28
+- Dated roadmap: `1shot/2026-04-28-memory-architecture-ROADMAP.md`
+- Dated project: `1shot/2026-04-28-memory-architecture-PROJECT.md`
+- Dated state: `1shot/2026-04-28-memory-architecture-STATE.md`
+- Active spec: `1shot/MEMORY_ARCHITECTURE_SPEC.md`
+- Phase-1 implementation spec: `1shot/MEMORY_PHASE1_IMPLEMENTATION_SPEC.md`
 
-## Task Classes
+## Live Objective
+Design and stage a repo-first memory system for OneShot without making the OneShot repo the home of project work, and make the design portable to downstream customer repos.
 
-| Class | Lane | Category | Preferred Workers |
-|-------|------|----------|-------------------|
-| `plan` | premium | general | claude_code |
-| `research` | research | research | gemini_cli, codex |
-| `search_sweep` | research | research | gemini_cli, codex |
-| `implement_small` | cheap | coding | codex, gemini_cli, glm_claude |
-| `implement_medium` | balanced | coding | codex, gemini_cli |
-| `test_write` | cheap | coding | codex, gemini_cli, glm_claude |
-| `review_diff` | premium | review | codex, claude_code |
-| `doc_draft` | cheap | writing | gemini_cli, codex, glm_claude |
-| `summarize_findings` | cheap | writing | gemini_cli, codex, glm_claude |
+## Current Build Contract
+- `1shot/MEMORY_PHASE1_IMPLEMENTATION_SPEC.md` defines the first coding pass:
+  - exact repo-local files
+  - memory policy format
+  - promotion rules
+  - retrieval behavior
+  - degraded-mode contract
 
-### `plan` — Planning & Decomposition
-- **Lane**: premium | **Category**: general
-- **Planner**: claude_code (required)
-- **Worker**: None (planner handles directly)
-- **Review**: claude_code
-- **Use when**: Starting any non-trivial work, creating a roadmap, breaking down goals
+## Implementation Progress
+- Shipped in current wave:
+  - repo scaffold and policy file creation
+  - stable memory promotion for decisions, blockers, runbooks, and session summaries
+  - provenance records
+  - same-repo retrieval ordering
+  - abstraction file generation
+  - local private SQLite-backed abstraction indexing
+  - cross-repo abstraction search with degraded-mode signaling
+- Not yet shipped:
+  - dual-home private index service integration
+  - review-gate enforcement for memory-affecting high-risk work
 
-### `research` — Deep Research
-- **Lane**: research | **Category**: research
-- **Planner**: claude_code
-- **Worker**: gemini_cli + argus (search backend)
-- **Review**: claude_code (optional, for synthesis)
-- **Use when**: Need to understand a domain, gather information, investigate options
+## Phase Plan
 
-### `search_sweep` — Quick Search Scan
-- **Lane**: research | **Category**: research
-- **Planner**: None
-- **Worker**: argus + cheap summarizer
-- **Review**: claude_code (optional)
-- **Use when**: Quick fact-checking, finding specific docs, looking up syntax
+### Phase 0: Planning Reset
+- Preserve passes by date and name instead of relying only on overwritten top-level files
+- Capture current intake, scope, constraints, and risk in dated and live planning artifacts
+- Record provider availability and baseline planning state
+- Reseed the persistent task ledger for the memory program
+- Exit criteria:
+  - planning files reflect the memory pass
+  - dated artifacts preserve the pass identity
+  - task ledger is reseeded for this work
 
-### `implement_small` — Bounded Implementation
-- **Lane**: cheap | **Category**: coding
-- **Planner**: claude_code (for task decomposition)
-- **Worker**: cheap pool (codex, gemini_cli, glm_claude)
-- **Review**: claude_code (required)
-- **Use when**: Small code change, single file, clear requirements, isolated scope
-- **Max scope**: Single module, well-defined inputs/outputs
+### Phase 1: Memory Contract
+- Define the repo-first memory contract
+- Lock responsibilities for:
+  - `docs/agents/`
+  - `.oneshot/`
+  - external private index/search
+- Define initial first-class memory categories:
+  - decisions
+  - session summaries
+  - important commands/runbooks
+  - blockers/resolutions
+- Exit criteria:
+  - memory ownership and storage boundaries are explicit
 
-### `implement_medium` — Medium Implementation
-- **Lane**: balanced | **Category**: coding
-- **Planner**: claude_code (required)
-- **Worker**: balanced pool (codex, gemini_cli)
-- **Review**: claude_code (required)
-- **Use when**: Multi-file change, cross-cutting concern, moderate complexity
+### Phase 2: Lifecycle + Policy
+- Define memory lifecycle states:
+  - captured
+  - summarized
+  - promoted
+  - conflicted
+  - superseded
+  - archived
+- Define write policy:
+  - broad automatic signal capture
+  - provenance on every durable write
+  - conflict preservation instead of overwrite
+- Define per-repo policy modes:
+  - portable
+  - isolated
+  - sensitive
+  - private/no-cross-repo
+- Exit criteria:
+  - write rules and repo policy modes are stable enough to implement
 
-### `test_write` — Test Generation
-- **Lane**: cheap | **Category**: coding
-- **Planner**: claude_code (for test strategy)
-- **Worker**: cheap pool
-- **Review**: claude_code
-- **Use when**: Writing tests for existing code, test scaffolding
+### Phase 3: Retrieval + Portability
+- Define same-repo retrieval order
+- Define cross-repo retrieval order
+- Restrict cross-repo reuse to abstracted lessons by default
+- Define what is portable vs non-portable:
+  - tooling
+  - infra
+  - orchestration
+  - debugging
+  - runbook patterns
+  - not business logic or repo-bound assumptions by default
+- Exit criteria:
+  - retrieval policy can be implemented without reopening trust questions
 
-### `review_diff` — Code Review
-- **Lane**: premium | **Category**: review
-- **Planner**: None
-- **Worker**: claude_code or strong reviewer
-- **Review**: claude_code (final say)
-- **Use when**: Adversarial review, quality gate, challenge pass
+### Phase 4: Governance + Review Gates
+- Define which work classes are high-risk
+- Lock planner vs worker vs reviewer roles for memory-related work
+- Define when cross-model quorum is required
+- Define how memory changes are reviewed and promoted
+- Exit criteria:
+  - important work has a clear review path that is strong without being everywhere-all-at-once
 
-### `doc_draft` — Documentation Draft
-- **Lane**: cheap | **Category**: writing
-- **Planner**: None
-- **Worker**: cheap pool
-- **Review**: claude_code (optional polish)
-- **Use when**: Writing README sections, API docs, inline comments
+### Phase 5: Infra Fit
+- Define the external index role across homelab, OCI, and Tailscale
+- Keep repo memory canonical; external index remains secondary
+- Define degraded-mode behavior when index/search is down
+- Define onboarding behavior for repos with no memory yet
+- Exit criteria:
+  - system can fail gracefully without losing repo truth
 
-### `summarize_findings` — Result Summarization
-- **Lane**: cheap | **Category**: writing
-- **Planner**: None
-- **Worker**: cheap pool
-- **Review**: None
-- **Use when**: Condensing research, summarizing logs, creating executive summaries
+### Phase 6: Implementation Roadmap
+- Break the architecture into buildable milestones
+- Order work to reduce risk:
+  1. repo memory scaffold
+  2. repo policy modes
+  3. write/promotion rules
+  4. same-repo retrieval
+  5. cross-repo abstractions
+  6. conflict handling
+  7. review gates
+  8. central index hardening
+- Exit criteria:
+  - next pass can start implementation without redesigning the system
 
-## Classification Guide
+## Recommended Implementation Order
 
-To classify a task, ask:
+### Milestone 1: Repo Scaffold
+- Create standard repo-local memory layout
+- Add policy declaration support
+- Add empty first-class memory documents
+- Success measure:
+  - operational fit
+  - review governance anchor points exist
 
-1. **Does it require understanding the full repo context?** → `plan` or `review_diff`
-2. **Does it need web search?** → `research` or `search_sweep`
-3. **Is it a code change?**
-   - Single file, clear scope → `implement_small`
-   - Multi-file, moderate complexity → `implement_medium`
-4. **Is it a test?** → `test_write`
-5. **Is it documentation?** → `doc_draft`
-6. **Is it summarizing something?** → `summarize_findings`
+### Milestone 2: Stable Writes
+- Add checkpoint and session summary capture
+- Promote first-class durable categories into repo-local memory
+- Preserve provenance on all writes
+- Success measure:
+  - reliable repo memory exists and can be trusted
 
-## Lane Escalation
+### Milestone 3: Same-Repo Retrieval
+- Retrieve canonical memory from the active repo only
+- Rank `docs/agents/` above `.oneshot/`
+- Surface conflicts and superseded entries explicitly
+- Success measure:
+  - current repo gets useful memory without cross-project contamination
 
-Each lane has a `fallback_lane` in `config/lanes.yaml`. If a worker fails:
-- `cheap` → `balanced` → `premium` → inline (Claude handles directly)
-- `research` → `balanced` → inline
+### Milestone 4: Cross-Repo Abstractions
+- Generate abstracted lessons from repo-local memory
+- Keep a global private abstraction pool with sensitivity/trust tags
+- Default to abstracted-first cross-repo retrieval
+- Success measure:
+  - safe retrieval across repos without importing raw local assumptions first
 
-Three consecutive failures → circuit breaker → log blocker → skip.
+### Milestone 5: Governance
+- Add high-risk review gates for memory-affecting work
+- Require planner plus cross-model quorum only for high-risk changes
+- Success measure:
+  - memory and governance changes are reviewed proportionally to risk
 
-## Available Workers
+### Milestone 6: Private Index Hardening
+- Add resiliency, degraded mode, and operational checks for the central index
+- Keep repo truth intact if indexing services fail
+- Success measure:
+  - system remains useful when external search is degraded
 
-| Worker | Lane(s) | Backend | Notes |
-|--------|---------|---------|-------|
-| `codex` | cheap, balanced | ChatGPT Plus OAuth | Requires `unset OPENAI_API_KEY` |
-| `gemini_cli` | cheap, research, balanced | Google API | Direct CLI |
-| `glm_claude` | cheap | ZAI/GLM-5-turbo | Full claude CLI, free until 2026-05-02 |
-| `claw_code` | opt-in | OpenRouter | Manual opt-in via `--worker claw_code` |
-| `claude_code` | premium, planner | Anthropic API | Main orchestrator, never dispatched externally |
+## Verification Criteria For The Next Pass
+- Every architecture element maps to a concrete file or service responsibility
+- No implementation milestone depends on unresolved ownership questions
+- Same-repo and cross-repo retrieval rules are testable as behavior, not just prose
+- Review policy clearly distinguishes normal work from high-risk work
+- Repo-local truth remains usable even if the central index is unavailable
 
-## Risk Classification
+## File Targets For This Planning Pass
+- `1shot/PROJECT.md`
+- `1shot/ROADMAP.md`
+- `1shot/STATE.md`
+- `1shot/MEMORY_ARCHITECTURE_SPEC.md`
+- `1shot/tasks.json`
 
-Every task has a **risk level** (`low`, `medium`, `high`) that controls what workers
-can do autonomously. Risk and complexity (task class) are **independent axes** -- a
-3-line auth change is small complexity but high risk; a large refactoring of utility
-functions is high complexity but low risk.
-
-### Risk Levels
-
-| Level | Auto-edit | Auto-verify | Auto-commit | Needs approval | Sync-only |
-|-------|-----------|-------------|-------------|----------------|-----------|
-| `low` | Yes | Yes | No | No | No |
-| `medium` | No | Yes | No | Yes | No |
-| `high` | No | Yes | No | Yes | Yes |
-
-### Inference Rules
-
-Risk is inferred from keywords in the task description and affected file paths:
-
-**High risk** (any match): auth, billing, migration, security, password, token,
-secret, credential, production, deploy
-
-**Low risk** (any match): refactor, rename, test, lint, doc, format, comment
-
-**Medium risk**: everything else (default)
-
-High-risk keywords take priority over low-risk keywords -- if a description contains
-both "refactor" and "auth", it's classified as high risk.
-
-### Examples
-
-- "Fix typo in README" -- `implement_small`, risk `low`
-- "Rename `utils.py` to `helpers.py`" -- `implement_small`, risk `low`
-- "Add login endpoint" -- `implement_medium`, risk `high`
-- "Deploy v2 to production" -- `plan`, risk `high`
-- "Format all Python files with black" -- `implement_small`, risk `low`
-- "Add caching to API handler" -- `implement_medium`, risk `medium`
-
-## CLI Reference
-
-```bash
-# Resolve routing for a task class
-python -m core.router.resolve --class implement_small
-
-# Check available models for a lane
-python -c "from core.router.model_registry import models_for_lane; print(models_for_lane('cheap'))"
-
-# Check if Argus is available
-python -c "from core.search.argus_client import is_available; print(is_available())"
-```
+## Open Risks To Revisit During Implementation
+- Over-promotion of noisy session memory into durable repo memory
+- Conflict accumulation with no reconciliation path
+- Weak policy boundaries for sensitive repos
+- Overly broad cross-repo abstractions that become misleading
+- Operational drift between repo truth and external index state
 ````
 
-## File: scripts/check-apis.sh
+## File: core/janitor/recorder.py
+````python
+def _project_dir() -> Path
+⋮----
+cwd = Path(os.getcwd())
+⋮----
+def _janitor_dir(project_dir: "Path | None" = None) -> Path
+⋮----
+d = Path(project_dir) / ".janitor" if project_dir else _project_dir() / ".janitor"
+⋮----
+EVENT_TYPES = [
+class SessionRecorder
+⋮----
+def __init__(self, project_dir: Optional[str] = None)
+⋮----
+@property
+    def session_id(self) -> str
+⋮----
+@property
+    def events_path(self) -> Path
+⋮----
+@property
+    def janitor_dir(self) -> Path
+⋮----
+event = {
+⋮----
+def record_user_request(self, what: str)
+def record_action(self, what: str, tool: str = "", files: "list[str] | None" = None)
+def record_file_read(self, path: str)
+def record_file_written(self, path: str, action: str = "edited")
+def record_decision(self, decision: str, alternatives: "list[str] | None" = None)
+def record_blocker(self, what: str, reason: str = "")
+def record_discovery(self, what: str)
+def record_commit(self, message: str, files: "list[str] | None" = None)
+def record_error(self, what: str, context: str = "")
+def record_summary(self, summary: str, source: str = "janitor")
+def get_recent_events(self, n: int = 20) -> "list[dict]"
+⋮----
+r = subprocess.run(
+⋮----
+events = []
+⋮----
+line = line.strip()
+⋮----
+def get_events_by_type(self, event_type: str, limit: int = 50) -> "list[dict]"
+⋮----
+recent = self.get_recent_events(min(limit * 3, 500))
+⋮----
+def get_events_by_session(self, session_id: str) -> "list[dict]"
+def get_events_since(self, cutoff_iso: str) -> "list[dict]"
+⋮----
+"""Get events with timestamp >= cutoff_iso."""
+⋮----
+cutoff = cutoff_iso[:19]
+⋮----
+e = json.loads(line)
+ts = e.get("ts", "")[:19]
+⋮----
+def get_decisions(self) -> "list[dict]"
+def get_blockers(self) -> "list[dict]"
+def get_files_touched(self) -> "dict[str, list[str]]"
+⋮----
+result: dict[str, list[str]] = {"read": [], "written": [], "committed": []}
+⋮----
+t = event.get("type")
+⋮----
+def session_summary_text(self) -> str
+⋮----
+"""Generate a plain-text summary of the current session."""
+events = self.get_events_by_session(self._session_id)
+⋮----
+lines = [f"Session {self._session_id} — {len(events)} events", ""]
+decisions = [e for e in events if e["type"] == "decision"]
+⋮----
+blockers = [e for e in events if e["type"] == "blocker"]
+⋮----
+files_touched = set()
+⋮----
+user_requests = [e for e in events if e["type"] == "user_request"]
+⋮----
+def _get_db(self) -> sqlite3.Connection
+⋮----
+conn = sqlite3.connect(str(self._db_path))
+⋮----
+def rebuild_index(self)
+⋮----
+conn = self._get_db()
+⋮----
+count = 0
+⋮----
+def query(self, sql: str, params: tuple = ()) -> "list[dict]"
+⋮----
+rows = conn.execute(sql, params).fetchall()
+⋮----
+def stats(self) -> "dict"
+⋮----
+total = 0
+sessions = set()
+````
+
+## File: oneshot_cli/tasks.py
+````python
+REPO_ROOT = Path(__file__).resolve().parents[1]
+TASKS_DIR = REPO_ROOT / ".oneshot" / "tasks"
+def _generate_task_id(lane: str) -> str
+⋮----
+now = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+rand4 = "".join(random.choices(string.ascii_lowercase + string.digits, k=4))
+⋮----
+# ---------------------------------------------------------------------------
+# Task directory helpers
+⋮----
+def task_dir(task_id: str) -> Path
+def _task_exists(task_id: str) -> bool
+def _read_status(task_id: str) -> dict
+⋮----
+p = task_dir(task_id) / "status.json"
+⋮----
+def _write_status(task_id: str, data: dict) -> None
+def _read_file(task_id: str, name: str) -> str
+⋮----
+p = task_dir(task_id) / name
+⋮----
+def _write_file(task_id: str, name: str, content: str) -> None
+⋮----
+# Base SHA capture
+⋮----
+def _get_base_sha() -> str
+⋮----
+result = subprocess.run(
+⋮----
+def _is_tree_dirty() -> bool
+⋮----
+cfg = load_config()
+lane_data = get_lane(cfg, lane)
+⋮----
+task_md = Path(task_file).read_text()
+⋮----
+task_md = task_text
+⋮----
+task_id = _generate_task_id(lane)
+td = task_dir(task_id)
+⋮----
+base_sha = _get_base_sha()
+wp = create(task_id)
+now = datetime.now(timezone.utc).isoformat()
+status_data = {
+⋮----
+preamble = (
+⋮----
+runner = provider_key
+tmpl = get_runner_template(cfg, runner)
+task_file_path = str(wp / "worker.md")
+⋮----
+wt_worker_md = wp / "worker.md"
+⋮----
+agents_md = wp / "AGENTS.md"
+⋮----
+auth_env_name = tmpl.get("auth_env")
+auth_val = None
+⋮----
+auth_val = os.environ.get(auth_env_name)
+⋮----
+auth_val = subprocess.check_output(
+⋮----
+fmt_kwargs = dict(
+command = tmpl["command"].format(**fmt_kwargs)
+cwd_path = tmpl.get("cwd", str(wp)).format(**fmt_kwargs)
+extra_env = tmpl.get("env", {})
+run_env = {**os.environ}
+⋮----
+safe_command = _redact_auth_value(command, auth_env_name, auth_val)
+log_lines = [
+⋮----
+# STATUS
+⋮----
+def status(task_id: str | None = None) -> None
+⋮----
+# List all tasks
+⋮----
+tasks = sorted(TASKS_DIR.iterdir())
+tasks = [t for t in tasks if t.is_dir() and (t / "status.json").exists()]
+⋮----
+s = json.load(f)
+tid = s.get("task_id", td.name)
+ln = s.get("lane", "?")
+pm = f"{s.get('provider', '?')}/{s.get('model_id', '?')}"
+st = s.get("status", "?")
+⋮----
+def _print_single_status(task_id: str) -> None
+⋮----
+s = _read_status(task_id)
+⋮----
+# COLLECT
+⋮----
+def collect(task_id: str) -> None
+⋮----
+wp = Path(s["worktree_path"])
+base_sha = s["base_sha"]
+⋮----
+# Get head SHA from worktree
+⋮----
+head_sha = result.stdout.strip()
+diff_result = subprocess.run(
+⋮----
+name_status = subprocess.run(
+⋮----
+test_cmd = cfg.get("verification", {}).get("test_command")
+⋮----
+test_result = subprocess.run(
+test_log = f"Exit code: {test_result.returncode}\n\n{test_result.stdout}\n{test_result.stderr}"
+⋮----
+test_log = "Skipped: no test_command configured in .oneshot/config/models.yaml"
+⋮----
+result_md = (
+⋮----
+# REVIEW
+⋮----
+def review(task_id: str) -> None
+⋮----
+files = {
+⋮----
+exists = path.exists()
+marker = "" if exists else " (missing)"
+⋮----
+# ESCALATE
+⋮----
+def escalate(task_id: str, new_lane: str) -> str
+⋮----
+parent_status = _read_status(task_id)
+parent_task = _read_file(task_id, "task.md")
+⋮----
+parent_result = _read_file(task_id, "result.md")
+⋮----
+parent_result = "(no result collected yet)"
+⋮----
+new_id = _generate_task_id(new_lane)
+td = task_dir(new_id)
+⋮----
+escalated_task = (
+⋮----
+f"## Original Task\n\n{parent_task}\n\n"
+````
+
+## File: scripts/claude-shell-setup.sh
+````bash
+ZAI_API_KEY="YOUR_ZAI_API_KEY_HERE"
+GLM_MODEL="glm-5-turbo"
+SHELL_TYPE="${SHELL_TYPE:-bash}"
+if [[ -n "${ZSH_VERSION:-}" ]]; then
+	SHELL_TYPE="zsh"
+elif [[ -n "${BASH_VERSION:-}" ]]; then
+	SHELL_TYPE="bash"
+fi
+if [[ "$1" == "--install" ]]; then
+	if [[ "$ZAI_API_KEY" == "YOUR_ZAI_API_KEY_HERE" ]]; then
+		_vault_key=$(secrets get ZAI_API_KEY 2>/dev/null)
+		if [[ -n "$_vault_key" ]]; then
+			ZAI_API_KEY="$_vault_key"
+			echo "✓ ZAI_API_KEY loaded from vault"
+		else
+			echo "ERROR: ZAI_API_KEY not found in vault and not set in script." >&2
+			echo "  Run: secrets set research_keys ZAI_API_KEY=<your-key>" >&2
+			echo "  Or get your key at: https://z.ai/devpack" >&2
+			exit 1
+		fi
+	fi
+	if [[ -n "${ZSH_VERSION:-}" ]]; then
+		SHELL_TYPE="zsh"
+	elif [[ -n "${BASH_VERSION:-}" ]]; then
+		SHELL_TYPE="bash"
+	fi
+	if [[ "$SHELL_TYPE" == "zsh" ]]; then
+		SHELLRC="$HOME/.zshrc"
+	else
+		SHELLRC="$HOME/.bashrc"
+	fi
+	if grep -q "##### Claude Code + ZAI shortcuts" "$SHELLRC" 2>/dev/null; then
+		sed -i.bak "/##### Claude Code + ZAI shortcuts/,/##### end Claude Code + ZAI shortcuts #####/d" "$SHELLRC"
+		rm -f "${SHELLRC}.bak"
+		echo "Removed old Claude/ZAI block from $SHELLRC"
+	fi
+	if grep -q "##### ONE-SHOT Heartbeat #####" "$SHELLRC" 2>/dev/null; then
+		sed -i.bak "/##### ONE-SHOT Heartbeat #####/,/##### end ONE-SHOT Heartbeat #####/d" "$SHELLRC"
+		rm -f "${SHELLRC}.bak"
+		echo "Removed old Heartbeat block from $SHELLRC"
+	fi
+	cat >>"$SHELLRC" <<'SHELLRC_BLOCK'
+export ZAI_API_KEY="__ZAI_API_KEY__"
+export GLM_MODEL="__GLM_MODEL__"
+unalias cc zai oc 2>/dev/null || true
+unset -f cc zai oc 2>/dev/null || true
+cc() {
+    claude "$@"
+}
+zai() {
+    if ! command -v claude >/dev/null 2>&1; then
+        echo "zai: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
+        return 127
+    fi
+    [[ -z "$ZAI_API_KEY" ]] && { echo "zai: ZAI_API_KEY not set" >&2; return 1; }
+    echo "zai: z.ai/$GLM_MODEL" >&2
+    ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+    ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
+    ANTHROPIC_MODEL="$GLM_MODEL" \
+        claude "$@"
+}
+oc() {
+    if ! command -v opencode >/dev/null 2>&1; then
+        echo "oc: 'opencode' CLI not found" >&2
+        return 127
+    fi
+    unset OPENAI_API_KEY OPENAI_BASE_URL ANTHROPIC_BASE_URL
+    if command -v secrets >/dev/null 2>&1; then
+        export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null || true)"
+    fi
+    opencode "$@"
+}
+alias saveplan='${EDITOR:-nano} /tmp/claude-plan.md'
+approveplan() {
+    local project="${1:-$PWD}"
+    local plan_file="/tmp/claude-plan.md"
+    local claude_md="$project/.claude/CLAUDE.md"
+    local backup_file="/tmp/claude-plan-backup.md"
+    local was_fresh=false
+    if [[ ! -f "$plan_file" ]]; then
+        echo "approveplan: no plan at $plan_file — run 'saveplan' first" >&2
+        return 1
+    fi
+    mkdir -p "$project/.claude"
+    if [[ ! -f "$claude_md" ]]; then
+        was_fresh=true
+    else
+        cp "$claude_md" "$backup_file"
+    fi
+    cp "$plan_file" "$claude_md"
+    echo "Plan written to $claude_md"
+    (cd "$project" && claude)
+    read -r -p "Remove plan from CLAUDE.md? [y/N] " answer
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+        if [[ "$was_fresh" == "true" ]]; then
+            rm "$claude_md"
+            echo "Removed $claude_md"
+        else
+            mv "$backup_file" "$claude_md"
+            echo "Restored original $claude_md"
+        fi
+    fi
+    rm -f "$backup_file"
+}
+_oneshot_heartbeat() {
+    local heartbeat_script="${ONESHOT_DIR:-$HOME/github/oneshot}/scripts/heartbeat.sh"
+    if [[ -f "$PWD/CLAUDE.md" ]] && [[ -x "$heartbeat_script" ]]; then
+        "$heartbeat_script" --quiet --background 2>/dev/null &
+    fi
+}
+oneshot-dismiss() {
+    local suppressed="$HOME/.claude/state/suppressed-warnings"
+    mkdir -p "$(dirname "$suppressed")"
+    echo "$1" >> "$suppressed"
+    echo "Dismissed: $1"
+}
+SHELLRC_BLOCK
+	escaped_key=$(printf '%s\n' "$ZAI_API_KEY" | sed 's/[[\.*^$()+?{|]/\\&/g')
+	escaped_model=$(printf '%s\n' "$GLM_MODEL" | sed 's/[[\.*^$()+?{|]/\\&/g')
+	sed -i.bak "s|__ZAI_API_KEY__|${escaped_key}|g" "$SHELLRC"
+	sed -i.bak "s|__GLM_MODEL__|${escaped_model}|g" "$SHELLRC"
+	rm -f "${SHELLRC}.bak"
+	if [[ "$SHELL_TYPE" == "zsh" ]]; then
+		sed -i.bak '/add-zsh-hook _oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
+		rm -f "${SHELLRC}.bak"
+		cat >>"$SHELLRC" <<'ZSH_HOOK'
+autoload -U add-zsh-hook
+add-zsh-hook chpwd _oneshot_heartbeat
+ZSH_HOOK
+	else
+		sed -i.bak '/PROMPT_COMMAND.*_oneshot_heartbeat/d' "$SHELLRC" 2>/dev/null || true
+		rm -f "${SHELLRC}.bak"
+		cat >>"$SHELLRC" <<BASH_HOOK
+PROMPT_COMMAND="_oneshot_heartbeat\${PROMPT_COMMAND:+;\$PROMPT_COMMAND}"
+BASH_HOOK
+	fi
+	echo "✓ Installed to $SHELLRC"
+	echo "✓ cc  = Claude Code (Anthropic Pro, YOLO mode)"
+	echo "✓ zai = Claude Code (z.ai $GLM_MODEL, YOLO mode)"
+	echo "✓ oc  = OpenCode wrapper (vault-backed OpenRouter auth)"
+	echo "✓ Heartbeat: Daily health checks on project enter"
+	echo ""
+	if [[ "$SHELL_TYPE" == "zsh" ]]; then
+		echo "Run: source ~/.zshrc"
+	else
+		echo "Run: source ~/.bashrc"
+	fi
+	exit 0
+fi
+if [[ "$ZAI_API_KEY" == "YOUR_ZAI_API_KEY_HERE" ]]; then
+	echo "WARNING: ZAI_API_KEY not set. Edit the script or set ZAI_API_KEY env var." >&2
+fi
+unalias cc zai oc 2>/dev/null || true
+unset -f cc zai oc 2>/dev/null || true
+cc() {
+	claude "$@"
+}
+zai() {
+	if ! command -v claude >/dev/null 2>&1; then
+		echo "zai: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
+		return 127
+	fi
+	[[ -z "$ZAI_API_KEY" ]] && {
+		echo "zai: ZAI_API_KEY not set" >&2
+		return 1
+	}
+	echo "zai: z.ai/$GLM_MODEL" >&2
+	ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+		ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
+		ANTHROPIC_MODEL="$GLM_MODEL" \
+		claude "$@"
+}
+oc() {
+	if ! command -v opencode >/dev/null 2>&1; then
+		echo "oc: 'opencode' CLI not found" >&2
+		return 127
+	fi
+	unset OPENAI_API_KEY OPENAI_BASE_URL ANTHROPIC_BASE_URL
+	if command -v secrets >/dev/null 2>&1; then
+		export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null || true)"
+	fi
+	opencode "$@"
+}
+alias saveplan='${EDITOR:-nano} /tmp/claude-plan.md'
+approveplan() {
+	local project="${1:-$PWD}"
+	local plan_file="/tmp/claude-plan.md"
+	local claude_md="$project/.claude/CLAUDE.md"
+	local backup_file="/tmp/claude-plan-backup.md"
+	local was_fresh=false
+	if [[ ! -f "$plan_file" ]]; then
+		echo "approveplan: no plan at $plan_file — run 'saveplan' first" >&2
+		return 1
+	fi
+	mkdir -p "$project/.claude"
+	if [[ ! -f "$claude_md" ]]; then
+		was_fresh=true
+	else
+		cp "$claude_md" "$backup_file"
+	fi
+	cp "$plan_file" "$claude_md"
+	echo "Plan written to $claude_md"
+	(cd "$project" && claude)
+	read -r -p "Remove plan from CLAUDE.md? [y/N] " answer
+	if [[ "$answer" =~ ^[Yy]$ ]]; then
+		if [[ "$was_fresh" == "true" ]]; then
+			rm "$claude_md"
+			echo "Removed $claude_md"
+		else
+			mv "$backup_file" "$claude_md"
+			echo "Restored original $claude_md"
+		fi
+	fi
+	rm -f "$backup_file"
+}
+_oneshot_heartbeat() {
+	local heartbeat_script="${ONESHOT_DIR:-$HOME/github/oneshot}/scripts/heartbeat.sh"
+	if [[ -f "$heartbeat_script" ]]; then
+		"$heartbeat_script" "${@}"
+	else
+		echo "Heartbeat script not found at: $heartbeat_script" >&2
+		return 1
+	fi
+}
+oneshot-dismiss() {
+	local suppressed="$HOME/.claude/state/suppressed-warnings"
+	mkdir -p "$(dirname "$suppressed")"
+	echo "$1" >>"$suppressed"
+	echo "Dismissed: $1"
+}
+````
+
+## File: CLAUDE.local.md
+````markdown
+<!-- Auto-generated by janitor. Edit freely -- janitor overwrites daily. -->
+
+
+## Tasks
+
+1. **[high]** Add tests for core/dispatch/direct_api.py
+
+2. **[high]** Add tests for oneshot_cli/__main__.py
+
+3. **[high]** Add tests for oneshot_cli/memory.py
+
+4. **[high]** Add tests for scripts/validate-oneshot-config.py
+
+5. **[medium]** Refactor autofix in oneshot_cli/doctor_cmd.py (271 lines)
+
+6. **[medium]** Refactor _gitignore_template in oneshot_cli/memory.py (260 lines)
+
+7. **[medium]** Refactor generate_onboarding in core/janitor/jobs.py (242 lines)
+
+8. **[medium]** Refactor run_session_start in core/janitor/jobs.py (202 lines)
+
+9. **[medium]** Split core/janitor/jobs.py (1834 lines) into smaller modules
+
+10. **[low]** Add a second contributor to .claude/skills/_shared/providers.md (sole author: Test User, 11 edits)
+
+11. **[low]** Add a second contributor to .claude/skills/conduct/SKILL.md (sole author: Test User, 11 edits)
+
+12. **[low]** Add a second contributor to .claude/skills/full/SKILL.md (sole author: Test User, 10 edits)
+
+13. **[low]** Add a second contributor to .claude/skills/short/SKILL.md (sole author: Test User, 8 edits)
+
+14. **[low]** Add a second contributor to .claude/skills/_shared/dispatch.md (sole author: Test User, 6 edits)
+
+15. **[low]** Add frontmatter to 6 research docs: docs/research/2026-03-27_multi-tenant_platforms_research.md, docs/research/background-intelligence/research.md, docs/research/claude-code-non-anthropic-models/research.md (+3 more)
+
+16. **[low]** Update docs/public-access.md — 102 days stale
+
+17. **[low]** Update docs/sessions/README.md — 79 days stale
+
+18. **[low]** Update .sops.yaml — 75 days stale
+# Project Status  
+The codebase is functional but shows maintenance debt: several huge modules (e.g., `core/janitor/jobs.py` 1834 lines) and four uncovered files, while key documentation is stale.
+
+# Recent Activity  
+- `core/janitor/jobs.py` (large file edits)  
+- `oneshot_cli/tasks.py` (17 sessions)  
+- `.oneshot/config/models.yaml` (36 sessions)  
+- `.claude/skills/conduct/SKILL.md` (frequent edits)  
+- Memory notes in `memory/conduct-inline-fallback-bug.md` and `memory/MEMORY.md`.
+
+# Attention Items  
+1. **Test Gaps (4 files)** – `core/dispatch/direct_api.py`, `oneshot_cli/__main__.py`, `oneshot_cli/memory.py`, `scripts/validate-oneshot-config.py` have no test coverage.  
+2. **Knowledge Risk (3 files)** – sole‑author files: `.claude/skills/_shared/providers.md` (11 edits), `.claude/skills/conduct/SKILL.md` (11 edits), `.claude/skills/full/SKILL.md` (10 edits).  
+3. **Oversized Files** – `core/janitor/jobs.py` 1834 lines, `oneshot_cli/doctor_cmd.py` 791 lines, `core/dispatch/run.py` 675 lines, `oneshot_cli/doctor_cmd.py:autofix` 271 lines, `oneshot_cli/memory.py:_gitignore_template` 260 lines, `core/janitor/jobs.py:generate_onboarding` 242 lines.  
+4. **Config Drift** – YAML configs (`models.yaml`, `workers.yaml`, `providers.yaml`) are edited in >5 sessions each, indicating possible divergence from code expectations.
+
+# Recommended Next Steps  
+1. Add unit tests for the four uncovered files (`core/dispatch/direct_api.py`, `oneshot_cli/__main__.py`, `oneshot_cli/memory.py`, `scripts/validate-oneshot-config.py`).  
+2. Conduct a knowledge‑transfer review of the three sole‑author skill files; copy critical logic into shared modules or add documentation.  
+3. Refactor the largest modules: split `core/janitor/jobs.py` (>1800 lines) into logical sub‑modules, and similarly break down `oneshot_cli/doctor_cmd.py` and `core/dispatch/run.py`.  
+4. Audit the YAML config files (`.oneshot/config/models.yaml`, `workers.yaml`, `providers.yaml`) against the dispatch code (`core/dispatch/run.py`, `dispatch_cmd.py`) to ensure schema alignment.  
+5. Update stale docs (`docs/public-access.md`, `archive/v7-high-token/README.md`, etc.) to reflect current architecture, reducing orphaned documentation.
+
+## Project Intelligence Sources
+
+Read these files for details on demand:
+
+- `.janitor/test-gaps.json` -- untested files
+- `.janitor/code-smells.json` -- oversized files/functions
+- `.janitor/dep-graph.json` -- dependency impact ranking
+- `.janitor/doc-staleness.json` -- stale documents
+- `.janitor/doc-orphans.json` -- orphan/unlinked documents
+- `.janitor/doc-clusters.json` -- document topic clusters
+- `.janitor/doc-size-outliers.json` -- unusually large files
+- `.janitor/doc-crossrefs.json` -- cross-reference map
+- `.janitor/doc-recent-activity.json` -- recent document changes
+- `.janitor/config-drift.json` -- uncommitted config changes
+- `.janitor/patterns.json` -- recurring patterns
+- `.janitor/recent-focus.json` -- last session's focus
+- `.janitor/dead-ends.json` -- recurring failed searches
+- `.janitor/blockers.json` -- unresolved blockers
+- `.janitor/critical-files.json` -- high-touch x high-impact files
+- `.janitor/knowledge-risk.json` -- low bus factor files
+- `.janitor/onboarding.md` -- full onboarding summary
+- `.janitor/events.jsonl` -- raw event log
+````
+
+## File: install.sh
 ````bash
 set -euo pipefail
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/secrets-helper.sh"
-ISSUES=0
-check() {
-  local name="$1"
-  local optional="${2:-false}"
-  if [[ "$optional" == "true" ]]; then
-    echo "── $name (optional) ──"
-  else
-    echo "── $name ──"
-  fi
+ONESHOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+BIN_DIR="${HOME}/.local/bin"
+HOOKS_DIR="${HOME}/.claude/hooks"
+install_hooks() {
+	local src="$ONESHOT_DIR/.claude/hooks"
+	[ -d "$src" ] || return 0
+	mkdir -p "$HOOKS_DIR"
+	local count=0
+	for f in "$src"/*.sh; do
+		[ -f "$f" ] || continue
+		local name
+		name=$(basename "$f")
+		if [ -f "$HOOKS_DIR/$name" ]; then
+			echo "  $name (exists, skipped)"
+		else
+			cp "$f" "$HOOKS_DIR/$name"
+			chmod +x "$HOOKS_DIR/$name"
+			echo "  $name (installed)"
+			count=$((count + 1))
+		fi
+	done
+	if [ "$count" -gt 0 ]; then
+		echo "  $count hook(s) installed"
+	fi
 }
-check_zai() {
-  check "ZAI (GLM Coding Plan)"
-  local key="${ZAI_API_KEY:-}"
-  if [[ -z "$key" ]]; then
-    key=$(secrets_get "ZAI_API_KEY" "research_keys" 2>/dev/null) || true
-  fi
-  if [[ -z "$key" ]]; then
-    echo "  ⚠️  Key not set"
-    ISSUES=1
-    return
-  fi
-  local resp
-  resp=$(curl -s -w "\n%{http_code}" "https://api.z.ai/api/anthropic/v1/messages" \
-    -H "Content-Type: application/json" \
-    -H "x-api-key: $key" \
-    -H "anthropic-version: 2023-06-01" \
-    -d '{"model":"glm-5-turbo","max_tokens":5,"messages":[{"role":"user","content":"hi"}]}' 2>/dev/null)
-  local http_code
-  http_code=$(echo "$resp" | tail -1)
-  local body
-  body=$(echo "$resp" | sed '$d')
-  if [[ "$http_code" == "200" ]]; then
-    local model
-    model=$(echo "$body" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('model','unknown'))" 2>/dev/null || echo "unknown")
-    echo "  ✓ Key active — $model"
-  elif [[ "$http_code" == "429" ]]; then
-    echo "  ⚠️  Key valid — rate limited (429)"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code — may be invalid or expired"
-    ISSUES=1
-  fi
-}
-check_tavily() {
-  check "Tavily" "true"
-  local key
-  key=$(secrets_get "TAVILY_API_KEY" "research_keys" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set (optional)"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.tavily.com/search" -H "Content-Type: application/json" \
-    -d "{\"api_key\":\"$key\",\"query\":\"test\",\"max_results\":1}" 2>/dev/null)
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active"
-  elif [[ "$http_code" == "401" ]]; then
-    echo "  ⚠️  HTTP 401 — invalid key"
-    ISSUES=1
-  elif [[ "$http_code" == "402" ]]; then
-    echo "  ⚠️  HTTP 402 — credits exhausted"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code"
-    ISSUES=1
-  fi
-}
-check_exa() {
-  check "Exa" "true"
-  local key
-  key=$(secrets_get "EXA_API_KEY" "research_keys" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set (optional)"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.exa.ai/search" -H "x-api-key: $key" \
-    -H "Content-Type: application/json" -d "{\"query\":\"test\",\"numResults\":1}" 2>/dev/null)
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active"
-  elif [[ "$http_code" == "402" ]]; then
-    echo "  ⊘ Credits exhausted (top up at exa.ai when needed)"
-  elif [[ "$http_code" == "401" ]]; then
-    echo "  ⚠️  HTTP 401 — invalid key"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code"
-    ISSUES=1
-  fi
-}
-check_apify() {
-  check "Apify" "true"
-  local key
-  key=$(secrets_get "APIFY_TOKEN" "research_keys" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set (optional)"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.apify.com/v2/actor-runs" -H "Authorization: Bearer $key" 2>/dev/null)
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active"
-  elif [[ "$http_code" == "401" ]]; then
-    echo "  ⚠️  HTTP 401 — key may be invalid"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code"
-    ISSUES=1
-  fi
-}
-check_context7() {
-  check "Context7" "true"
-  local key
-  key=$(secrets_get "CONTEXT7_API_KEY" "research_keys" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set (optional)"
-    return
-  fi
-  if [[ "$key" != ctx7sk-* ]]; then
-    echo "  ⚠️  Key format outdated (needs ctx7sk- prefix)"
-    ISSUES=1
-    return
-  fi
-  echo "  ✓ Key format valid (ctx7sk-...)"
-}
-check_openai() {
-  check "OpenAI"
-  local key
-  key=$(secrets_get "OPENAI_API_KEY" "research_keys" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.openai.com/v1/models" -H "Authorization: Bearer $key" 2>/dev/null)
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active"
-  else
-    echo "  ⚠️  HTTP $http_code — key may be invalid"
-    ISSUES=1
-  fi
-}
-check_openrouter() {
-  check "OpenRouter"
-  local key
-  key=$(secrets_get "OPENROUTER_API_KEY" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://openrouter.ai/api/v1/models" -H "Authorization: Bearer $key" 2>/dev/null)
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active"
-  elif [[ "$http_code" == "401" ]]; then
-    echo "  ⚠️  HTTP 401 — invalid key"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code"
-    ISSUES=1
-  fi
-}
-check_deepseek() {
-  check "DeepSeek" "true"
-  local key
-  key=$(secrets_get "DEEPSEEK_API_KEY" "services" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set (optional)"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.deepseek.com/v1/models" -H "Authorization: Bearer $key" 2>/dev/null)
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active"
-  elif [[ "$http_code" == "401" ]]; then
-    echo "  ⚠️  HTTP 401 — invalid key"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code"
-    ISSUES=1
-  fi
-}
-check_brave() {
-  check "Brave Search" "true"
-  local key
-  key=$(secrets_get "BRAVE_API_KEY" "openclaw" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set (optional)"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.search.brave.com/res/v1/web/search?q=test" \
-    -H "Accept: application/json" -H "X-Subscription-Token: $key" 2>/dev/null)
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active"
-  elif [[ "$http_code" == "401" ]]; then
-    echo "  ⚠️  HTTP 401 — invalid key"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code"
-    ISSUES=1
-  fi
-}
-check_jina() {
-  check "Jina" "true"
-  local key
-  key=$(secrets_get "JINA_API_KEY" "api" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set (optional)"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.jina.ai/v1/embeddings" -H "Authorization: Bearer $key" 2>/dev/null)
-  if [[ "$http_code" == "200" || "$http_code" == "405" ]]; then
-    echo "  ✓ Key active"
-  elif [[ "$http_code" == "401" ]]; then
-    echo "  ⚠️  HTTP 401 — invalid key"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code"
-    ISSUES=1
-  fi
-}
-check_github() {
-  check "GitHub PAT"
-  local key
-  key=$(secrets_get "GITHUB_PAT" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set"
-    return
-  fi
-  local http_code user
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.github.com/user" -H "Authorization: Bearer $key" 2>/dev/null)
-  user=$(curl -s --max-time 10 "https://api.github.com/user" \
-    -H "Authorization: Bearer $key" 2>/dev/null \
-    | python3 -c "import sys,json;print(json.load(sys.stdin).get('login','?'))" 2>/dev/null || echo "?")
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active ($user)"
-  elif [[ "$http_code" == "401" ]]; then
-    echo "  ⚠️  HTTP 401 — invalid or expired"
-    ISSUES=1
-  else
-    echo "  ⚠️  HTTP $http_code"
-    ISSUES=1
-  fi
-}
-check_cloudflare() {
-  check "Cloudflare API"
-  local key
-  key=$(secrets_get "CLOUDFLARE_API_TOKEN" 2>/dev/null) || true
-  if [[ -z "$key" ]]; then
-    echo "  ⊘ Not set"
-    return
-  fi
-  local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    "https://api.cloudflare.com/client/v4/user/tokens/verify" -H "Authorization: Bearer $key" 2>/dev/null)
-  if [[ "$http_code" == "200" ]]; then
-    echo "  ✓ Key active"
-  else
-    echo "  ⚠️  HTTP $http_code — token may be expired"
-    ISSUES=1
-  fi
-}
-check_telegram() {
-  check "Telegram Bots"
-  local checked=0
-  for prefix in openclaw penny; do
-    local key
-    key=$(secrets_get "TELEGRAM_BOT_TOKEN" "$prefix" 2>/dev/null) || true
-    [[ -z "$key" ]] && continue
-    local bot
-    bot=$(curl -s --max-time 10 "https://api.telegram.org/bot$key/getMe" 2>/dev/null \
-      | python3 -c "import sys,json;d=json.load(sys.stdin);print(f'@{d[\"result\"][\"username\"]}')" 2>/dev/null || true)
-    [[ -z "$bot" ]] && { echo "  ⚠️  $prefix bot — invalid"; ISSUES=1; continue; }
-    echo "  ✓ $bot ($prefix)"
-    checked=$((checked + 1))
-  done
-  [[ $checked -eq 0 ]] && echo "  ⊘ No bots configured"
-}
-_is_validated_key() {
-  case "$1" in
-    ZAI_API_KEY|TAVILY_API_KEY|EXA_API_KEY|APIFY_TOKEN|CONTEXT7_API_KEY \
-    |OPENAI_API_KEY|OPENROUTER_API_KEY|DEEPSEEK_API_KEY|BRAVE_API_KEY \
-    |JINA_API_KEY|GITHUB_PAT|CLOUDFLARE_API_TOKEN|TELEGRAM_BOT_TOKEN \
-    |TELEGRAM_BOT_TOKEN_BOYS|TELEGRAM_BOT_TOKEN_DADA|TELEGRAM_BOT_TOKEN_ATLAS_VOICE) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-check_zai
-check_tavily
-check_exa
-check_apify
-check_context7
-check_openai
-check_openrouter
-check_deepseek
-check_brave
-check_jina
-check_github
-check_cloudflare
-check_telegram
-exit $ISSUES
-````
-
-## File: .gitignore
-````
-# Never commit plaintext secrets
-*.env
-*.env.tmp
-secrets/*.env
-!*.encrypted
-!.env.example
-
-# Agent working directories (local only)
-.agent/
-.beads/
-.oneshot/  # Legacy janitor runtime data (migrated to .janitor/)
-.janitor/  # Janitor runtime data (events.jsonl, intelligence.db, usage.jsonl)
-
-# Output directories (runtime generated, not source)
-dispatch/
-# But DO track the dispatch Python module and 1shot directory structure
-!core/dispatch/
-!core/dispatch/__init__.py
-!core/dispatch/run.py
-!1shot/dispatch/
-!1shot/dispatch/.gitkeep
-
-# But DO track research results
-!docs/research/
-
-# Local keys
-.age/
-*.key
-
-# The Audit - source documents (large, copyrighted)
-.claude/skills/the-audit/SOURCE_DOCS/
-
-# Encrypted sessions (but keep index.md for searchability)
-*.age
-!docs/sessions/index.md
-
-# Python / Node artifacts
-__pycache__/
-*.pyc
-.pytest_cache/
-node_modules/
-
-# OS / editor
-.DS_Store
-*.swp
-.vercel
+VERSION=$(grep -m1 "ONE_SHOT v" "$ONESHOT_DIR/AGENTS.md" 2>/dev/null | sed 's/.*\(v[0-9.]*\).*/\1/' || echo "unknown")
+echo "Installing ONE_SHOT $VERSION..."
+mkdir -p "$BIN_DIR"
+rm -f "$BIN_DIR/oneshot" "$BIN_DIR/oneshot-build" "$BIN_DIR/oneshot-resilient" 2>/dev/null || true
+ln -sf "$ONESHOT_DIR/scripts/oneshot-update.sh" "$BIN_DIR/oneshot-update"
+echo "  oneshot-update    - Update ONE_SHOT from GitHub"
+ln -sf "$ONESHOT_DIR/scripts/secrets" "$BIN_DIR/secrets"
+echo "  secrets           - SOPS/Age vault CLI"
+if [ -f "$ONESHOT_DIR/scripts/oc" ]; then
+	ln -sf "$ONESHOT_DIR/scripts/oc" "$BIN_DIR/oc"
+	chmod +x "$ONESHOT_DIR/scripts/oc"
+	echo "  oc                - OpenCode wrapper"
+fi
+if [ -f "$ONESHOT_DIR/scripts/docs-link" ]; then
+	ln -sf "$ONESHOT_DIR/scripts/docs-link" "$BIN_DIR/docs-link"
+	echo "  docs-link         - Documentation cache manager"
+fi
+if [ -d "$ONESHOT_DIR/.claude/skills" ]; then
+	mkdir -p "${HOME}/.claude/skills"
+	echo "Syncing skills to ~/.claude/skills/..."
+	cp -r "$ONESHOT_DIR/.claude/skills/"* "${HOME}/.claude/skills/" 2>/dev/null || true
+	echo "  10+1 skills synced"
+fi
+if [ -d "$ONESHOT_DIR/.claude/hooks" ]; then
+	echo "Syncing hooks to ~/.claude/hooks/..."
+	install_hooks
+fi
+echo ""
+echo "ONE_SHOT $VERSION installed."
+echo ""
+echo "Skills available in Claude Code:"
+echo "  /short     - Quick iteration"
+echo "  /full      - Structured work"
+echo "  /conduct   - Multi-model orchestration"
+echo "  /handoff   - Save context"
+echo "  /restore   - Resume from handoff"
+echo "  /research  - Background research"
+echo "  /freesearch - Zero-token search"
+echo "  /doc       - Cache external docs"
+echo "  /vision    - Image/website analysis"
+echo "  /secrets   - SOPS/Age secrets"
+echo ""
+echo "CLI wrappers:"
+echo "  secrets    - Vault CLI"
+echo "  oc         - OpenCode wrapper (if opencode is installed)"
+echo ""
+echo "See ~/.claude/skills/INDEX.md for full reference."
+# Check if in PATH
+if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+	echo ""
+	echo "Add to your shell profile (~/.bashrc or ~/.zshrc):"
+	echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
+	echo ""
+fi
+echo "Done! To update: oneshot-update"
 ````
 
 ## File: oneshot.sh
@@ -30907,7 +32707,7 @@ echo ""
 echo -e "${BLUE}Research & docs:${NC}"
 echo "  /research   Deep research via Argus"
 echo "  /freesearch Zero-token search via Argus"
-echo "  /doc        Cache external docs locally"
+echo "  /doc        Build docs and research packs through Argus"
 echo ""
 echo -e "${BLUE}Operators & utilities:${NC}"
 echo "  /janitor   Project debrief from background intelligence"
@@ -30926,462 +32726,80 @@ if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
 fi
 ````
 
-## File: .claude/skills/_shared/providers.md
+## File: 1shot/PROJECT.md
 ````markdown
-# Shared Provider Routing Module
+# Current Project Pointer
 
-Reference this module from any skill that needs delegation or multi-model routing.
-This is a DRY reference — skills include it by mention, not import.
+## Active Pass
+- Name: OneShot repo-first memory architecture
+- Date: 2026-04-28
+- Dated project: `1shot/2026-04-28-memory-architecture-PROJECT.md`
+- Dated roadmap: `1shot/2026-04-28-memory-architecture-ROADMAP.md`
+- Dated state: `1shot/2026-04-28-memory-architecture-STATE.md`
+- Dated spec: `1shot/2026-04-28-memory-architecture-SPEC.md`
 
----
+## Previous Pass
+- 2026-04-27 Plan L hardening
+  - `1shot/2026-04-27-plan-l-hardening-PROJECT.md`
+  - `1shot/2026-04-27-plan-l-hardening-ROADMAP.md`
+  - `1shot/2026-04-27-plan-l-hardening-STATE.md`
 
-## Provider Detection
+## Pass Index
+- `1shot/INDEX.md`
 
-```bash
-command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
-command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
-[ -d ~/github/claw-code-agent/src ] && echo "claw_code: yes" || echo "claw_code: no"
-[ -n "$ZAI_API_KEY" ] && echo "zai: yes" || echo "zai: no"
-[ -n "$OPENROUTER_API_KEY" ] && echo "openrouter: yes" || echo "openrouter: no"
-python -c "from core.search.argus_client import is_available; print('argus:', is_available())" 2>/dev/null || echo "argus: no"
-```
+## Live Working Copies
+- Current live intake: `1shot/PROJECT.md`
+- Current live roadmap: `1shot/ROADMAP.md`
+- Current live state: `1shot/STATE.md`
+- Current live spec: `1shot/MEMORY_ARCHITECTURE_SPEC.md`
+- Current live phase-1 implementation spec: `1shot/MEMORY_PHASE1_IMPLEMENTATION_SPEC.md`
 
-**Fallback chain for cheap lane**: codex → gemini_cli → claw_code
-Within claw_code, model routing is automatic:
-- GLM models (`glm-5.1`, `glm-4.7`, etc.) → ZAI endpoint (free on plan)
-- Everything else → OpenRouter (paid)
+## Current Goal
+Design a repo-first memory system for OneShot that works for OneShot itself and for downstream customer repos, while keeping durable project memory in the target repo instead of in the OneShot repo.
 
-`strategy: first_available` is implemented in `core/dispatch/run.py`.
+## Current Next Step
+Turn the architecture into a first implementation pass with exact file contracts, policy format, promotion rules, retrieval rules, and degraded-mode behavior.
 
-Also read `config/workers.yaml` for machine-level worker placement (if it exists — skip silently if not).
-
----
-
-## Lane-Based Routing
-
-**Route by task class, not provider name.** See `docs/instructions/task-classes.md`.
-
-```
-task → task_class → lane → worker_pool → reviewer
-```
-
-Resolve routing:
-```bash
-python -m core.router.resolve --class <task_class>
-```
-
-Returns JSON: `{task_class, lane, workers[], review_with, search_backend, fallback_lane}`
-
----
-
-## Lane Summary
-
-| Lane | Planner | Workers (first_available order) | Review |
-|------|---------|----------------------------------|--------|
-| premium | claude_code | claude_code, codex | claude_code |
-| balanced | claude_code | codex, gemini_cli | claude_code |
-| cheap | claude_code | gemini_cli → codex → glm_claude | claude_code |
-| research | claude_code | gemini_cli, codex | claude_code |
-
-**glm_claude**: `claude` CLI running on ZAI/GLM-5-turbo via `ANTHROPIC_BASE_URL`. Full native toolchain (bash, read, edit, glob, grep, git). Free on GLM Coding Plan (expires **2026-05-02**). Same dispatch pattern as codex/gemini — `claude --print --dangerously-skip-permissions "prompt"`.
-
-**claw_code**: Available but **manual opt-in only** (not in lane pools). Re-enable by adding `claw_code` back to `worker_pool` in `config/lanes.yaml`. Use `--worker claw_code` flag on dispatch.
-
----
-
-## Category-Based Worker Preference
-
-Each lane has `category_preference` in `config/lanes.yaml` that reorders workers
-when the task category is known. Workers not in the preference list are appended
-in their original pool order.
-
-```
-task → task_class → lane → category_preference[category] → reordered workers
-```
-
-| Category | Cheap Lane Preference | Balanced | Premium | Research |
-|----------|-----------------------|----------|---------|----------|
-| coding | codex, gemini_cli, glm_claude | codex, gemini_cli | claude_code, codex | codex, gemini_cli |
-| research | gemini_cli, codex, glm_claude | gemini_cli, codex | claude_code, codex | gemini_cli, codex |
-| writing | gemini_cli, codex, glm_claude | gemini_cli, codex | claude_code, codex | gemini_cli, codex |
-| review | codex, glm_claude, gemini_cli | codex, gemini_cli | claude_code, codex | codex, gemini_cli |
-| general | gemini_cli, codex, glm_claude | codex, gemini_cli | claude_code, codex | gemini_cli, codex |
-
-Category is inferred from task_class by default, or passed explicitly via `--category`.
-Inferred mapping: plan→general, research/search_sweep→research, implement_*/test_write→coding,
-review_diff→review, doc_draft/summarize_findings→writing.
-
-## claw_code Worker Model Priority
-
-Used when codex and gemini_cli are unavailable. Priority order in `config/models.yaml`:
-
-**ZAI (free on GLM Coding Plan, expires 2026-05-02):**
-
-glm_claude harness → `api.z.ai/api/anthropic` (Anthropic-compat, full claude CLI):
-
-| Model | Cost | Strengths |
-|-------|------|-----------|
-| glm-5-turbo | free | fast, strong coding+reasoning — **default** |
-
-claw_code harness → `api.z.ai/api/coding/paas/v4` (OpenAI-compat, claw-code-agent):
-
-| Model | Cost | Strengths |
-|-------|------|-----------|
-| glm-5-turbo | free | **default fallback** |
-| glm-5.1 | free | deep reasoning |
-| glm-4.7 | free | balanced |
-| glm-4.5-air | free | throughput |
-
-**OpenRouter (paid) — routed to `openrouter.ai/api/v1`:**
-
-| Model | Input/M | Output/M | Strengths |
-|-------|---------|----------|-----------|
-| deepseek/deepseek-v3.2 | $0.26 | $0.38 | coding, low-cost |
-| google/gemini-2.5-flash-lite | $0.10 | $0.40 | throughput, cheapest |
-| minimax/minimax-m2.7 | $0.30 | $1.20 | long context |
-| moonshotai/kimi-k2.5 | $0.38 | $1.72 | strong agentic |
-
-All models support tool calling. Key env vars: `ZAI_API_KEY` (in `research_keys.env`), `OPENROUTER_API_KEY` (in `services.env`).
-
----
-
-## Dispatch Commands
-
-**Codex** (adversarial review, challenge, worker tasks):
-
-Structured output (preferred for all programmatic dispatch):
-```bash
-unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access "PROMPT"
-# Returns JSONL stream: thread.started, turn.started, item.*, turn.completed
-# Parse final agent message:  | jq 'select(.type == "item.completed") | select(.item.type == "agent_message")'
-```
-
-Quick single-run with last-message capture:
-```bash
-unset OPENAI_API_KEY && codex exec --sandbox danger-full-access -o /tmp/codex-output.txt "PROMPT"
-```
-
-Structured output with schema (for downstream processing):
-```bash
-unset OPENAI_API_KEY && codex exec --sandbox danger-full-access --output-schema ./schema.json -o ./result.json "PROMPT"
-```
-
-Resume a previous session:
-```bash
-unset OPENAI_API_KEY && codex exec resume --last "follow-up prompt"
-```
-
-**Gemini** (research fallback):
-```bash
-printf '%s' "PROMPT" | gemini -p "" -o text --approval-mode yolo
-```
-
-**Claw Code** (OpenRouter models — cheap lane):
-```bash
-cd ~/github/claw-code-agent && \
-OPENAI_BASE_URL=https://openrouter.ai/api/v1 \
-OPENAI_MODEL=openai/gpt-4o-mini \
-python3 -m src.main agent "PROMPT" --cwd /path/to/repo --allow-write --allow-shell
-```
-Model is configurable via `OPENAI_MODEL` env var or `--model` flag on dispatch.
-See `config/models.yaml` `claw_code` section for supported models.
-
-**Argus** (search):
-```bash
-curl -s -X POST http://localhost:8005/api/search \
-  -H "Content-Type: application/json" \
-  -d '{"query": "QUERY", "mode": "discovery"}'
-```
-
----
-
-## Worker Placement
-
-From `config/workers.yaml`:
-- `local` (localhost) — planner, claude_code
-- `oci` (oci-dev) — planner, claude_code
-- `claw` (localhost) — worker, claw_code (OpenRouter models)
-- `macmini` — worker, opencode (future)
-- `homelab` — worker, opencode (future)
-
-Dispatch to remote worker via SSH when configured.
-
----
-
-## Quality Gate
-
-75% consensus required when multiple providers contribute. If not reached:
-- Log disagreement to `1shot/ISSUES.md`
-- Claude makes final call
-
----
-
-## Circuit Breaker
-
-- Same task fails 3x → log blocker → skip → continue
-- 3 consecutive tasks fail → stop, surface to user
-- Lane escalation: cheap → balanced → premium → inline (Claude handles directly)
+## Current Status
+- Phase-1 implementation wave shipped in the CLI:
+  - repo memory scaffold
+  - stable memory promotion with provenance
+  - same-repo retrieval
+  - abstraction file generation
+  - local private SQLite-backed abstraction indexing
+  - cross-repo abstraction search with degraded-mode signaling
+- Remaining major work:
+  - dual-home central private index integration
+  - degraded-mode signaling
+  - review-gate integration
 ````
 
-## File: .claude/skills/conduct/SKILL.md
+## File: 1shot/STATE.md
 ````markdown
----
-name: conduct
-description: Multi-model orchestration with lane-based routing. Classifies tasks, routes to appropriate lanes (premium/balanced/cheap/research), and loops until the goal is met. Use when the task is non-trivial and you want it to run until done. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, conduct.
----
+# Current State Pointer
 
-# /conduct — Lane-Based Orchestrator
-
-Classifies tasks by type, routes to lanes, dispatches to workers, reviews with Claude. Loops until done.
-
-## Usage
-
-```
-/conduct
-/conduct <idea or goal>
-```
-
-## Behavior
-
-### Phase 0: Intake (BLOCKING — nothing else runs until complete)
-
-1. **Detect providers and config**
-   ```bash
-   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
-   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
-   python -c "from core.search.argus_client import is_available; print('argus:', is_available())" 2>/dev/null || echo "argus: no"
-   ```
-   If `config/lanes.yaml` and `config/workers.yaml` exist, read them for routing.
-   If they don't exist, skip silently — execute all tasks inline with Claude.
-   Never mention the absence of routing config to the user.
-
-2. **Ask 5 required questions** using AskUserQuestion — do NOT proceed until answered:
-   1. What is the goal / deliverable?
-   2. What does done look like? (acceptance criteria — be specific)
-   3. What is in scope? What is explicitly out of scope?
-   4. Any constraints? (tech stack, time, things to avoid)
-   5. What is the riskiest / most uncertain part?
-
-3. **Initialize `1shot/`** in the project root (create if missing):
-   - Write intake answers to `1shot/PROJECT.md`
-   - Update `1shot/STATE.md`: phase = "intake → plan"
-   - Create `1shot/skills/` directory
-
-4. **Show PROJECT.md** to user and confirm before proceeding.
-
-### Phase 1: Plan
-
-1. **Explore codebase** (Explore subagent) — identify impacted files
-2. **Persist exploration artifact** — Write structured output to `1shot/explore.json`:
-   ```json
-   {
-     "goal": "[from PROJECT.md]",
-     "candidate_files": ["list of relevant files"],
-     "commands_to_run": ["test commands", "lint commands"],
-     "constraints": ["architectural constraints discovered"],
-     "unknowns": ["open questions to resolve"],
-     "risk_assessment": {"level": "low|medium|high", "reasoning": "..."},
-     "existing_patterns": ["patterns found in relevant files"]
-   }
-   ```
-   This artifact is visible, editable, and reusable. Update it as exploration progresses.
-3. **Docs Check**
-   - Check cache: `cat ~/github/docs-cache/docs/cache/.index.md`
-   - For anything missing → run `/doc <name> <url>` before assigning build tasks
-4. **Write `1shot/ROADMAP.md`** — phases and success criteria
-5. **Task specs for non-trivial work**: If any task is medium or high risk, generate a TASK_SPEC.md from the template at `templates/TASK_SPEC.md` and write it to `1shot/TASK_SPEC.md`. Use `1shot/explore.json` to populate the Files Involved section of TASK_SPEC.
-6. **Generate machine-readable plan** — Create `1shot/plan.json` from the TASK_SPEC:
-   Use the plan schema from `core/plan_schema.py`:
-   ```python
-   from core.plan_schema import Plan, PlanStep, VerifyStep, StepAction, VerifyType
-   from core.task_schema import RiskLevel
-
-   plan = Plan(
-       objective="[from TASK_SPEC Goal]",
-       risk_level=RiskLevel.medium,
-       steps=[
-           PlanStep(id="1", action=StepAction.explore, description="...", files=[...]),
-           PlanStep(id="2", action=StepAction.implement, description="...", files=[...], depends_on=["1"]),
-       ],
-       verification=[
-           VerifyStep(verify_type=VerifyType.test, command="pytest tests/"),
-       ],
-       rollback="git restore [files]",
-   )
-   ```
-   Write to `1shot/plan.json`. This file is the executable plan that drives the build loop.
-7. **Create native tasks** — one TaskCreate per deliverable:
-   - subject: deliverable title
-   - description: acceptance criteria, files to touch
-   - Set addBlockedBy for dependencies
-8. **Classify each task** using `docs/instructions/task-classes.md`:
-   ```bash
-   python -m core.router.resolve --class <task_class>
-   ```
-   This returns: lane, workers, reviewer, search_backend, fallback_lane
-9. **Update STATE.md**: phase = "plan → build"
-
-### Phase 2: Build Loop
-
-Repeat until no unblocked tasks remain:
-
-1. Pick next unblocked task (`TaskList` → lowest ID pending)
-2. `TaskUpdate` → in_progress
-3. **Select methodology** (automatic — based on task description):
-   - **Bug fix** (fix, bug, broken, error, crash, failing, wrong, unexpected, regression,
-     investigate, troubleshoot, not working, incorrect) → apply `/debug` protocol:
-     investigate → analyze → hypothesize → fix. Phases 1-3 are read-only.
-   - **New feature / implementation** (implement, add, create, build, new endpoint,
-     new function, new behavior) → apply `/tdd` protocol: RED-GREEN-REFACTOR.
-     No production code without a failing test shown first.
-   - **Doc edit, config change, refactor, review**: no special methodology needed.
-4. **Classify and dispatch**:
-   - Determine task class (see task-classes.md)
-   - Resolve lane: `python -m core.router.resolve --class <class>`
-   - **Follow the dispatch protocol** (see `~/.claude/skills/_shared/dispatch.md`):
-     - If premium lane → execute inline with Claude
-     - Otherwise → build self-contained prompt → dispatch to Codex/Gemini
-     - For parallel tasks → use `python3 -m core.dispatch.run --prompts-file batch.json`
-     - Capture output, validate, write manifest to `1shot/dispatch/`
-   - **CRITICAL: Use subprocess dispatch, NOT Agent tool subagents.**
-     The dispatch runner (`core.dispatch.run`) spawns lightweight CLI processes.
-     The Agent tool spawns full Claude Code sessions — only use Agent tool for
-     complex multi-step reasoning that the dispatch runner can't handle.
-     For batch file processing, extraction, summarization → always use `core.dispatch.run`.
-5. **Review**: If task requires review, dispatch review to reviewer (see dispatch.md Step 7)
-6. **Scope check** — Before verification, compare actual changes against plan:
-   ```bash
-   # Get files actually changed
-   git diff --name-only
-
-   # Compare against planned files from TASK_SPEC (1shot/TASK_SPEC.md "Files Involved" section)
-   ```
-
-   - If changes touch files listed in "Must NOT Touch" → **STOP**, flag as blocker, require human decision
-   - If changes touch files not in "Will Change" or "Read-Only" → **WARN**, log to `1shot/BLOCKERS.md` with explanation, ask if the new files should be added to the plan
-   - If changes are within plan → continue to verification
-
-   This prevents the common pattern where a "small fix" grows to touch unrelated subsystems.
-7. **Verify**: Run the Phase 3 verification checklist (see below) — all checks must pass before marking completed
-8. `TaskUpdate` → completed (only after verification passes)
-9. Update `1shot/STATE.md`: increment loop count, log action
-10. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
-
-If 3 consecutive tasks hit circuit breaker → stop, surface to user.
-
-### Phase 3: Verify (MANDATORY — evidence required)
-
-**No verification, no completion. Assertions don't count — show the output.**
-
-Every task must pass this checklist before it can be marked completed. No exceptions —
-"trivial," "just a doc edit," and "obviously correct" all get verified.
-
-For each completed task, run this checklist. **Each step requires showing actual command
-output.** "I checked it" or "tests pass" without output = verification not done.
-
-1. **Run targeted tests** — if test files exist for the changed files, run them.
-   Show the output. If no test files exist, state explicitly: "No test files found for
-   {files changed}." This is not a pass — it's a gap.
-2. **Run lint/static analysis** — shellcheck, prettier, ruff, or whatever the project uses.
-   Show the output (or lack of errors). If no linter is configured, state what was tried.
-3. **Run type check** — tsc, pyright, or equivalent. Show the output.
-4. **Check acceptance criteria** — go through each criterion from `1shot/PROJECT.md` or the
-   task description one by one. For each: state the criterion, then cite the evidence
-   (file changed, output shown, behavior confirmed). A criterion without evidence is unverified.
-5. **Review diff** — `git diff` and confirm changed files match the plan scope.
-   Flag anything out of scope.
-
-If any check fails:
-- `TaskUpdate` back to **pending** — never mark as completed with failing checks
-- Loop back to Phase 2 with the specific failure as context
-- Document what failed in `1shot/BLOCKERS.md` if it was not resolved in one retry
-
-### Phase 4: Challenge (two-stage review)
-
-Two-stage adversarial review. Stage A must pass before Stage B runs.
-
-#### Stage A: Spec Compliance
-
-Did we build what PROJECT.md asked for?
-
-1. Re-read `1shot/PROJECT.md` — every acceptance criterion, scope constraint, and goal
-2. For each acceptance criterion: cite the evidence (file changed, test output, behavior confirmed)
-3. Check scope: are there changes to files that were explicitly out of scope?
-4. **If any criterion has no evidence** → fail Stage A, create tasks to address gaps, loop to Phase 2
-5. **If scope was violated** → fail Stage A, flag for human review
-
-**Stage A pass** → proceed to Stage B. **Stage A fail** → do not run Stage B.
-
-#### Stage B: Code Quality
-
-Is the implementation well-built?
-
-1. `git diff $(git merge-base HEAD main)..HEAD` — full diff since conduct started
-2. If Codex available:
-   ```bash
-   unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access -o /tmp/conduct-challenge.json "Review this diff for code quality: (1) what could break in production, (2) what edge cases are unhandled, (3) are there any security concerns, (4) does it follow the repo's existing patterns. Diff: [content]"
-   ```
-   Parse: `jq 'select(.type=="item.completed") | .item.text' /tmp/conduct-challenge.json`
-   If Codex unavailable: Claude performs code quality review inline.
-3. New issues → create Tasks → loop to Phase 2
-4. Clean pass → update STATE.md: phase = "complete"
-
-### Phase 5: Session-End Learning
-
-If any correction was given 2+ times during this session:
-- Write proposal to `docs/instructions/learned/{date}-{topic}.md`
-- Never auto-edit `CLAUDE.md` or rules
-
-### Done
-
-```
-Conduct Complete
-├─ Tasks: X/Y completed
-├─ Lanes used: [list]
-├─ Files changed: Z
-├─ Commits: N
-└─ Blockers: M (see 1shot/ISSUES.md)
-```
-
----
-
-## Routing Reference
-
-See `docs/instructions/task-classes.md` for full classification guide.
-See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol (how to build prompts, run parallel workers, capture output, write manifests).
-See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
-
-**Key rule**: Route by task class, not provider name. Use lane policy from config.
-Claude thinks. Codex and Gemini execute.
-
----
-
-## Decision Defaults
-
-| Ambiguity | Default |
-|-----------|---------|
-| Multiple implementations | Simplest one |
-| Naming | Follow existing pattern |
-| Lane selection | Use task class routing |
-| Stack | Follow CLAUDE.md defaults |
-
----
-
-## Auto-Approved Actions
-
-- Reading any file
-- Writing to scope-matched files
-- Creating / updating `1shot/` files
-- Running tests and linters
-- Git commit (not push)
-- Creating and updating native tasks
-
-## Requires Confirmation
-
-- Destructive operations (rm -rf, DROP TABLE, reset --hard)
-- Git push to shared branches
-- External API calls that cost money
-- Deploying to production
+Phase: plan -> complete
+Started: 2026-04-28
+Loop: 1
+Tasks: 6/9 completed
+Current focus: repo-local memory and local global abstraction index shipped; next pass should tackle dual-home service integration and review gates
+Last updated: 2026-04-28
+Dated state file: `1shot/2026-04-28-memory-architecture-STATE.md`
+Dated phase-1 implementation spec: `1shot/2026-04-28-memory-phase1-implementation-SPEC.md`
+Providers:
+- codex: yes
+- gemini: yes
+- argus: yes
+Notes:
+- Top-level state now acts as a live pointer/current summary rather than the only record of the pass
+- This pass now includes the first implementation wave: scaffold, promote, retrieve, and abstract commands
+- This pass also includes a private local SQLite-backed abstraction index and degraded-mode signaling for cross-repo search
+- Work memory belongs to target repos, not the OneShot repo
+- Durable human-facing memory will live in `docs/agents/`
+- Operational machine memory will live in `.oneshot/`
+- Cross-repo retrieval remains allowed, but abstracted-first by default
+- Stable memory is intended to be committed; transient state should usually remain local
+- Phase-1 implementation contract now exists for the first coding pass
 ````
 
 ## File: config/lanes.yaml
@@ -31451,6 +32869,866 @@ lanes:
       general: [free]
     retry_limit: 3
     retry_delay: 5
+````
+
+## File: config/workers.yaml
+````yaml
+workers:
+  local:
+    host: localhost
+    transport: local
+    role: planner
+    harness: claude_code
+  oci:
+    host: oci-ts
+    transport: ssh
+    role: planner
+    harness: claude_code
+  macmini:
+    host: macmini-ts
+    transport: ssh
+    role: worker
+    harness: opencode
+  homelab:
+    host: homelab-ts
+    transport: ssh
+    role: worker
+    harness: opencode
+  claw:
+    host: localhost
+    transport: local
+    role: worker
+    harness: claw_code
+    provider: zai
+    install_path: ~/github/claw-code-agent
+  glm:
+    host: localhost
+    transport: local
+    role: worker
+    harness: claude_code
+    provider: zai
+    model: glm-5-turbo
+    plan_expires: "2026-05-02"
+  ocg_minimax:
+    host: localhost
+    transport: local
+    role: worker
+    harness: claude_code
+    provider: opencode_go
+    model: minimax-m2.7
+    protocol: anthropic
+    cost_tier: cheap
+    notes:
+      - "Claude CLI with ANTHROPIC_BASE_URL → OpenCode Go /messages endpoint"
+      - "Full toolchain access. MiniMax models only."
+  ocg_api:
+    host: localhost
+    transport: local
+    role: worker
+    harness: direct_api
+    provider: opencode_go
+    model: deepseek-v4-flash
+    protocol: openai
+    cost_tier: cheap
+    notes:
+      - "Direct API calls. No shell access for the model."
+      - "Good for summaries, extraction, quick coding tasks."
+  free:
+    host: localhost
+    transport: local
+    role: worker
+    harness: openrouter_api
+    provider: openrouter
+    model: openrouter/free
+    cost: 0
+    plan_expires: null
+    max_tokens: 1024
+    timeout: 30
+````
+
+## File: core/janitor/worker.py
+````python
+ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
+DAILY_LIMIT = 1000
+MINUTE_LIMIT = 20
+MODEL_TIERS: "dict[str, list[str]]" = {
+_cached_api_key = None
+def _get_api_key() -> str
+⋮----
+key = os.environ.get("OPENROUTER_API_KEY", "")
+⋮----
+_cached_api_key = key
+⋮----
+def _usage_log_path() -> Path
+⋮----
+project = Path(os.getcwd())
+⋮----
+d = parent / ".janitor"
+⋮----
+_rate_cache: dict = {"minute_count": 0, "day_count": 0, "cached_at": 0}
+_RATE_TTL = 5
+def _check_rate_limit() -> bool
+⋮----
+now = time.time()
+⋮----
+path = _usage_log_path()
+⋮----
+_rate_cache = {"minute_count": 0, "day_count": 0, "cached_at": now}
+⋮----
+minute_ago = now - 60
+day_ago = now - 86400
+recent_minute = 0
+recent_day = 0
+⋮----
+line = line.strip()
+⋮----
+ts = float(line.split('"ts":', 1)[1].split(",")[0])
+⋮----
+_rate_cache = {
+⋮----
+def _log_usage(model: str, tokens_in: int = 0, tokens_out: int = 0)
+⋮----
+"""Log API usage for rate limit tracking."""
+entry = {
+⋮----
+def get_usage_stats() -> dict
+⋮----
+total = 0
+⋮----
+api_key = _get_api_key()
+tier = MODEL_TIERS.get(quality, MODEL_TIERS["cheap"])
+messages = []
+⋮----
+payload = json.dumps({
+req = urllib.request.Request(
+last_error = None
+⋮----
+data = json.loads(resp.read())
+content = data["choices"][0]["message"]["content"]
+model_used = data.get("model", "unknown")
+usage = data.get("usage", {})
+⋮----
+body = ""
+⋮----
+body = e.read().decode()[:200]
+⋮----
+last_error = f"HTTP {e.code}: {e.reason} — {body}"
+⋮----
+last_error = str(e)
+⋮----
+raw = call_free(prompt, system=system, max_tokens=2048, timeout=30, quality=quality)
+⋮----
+stripped = raw.strip()
+⋮----
+lines = stripped.split("\n")
+inner = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+⋮----
+match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', stripped, re.DOTALL)
+````
+
+## File: docs/instructions/task-classes.md
+````markdown
+# Task Classes & Routing Contract
+
+Task classes are the bridge between intent and execution. Every task in OneShot
+gets classified into one of these classes, which determines its lane, worker
+pool, and review path.
+
+## Task Classes
+
+| Class | Lane | Category | Preferred Workers |
+|-------|------|----------|-------------------|
+| `plan` | premium | general | claude_code |
+| `research` | research | research | gemini_cli, codex |
+| `search_sweep` | research | research | gemini_cli, codex |
+| `implement_small` | cheap | coding | codex, gemini_cli, glm_claude |
+| `implement_medium` | balanced | coding | codex, gemini_cli |
+| `test_write` | cheap | coding | codex, gemini_cli, glm_claude |
+| `review_diff` | premium | review | codex, claude_code |
+| `doc_draft` | cheap | writing | gemini_cli, codex, glm_claude |
+| `summarize_findings` | cheap | writing | gemini_cli, codex, glm_claude |
+
+### `plan` — Planning & Decomposition
+- **Lane**: premium | **Category**: general
+- **Planner**: claude_code (required)
+- **Worker**: None (planner handles directly)
+- **Review**: claude_code
+- **Use when**: Starting any non-trivial work, creating a roadmap, breaking down goals
+
+### `research` — Deep Research
+- **Lane**: research | **Category**: research
+- **Planner**: claude_code
+- **Worker**: gemini_cli + argus (search backend)
+- **Review**: claude_code (optional, for synthesis)
+- **Use when**: Need to understand a domain, gather information, investigate options
+
+### `search_sweep` — Quick Search Scan
+- **Lane**: research | **Category**: research
+- **Planner**: None
+- **Worker**: argus + cheap summarizer
+- **Review**: claude_code (optional)
+- **Use when**: Quick fact-checking, finding specific docs, looking up syntax
+
+### `implement_small` — Bounded Implementation
+- **Lane**: cheap | **Category**: coding
+- **Planner**: claude_code (for task decomposition)
+- **Worker**: cheap pool (codex, gemini_cli, glm_claude)
+- **Review**: claude_code (required)
+- **Use when**: Small code change, single file, clear requirements, isolated scope
+- **Max scope**: Single module, well-defined inputs/outputs
+
+### `implement_medium` — Medium Implementation
+- **Lane**: balanced | **Category**: coding
+- **Planner**: claude_code (required)
+- **Worker**: balanced pool (codex, gemini_cli)
+- **Review**: claude_code (required)
+- **Use when**: Multi-file change, cross-cutting concern, moderate complexity
+
+### `test_write` — Test Generation
+- **Lane**: cheap | **Category**: coding
+- **Planner**: claude_code (for test strategy)
+- **Worker**: cheap pool
+- **Review**: claude_code
+- **Use when**: Writing tests for existing code, test scaffolding
+
+### `review_diff` — Code Review
+- **Lane**: premium | **Category**: review
+- **Planner**: None
+- **Worker**: claude_code or strong reviewer
+- **Review**: claude_code (final say)
+- **Use when**: Adversarial review, quality gate, challenge pass
+
+### `doc_draft` — Documentation Draft
+- **Lane**: cheap | **Category**: writing
+- **Planner**: None
+- **Worker**: cheap pool
+- **Review**: claude_code (optional polish)
+- **Use when**: Writing README sections, API docs, inline comments
+
+### `summarize_findings` — Result Summarization
+- **Lane**: cheap | **Category**: writing
+- **Planner**: None
+- **Worker**: cheap pool
+- **Review**: None
+- **Use when**: Condensing research, summarizing logs, creating executive summaries
+
+## Classification Guide
+
+To classify a task, ask:
+
+1. **Does it require understanding the full repo context?** → `plan` or `review_diff`
+2. **Does it need web search?** → `research` or `search_sweep`
+3. **Is it a code change?**
+   - Single file, clear scope → `implement_small`
+   - Multi-file, moderate complexity → `implement_medium`
+4. **Is it a test?** → `test_write`
+5. **Is it documentation?** → `doc_draft`
+6. **Is it summarizing something?** → `summarize_findings`
+
+## Lane Escalation
+
+Each lane has a `fallback_lane` in `config/lanes.yaml`. If a worker fails:
+- `cheap` → `balanced` → `premium` → inline (Claude handles directly)
+- `research` → `balanced` → inline
+
+Three consecutive failures → circuit breaker → log blocker → skip.
+
+## Available Workers
+
+| Worker | Lane(s) | Backend | Notes |
+|--------|---------|---------|-------|
+| `codex` | cheap, balanced | ChatGPT Plus OAuth | Requires `unset OPENAI_API_KEY` |
+| `gemini_cli` | cheap, research, balanced | Google API | Direct CLI |
+| `glm_claude` | cheap | ZAI/GLM-5-turbo | Full claude CLI, free until 2026-05-02 |
+| `claw_code` | opt-in | OpenRouter | Manual opt-in via `--worker claw_code` |
+| `claude_code` | premium, planner | Anthropic API | Main orchestrator, never dispatched externally |
+
+## Risk Classification
+
+Every task has a **risk level** (`low`, `medium`, `high`) that controls what workers
+can do autonomously. Risk and complexity (task class) are **independent axes** -- a
+3-line auth change is small complexity but high risk; a large refactoring of utility
+functions is high complexity but low risk.
+
+### Risk Levels
+
+| Level | Auto-edit | Auto-verify | Auto-commit | Needs approval | Sync-only |
+|-------|-----------|-------------|-------------|----------------|-----------|
+| `low` | Yes | Yes | No | No | No |
+| `medium` | No | Yes | No | Yes | No |
+| `high` | No | Yes | No | Yes | Yes |
+
+### Inference Rules
+
+Risk is inferred from keywords in the task description and affected file paths:
+
+**High risk** (any match): auth, billing, migration, security, password, token,
+secret, credential, production, deploy
+
+**Low risk** (any match): refactor, rename, test, lint, doc, format, comment
+
+**Medium risk**: everything else (default)
+
+High-risk keywords take priority over low-risk keywords -- if a description contains
+both "refactor" and "auth", it's classified as high risk.
+
+### Examples
+
+- "Fix typo in README" -- `implement_small`, risk `low`
+- "Rename `utils.py` to `helpers.py`" -- `implement_small`, risk `low`
+- "Add login endpoint" -- `implement_medium`, risk `high`
+- "Deploy v2 to production" -- `plan`, risk `high`
+- "Format all Python files with black" -- `implement_small`, risk `low`
+- "Add caching to API handler" -- `implement_medium`, risk `medium`
+
+## CLI Reference
+
+```bash
+# Resolve routing for a task class
+python -m core.router.resolve --class implement_small
+
+# Check available models for a lane
+python -c "from core.router.model_registry import models_for_lane; print(models_for_lane('cheap'))"
+
+# Check if Argus is available
+python -c "from core.search.argus_client import is_available; print(is_available())"
+```
+````
+
+## File: .gitignore
+````
+# Never commit plaintext secrets
+*.env
+*.env.tmp
+secrets/*.env
+!*.encrypted
+!.env.example
+
+# Agent working directories (local only)
+.agent/
+.beads/
+.oneshot/
+# But DO track config and task scaffolding
+!.oneshot/config/
+!.oneshot/config/*.yaml
+!.oneshot/tasks/
+!.oneshot/tasks/.gitkeep
+!.oneshot/TASKS.md
+.janitor/  # Janitor runtime data (events.jsonl, intelligence.db, usage.jsonl)
+
+# Output directories (runtime generated, not source)
+dispatch/
+# But DO track the dispatch Python module and 1shot directory structure
+!core/dispatch/
+!core/dispatch/__init__.py
+!core/dispatch/run.py
+!1shot/dispatch/
+!1shot/dispatch/.gitkeep
+
+# But DO track research results
+!docs/research/
+
+# Local keys
+.age/
+*.key
+
+# The Audit - source documents (large, copyrighted)
+.claude/skills/the-audit/SOURCE_DOCS/
+
+# Encrypted sessions (but keep index.md for searchability)
+*.age
+!docs/sessions/index.md
+
+# Python / Node artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+
+# OS / editor
+.DS_Store
+*.swp
+.vercel
+````
+
+## File: .claude/skills/_shared/dispatch.md
+````markdown
+# Dispatch Protocol
+
+Reference this module from any skill that needs to route work to external workers.
+Skills include it by mention, not import. This is the single source of truth for
+how Claude delegates execution to Codex and Gemini.
+
+---
+
+## Overview
+
+```
+Claude (thinker) → classify task → build prompt → dispatch to worker(s) → capture output → validate → commit or retry
+```
+
+Claude plans, reviews, and integrates. Codex and Gemini execute.
+
+---
+
+## Step 1: Classify and Resolve
+
+For each task to dispatch:
+
+1. Determine task class using `docs/instructions/task-classes.md`
+2. Determine category (coding, research, writing, review, general) — infer from the task
+   description keywords (implement/code/fix→coding, research/search→research,
+   doc/write/summarize→writing, review/audit→review, default→general)
+3. Resolve lane, worker pool (reordered by category preference), and routing:
+   ```bash
+   python3 -m core.router.resolve --class <task_class> --category <category>
+   ```
+   Returns: `{task_class, category, lane, workers[], review_with, search_backend, fallback_lane}`
+   Workers are already ordered by category preference — first available wins.
+   If the resolver fails (missing config, import error, etc.), this is a BLOCKER.
+   **Do NOT execute inline.** Log to BLOCKERS.md, stop, and tell the user the routing config is missing.
+4. Read `max_parallel` from `config/lanes.yaml` for the resolved lane
+5. If lane is `premium` → execute inline with Claude (no dispatch). Stop here.
+6. Otherwise → continue to Step 2
+
+---
+
+## Step 2: Build Self-Contained Prompt
+
+Every dispatched task must be **fully self-contained**. The worker gets a prompt
+that includes everything it needs — no back-reference to conversation context.
+
+### Prompt Template
+
+```markdown
+## Task
+{one-line description}
+
+## Task Class
+{task_class} — {lane}
+
+## Acceptance Criteria
+- {criterion 1}
+- {criterion 2}
+- ...
+
+## Context: Files to Read
+- `path/to/file1.py` — {why relevant}
+- `path/to/file2.ts` — {why relevant}
+
+## Patterns to Follow
+{if applicable: "Follow the existing pattern in path/to/reference.py"}
+
+## Constraints
+- {constraint 1}
+- {constraint 2}
+
+## Output Format
+Return your changes as file diffs. If creating new files, show the full content.
+End with a summary of what you changed and any concerns.
+```
+
+### Prompt Construction Rules
+
+- **Always include the full acceptance criteria** — the worker can't ask questions
+- **Always list specific files to read** — the worker needs to know what matters
+- **Always state output format** — structured output from both Codex and Gemini
+- **Never reference conversation history** — the prompt must stand alone
+- **Keep under 4000 words** — context window limits on cheaper models
+- **If the task needs files changed, say which ones and what to change**
+- **Include shared memory instruction** — prepend: "Read `.claude/memory/memory.md` for shared learnings from past sessions. If you discover something notable, append a dated entry."
+
+---
+
+## Step 3: Dispatch
+
+### Worker Commands
+
+**GLM Claude** (full Claude Code session on GLM-5-turbo via ZAI, free until 2026-05-02):
+```bash
+ZAI_KEY="$(secrets get ZAI_API_KEY 2>/dev/null)" && \
+ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+ANTHROPIC_AUTH_TOKEN="$ZAI_KEY" \
+ANTHROPIC_API_KEY="" \
+ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5-turbo" \
+ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5-turbo" \
+claude --print --dangerously-skip-permissions "{prompt}"
+```
+
+**Codex** (structured JSON output):
+```bash
+unset OPENAI_API_KEY && \
+codex exec --json --sandbox danger-full-access \
+  -o /tmp/dispatch-{id}.json \
+  "{prompt}"
+```
+
+**Gemini** (structured JSON output):
+```bash
+gemini -p "{prompt}" \
+  --output-format json \
+  --approval-mode yolo \
+  > /tmp/dispatch-{id}.json 2>/dev/null
+```
+
+**Gemini** (streaming JSONL for long tasks):
+```bash
+gemini -p "{prompt}" \
+  --output-format stream-json \
+  --approval-mode yolo \
+  > /tmp/dispatch-{id}.jsonl 2>/dev/null
+```
+
+### Parallel Execution
+
+Run multiple dispatches in parallel using background processes:
+
+```bash
+# Launch workers
+codex exec --json --sandbox danger-full-access -o /tmp/dispatch-1.json "task 1" &
+PID1=$!
+gemini -p "task 2" --output-format json --yolo > /tmp/dispatch-2.json 2>/dev/null &
+PID2=$!
+codex exec --json --sandbox danger-full-access -o /tmp/dispatch-3.json "task 3" &
+PID3=$!
+
+# Wait for all
+wait $PID1; STATUS1=$?
+wait $PID2; STATUS2=$?
+wait $PID3; STATUS3=$?
+
+# Check results
+[ $STATUS1 -eq 0 ] && echo "task 1: ok" || echo "task 1: failed (exit $STATUS1)"
+[ $STATUS2 -eq 0 ] && echo "task 2: ok" || echo "task 2: failed (exit $STATUS2)"
+[ $STATUS3 -eq 0 ] && echo "task 3: ok" || echo "task 3: failed (exit $STATUS3)"
+```
+
+**Limits**:
+- Respect `max_parallel` from `config/lanes.yaml` (default 3)
+- Codex: no documented concurrency limit — each `codex exec` is independent
+- Gemini CLI: 60 req/min (Google Sign-in), 10 req/min (API key)
+- Machine resource: don't exceed ~6 parallel processes on oci-dev
+
+---
+
+## Step 4: Capture and Parse Output
+
+### Codex Output (JSONL)
+
+Parse with `jq`:
+```bash
+# Final agent message
+jq -s '[.[] | select(.type=="item.completed") | select(.item.type=="agent_message") | .item.text] | last' /tmp/dispatch-{id}.json
+
+# All messages
+jq -s '[.[] | select(.type=="item.completed") | select(.item.type=="agent_message")]' /tmp/dispatch-{id}.json
+
+# Token usage
+jq -s '[.[] | select(.type=="turn.completed") | .usage] | last' /tmp/dispatch-{id}.json
+
+# Errors
+jq -s '[.[] | select(.type=="error")]' /tmp/dispatch-{id}.json
+```
+
+### Gemini Output (JSON)
+
+```bash
+# Response text
+jq -r '.response' /tmp/dispatch-{id}.json
+
+# Session stats (tokens, duration)
+jq '.stats' /tmp/dispatch-{id}.json
+
+# Exit code tells success/failure
+# 0 = success, non-zero = failure
+```
+
+### Gemini Output (Stream JSONL)
+
+```bash
+# Final result
+jq -s '[.[] | select(.type=="result") | .data] | last' /tmp/dispatch-{id}.jsonl
+
+# Tool calls made
+jq -s '[.[] | select(.type=="tool_use")]' /tmp/dispatch-{id}.jsonl
+```
+
+---
+
+## Step 5: Validate
+
+After capturing output, validate against acceptance criteria:
+
+1. **Check exit code**: 0 = success, non-zero = failure
+2. **Check for errors in output**: parse error events from JSON
+3. **Check acceptance criteria**: did the worker's output satisfy each criterion?
+4. **If validation passes**: proceed to Step 6
+5. **If validation fails**: proceed to Step 7 (retry/escalate)
+
+---
+
+## Step 6: Write Manifest
+
+Write a manifest file for every dispatched task:
+
+```
+1shot/dispatch/{task-id}.md
+```
+
+### Manifest Format
+
+```markdown
+# Dispatch: {task-id}
+
+## Status: succeeded | failed | retrying | escalated
+
+## Task
+- **Class**: {task_class}
+- **Lane**: {lane}
+- **Worker**: codex | gemini_cli
+- **Prompt**: (truncated, first 200 chars)
+- **Acceptance Criteria**: (from original task)
+
+## Execution
+- **Started**: {ISO timestamp}
+- **Completed**: {ISO timestamp}
+- **Duration**: {seconds}
+- **Output file**: `/tmp/dispatch-{id}.json`
+- **Exit code**: {code}
+- **Tokens used**: {if available from JSON}
+
+## Result
+- **Passed validation**: yes | no
+- **Summary**: {one-line of what happened}
+
+## Retry History
+- Attempt 1: {status}, {timestamp}
+- Attempt 2: {status}, {timestamp} (if retried)
+```
+
+---
+
+## Step 7: Retry and Escalation
+
+### Retry Logic
+
+- **Attempt 1**: dispatch to lane's worker pool
+- **Attempt 2**: dispatch to fallback_lane (if configured)
+- **Attempt 3**: Log blocker, skip task, continue to next task. Do NOT handle inline.
+
+### When to Retry
+
+- Worker exit code is non-zero
+- Output contains errors
+- Acceptance criteria not met
+- Worker produced no useful output (empty response)
+
+### When to Escalate Immediately
+
+- The task involves auth, secrets, or data mutation
+- The task requires repo-wide synthesis
+- The prompt was malformed (Claude's fault — fix the prompt, not the worker)
+
+### Circuit Breaker
+
+If same task fails 3 times total:
+1. Log to manifest with status `escalated`
+2. Log to `BLOCKERS.md` or `1shot/ISSUES.md`
+3. Skip to next task
+4. If 3 consecutive tasks hit circuit breaker → stop, surface to user
+
+---
+
+## Step 8: Integrate and Commit
+
+After successful dispatch:
+
+1. **Read the worker's output** — understand what changed
+2. **Read modified files** — confirm diffs match intent
+3. **Run tests** if applicable: `./scripts/ci.sh` or project test command
+4. **Commit**: `git add <files> && git commit -m "feat: <task description>"`
+5. **Update manifest**: status = `succeeded`
+6. **Update task tracker**: `TaskUpdate` completed
+
+---
+
+## Worker Selection
+
+Worker ordering is **category-driven** via `config/lanes.yaml`. The resolver returns
+workers already sorted by category preference. Just pick the first available.
+
+| Category | Cheap Lane (first_available) | Balanced | Premium | Research |
+|----------|------------------------------|----------|---------|----------|
+| coding | codex → gemini_cli → glm_claude | codex → gemini_cli | claude_code → codex | codex → gemini_cli |
+| research | gemini_cli → codex → glm_claude | gemini_cli → codex | claude_code → codex | gemini_cli → codex |
+| writing | gemini_cli → codex → glm_claude | gemini_cli → codex | claude_code → codex | gemini_cli → codex |
+| review | codex → glm_claude → gemini_cli | codex → gemini_cli | claude_code → codex | codex → gemini_cli |
+| general | gemini_cli → codex → glm_claude | codex → gemini_cli | claude_code → codex | gemini_cli → codex |
+
+No manual selection needed — `python3 -m core.router.resolve --class <class> --category <cat>`
+returns the correct order. See `~/.claude/skills/_shared/providers.md` for full provider details.
+
+## Terminal Entry Points
+
+From the terminal (outside CC sessions), use shell functions:
+- `shot "task"` — auto-routes to best model (GLM by default, falls back to OpenRouter when ZAI expires)
+- `zai` — force GLM-5-turbo (ZAI, free)
+- `or` — force OpenRouter model (paid)
+- `or --code` — force Qwen3-Coder (OpenRouter, free)
+
+Inside a CC session, use the dispatch protocol above to hand off tasks to workers.
+````
+
+## File: .claude/skills/full/SKILL.md
+````markdown
+---
+name: full
+description: Structured operator for new projects, refactors, and complex implementations. Implementation dispatched to workers.
+---
+
+# /full — Full Operator for Complex Work
+
+Structured operator for new projects, refactors, and complex implementations.
+Claude plans and reviews. Codex and Gemini execute implementation tasks via dispatch.
+**There is no "Claude handles implementation inline" path. If dispatch fails, log a blocker.**
+
+## CRITICAL: Dispatch Is Mandatory
+
+This operator REQUIRES external worker dispatch for ALL implementation tasks.
+Claude's role: planning, review, integration. That's it. Workers do the coding.
+
+## Usage
+
+```
+/full
+/full <project-description>
+```
+
+## Behavior
+
+### Phase 1: Intake
+
+1. **Load or Create `1shot/` Context**
+2. **Structured Discovery** — what, scope, architecture, constraints
+3. **Document Decisions** → `1shot/PROJECT.md` and `1shot/DECISIONS.md`
+4. **Update `1shot/LLM-OVERVIEW.md`** if needed
+
+### Phase 2: Planning
+
+1. **Docs Check** — `cat ~/github/docs-cache/docs/cache/.index.md` → cache missing via `/doc`
+2. **Phase-Based Plan** → `1shot/ROADMAP.md`
+3. **Skill Discovery** — check `1shot/skills/`, search SkillsMP for specialized domains
+4. **Create Task Queue** — TaskCreate per milestone
+5. **Verify Workers** — this is MANDATORY before proceeding:
+   ```bash
+   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
+   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+   python3 -m core.router.resolve --class implement_medium --category coding
+   ```
+   If NO workers available: stop and tell the user. Do not proceed without workers.
+6. **Codex Plan Review** — dispatch plan for adversarial review BEFORE coding:
+   ```bash
+   unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access \
+     -o /tmp/full-plan-review.json \
+     "Review this implementation plan: [ROADMAP content]. Flag: (1) missing steps, (2) tasks to combine, (3) risks, (4) better ordering."
+   ```
+   Surface feedback, adjust plan. If codex unavailable: log blocker, proceed.
+
+### Phase 3: Execution
+
+1. **Methodology Selection** (per milestone — automatic)
+   - **Bug fix** → `/debug` protocol
+   - **New feature** → `/tdd` protocol
+   - **Doc edit, config change, refactor**: no special methodology
+
+2. **Milestone Tracking** — commit after each milestone
+
+3. **Dispatch ALL Implementation Tasks** (MANDATORY)
+   For each milestone task:
+   ```bash
+   # Classify and resolve
+   python3 -m core.router.resolve --class <task_class> --category <category>
+
+   # Dispatch to worker
+   python3 -m core.dispatch.run \
+     --class <task_class> \
+     --category <category> \
+     --prompt "Self-contained prompt: task, acceptance criteria, files to read, patterns, constraints, output format" \
+     --output 1shot/dispatch \
+     --manifest 1shot/dispatch
+   ```
+   - Review dispatch output, validate against acceptance criteria, commit
+   - If dispatch fails: retry with fallback_lane, then log blocker and skip
+   - **Do NOT implement code yourself**
+
+4. **Burn-Down Mode** — complete one milestone fully before next
+
+5. **Context Checkpoints** — at 50% suggest /handoff, at 70% auto-handoff
+
+### Phase 4: Completion
+
+1. **Challenge Pass** — dispatch adversarial review to Codex:
+   ```bash
+   unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access \
+     -o /tmp/full-challenge.json \
+     "Review this diff for code quality: (1) production risks, (2) unhandled edge cases, (3) security concerns, (4) pattern adherence. Diff: [content]"
+   ```
+   If Codex unavailable: log blocker, surface to user.
+
+2. **Verification (MANDATORY — evidence required)**
+   1. Run targeted tests — show output
+   2. Run lint/static analysis — show output
+   3. Run type check — show output
+   4. Check acceptance criteria — cite evidence per criterion
+   5. Review diff against plan scope
+
+3. **Update `1shot/LLM-OVERVIEW.md`** with current state
+
+4. **Summary**
+   ```
+   Implementation Complete
+   ├─ Milestones: X/Y completed
+   ├─ Workers used: [codex: N, gemini: M, glm: P]
+   ├─ Files changed: Z
+   ├─ Commits: N
+   └─ Next steps: [if any]
+   ```
+
+## Provider Routing
+
+See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol.
+See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
+
+## `1shot/` Structure
+
+```
+1shot/
+├── LLM-OVERVIEW.md   # Full project context
+├── PROJECT.md        # Goals, scope, acceptance criteria
+├── STATE.md          # Current phase and loop state
+├── ROADMAP.md        # Milestones and plan
+├── DECISIONS.md      # Decision log
+├── BLOCKERS.md       # Blocked items
+├── dispatch/         # Dispatch manifests and output
+└── skills/           # SkillsMP-pulled project skills
+```
+
+## Auto-Approved Actions
+
+- Reading any file
+- Writing to scope-matched files
+- Creating/updating any file under `1shot/`
+- Running tests and linters
+- Calling Codex/Gemini/GLM CLI via bash (dispatch)
+- Git commit (not push)
+
+## Requires Confirmation
+
+- Destructive operations
+- Git push to shared branches
+- External API calls that cost money
+- Deploying to production
+- Major architecture changes
 ````
 
 ## File: core/dispatch/run.py
@@ -31680,6 +33958,7 @@ implement_small = "implement_small"
 implement_medium = "implement_medium"
 test_write = "test_write"
 review_diff = "review_diff"
+adversarial_review = "adversarial_review"
 doc_draft = "doc_draft"
 summarize_findings = "summarize_findings"
 janitor_summarize = "janitor_summarize"
@@ -31716,112 +33995,144 @@ JANITOR_KEYWORDS = [
 def infer_category(description: str) -> TaskCategory
 ````
 
-## File: scripts/heartbeat.sh
-````bash
-set -euo pipefail
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/state.sh"
-QUIET=false
-FORCE=false
-while [[ $
-  case "$1" in
-    --quiet|-q) QUIET=true ;;
-    --force|-f) FORCE=true ;;
-  esac
-  shift
-done
-TODAY=$(date +%Y-%m-%d)
-LAST_CHECK=$(state_get_last_check)
-if [[ "$FORCE" != "true" ]] && [[ "$LAST_CHECK" == "$TODAY" ]]; then
-  [[ "$QUIET" != "true" ]] && echo "heartbeat: already ran today ($TODAY)"
-  exit 0
-fi
-if [[ "$QUIET" != "true" ]]; then
-  echo ""
-  echo "╔══════════════════════════════════════════╗"
-  echo "║  ONE-SHOT Heartbeat  $(date '+%Y-%m-%d %H:%M')  ║"
-  echo "║  $(hostname)                              ║"
-  echo "╚══════════════════════════════════════════╝"
-fi
-RESULTS=()
-ISSUES=0
-run_check() {
-  local name="$1"
-  local script="$2"
-  local fix_flag=""
-  if [[ ! -f "$script" ]]; then
-    RESULTS+=("○ $name (script missing)")
-    return
-  fi
-  [[ "$FORCE" == "true" && "$script" == *"check-clis.sh" ]] && fix_flag="--fix"
-  local rc=0
-  output=$("$script" $fix_flag 2>&1) || rc=$?
-  if [[ $rc -eq 0 ]]; then
-    local passed failed
-    passed=$(echo "$output" | grep -c "^✓" || true)
-    failed=$(echo "$output" | grep -c "^⚠️" || true)
-    if [[ "$QUIET" != "true" ]]; then
-      echo "$output" | sed 's/^/  /'
-    fi
-    if [[ "$failed" -eq 0 ]]; then
-      RESULTS+=("✓ $name")
-    else
-      RESULTS+=("⚠️  $name ($failed issue(s))")
-      ISSUES=$((ISSUES + failed))
-    fi
-  else
-    RESULTS+=("⚠️  $name (exit $rc)")
-    ISSUES=$((ISSUES + 1))
-  fi
-}
-run_check "ONE-SHOT Repo"  "$SCRIPT_DIR/check-oneshot.sh"
-run_check "GLM Model"      "$SCRIPT_DIR/check-glm.sh"
-run_check "Secrets"        "$SCRIPT_DIR/sync-secrets.sh"
-run_check "CLI Tools"      "$SCRIPT_DIR/check-clis.sh"
-run_check "API Keys"       "$SCRIPT_DIR/check-apis.sh"
-run_check "MCP Servers"    "$SCRIPT_DIR/check-mcps.sh"
-run_check "Connectivity"   "$SCRIPT_DIR/check-connections.sh"
-run_check "Backup"        "$SCRIPT_DIR/check-backup.sh"
-if [[ "$QUIET" != "true" ]]; then
-  echo "  Cross-Machine Reachability:"
-fi
-MACHINE_OK=0
-MACHINE_TOTAL=0
-THIS_IP=$(tailscale ip -4 2>/dev/null || echo "")
-check_machine() {
-  local name="$1"
-  local host="$2"
-  local ip="${3:-}"
-  if [[ -n "$ip" && "$ip" == "$THIS_IP" ]]; then
-    if [[ "$QUIET" != "true" ]]; then echo "  ○ $name — self"; fi
-    return
-  fi
-  MACHINE_TOTAL=$((MACHINE_TOTAL + 1))
-  if ssh -o ConnectTimeout=3 -o BatchMode=yes "$host" true 2>/dev/null; then
-    if [[ "$QUIET" != "true" ]]; then echo "  ✓ $name"; fi
-    MACHINE_OK=$((MACHINE_OK + 1))
-  else
-    if [[ "$QUIET" != "true" ]]; then echo "  ⚠️  $name — unreachable"; fi
-  fi
-}
-check_machine "oci-dev"  "oci-dev"    "100.126.13.70"   || true
-check_machine "homelab" "homelab"   "100.112.130.100"  || true
-check_machine "macmini"  "macmini"   "100.113.216.27"  || true
-RESULTS+=("✓ Machines: $MACHINE_OK/$MACHINE_TOTAL reachable")
-state_set_last_check "$TODAY"
-if [[ "$QUIET" != "true" ]]; then
-  echo ""
-  echo "Results:"
-  for r in "${RESULTS[@]}"; do
-    echo "  $r"
-  done
-  if [[ $ISSUES -gt 0 ]]; then
-    echo ""
-    echo "  $ISSUES issue(s) found — run with --force to auto-fix CLIs"
-  fi
-  echo ""
-fi
-exit $ISSUES
+## File: docs/instructions/oneshot.md
+````markdown
+# OneShot Project-Specific Rules
+
+This file contains rules specific to the OneShot framework itself.
+For general coding/workflow rules, see the other instruction files.
+
+## What OneShot Is
+
+OneShot is a **control plane for Claude-first orchestration**:
+- Claude Code is the primary planner and reviewer (thinker)
+- Codex and Gemini execute tasks via parallel dispatch (doers)
+- Lane-based routing policy (config/lanes.yaml) drives task dispatch
+- Dispatch protocol (`_shared/dispatch.md`) handles prompt construction, parallel execution, output capture
+- Argus is the default search plane
+- Instructions are the single source of truth (docs/instructions/)
+
+## Project Structure
+
+```
+oneshot/
+  config/           # YAML routing policy (lanes, models, workers, search, providers)
+  core/             # Python schemas, router, and dispatch runner
+  docs/instructions/ # Neutral instruction source (this directory)
+  .claude/rules/    # Thin imports to docs/instructions/
+  .claude/skills/   # Operator and utility skill prompts
+  .opencode/        # OpenCode adapter (installed, pending interactive auth)
+  templates/        # Project templates (AGENTS.md.j2, CLAUDE.md.j2)
+  secrets/          # SOPS/Age encrypted vault
+  scripts/          # Build, deployment, and maintenance scripts
+```
+
+## Progressive Disclosure
+
+Instructions load based on project type:
+- **Core rules** always load (~300 tokens)
+- **Project-specific** rules load based on file detection
+
+## Skill Catalog
+
+### Operators
+| Skill | Purpose |
+|-------|---------|
+| `/short` | Quick iteration, burn-down mode |
+| `/full` | Structured work with milestones |
+| `/conduct` | Multi-model orchestration with lane routing |
+
+### Utilities
+| Skill | Purpose |
+|-------|---------|
+| `/handoff` | Save context before `/clear` |
+| `/restore` | Resume from handoff |
+| `/research` | Background research via Argus |
+| `/freesearch` | Zero-token web search via Argus |
+| `/doc` | Cache external documentation |
+| `/vision` | Image/website visual analysis |
+| `/secrets` | SOPS/Age secrets management |
+| `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
+| `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
+
+## v2 Capabilities
+
+New structured artifacts and schemas available to operators:
+- `templates/TASK_SPEC.md` — Template for task specification documents
+- `core/plan_schema.py` — Machine-readable plan schema (plan.json)
+- `core/task_schema.py` — Task schema with `infer_risk()` for risk classification (low/medium/high)
+
+## AGENTS.md
+
+AGENTS.md is the **neutral operating contract** — not Claude-specific.
+It references config/lanes.yaml for routing and defines task classes.
+Any code assistant (Claude, OpenCode, etc.) can read it directly.
+
+## Janitor System
+
+Background intelligence layer (`core/janitor/`) that runs automatically via Claude Code hooks (global `~/.claude/settings.json` — all projects get it). Hooks live at `~/.claude/hooks/janitor-*.sh` (not in the oneshot repo — they must work across all machines and projects without requiring the repo at a specific path).
+
+- **Project type detection**: classifies repos as `code`, `document`, or `hybrid` on every session start
+- **Code signals** (code/hybrid): test gaps, code smells, dependency map
+- **Document signals** (document/hybrid): staleness, orphans, clusters, size outliers, recent activity, cross-references
+- **Universal signals** (all types): config drift, recent focus, critical files, knowledge risk, blockers, dead ends
+- **Session recording**: file reads/writes/edits via PostToolUse hook → `.janitor/events.jsonl`
+- **Onboarding generation**: project-type-aware summary → `CLAUDE.local.md` (runs at session end via openrouter/free)
+- **Staleness gating**: signals are only regenerated when underlying data changes
+
+Storage: `.janitor/` per project (events.jsonl, signal JSON files, onboarding-state.json).
+
+The janitor lane (`janitor` task classes) routes exclusively to the `free` worker.
+No review needed — these are housekeeping tasks.
+
+## Shared Memory
+
+Cross-agent knowledge surface at `.claude/memory/`. All agents (Claude, Codex, Gemini, OpenCode) read and write to the same files, so learnings from one agent benefit all others.
+
+**Structure:**
+```
+.claude/memory/
+  memory.md           # Index — entry point, read at session start
+  learnings.md        # Cross-agent dated discoveries
+  tools/
+    gemini.md         # Gemini CLI usage, quotas, cost
+    other-agents.md   # OpenCode, Cursor, etc.
+```
+
+**How it works:**
+1. Claude reads `.claude/memory/memory.md` at session start (via `.claude/rules/core.md`)
+2. Dispatch prompts tell Codex/Gemini to read it before starting tasks (via `_shared/dispatch.md`)
+3. Any agent that discovers something useful appends a dated entry: `YYYY-MM-DD — [agent] — finding`
+4. AGENTS.md references it as the shared memory location
+
+**What goes here:** Operational learnings, gotchas, quirks — descriptive knowledge that agents discover during sessions.
+
+**What does NOT go here:** Rules, instructions, config (those stay in `docs/instructions/`, `.claude/rules/`, and YAML configs).
+
+**Maintenance:**
+- Entries are date-stamped so stale ones are visible
+- Git-tracked — easy to see changes and revert
+- Periodically prune entries older than 90 days or summarize into rules
+- If a file exceeds ~100 lines, summarize and reset
+
+## Secrets
+
+SOPS/Age encrypted vault at `secrets/`. Use the `secrets` CLI:
+```bash
+secrets get KEY                        # retrieve a value
+secrets set NAME KEY=value [--commit]  # add/update
+secrets list                           # show all vault files
+```
+
+Never echo secrets in output. Never commit plaintext secrets.
+
+## Infrastructure
+
+| Machine | IP | Role |
+|---------|------|------|
+| oci-dev | 100.126.13.70 | Primary dev, services, Claude Code |
+| homelab | 100.112.130.100 | Docker services, 26TB storage |
+| macmini | 100.113.216.27 | Apple Silicon GPU, transcription |
 ````
 
 ## File: scripts/janitor-cron.sh
@@ -31924,6 +34235,182 @@ except Exception as e:
     print(f'INBOX_SKIP: {e}')
 " 2>&1)
 echo "[$TIMESTAMP] inbox: $INBOX_OUT" >> "$INBOX_LOG"
+````
+
+## File: .claude/skills/conduct/SKILL.md
+````markdown
+---
+name: conduct
+description: Multi-model orchestration with lane-based routing. Classifies tasks, routes to appropriate lanes (premium/balanced/cheap/research), and loops until the goal is met. Use when the task is non-trivial and you want it to run until done. Trigger keywords: orchestrate, PMO, keep working, until done, multi-model, conduct.
+---
+
+# /conduct — Lane-Based Orchestrator
+
+Classifies tasks by type, routes to lanes, dispatches to workers, reviews with Claude. Loops until done.
+
+## CRITICAL: Dispatch Is Mandatory
+
+This operator REQUIRES external worker dispatch. Claude is the planner and reviewer ONLY.
+Implementation tasks MUST go to codex/gemini/glm via `core.dispatch.run` or subprocess.
+**There is no "do it inline" fallback. If dispatch fails, log a blocker and escalate.**
+
+## Usage
+
+```
+/conduct
+/conduct <idea or goal>
+```
+
+## Behavior
+
+### Phase 0: Intake (BLOCKING — nothing else runs until complete)
+
+1. **Detect providers and verify routing works**
+   ```bash
+   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
+   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+   python3 -m core.router.resolve --class implement_small --category coding
+   ```
+   The router MUST return a valid lane with workers. If it fails, stop and tell the user.
+   `config/lanes.yaml` and `config/workers.yaml` MUST exist. If they don't, stop and tell the user.
+
+2. **Ask 5 required questions** using AskUserQuestion — do NOT proceed until answered:
+   1. What is the goal / deliverable?
+   2. What does done look like? (acceptance criteria — be specific)
+   3. What is in scope? What is explicitly out of scope?
+   4. Any constraints? (tech stack, time, things to avoid)
+   5. What is the riskiest / most uncertain part?
+
+3. **Initialize `1shot/`** in the project root (create if missing):
+   - Create dated subdirectory: `1shot/{YYYY-MM-DD}-{session-slug}/`
+   - Write intake answers to `1shot/{session-dir}/PROJECT.md`
+   - Update `1shot/{session-dir}/STATE.md`: phase = "intake → plan"
+   - Create `1shot/{session-dir}/skills/` directory
+   - NEVER clobber an existing session directory — each /conduct run gets its own folder
+
+4. **Show PROJECT.md** to user and confirm before proceeding.
+
+### Phase 1: Plan
+
+1. **Explore codebase** (Explore subagent) — identify impacted files
+2. **Persist exploration artifact** — Write structured output to `1shot/explore.json`:
+   ```json
+   {
+     "goal": "[from PROJECT.md]",
+     "candidate_files": ["list of relevant files"],
+     "commands_to_run": ["test commands", "lint commands"],
+     "constraints": ["architectural constraints discovered"],
+     "unknowns": ["open questions to resolve"],
+     "risk_assessment": {"level": "low|medium|high", "reasoning": "..."},
+     "existing_patterns": ["patterns found in relevant files"]
+   }
+   ```
+3. **Docs Check** — `cat ~/github/docs-cache/docs/cache/.index.md` → cache missing docs via `/doc`
+4. **Write `1shot/ROADMAP.md`** — phases and success criteria
+5. **Task specs for non-trivial work**: Generate TASK_SPEC.md from `templates/TASK_SPEC.md`
+6. **Generate machine-readable plan** — Create `1shot/plan.json` from `core/plan_schema.py`
+7. **Create native tasks** — one TaskCreate per deliverable
+8. **Classify each task**: `python -m core.router.resolve --class <task_class> --category <category>`
+9. **Update STATE.md**: phase = "plan → build"
+
+### Phase 2: Build Loop (ALL implementation via dispatch)
+
+Repeat until no unblocked tasks remain:
+
+1. Pick next unblocked task (`TaskList` → lowest ID pending)
+2. `TaskUpdate` → in_progress
+3. **Select methodology** (automatic — based on task description):
+   - **Bug fix** → `/debug` protocol (investigate → analyze → hypothesize → fix)
+   - **New feature** → `/tdd` protocol (RED-GREEN-REFACTOR)
+   - **Doc edit, config change, refactor**: no special methodology needed
+4. **Classify and dispatch** (MANDATORY — no exceptions):
+   - Determine task class (see task-classes.md)
+   - Resolve lane: `python -m core.router.resolve --class <class> --category <category>`
+   - **If lane is NOT premium**: Build self-contained prompt → dispatch to worker:
+     ```bash
+     python3 -m core.dispatch.run \
+       --class <task_class> \
+       --category <category> \
+       --prompt "Your self-contained prompt here..." \
+       --output 1shot/dispatch \
+       --manifest 1shot/dispatch
+     ```
+   - **If lane IS premium**: Claude handles inline (planning, review, integration only)
+   - **For parallel tasks**:
+     ```bash
+     echo '[{"id":"1","prompt":"task 1"},{"id":"2","prompt":"task 2"}]' > /tmp/batch.json
+     python3 -m core.dispatch.run --class <task_class> --prompts-file /tmp/batch.json --parallel 3
+     ```
+   - **CRITICAL: Use subprocess dispatch, NOT Agent tool subagents.**
+     `core.dispatch.run` spawns lightweight CLI processes.
+     Agent tool spawns full Claude Code sessions — never use Agent for dispatch.
+   - If NO workers are available (codex, gemini, glm all fail): **log blocker, stop, tell user**
+5. **Review**: If task requires review, dispatch review to reviewer
+6. **Scope check** — `git diff --name-only` against TASK_SPEC "Files Involved"
+7. **Verify**: Run Phase 3 verification checklist
+8. `TaskUpdate` → completed (only after verification passes)
+9. Update `1shot/STATE.md`
+10. **Circuit breaker**: if same task failed 3x → log blocker → skip → continue
+
+If 3 consecutive tasks hit circuit breaker → stop, surface to user.
+
+### Phase 3: Verify (MANDATORY — evidence required)
+
+**No verification, no completion. Assertions don't count — show the output.**
+
+1. **Run targeted tests** — if test files exist for the changed files, run them.
+2. **Run lint/static analysis** — shellcheck, prettier, ruff, or whatever the project uses.
+3. **Run type check** — tsc, pyright, or equivalent.
+4. **Check acceptance criteria** — go through each criterion, cite evidence.
+5. **Review diff** — `git diff` and confirm changed files match plan scope.
+
+If any check fails:
+- `TaskUpdate` back to **pending** — never mark as completed with failing checks
+- Loop back to Phase 2
+- Document persistent failures in `1shot/BLOCKERS.md`
+
+### Phase 4: Challenge (two-stage review)
+
+#### Stage A: Spec Compliance
+Re-read `1shot/PROJECT.md`. For each acceptance criterion: cite evidence. Check scope violations.
+**Stage A fail** → do not run Stage B. Create tasks to address gaps.
+
+#### Stage B: Code Quality
+```bash
+unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access \
+  -o /tmp/conduct-challenge.json \
+  "Review this diff for code quality: (1) what could break in production, (2) what edge cases are unhandled, (3) are there any security concerns, (4) does it follow the repo's existing patterns. Diff: [content]"
+```
+Parse: `jq 'select(.type=="item.completed") | .item.text' /tmp/conduct-challenge.json`
+If Codex unavailable: log blocker, surface to user. Do NOT review inline.
+
+### Phase 5: Session-End Learning
+
+If any correction was given 2+ times during this session:
+- Write proposal to `docs/instructions/learned/{date}-{topic}.md`
+
+### Done
+
+```
+Conduct Complete
+├─ Tasks: X/Y completed
+├─ Lanes used: [list]
+├─ Workers used: [list with counts]
+├─ Files changed: Z
+├─ Commits: N
+└─ Blockers: M (see 1shot/ISSUES.md)
+```
+
+---
+
+## Routing Reference
+
+See `docs/instructions/task-classes.md` for full classification guide.
+See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol.
+See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
+
+**Key rule**: Route by task class, not provider name. Use lane policy from config.
+Claude thinks. Codex and Gemini execute. This is non-negotiable.
 ````
 
 ## File: core/janitor/jobs.py
@@ -32119,6 +34606,17 @@ ref_count: dict[str, int] = {}
 # Count all links for accuracy, not just the truncated preview
 ⋮----
 most_referenced = sorted(ref_count.items(), key=lambda x: x[1], reverse=True)[:10]
+⋮----
+def detect_missing_frontmatter(project_dir: Optional[str] = None, search_dirs: Optional[list] = None) -> dict
+⋮----
+"""Find markdown files in research/knowledge dirs that lack YAML frontmatter."""
+⋮----
+search_dirs = ["docs/research", "docs/decisions", "docs/learnings"]
+⋮----
+missing = []
+checked = 0
+⋮----
+first_bytes = full_path.read_text(encoding="utf-8", errors="replace")[:4]
 ⋮----
 # --- LLM Jobs (require OPENROUTER_API_KEY) ---
 def summarize_session(project_dir: Optional[str] = None) -> dict
@@ -32363,23 +34861,14 @@ def generate_pending_tasks(project_dir: Optional[str] = None) -> dict
 
 | File | Date | Title | Topics |
 |------|------|-------|--------|
-| [20260419_172352__command-name__model__command-name_.md.age](20260419_172352__command-name__model__command-name_.md.age) | 2026-04-19 17:23:52 | <command-name>/model</command-name> | add, age, api, auth, bug, build, config, feature, fix, frontend, go, implement, oci, postgres, python, refactor, rust, session, setup, sqlite, test, update |
-| [20260416_225931__command-name__model__command-name_.md.age](20260416_225931__command-name__model__command-name_.md.age) | 2026-04-16 22:59:32 | <command-name>/model</command-name> | add, age, api, build, config, encrypt, fix, go, implement, install, oci, python, remove, rust, session, sops, test, update |
-| [20260416_225019__command-name__model__command-name_.md.age](20260416_225019__command-name__model__command-name_.md.age) | 2026-04-16 22:50:19 | <command-name>/model</command-name> | add, age, api, build, config, encrypt, fix, go, implement, install, oci, python, remove, rust, session, sops, test, update |
-| [20260416_184810__command-name__model__command-name_.md.age](20260416_184810__command-name__model__command-name_.md.age) | 2026-04-16 18:48:10 | <command-name>/model</command-name> | add, age, api, config, encrypt, fix, go, implement, install, oci, python, rust, session, sops, update |
-| [20260414_172110_Failed_with_non-blocking_status_code___bin_sh__1__.md.age](20260414_172110_Failed_with_non-blocking_status_code___bin_sh__1__.md.age) | 2026-04-14 17:21:10 | Failed with non-blocking status code: /bin/sh: 1: | oci, test, update |
-| [20260413_222616___I_ll_use__conduct_to_orchestrate_the_development.md.age](20260413_222616___I_ll_use__conduct_to_orchestrate_the_development.md.age) | 2026-04-13 22:26:17 | ⏺ I'll use /conduct to orchestrate the development... | add, age, config, fix, go, install, oci, remove, session, setup, sops, test, update |
-| [20260409_214457__conduct_lets_knock_these_out_and_keep_documetaint.md.age](20260409_214457__conduct_lets_knock_these_out_and_keep_documetaint.md.age) | 2026-04-09 21:44:57 | /conduct lets knock these out and keep documetaint... | config |
-| [20260409_165813_so_when_we_use_the___research__command_are_we_no_l.md.age](20260409_165813_so_when_we_use_the___research__command_are_we_no_l.md.age) | 2026-04-09 16:58:13 | so when we use the "/research" command are we no l... | age, api, feature, go, update |
-| [20260409_145106____SessionStart_startup_hook_error_______________J.md.age](20260409_145106____SessionStart_startup_hook_error_______________J.md.age) | 2026-04-09 14:51:06 | ⎿  SessionStart:startup hook error            ⎿  J... | age, session |
-| [20260409_112610_ubuntu_instance-first___github_ideaz__curl_-sL_htt.md.age](20260409_112610_ubuntu_instance-first___github_ideaz__curl_-sL_htt.md.age) | 2026-04-09 11:26:10 | ubuntu@instance-first:~/github/ideaz$ curl -sL htt... | add, age, install, refactor, session, sops, update |
-| [20260408_231705_lets_identify_what_the_startup_hook_error_and_also.md.age](20260408_231705_lets_identify_what_the_startup_hook_error_and_also.md.age) | 2026-04-08 23:17:05 | lets identify what the startup hook error and also... | add, age, api, auth, bug, build, config, decrypt, docker, encrypt, fix, go, implement, install, oci, python, refactor, session, setup, sops, test, update |
-| [20260408_134524__command-name__clear__command-name_.md.age](20260408_134524__command-name__clear__command-name_.md.age) | 2026-04-08 13:45:24 | <command-name>/clear</command-name> | add, age, auth, backend, bug, fix, go, implement, install, python, refactor, setup, sops, test, update |
-| [20260408_132553__command-name__clear__command-name_.md.age](20260408_132553__command-name__clear__command-name_.md.age) | 2026-04-08 13:25:53 | <command-name>/clear</command-name> | add, age, auth, backend, bug, fix, go, implement, install, python, refactor, setup, sops, test, update |
-| [20260408_125059__command-message_conduct__command-message_.md.age](20260408_125059__command-message_conduct__command-message_.md.age) | 2026-04-08 12:50:59 | <command-message>conduct</command-message> | add, age, api, feature, go, session, update |
-| [20260407_191134__command-message_conduct__command-message_.md.age](20260407_191134__command-message_conduct__command-message_.md.age) | 2026-04-07 19:11:34 | <command-message>conduct</command-message> | add, age, api, feature, go, update |
-| [20260407_172318__command-message_conduct__command-message_.md.age](20260407_172318__command-message_conduct__command-message_.md.age) | 2026-04-07 17:23:18 | <command-message>conduct</command-message> | age, build, go |
-| [20260407_172311__command-name__clear__command-name_.md.age](20260407_172311__command-name__clear__command-name_.md.age) | 2026-04-07 17:23:11 | <command-name>/clear</command-name> | age, api, auth, rust, setup |
+| [20260428_142043__command-name__exit__command-name_.md.age](20260428_142043__command-name__exit__command-name_.md.age) | 2026-04-28 14:20:43 | <command-name>/exit</command-name> | age |
+| [20260428_132533__command-name__clear__command-name_.md.age](20260428_132533__command-name__clear__command-name_.md.age) | 2026-04-28 13:25:33 | <command-name>/clear</command-name> | add, age, api, auth, bug, build, config, database, deploy, docker, fix, frontend, go, install, javascript, kubernetes, logger, migration, oci, postgres, python, refactor, remove, session, setup, sqlite, test, typescript, update |
+| [20260428_132530_pull_from_remote_and_sync.md.age](20260428_132530_pull_from_remote_and_sync.md.age) | 2026-04-28 13:25:30 | pull from remote and sync | add, age, api, auth, config, encrypt, fix, go, implement, install, migration, python, session, update |
+| [20260428_114410_On__how_is_this_a_conduct_process___You_re_right__.md.age](20260428_114410_On__how_is_this_a_conduct_process___You_re_right__.md.age) | 2026-04-28 11:44:10 | On "how is this a conduct process": You're right —... | add, age, api, build, config, fix, go, implement, install, oci, python, remove, session, test |
+| [20260428_112215_On__how_is_this_a_conduct_process___You_re_right__.md.age](20260428_112215_On__how_is_this_a_conduct_process___You_re_right__.md.age) | 2026-04-28 11:22:15 | On "how is this a conduct process": You're right —... | age, config |
+| [20260427_132406__command-name__clear__command-name_.md.age](20260427_132406__command-name__clear__command-name_.md.age) | 2026-04-27 13:24:06 | <command-name>/clear</command-name> | add, age, api, auth, bug, config, encrypt, fix, go, install, oci, python, remove, rust, test |
+| [20260427_125247_Done__The_plan_is_now_decomposed_and_parked__ready.md.age](20260427_125247_Done__The_plan_is_now_decomposed_and_parked__ready.md.age) | 2026-04-27 12:52:47 | Done. The plan is now decomposed and parked, ready... | add, age, api, auth, bug, build, config, fix, go, implement, migration, python, rust, session, sops, test, update |
+| [20260424_102222_how_do_i_update_an_existing_project_with_an_update.md.age](20260424_102222_how_do_i_update_an_existing_project_with_an_update.md.age) | 2026-04-24 10:22:22 | how do i update an existing project with an update... | add, age, bug, deploy, kubernetes, oci, update |
 | [20260407_145739__command-message_conduct__command-message_.md.age](20260407_145739__command-message_conduct__command-message_.md.age) | 2026-04-07 14:57:39 | <command-message>conduct</command-message> | age, build, go |
 | [20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age](20260406_114345_So_we_added_back_in_janitor_here__I_just_want_to_m.md.age) | 2026-04-06 11:43:45 | So we added back in janitor here. I just want to m... | add, age, refactor, session, update |
 | [20260405_231732__command-name__clear__command-name_.md.age](20260405_231732__command-name__clear__command-name_.md.age) | 2026-04-05 23:17:32 | <command-name>/clear</command-name> | add, age, api, auth, backend, build, config, database, deploy, encrypt, feature, fix, go, implement, install, logger, migration, oci, postgres, python, refactor, session, setup, sqlite, test, update |
@@ -32455,156 +34944,18 @@ def generate_pending_tasks(project_dir: Optional[str] = None) -> dict
 | [20260207_153315__Request_interrupted_by_user_for_tool_use_.md.age](20260207_153315__Request_interrupted_by_user_for_tool_use_.md.age) | 2026-02-07 15:33:15 | [Request interrupted by user for tool use] | add, age, api, config, decrypt, encrypt, fix, go, implement, logger, python, session, sops, test, update |
 ````
 
-## File: docs/instructions/oneshot.md
-````markdown
-# OneShot Project-Specific Rules
-
-This file contains rules specific to the OneShot framework itself.
-For general coding/workflow rules, see the other instruction files.
-
-## What OneShot Is
-
-OneShot is a **control plane for Claude-first orchestration**:
-- Claude Code is the primary planner and reviewer (thinker)
-- Codex and Gemini execute tasks via parallel dispatch (doers)
-- Lane-based routing policy (config/lanes.yaml) drives task dispatch
-- Dispatch protocol (`_shared/dispatch.md`) handles prompt construction, parallel execution, output capture
-- Argus is the default search plane
-- Instructions are the single source of truth (docs/instructions/)
-
-## Project Structure
-
-```
-oneshot/
-  config/           # YAML routing policy (lanes, models, workers, search, providers)
-  core/             # Python schemas, router, and dispatch runner
-  docs/instructions/ # Neutral instruction source (this directory)
-  .claude/rules/    # Thin imports to docs/instructions/
-  .claude/skills/   # Operator and utility skill prompts
-  .opencode/        # OpenCode adapter (installed, pending interactive auth)
-  templates/        # Project templates (AGENTS.md.j2, CLAUDE.md.j2)
-  secrets/          # SOPS/Age encrypted vault
-  scripts/          # Build, deployment, and maintenance scripts
-```
-
-## Progressive Disclosure
-
-Instructions load based on project type:
-- **Core rules** always load (~300 tokens)
-- **Project-specific** rules load based on file detection
-
-## Skill Catalog
-
-### Operators
-| Skill | Purpose |
-|-------|---------|
-| `/short` | Quick iteration, burn-down mode |
-| `/full` | Structured work with milestones |
-| `/conduct` | Multi-model orchestration with lane routing |
-
-### Utilities
-| Skill | Purpose |
-|-------|---------|
-| `/handoff` | Save context before `/clear` |
-| `/restore` | Resume from handoff |
-| `/research` | Background research via Argus |
-| `/freesearch` | Zero-token web search via Argus |
-| `/doc` | Cache external documentation |
-| `/vision` | Image/website visual analysis |
-| `/secrets` | SOPS/Age secrets management |
-| `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
-| `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
-
-## v2 Capabilities
-
-New structured artifacts and schemas available to operators:
-- `templates/TASK_SPEC.md` — Template for task specification documents
-- `core/plan_schema.py` — Machine-readable plan schema (plan.json)
-- `core/task_schema.py` — Task schema with `infer_risk()` for risk classification (low/medium/high)
-
-## AGENTS.md
-
-AGENTS.md is the **neutral operating contract** — not Claude-specific.
-It references config/lanes.yaml for routing and defines task classes.
-Any code assistant (Claude, OpenCode, etc.) can read it directly.
-
-## Janitor System
-
-Background intelligence layer (`core/janitor/`) that runs automatically via Claude Code hooks (global `~/.claude/settings.json` — all projects get it). Hooks live at `~/.claude/hooks/janitor-*.sh` (not in the oneshot repo — they must work across all machines and projects without requiring the repo at a specific path).
-
-- **Project type detection**: classifies repos as `code`, `document`, or `hybrid` on every session start
-- **Code signals** (code/hybrid): test gaps, code smells, dependency map
-- **Document signals** (document/hybrid): staleness, orphans, clusters, size outliers, recent activity, cross-references
-- **Universal signals** (all types): config drift, recent focus, critical files, knowledge risk, blockers, dead ends
-- **Session recording**: file reads/writes/edits via PostToolUse hook → `.janitor/events.jsonl`
-- **Onboarding generation**: project-type-aware summary → `CLAUDE.local.md` (runs at session end via openrouter/free)
-- **Staleness gating**: signals are only regenerated when underlying data changes
-
-Storage: `.janitor/` per project (events.jsonl, signal JSON files, onboarding-state.json).
-
-The janitor lane (`janitor` task classes) routes exclusively to the `free` worker.
-No review needed — these are housekeeping tasks.
-
-## Shared Memory
-
-Cross-agent knowledge surface at `.claude/memory/`. All agents (Claude, Codex, Gemini, OpenCode) read and write to the same files, so learnings from one agent benefit all others.
-
-**Structure:**
-```
-.claude/memory/
-  memory.md           # Index — entry point, read at session start
-  learnings.md        # Cross-agent dated discoveries
-  tools/
-    gemini.md         # Gemini CLI usage, quotas, cost
-    other-agents.md   # OpenCode, Cursor, etc.
-```
-
-**How it works:**
-1. Claude reads `.claude/memory/memory.md` at session start (via `.claude/rules/core.md`)
-2. Dispatch prompts tell Codex/Gemini to read it before starting tasks (via `_shared/dispatch.md`)
-3. Any agent that discovers something useful appends a dated entry: `YYYY-MM-DD — [agent] — finding`
-4. AGENTS.md references it as the shared memory location
-
-**What goes here:** Operational learnings, gotchas, quirks — descriptive knowledge that agents discover during sessions.
-
-**What does NOT go here:** Rules, instructions, config (those stay in `docs/instructions/`, `.claude/rules/`, and YAML configs).
-
-**Maintenance:**
-- Entries are date-stamped so stale ones are visible
-- Git-tracked — easy to see changes and revert
-- Periodically prune entries older than 90 days or summarize into rules
-- If a file exceeds ~100 lines, summarize and reset
-
-## Secrets
-
-SOPS/Age encrypted vault at `secrets/`. Use the `secrets` CLI:
-```bash
-secrets get KEY                        # retrieve a value
-secrets set NAME KEY=value [--commit]  # add/update
-secrets list                           # show all vault files
-```
-
-Never echo secrets in output. Never commit plaintext secrets.
-
-## Infrastructure
-
-| Machine | IP | Role |
-|---------|------|------|
-| oci-dev | 100.126.13.70 | Primary dev, services, Claude Code |
-| homelab | 100.112.130.100 | Docker services, 26TB storage |
-| macmini | 100.113.216.27 | Apple Silicon GPU, transcription |
-````
-
 ## File: AGENTS.md
 ````markdown
-# ONE_SHOT v14 — Orchestration Control Plane
+# ONE_SHOT v14 — Orchestration Operating Contract
 
-> Category-based routing. Claude plans, workers execute. Argus searches. Janitor runs in the background.
+> Works in any project on any machine. Claude plans, workers execute, Argus searches, Janitor runs in the background.
+
+---
 
 ## OPERATORS
 
 ### `/short` — Quick Iteration
-1. Load context: git log -5, TaskList, DECISIONS.md, BLOCKERS.md
+1. Load context: `git log -5`, TaskList, DECISIONS.md, BLOCKERS.md
 2. Ask: "What are you working on?"
 3. Execute via dispatch protocol (non-premium tasks → best worker for category)
 4. Show delegation summary
@@ -32618,551 +34969,470 @@ Never echo secrets in output. Never commit plaintext secrets.
 6. Verify and show completion summary
 
 ### `/conduct` — Multi-Model Orchestration
-1. Detect available providers (read `config/workers.yaml`)
-2. Ask clarifying questions — BLOCKING
-3. Classify tasks by task class + category (see `docs/instructions/task-classes.md`)
-4. Route: task class → lane → category preference → worker pool → reviewer
-5. Dispatch non-premium tasks in parallel via dispatch protocol
+1. Check available workers (see INTELLIGENCE TIERS below)
+2. Ask clarifying questions — BLOCKING, nothing runs until answered
+3. Classify each task by task class + category
+4. Route via the ROUTING TABLE below — first available worker in preferred order wins
+5. Dispatch non-premium tasks in parallel
 6. Loop until goal is fully met
+
+---
+
+## ROUTING TABLE
+
+Classify tasks by class AND category. Category determines worker order within a lane.
+
+| Task Class | Lane | Category | Worker Order |
+|---|---|---|---|
+| `plan` | premium | general | claude_code |
+| `research` | research | research | gemini_cli → codex |
+| `implement_small` | cheap | coding | codex → gemini_cli → glm_claude |
+| `implement_medium` | balanced | coding | codex → gemini_cli |
+| `test_write` | cheap | coding | codex → gemini_cli → glm_claude |
+| `review_diff` | premium | review | claude_code → codex |
+| `doc_draft` | cheap | writing | gemini_cli → codex → glm_claude |
+| `search_sweep` | research | research | gemini_cli → codex (+ Argus) |
+| `summarize_findings` | cheap | writing | gemini_cli → codex → glm_claude |
+| `janitor_*` | janitor | general | openrouter/free only |
+
+**In the oneshot project**, use the Python resolver:
+```bash
+python3 -m core.router.resolve --class implement_small --category coding
+```
+
+**In any other project**, read the table directly and pick the first available worker.
+
+---
 
 ## DISPATCH PROTOCOL
 
-All non-premium tasks use the dispatch protocol (`_shared/dispatch.md`):
-- Classify task by class and category
-- Resolve lane + worker ordering via `python3 -m core.router.resolve --class <class> --category <category>`
-- Workers are ordered by category preference — first available wins
-- Structured output captured and validated
-- Manifests written to `1shot/dispatch/{id}.md`
-
 ```
-classify → resolve (category-ordered workers) → build prompt → dispatch → capture → validate → commit
+classify task → pick worker from routing table → build self-contained prompt → dispatch → capture output → validate → commit
 ```
 
-## TASK CLASSES & CATEGORY ROUTING
+1. Classify: pick `task_class` + `category` from the table above
+2. Pick worker: first available in the preferred order for that class
+3. Build prompt: self-contained — include all context the worker needs, no shared state
+4. Dispatch using the worker command below
+5. Capture structured output, validate it meets the task goal
+6. Manifests written to `1shot/dispatch/{id}.md` if the dir exists
 
-Tasks are classified by task class AND category. Category determines worker preference within a lane.
+---
 
-| Task Class | Lane | Category | Preferred Workers |
-|-----------|------|----------|-------------------|
-| plan | premium | general | claude_code |
-| research | research | research | gemini_cli, codex |
-| implement_small | cheap | coding | codex, gemini_cli, glm_claude |
-| implement_medium | balanced | coding | codex, gemini_cli |
-| test_write | cheap | coding | codex, gemini_cli, glm_claude |
-| review_diff | premium | review | claude_code, codex |
-| doc_draft | cheap | writing | gemini_cli, codex, glm_claude |
-| search_sweep | research | research | gemini_cli, codex + argus |
-| summarize_findings | cheap | writing | gemini_cli, codex, glm_claude |
-| janitor_summarize | janitor | general | free (openrouter/free) |
-| janitor_extract | janitor | general | free (openrouter/free) |
-| janitor_hygiene | janitor | general | free (openrouter/free) |
-| janitor_analyze | janitor | general | free (openrouter/free) |
+## INTELLIGENCE TIERS & WORKER COMMANDS
 
-Resolve routing: `python3 -m core.router.resolve --class <task_class> --category <category>`
-Parallel dispatch: `python3 -m core.dispatch.run --class <class> --category <category> --prompt "..."`
+| Worker | Cost | How to invoke |
+|---|---|---|
+| `glm_claude` | Free (ZAI plan, check expiry) | `zai` — full Claude Code session via GLM-5-turbo |
+| `codex` | $20/mo (ChatGPT Plus sub) | `unset OPENAI_API_KEY && codex exec --sandbox danger-full-access "prompt"` |
+| `gemini_cli` | Free (Google sign-in) | `gemini "prompt"` or `gemini -p "prompt"` |
+| `free` | $0 always | OpenRouter free pool — janitor lane only, not for user tasks |
+| `claw_code` | Pay per token | Manual opt-in only — `--worker claw_code` |
 
-## INTELLIGENCE TIERS
+**glm_claude expiry:** Check `config/workers.yaml → plan_expires` in the oneshot project. After expiry, `zai` falls back to OpenRouter via the `shot` command.
 
-| Worker | Backend | Cost | Notes |
-|--------|---------|------|-------|
-| glm_claude | ZAI/GLM-5-turbo | Free until 2026-05-02 | Full Claude Code session, all tools |
-| codex | ChatGPT Plus | $20/mo sub | Strong coding, structured output |
-| gemini_cli | Google API | Free (sign-in) | Research, documentation |
-| free | openrouter/free | $0 (always) | Background intelligence, janitor lane only |
-| claw_code | OpenRouter | Pay per token | Manual opt-in via `--worker claw_code` |
+**SSH dispatch** (run worker on a specific machine):
+```bash
+ssh oci-ts "cd ~/github/PROJECT && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'prompt'"
+ssh macmini-ts "cd ~/github/PROJECT && gemini 'prompt'"
+```
 
-Auto-expiry: `glm_claude` worker checks `plan_expires` from `config/workers.yaml` and disables itself when expired. `shot` terminal command auto-falls back to OpenRouter.
+---
 
-## UTILITY COMMANDS
+## SEARCH (ARGUS)
 
-| Command | Purpose |
-|---------|---------|
-| `/handoff` | Save context before /clear |
-| `/restore` | Resume from handoff |
-| `/research` | Background research via Argus |
-| `/freesearch` | Zero-token search via Argus (cheap mode) |
-| `/doc` | Cache external documentation |
-| `/vision` | Image/website analysis |
-| `/secrets` | SOPS/Age secrets management |
-| `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
-| `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
+All web search routes through Argus on homelab.
 
-## TERMINAL ENTRY POINTS
+- **HTTP API**: `http://100.112.130.100:8270/api/search`
+- **MCP tool** (Claude Code): `mcp__argus__search_web` — registered in `~/.claude/settings.json`
 
-| Command | Purpose |
-|---------|---------|
-| `shot "task"` | Auto-route to best model (GLM free → OpenRouter fallback) |
-| `zai` | Force GLM-5-turbo via ZAI (free) |
-| `or` | Force OpenRouter model (paid) |
-| `or --code` | Force Qwen3-Coder (free on OpenRouter) |
+```bash
+# From code
+curl -s -X POST http://100.112.130.100:8270/api/search \
+  -H "Content-Type: application/json" \
+  -d '{"query": "...", "mode": "discovery"}'
 
-## PLANNER/WORKER SPLIT
+# From Python (oneshot project)
+from core.search.argus_client import search
+results = search("query", mode="precision")
+```
 
-**Planner (Claude)**: planning, decomposition, repo synthesis, review, sensitive edits
-**Workers (Codex, Gemini, GLM)**: bounded implementation, tests, docs, search summarization
-**Dispatch**: category-ordered parallel execution with structured output and manifest tracking
+| Mode | Providers | Use for |
+|---|---|---|
+| `discovery` | SearXNG, Brave, Exa | Broad exploration |
+| `precision` | Serper, Tavily | Targeted, high-relevance |
+| `cheap` | SearXNG only | Quick lookups |
+| `research` | All providers | Deep, comprehensive |
+
+**In Claude Code**: just ask — Claude calls `mcp__argus__search_web` automatically. Use `/research` for background deep search, `/freesearch` for zero-token quick lookups.
+
+**Fallback**: if Argus is unreachable (homelab down), use `gemini` CLI for research tasks.
+
+---
+
+## SECRETS
+
+Vault: `~/github/oneshot/secrets/` — single source of truth, synced to all machines.
+CLI: `secrets` — available everywhere after `bash ~/github/oneshot/install.sh`.
+
+```bash
+secrets get KEY                     # fetch one value
+secrets set FILE KEY=value          # add/update a key
+secrets set FILE KEY=value --commit # add, commit, and push
+secrets init FILE                   # write FILE.env → .env in current dir
+secrets list                        # show all vault files and key names
+```
+
+Full vault file index: `~/github/oneshot/docs/instructions/secrets.md`
+
+---
+
+## STACK DEFAULTS
+
+Pick the right stack without asking. Detect from project files:
+
+| Detection | Type | Stack |
+|---|---|---|
+| `vercel.json` or `supabase/` | Web app | Vercel + Supabase (Auth + Postgres) + Python + HTML/JS |
+| `setup.py` or `pyproject.toml` | CLI | Python + Click + SQLite |
+| `*.service` systemd file | Service | Python + systemd → oci-dev |
+| Docker Compose | Service | Deploy to homelab via `hl remote-recreate-SERVICE` |
+
+**Never use**: nginx/traefik (use Tailscale Funnel), self-hosted Postgres (use Supabase), Express/FastAPI for web (use Python serverless on Vercel), AWS/GCP/Azure (use OCI free tier or homelab).
+
+---
+
+## PLANNER / WORKER SPLIT
+
+**Planner (Claude)**: planning, decomposition, repo synthesis, final review, sensitive edits (auth, data mutation, production deploys)
+
+**Workers (Codex, Gemini, GLM)**: bounded implementation, test generation, doc drafting, search summarization
+
+**Rule**: never delegate planning or review. Never let a worker touch auth, secrets, or production without planner review.
+
+---
 
 ## DECISION DEFAULTS
 
 | Ambiguity | Default |
-|-----------|---------|
+|---|---|
 | Multiple implementations | Simplest |
-| Naming | Follow existing pattern |
+| Naming | Follow existing pattern in repo |
 | Refactor opportunity | Skip unless blocking |
-| Lane selection | Use task class routing |
+| Error handling | Match surrounding code |
+| Stack choice | Follow detection table above |
+| Lane selection | Use routing table above |
+
+---
 
 ## AUTO-APPROVED
 
-Reading files, writing to scope-matched files, running tests, git commit (not push), creating tasks.
+Reading files, writing to scope-matched files, running tests, `git commit` (not push), creating tasks, calling Argus search.
 
 ## REQUIRES CONFIRMATION
 
-Destructive ops, git push, external API calls that cost money, production deploy.
+Destructive ops (`rm -rf`, DROP TABLE), `git push`, external API calls that cost money, production deploy, force push.
 
-## V2 FEATURES
+---
 
-- Risk-based autonomy gating: `RiskLevel` (low/medium/high) controls what requires confirmation
-- Structured exploration artifact: `explore.json` from intake phase
-- Machine-readable plan schema: `plan.json` via `core/plan_schema.py`
-- TASK_SPEC template: `templates/TASK_SPEC.md` for formal task specification
-- Mandatory verification gate after each build step
-- Scope creep detection in the build loop
-- Session-end feedback loop: handoff proposes CLAUDE.md/rule updates when patterns repeat
+## UTILITY SKILLS (Claude Code)
 
-## JANITOR SYSTEM
+| Skill | Purpose |
+|---|---|
+| `/handoff` | Save context before `/clear` |
+| `/restore` | Resume from handoff |
+| `/research` | Background research via Argus |
+| `/freesearch` | Zero-token search via Argus cheap mode |
+| `/doc` | Cache external documentation locally |
+| `/vision` | Analyze images or websites |
+| `/secrets` | Manage vault interactively |
+| `/debug` | 4-phase systematic debugging |
+| `/tdd` | RED-GREEN-REFACTOR cycle |
+| `/adversarial-review` | Gemini second-opinion on design decisions |
 
-Background intelligence layer that runs automatically — no manual action needed.
+---
 
-**How it works:**
-1. **PostToolUse hook** records every file read/write/edit to `.oneshot/events.jsonl` (transparent, zero overhead)
-2. **System cron** (every 15min) finds unprocessed events across all projects, runs free model summarizer
-3. **SessionEnd hook** marks session as ended; cron picks up remaining data
+## TERMINAL ENTRY POINTS
 
-**What it produces:** structured decisions, blockers, discoveries, file change summaries — all queryable across sessions via grep, SQLite, or future sessions.
+| Command | Purpose |
+|---|---|
+| `shot "task"` | Auto-route: GLM free → OpenRouter fallback |
+| `zai` | Force GLM-5-turbo via ZAI |
+| `or` | Force OpenRouter model |
+| `or --code` | Force Qwen3-Coder (free) |
 
-**Cost:** $0. openrouter/free model router. ~60-150 calls/day. Storage: ~30MB/year.
+---
 
-**Files:** `core/janitor/` — worker.py (OpenRouter caller), recorder.py (event log), jobs.py (job implementations), jobs_catalog.md (planned jobs)
+## JANITOR (BACKGROUND INTELLIGENCE)
 
-**Cron install (all machines):** Already installed on oci-dev, homelab, macmini.
+Runs automatically on all machines — no action needed. Cost: $0.
+
+1. PostToolUse hook records file reads/writes/edits → `.janitor/events.jsonl`
+2. Cron (every 15 min) processes events, runs free model summarizer
+3. Produces: test gap analysis, code smells, dep map, staleness, onboarding summary
+
+Signal files in `.janitor/` — read on demand, never block on them.
+
+---
 
 ## SHARED MEMORY
 
 Read `.claude/memory/memory.md` at session start for cross-agent learnings.
-When you discover something useful for other agents, append a dated entry to the relevant file.
+When you discover something useful for other agents, append a dated entry.
+
+---
 
 ## VERSION
 
-v14.3 | Janitor lane | Background intelligence | openrouter/free worker | Session recording
+v14.4 | Self-contained cross-project contract | Search, secrets, stack defaults, worker commands
 ````
 
-## File: README.md
+## File: .claude/skills/_shared/providers.md
 ````markdown
-# ONE_SHOT: AI-Powered Autonomous Project Builder
+# Shared Provider Routing Module
 
-**Version**: 1.6
-**Philosophy**: Ask everything upfront, then execute autonomously
-**Security**: SOPS-encrypted secrets (never commit plaintext)
-
----
-
-## 🎯 What This Is
-
-ONE_SHOT is a **single-file specification** for building projects with AI coding agents (Claude Code, Cursor, etc.). It captures the complete philosophy, patterns, and workflows learned from 8 real-world projects (135K+ records, 29 services, $1-3/month AI costs).
-
-**The Contract**: Answer questions once → Generate PRD → Autonomous build
+Reference this module from any skill that needs delegation or multi-model routing.
+This is a DRY reference — skills include it by mention, not import.
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
-
-### 1. Setup Central Secrets (One-Time - REQUIRED)
+## Provider Detection
 
 ```bash
-# Install SOPS and age
-brew install sops age  # Mac
-# OR for Linux:
-sudo apt install age
-wget https://github.com/getsops/sops/releases/latest/download/sops-v3.8.1.linux.amd64 -O /usr/local/bin/sops && chmod +x /usr/local/bin/sops
-
-# Generate encryption key
-mkdir -p ~/.config/sops/age
-age-keygen -o ~/.config/sops/age/keys.txt
-
-# CRITICAL: Back up this key to 1Password NOW
-# (You can't decrypt secrets without it)
-
-# Create central secrets repo
-mkdir -p ~/secrets-vault && cd ~/secrets-vault
-
-# Create SOPS config (replace age1xxx with your public key)
-cat > .sops.yaml << 'EOF'
-creation_rules:
-  - path_regex: .*\.env\.encrypted$
-    age: YOUR_AGE_PUBLIC_KEY_HERE
-EOF
-
-# Create your secrets
-cat > secrets.env << 'EOF'
-OPENROUTER_API_KEY=sk-or-v1-your-key-here
-GITHUB_TOKEN=ghp_your-token-here
-FIRECRAWL_API_KEY=fc-your-key-here
-EOF
-
-# Encrypt and push
-sops --encrypt secrets.env > secrets.env.encrypted
-rm secrets.env
-echo "*.env" > .gitignore
-echo "!*.env.encrypted" >> .gitignore
-git init && git add . && git commit -m "Central secrets"
-gh repo create secrets-vault --private --source=. --push
+command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
+command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
+[ -d ~/github/claw-code-agent/src ] && echo "claw_code: yes" || echo "claw_code: no"
+[ -n "$ZAI_API_KEY" ] && echo "zai: yes" || echo "zai: no"
+[ -n "$OPENROUTER_API_KEY" ] && echo "openrouter: yes" || echo "openrouter: no"
+python -c "from core.search.argus_client import is_available; print('argus:', is_available())" 2>/dev/null || echo "argus: no"
 ```
 
-**Why Central Secrets?** ONE place for ALL your secrets (OpenRouter, GitHub, Firecrawl, etc.). Update once, every project gets it. Never duplicate secrets again.
+**Fallback chain for cheap lane**: codex → gemini_cli → claw_code
+Within claw_code, model routing is automatic:
+- GLM models (`glm-5.1`, `glm-4.7`, etc.) → ZAI endpoint (free on plan)
+- Everything else → OpenRouter (paid)
 
-See [CENTRAL_SECRETS.md](CENTRAL_SECRETS.md) for details.
+`strategy: first_available` is implemented in `core/dispatch/run.py`.
 
-### 2. Use ONE_SHOT in Your Project
+Also read `config/workers.yaml` for machine-level worker placement.
+If config files are missing, this is a blocker — stop and tell the user. Do NOT skip silently.
 
+---
+
+## Lane-Based Routing
+
+**Route by task class, not provider name.** See `docs/instructions/task-classes.md`.
+
+```
+task → task_class → lane → worker_pool → reviewer
+```
+
+Resolve routing:
 ```bash
-# 1. Create new project directory
-mkdir my-project && cd my-project
+python -m core.router.resolve --class <task_class>
+```
 
-# 2. Copy ONE_SHOT.md to your project
-cp /path/to/oneshot/one_shot.md ONE_SHOT.md
+Returns JSON: `{task_class, lane, workers[], review_with, search_backend, fallback_lane}`
 
-# 3. Open in your AI coding agent (Claude Code, Cursor, etc.)
-# Tell it:
-#   "Use ONE_SHOT.md as the spec. Ask me all Core Questions (Section 2) first.
-#    Don't write code until I say 'PRD approved. Execute autonomous build.'"
+---
 
-# 4. Answer questions once
-# 5. Review generated PRD
-# 6. Say: "PRD approved. Execute autonomous build."
-# 7. Watch it build autonomously
+## Lane Summary
+
+| Lane | Planner | Workers (first_available order) | Review |
+|------|---------|----------------------------------|--------|
+| premium | claude_code | claude_code, codex | claude_code |
+| balanced | claude_code | codex, gemini_cli | claude_code |
+| cheap | claude_code | gemini_cli → codex → glm_claude | claude_code |
+| research | claude_code | gemini_cli, codex | claude_code |
+
+**glm_claude**: `claude` CLI running on ZAI/GLM-5-turbo via `ANTHROPIC_BASE_URL`. Full native toolchain (bash, read, edit, glob, grep, git). Free on GLM Coding Plan (expires **2026-05-02**). Same dispatch pattern as codex/gemini — `claude --print --dangerously-skip-permissions "prompt"`.
+
+**OpenCode Go**: Model gateway ($5/$10mo sub). Three invocation paths — not limited to OpenCode CLI. See [OpenCode Go Protocol Routing](#opencode-go-protocol-routing) below.
+
+---
+
+## Provider Capability Table
+
+| Provider | Endpoint | Context | Cost | Best Lane | Harness Options |
+|----------|----------|---------|------|-----------|-----------------|
+| anthropic | api.anthropic.com | 200k | $$$$ | planner, reviewer | Claude CLI (native) |
+| openai | api.openai.com | 128k | $$$ | balanced | Codex CLI (native) |
+| zai | api.z.ai | 128k | free* | cheap | Claude CLI, Direct API |
+| opencode_go | opencode.ai/zen/go | varies | $ (sub) | cheap, routine | Claude CLI (MiniMax only), OpenCode CLI, Direct API |
+| openrouter | openrouter.ai/api/v1 | varies | $$-free | cheap, janitor | Direct API, Claw Code |
+| gemini | generativelanguage.googleapis.com | 1M+ | $ | research | Gemini CLI |
+
+* ZAI free plan expires 2026-05-02
+
+### Harness vs Provider
+
+```
+dispatch target = harness + provider + model
+
+harness  = HOW you invoke (claude CLI, opencode CLI, codex CLI, direct API)
+provider = WHERE the model runs (anthropic, openai, zai, opencode_go, openrouter, gemini)
+```
+
+A single provider can be invoked through multiple harnesses. For example, OpenCode Go via Claude CLI (MiniMax) or via OpenCode CLI (all models) or via direct API (all models).
+
+---
+
+## OpenCode Go Protocol Routing
+
+Endpoints are **per-model, not universal**:
+
+| Protocol | Endpoint | Models | Usable By |
+|----------|----------|--------|-----------|
+| OpenAI-compatible | `/v1/chat/completions` | GLM, Kimi, DeepSeek, MiMo, Qwen | OpenCode CLI, Direct API |
+| Anthropic-compatible | `/v1/messages` | MiniMax M2.5, M2.7 | Claude CLI, OpenCode CLI |
+
+**Invocation paths:**
+1. **OpenCode CLI** — `opencode run --model opencode-go/<id>` (universal, all models)
+2. **Claude CLI** — `claude -p` + `ANTHROPIC_BASE_URL=https://opencode.ai/zen/go/v1/messages` (MiniMax only)
+3. **Direct API** — HTTP POST to OpenAI-compatible endpoint (all models, no shell for model)
+
+Path 2 gives full Claude Code toolchain (bash, edit, grep, git) with OpenCode Go pricing.
+Path 3 is lightweight — good for summaries, extraction, classification.
+
+See `.oneshot/config/models.yaml` for runner templates (`opencode_go`, `opencode_go_claude`, `opencode_go_api`).
+
+---
+
+## Category-Based Worker Preference
+
+Each lane has `category_preference` in `config/lanes.yaml` that reorders workers
+when the task category is known. Workers not in the preference list are appended
+in their original pool order.
+
+```
+task → task_class → lane → category_preference[category] → reordered workers
+```
+
+| Category | Cheap Lane Preference | Balanced | Premium | Research |
+|----------|-----------------------|----------|---------|----------|
+| coding | codex, gemini_cli, glm_claude | codex, gemini_cli | claude_code, codex | codex, gemini_cli |
+| research | gemini_cli, codex, glm_claude | gemini_cli, codex | claude_code, codex | gemini_cli, codex |
+| writing | gemini_cli, codex, glm_claude | gemini_cli, codex | claude_code, codex | gemini_cli, codex |
+| review | codex, glm_claude, gemini_cli | codex, gemini_cli | claude_code, codex | codex, gemini_cli |
+| general | gemini_cli, codex, glm_claude | codex, gemini_cli | claude_code, codex | gemini_cli, codex |
+
+Category is inferred from task_class by default, or passed explicitly via `--category`.
+Inferred mapping: plan→general, research/search_sweep→research, implement_*/test_write→coding,
+review_diff→review, doc_draft/summarize_findings→writing.
+
+## claw_code Worker Model Priority
+
+Used when codex and gemini_cli are unavailable. Priority order in `config/models.yaml`:
+
+**ZAI (free on GLM Coding Plan, expires 2026-05-02):**
+
+glm_claude harness → `api.z.ai/api/anthropic` (Anthropic-compat, full claude CLI):
+
+| Model | Cost | Strengths |
+|-------|------|-----------|
+| glm-5-turbo | free | fast, strong coding+reasoning — **default** |
+
+claw_code harness → `api.z.ai/api/coding/paas/v4` (OpenAI-compat, claw-code-agent):
+
+| Model | Cost | Strengths |
+|-------|------|-----------|
+| glm-5-turbo | free | **default fallback** |
+| glm-5.1 | free | deep reasoning |
+| glm-4.7 | free | balanced |
+| glm-4.5-air | free | throughput |
+
+**OpenRouter (paid) — routed to `openrouter.ai/api/v1`:**
+
+| Model | Input/M | Output/M | Strengths |
+|-------|---------|----------|-----------|
+| deepseek/deepseek-v3.2 | $0.26 | $0.38 | coding, low-cost |
+| google/gemini-2.5-flash-lite | $0.10 | $0.40 | throughput, cheapest |
+| minimax/minimax-m2.7 | $0.30 | $1.20 | long context |
+| moonshotai/kimi-k2.5 | $0.38 | $1.72 | strong agentic |
+
+All models support tool calling. Key env vars: `ZAI_API_KEY` (in `research_keys.env`), `OPENROUTER_API_KEY` (in `services.env`).
+
+---
+
+## Dispatch Commands
+
+**Codex** (adversarial review, challenge, worker tasks):
+
+Structured output (preferred for all programmatic dispatch):
+```bash
+unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access "PROMPT"
+# Returns JSONL stream: thread.started, turn.started, item.*, turn.completed
+# Parse final agent message:  | jq 'select(.type == "item.completed") | select(.item.type == "agent_message")'
+```
+
+Quick single-run with last-message capture:
+```bash
+unset OPENAI_API_KEY && codex exec --sandbox danger-full-access -o /tmp/codex-output.txt "PROMPT"
+```
+
+Structured output with schema (for downstream processing):
+```bash
+unset OPENAI_API_KEY && codex exec --sandbox danger-full-access --output-schema ./schema.json -o ./result.json "PROMPT"
+```
+
+Resume a previous session:
+```bash
+unset OPENAI_API_KEY && codex exec resume --last "follow-up prompt"
+```
+
+**Gemini** (research fallback):
+```bash
+printf '%s' "PROMPT" | gemini -p "" -o text --approval-mode yolo
+```
+
+**Claw Code** (OpenRouter models — cheap lane):
+```bash
+cd ~/github/claw-code-agent && \
+OPENAI_BASE_URL=https://openrouter.ai/api/v1 \
+OPENAI_MODEL=openai/gpt-4o-mini \
+python3 -m src.main agent "PROMPT" --cwd /path/to/repo --allow-write --allow-shell
+```
+Model is configurable via `OPENAI_MODEL` env var or `--model` flag on dispatch.
+See `config/models.yaml` `claw_code` section for supported models.
+
+**Argus** (search):
+```bash
+curl -s -X POST http://100.112.130.100:8270/api/search \
+  -H "Content-Type: application/json" \
+  -d '{"query": "QUERY", "mode": "discovery"}'
 ```
 
 ---
 
-## 📁 What's in This Repo
+## Worker Placement
 
-```
-oneshot/
-├── one_shot.md              # Main spec (use this in your projects)
-├── how_to_improve_one_shot.md  # Lessons from 8 real projects
-├── CENTRAL_SECRETS.md       # Central secrets guide (THE way)
-├── .env.example             # Reference (not used, everything from central)
-├── .gitignore.example       # Git ignore patterns
-└── scripts/
-    ├── setup_secrets.sh     # Pull secrets from central repo
-    └── update_secrets.sh    # Edit central secrets
-```
+From `config/workers.yaml`:
+- `local` (localhost) — planner, claude_code
+- `oci` (oci-dev) — planner, claude_code
+- `claw` (localhost) — worker, claw_code, provider: zai
+- `glm` (localhost) — worker, claude_code, provider: zai
+- `ocg_minimax` (localhost) — worker, claude_code, provider: opencode_go (MiniMax via Anthropic endpoint)
+- `ocg_api` (localhost) — worker, direct_api, provider: opencode_go (all models via OpenAI endpoint)
+- `macmini` — worker, opencode (future)
+- `homelab` — worker, opencode (future)
 
----
-
-## 🔑 Core Philosophy
-
-### 1. Central Secrets (NEW in v1.6)
-- ONE private GitHub repo for ALL secrets (OpenRouter, GitHub token, etc.)
-- SOPS-encrypted, safe to push
-- Every project pulls from central repo (no duplication)
-- One age key in 1Password unlocks everything
-- Update once, all projects get it
-
-### 2. Ownership & FOSS
-- 100% free & open-source stack
-- No vendor lock-in
-- Runs on OCI Always Free OR homelab
-- Cost: $0/month infra (AI optional at $1-3/month)
-
-### 3. Simplicity First
-- Start with simplest thing (files → SQLite → PostgreSQL)
-- Build only what you need NOW
-- Document upgrade triggers
-- Real problems only, no imaginary users
-
-### 4. Local-First
-- Own your data
-- Works offline
-- Cloud is optional
-
-### 5. Cost-Conscious AI
-- Default: Gemini 2.5 Flash Lite (~$0.10-0.30/M tokens)
-- Upgrade only when necessary
-- Track costs in SQLite
-- Typical: $1-3/month
-
-### 6. Documentation as Code
-- WHY documentation for decisions
-- README with Quick Start ≤5 commands
-- Status scripts for observability
-- Future-you friendly
+Dispatch to remote worker via SSH when configured.
 
 ---
 
-## 🏗️ Canonical Stack
+## Quality Gate
 
-```
-Application:   Python / Node / Go / Rust
-Web:          FastAPI, Flask, Express
-DB:           SQLite → PostgreSQL (upgrade when needed)
-Web server:   Nginx Proxy Manager OR Caddy
-DNS:          Cloudflare (free tier)
-OS:           Ubuntu Server 24.04 LTS
-Network:      Tailscale (zero-config VPN)
-VC:           Git + GitHub (or Gitea)
-Containers:   Docker + Docker Compose
-Secrets:      SOPS + age (THIS IS NON-NEGOTIABLE)
-```
+75% consensus required when multiple providers contribute. If not reached:
+- Log disagreement to `1shot/ISSUES.md`
+- Claude makes final call
 
 ---
 
-## 📊 Validated By Real Projects
-
-ONE_SHOT v1.6 patterns validated by:
-
-1. **Divorce** - Legal discovery (135K records, SQLite, web RAG)
-2. **Homelab** - 29 services, Docker Compose, Nginx PM
-3. **Atlas** - Podcast transcripts (750 transcripts, status scripts)
-4. **TrojanHorse** - Note processing (local-first, AI classification)
-5. **Frugalos/Hermes** - AI router (cost tracking, local→cloud)
-6. **Atlas-voice** - Voice analysis (privacy-first, 104M chars)
-7. **Tablo** - TV automation (dual mode, AI identification)
-8. **VDD/OOS** - Dev framework (27.5% code reduction)
-
-**Results**:
-- ✅ $0-3/month total cost (AI included)
-- ✅ Sub-second queries on 135K records (SQLite)
-- ✅ 29 services on single machine (homelab)
-- ✅ Months of uptime with systemd
-- ✅ ZERO secrets leaks (SOPS since day 1 on new projects)
-
----
-
-## 🎓 How to Use ONE_SHOT
-
-### For New Projects
-
-1. Copy `one_shot.md` to your project as `ONE_SHOT.md`
-2. Open in AI agent (Claude Code, Cursor)
-3. Tell agent: "Use ONE_SHOT.md as spec. Ask Core Questions."
-4. Answer questions once
-5. Review PRD
-6. Say: "PRD approved. Execute autonomous build."
-
-### For Existing Projects
-
-Use ONE_SHOT patterns piecemeal:
-- **Secrets**: Add SOPS encryption
-- **Docs**: Add WHY documentation
-- **Ops**: Add status scripts, health endpoints
-- **Data**: Follow data-first implementation order
-- **AI**: Add cost tracking
-
-### For Learning
-
-Read in order:
-1. `one_shot.md` - Main spec (complete reference)
-2. `CENTRAL_SECRETS.md` - Setup central secrets (5 minutes)
-3. `how_to_improve_one_shot.md` - Real-world lessons from 8 projects
-
----
-
-## 🔒 Central Secrets: The Secret Sauce
-
-**Problem**: How do you manage secrets across multiple projects without duplication?
-
-**Old way** (BAD):
-```
-project-a/.env (OpenRouter key)
-project-b/.env (OpenRouter key again)
-project-c/.env (OpenRouter key again)
-# Update key? Change in 3 places
-# Lost .env file? Secrets gone
-```
-
-**ONE_SHOT way** (GOOD):
-```
-github.com/you/secrets-vault
-├── secrets.env.encrypted  (ONE place for ALL secrets)
-└── .sops.yaml
-
-All projects pull from here!
-```
-
-**How it works**:
-1. You have ONE age key in 1Password (decrypts everything)
-2. ONE private repo with ALL your secrets (encrypted)
-3. Every project: `./scripts/setup_secrets.sh` (pulls from central, decrypts)
-4. Update secrets: Edit central repo, all projects get update
-
-**Result**: One OpenRouter key, one GitHub token, one place for everything. Update once, all projects work.
-
-See [CENTRAL_SECRETS.md](CENTRAL_SECRETS.md) for 5-minute setup.
-
----
-
-## 🆚 ONE_SHOT vs Other Approaches
-
-### vs Project Templates (Cookiecutter, etc.)
-- ONE_SHOT: Complete philosophy + automation (not just file structure)
-- Templates: Static snapshots (no upgrade path, no AI integration)
-
-### vs Frameworks (Rails, Django, etc.)
-- ONE_SHOT: Language-agnostic, pick your tools
-- Frameworks: Opinionated about language/stack
-
-### vs "Just Ask AI"
-- ONE_SHOT: Consistent patterns across projects
-- Ad-hoc: Every project different, no learnings captured
-
-### vs Manual Setup
-- ONE_SHOT: Questions → PRD → Autonomous build
-- Manual: Repeat decisions for every project
-
----
-
-## 🛠️ Archon Principles (Non-Negotiable)
-
-Every ONE_SHOT project MUST have:
-
-1. **Never Commit Plaintext Secrets** - SOPS-encrypted, always
-2. **Validate Before Create** - Check environment first
-3. **WHY Documentation** - Explain decisions, not just commands
-4. **Systematic Debugging** - Health checks, logs, status scripts
-5. **Health First** - Every service has `/health` endpoint
-6. **Future-You Documentation** - Understandable in 6 months
-
----
-
-## 📈 Version History
-
-- **v1.6** (2024-11-29)
-  - **BREAKING**: SOPS now MANDATORY (non-negotiable)
-  - Added Q14 (SOPS Setup) to Core Questions
-  - SOPS validation in environment checks
-  - SOPS setup automated in Phase 0
-  - Complete SOPS integration (scripts, docs, templates)
-  - Updated Archon Principles (Never Commit Plaintext Secrets)
-
-- **v1.5** (2024-11-26)
-  - Integrated patterns from 8 real-world projects
-  - Added Reality Check questions (Q2.5)
-  - Added Upgrade Path Principle
-  - Data-first implementation order
-  - Required automation scripts
-  - AI cost management
-  - Anti-patterns section
-
-- **v1.4** (2024-11-26)
-  - Single-file layout
-  - Clear Core Questions vs Advanced
-  - Unified AI section
-
-- **v1.0-1.3** (2024-11-21)
-  - Initial framework
-  - Archon integration
-  - AI/Agent patterns
-
----
-
-## 💡 Philosophy in Practice
-
-### "Works on My Machine" is Good
-- Ubuntu 24.04 LTS (homelab standard)
-- Mac (development)
-- OCI Always Free (cloud)
-- No wasted effort on unused platforms
-
-### The Upgrade Path
-```
-Files → SQLite → PostgreSQL
-Local script → systemd → Docker Compose → (not Kubernetes)
-```
-
-### The Reality Check
-Before building, ask:
-1. Do I have this problem RIGHT NOW?
-2. What's my current painful workaround?
-3. What's the simplest thing that helps?
-4. How will I know it's working?
-
-If you can't answer these, **don't build it**.
-
----
-
-## 🎯 Success Metrics
-
-A ONE_SHOT project is successful when:
-
-- ✅ You USE it (daily/weekly/monthly)
-- ✅ Setup takes ≤5 commands
-- ✅ Works 6 months later without remembering details
-- ✅ Secrets never leaked (SOPS-encrypted)
-- ✅ Costs ≤$3/month (AI included)
-- ✅ Runs unattended (cron, systemd)
-- ✅ Observable (status scripts, health checks)
-
----
-
-## 🚀 Next Steps
-
-1. **Setup SOPS** (5 minutes, one-time):
-   ```bash
-   brew install sops age
-   mkdir -p ~/.config/sops/age
-   age-keygen -o ~/.config/sops/age/keys.txt
-   # Back up to 1Password!
-   ```
-
-2. **Start a new project**:
-   - Copy `one_shot.md` to `ONE_SHOT.md`
-   - Open in Claude Code / Cursor
-   - Answer Core Questions
-   - Build autonomously
-
-3. **Retrofit existing project**:
-   - Add SOPS: `cp scripts/*.sh your-project/scripts/`
-   - Encrypt secrets: `./scripts/encrypt_secrets.sh`
-   - Add docs: README with Quick Start
-   - Add observability: status script
-
----
-
-## 📚 Additional Resources
-
-- **SOPS GitHub**: https://github.com/getsops/sops
-- **age encryption**: https://age-encryption.org
-- **OpenRouter** (AI): https://openrouter.ai
-- **Tailscale**: https://tailscale.com
-
----
-
-## 🤝 Contributing
-
-ONE_SHOT is a living document. Improvements come from real project usage.
-
-**To contribute**:
-1. Use ONE_SHOT on a real project
-2. Document what worked / what didn't
-3. Submit patterns that improved your workflow
-
-**Do NOT**:
-- Add complexity without real-world validation
-- Suggest patterns you haven't used yourself
-- Recommend paid services (unless truly better + documented tradeoff)
-
----
-
-## 📄 License
-
-MIT License - Use freely, modify, share. Credit appreciated but not required.
-
----
-
-**ONE_SHOT: One file. One workflow. Infinite possibilities.**
-
-**100% Free & Open-Source** • **Deploy Anywhere** • **No Vendor Lock-in** • **Secrets Always Encrypted**
+## Circuit Breaker
+
+- Same task fails 3x → log blocker → skip → continue
+- 3 consecutive tasks fail → stop, surface to user
+- Lane escalation: cheap → balanced → premium → inline (Claude handles directly)
 ````
 
 ## File: CLAUDE.md
@@ -33175,6 +35445,7 @@ See @docs/instructions/workflow.md
 See @docs/instructions/coding.md
 See @docs/instructions/search.md
 See @docs/instructions/review.md
+See @docs/instructions/secrets.md
 
 ## Project-Specific
 See @docs/instructions/oneshot.md
@@ -33208,9 +35479,34 @@ When you ask Claude to change `core/task_schema.py` keywords, `config/lanes.yaml
 - See `docs/meta-harness/refactor_plan.md` for full ranked list
 - See `docs/meta-harness/outer_loop_plan.md` for self-improvement loop designs
 
+## My Active Projects
+
+| Project | What it does | Where | Status |
+|---------|-------------|-------|--------|
+| **oneshot** | Orchestration control plane — Claude + workers, skills, routing | MBA | Active dev |
+| **atlas** | Knowledge ingestion: podcasts, articles, Gmail → 440K searchable chunks | oci-dev, 13 timers | Production |
+| **penny** | Voice memo → classify → route (Telegram, Keep, TrojanHorse…) | oci-dev | Production |
+| **poytz** | URL routing: khamel.com/* → homelab services | Cloudflare Workers | Live |
+| **homelab** | All Docker infra, Makefile ops, 26TB storage | homelab server | Running |
+| **argus** | Search plane: SearXNG+Brave+Exa+Tavily, MCP+HTTP | homelab:8270 | Running |
+| **n8n** | Workflow automation | homelab / khamel.com/workflows | Running |
+| **networth** | Tennis ladder platform | Vercel + Supabase | Production |
+| **ralex** | Multi-model chat: Claude + 10 OpenRouter models | local | Active |
+| **kid-friendly-ai** | Kids voice assistant (ElevenLabs) | buddy.khamel.com | Production |
+| **Argus corpus** | Canonical docs and research corpus for `/doc`, search, and MCP workflows | homelab appdata + optional local mirror | Running |
+| **archon** | RAG knowledge base + MCP server | local | MVP |
+| **atlas-voice** | Writing-style model from Atlas corpus | local | Active |
+| **oos** | Dev workflow context optimizer | local | Active |
+| **dada** | Family comms: video/audio → Telegram | local | Planned |
+| **divorce** | SB 1427 joint petition tooling | local | Personal |
+
+Dormant (keep): `atlas_researcher`, `vig`, `WFM`
+Full services catalog: `~/github/homelab/docs/SERVICES.md`
+
 ## Tool-Specific (Claude Code)
 See @.claude/rules/khamel-mode.md
 See @.claude/rules/codex.md
+- For code-change requests, dispatch via /dispatch — see @.claude/rules/delegation-enforcement.md
 
 ## Project Intelligence
 Need to understand what's been happening? Start here:
@@ -33236,4 +35532,230 @@ Need to understand what's been happening? Start here:
 | What files are unusually large? | `.janitor/doc-size-outliers.json` (all types) |
 | What files are touched most? | `.janitor/critical-files.json` (all types) |
 | What files have bus-factor risk? | `.janitor/knowledge-risk.json` (all types) |
+````
+
+## File: README.md
+````markdown
+# ONE_SHOT — Orchestration Control Plane for Claude Code and OpenCode
+
+**v14.3** | Claude plans. Workers execute. Argus searches. Janitor runs in the background.
+
+---
+
+## What It Is
+
+ONE_SHOT is an operator framework centered on Claude Code, with OpenCode-backed delegation support in the harness layer. It combines skills, routing policies, and background intelligence into a multi-model orchestration system.
+
+- **Claude Code** is the planner and reviewer (never the doer for bounded tasks)
+- **Codex, Gemini CLI, GLM** are the workers (parallel execution, structured output)
+- **OpenCode-backed runners** are supported through `.oneshot/config/models.yaml` and `oneshot_cli/`
+- **Lane-based routing** (`config/lanes.yaml`) drives task dispatch by class and category
+- **Argus** is the search plane (SearXNG + Brave + Exa, running on homelab)
+- **Janitor** is background intelligence ($0, always on, runs via `openrouter/free`)
+
+---
+
+## Install
+
+```bash
+bash install.sh
+```
+
+Or one-liner:
+```bash
+curl -sSL https://raw.githubusercontent.com/Khamel83/oneshot/master/oneshot.sh | bash
+```
+
+Installs skills to `~/.claude/skills/`, update command to `~/.local/bin/`, and writes `AGENTS.md` + `CLAUDE.md` to the current project.
+
+**Update:**
+```bash
+oneshot-update        # auto-update if newer version found
+oneshot-update force  # force now
+```
+
+**Readiness:**
+```bash
+./bin/oneshot doctor          # check this machine
+./bin/oneshot doctor --all-machines
+```
+
+---
+
+## Operators
+
+### `/short` — Quick Iteration
+Fast operator for existing projects. Loads context (git log, tasks, decisions), asks what you're working on, executes in burn-down mode.
+
+### `/full` — Structured Work
+Full operator for new projects and complex refactors. Structured intake → phase-based planning → parallel dispatch → verification.
+
+### `/conduct` — Multi-Model Orchestration
+PMO-style orchestrator. Asks clarifying questions first (blocking). Classifies tasks by class + category → routes to lane → dispatches workers in parallel → loops until goal is fully met.
+
+### `oneshot memory` — Repo-First Memory Primitives
+Customer-repo-facing memory commands for scaffolding and maintaining durable repo memory.
+
+```bash
+./bin/oneshot memory scaffold
+./bin/oneshot memory promote decision --title "Use repo memory" --summary "Stable memory lives in docs/agents." --rationale "Keeps project truth local."
+./bin/oneshot memory retrieve "repo memory"
+./bin/oneshot memory index
+./bin/oneshot memory search "portable runbook"
+./bin/oneshot memory retrieve "repo memory" --include-cross-repo
+./bin/oneshot memory abstract --title "Portable runbook pattern" --lesson "Prefer abstractions first" --category runbook
+```
+
+These commands operate on the current repo by default, not on the OneShot repo, so they can be used directly in downstream customer projects.
+The private global index currently uses a local SQLite store and reports degraded mode explicitly if cross-repo search is unavailable.
+
+---
+
+## Routing
+
+Tasks are classified by **task class** and **category**. The router selects the optimal worker within each lane.
+
+```bash
+python3 -m core.router.resolve --class implement_small --category coding
+```
+
+| Task Class | Lane | Category | Workers |
+|---|---|---|---|
+| `plan` | premium | general | claude_code |
+| `implement_small` | cheap | coding | codex, gemini_cli, glm_claude |
+| `implement_medium` | balanced | coding | codex, gemini_cli |
+| `test_write` | cheap | coding | codex, gemini_cli, glm_claude |
+| `review_diff` | premium | review | claude_code, codex |
+| `doc_draft` | cheap | writing | gemini_cli, codex, glm_claude |
+| `research` | research | research | gemini_cli, codex |
+| `janitor_*` | janitor | general | free (openrouter/free) |
+
+Full config: `config/lanes.yaml`, `config/workers.yaml`
+
+---
+
+## Workers
+
+| Worker | Backend | Cost |
+|---|---|---|
+| `glm_claude` | ZAI / GLM-5-turbo | Free (until plan expiry) |
+| `codex` | ChatGPT Plus | $20/mo subscription |
+| `gemini_cli` | Google API | Free (sign-in) |
+| `free` | openrouter/free | $0 always — janitor lane only |
+| `claw_code` | OpenRouter | Pay-per-token — manual opt-in |
+
+Auto-expiry: `glm_claude` checks `plan_expires` from `config/workers.yaml` and self-disables when expired. The `shot` terminal command auto-falls back to OpenRouter.
+
+**Terminal shortcuts:**
+```bash
+shot "task"    # auto-route: GLM free → OpenRouter fallback
+zai            # force GLM-5-turbo (free)
+oc             # local OpenCode wrapper, if present on this machine
+or             # force OpenRouter model
+or --code      # force Qwen3-Coder (free on OpenRouter)
+```
+
+`oneshot doctor` checks whether the local `oc` launcher exists, but `install.sh` does not create that wrapper for you.
+
+---
+
+## Skills (10 total)
+
+| Skill | Purpose |
+|---|---|
+| `/short` | Quick iteration on existing work |
+| `/full` | New project or major refactor |
+| `/conduct` | Multi-model orchestration until done |
+| `/handoff` | Save context before `/clear` |
+| `/restore` | Resume from handoff |
+| `/research` | Background research via Argus |
+| `/freesearch` | Zero-token search via Argus cheap mode |
+| `/doc` | Build docs and research packs through Argus |
+| `/vision` | Analyze images or websites |
+| `/secrets` | SOPS/Age secrets management |
+
+---
+
+## Janitor (Background Intelligence)
+
+Runs automatically — no manual action needed. Cost: $0.
+
+1. **PostToolUse hook** records every file read/write/edit to `.janitor/events.jsonl`
+2. **Cron** (every 15 min) finds unprocessed events, runs free model summarizer
+3. **SessionEnd hook** marks session; cron picks up remaining data
+
+Produces: test gap analysis, code smell detection, dependency maps, doc staleness, knowledge risk, onboarding summaries — all queryable via grep or `.janitor/*.json`.
+
+Files: `core/janitor/` — `worker.py`, `recorder.py`, `jobs.py`
+
+---
+
+## Search
+
+All web search routes through **Argus** on homelab (`100.112.130.100`):
+- HTTP API: `http://100.112.130.100:8270`
+- MCP server: registered in `~/.claude/settings.json`
+
+Providers: SearXNG, Brave, Serper, Tavily, Exa — with automatic fallback and RRF ranking.
+
+Config: `config/search.yaml`
+
+---
+
+## Secrets
+
+SOPS/Age encrypted vault at `secrets/`. All machines use the same age key at `~/.age/key.txt`.
+
+```bash
+secrets get KEY                        # retrieve a value
+secrets set NAME KEY=value [--commit]  # add/update
+secrets list                           # show all vault files
+```
+
+Never commit plaintext. Use the `/secrets` skill to manage from Claude Code.
+
+---
+
+## Project Structure
+
+```
+oneshot/
+  config/           # YAML routing policy (lanes, models, workers, search)
+  core/             # Python schemas, router, dispatch runner, janitor
+  docs/instructions/ # Operator instructions (single source of truth)
+  .claude/rules/    # Thin imports to docs/instructions/
+  .claude/skills/   # Operator and utility skill prompts
+  templates/        # TASK_SPEC.md, plan.json schema, CLAUDE.md.j2
+  secrets/          # SOPS/Age encrypted vault
+  scripts/          # Build, eval, and maintenance scripts
+  eval/             # Benchmark tasks and trace storage
+```
+
+---
+
+## Typical Session
+
+```
+claude .          # open Claude Code in project
+/short            # load context, ask what's next, burn down tasks
+/handoff          # save context before ending or /clear
+```
+
+---
+
+## Version History
+
+See `CHANGELOG.md` for full history. Current: **v14.3** (Janitor lane, background intelligence, openrouter/free worker, category routing).
+
+Major milestones:
+- **v14** — Category-based routing, GLM worker, ZAI expiry guard, Janitor system
+- **v13** — Operator framework (replaced 25+ commands with 3 operators + 7 utilities)
+- **v12** — Agent Lightning delegation audit, intelligent delegation protocol
+- **v11 and earlier** — See `archive/`
+
+---
+
+## License
+
+MIT — use freely, modify, share.
 ````
