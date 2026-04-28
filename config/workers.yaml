@@ -28,23 +28,54 @@ workers:
     transport: local
     role: worker
     harness: claw_code
+    provider: zai
     install_path: ~/github/claw-code-agent
 
   glm:
     host: localhost
     transport: local
     role: worker
-    harness: glm_claude          # claude CLI + ZAI backend
+    harness: claude_code
+    provider: zai               # WHERE the model runs (was implicit)
     model: glm-5-turbo
-    plan_expires: "2026-05-02"   # GLM Coding Plan expiry — reassess or renew before this date
+    plan_expires: "2026-05-02"
+
+  # OpenCode Go via Claude CLI (MiniMax models — full toolchain)
+  ocg_minimax:
+    host: localhost
+    transport: local
+    role: worker
+    harness: claude_code         # HOW we invoke
+    provider: opencode_go        # WHERE the model runs
+    model: minimax-m2.7
+    protocol: anthropic
+    cost_tier: cheap
+    notes:
+      - "Claude CLI with ANTHROPIC_BASE_URL → OpenCode Go /messages endpoint"
+      - "Full toolchain access. MiniMax models only."
+
+  # OpenCode Go via direct API (all other models — no shell for model)
+  ocg_api:
+    host: localhost
+    transport: local
+    role: worker
+    harness: direct_api
+    provider: opencode_go
+    model: deepseek-v4-flash
+    protocol: openai
+    cost_tier: cheap
+    notes:
+      - "Direct API calls. No shell access for the model."
+      - "Good for summaries, extraction, quick coding tasks."
 
   free:
     host: localhost
     transport: local
     role: worker
-    harness: openrouter_api     # direct OpenRouter API call
-    model: openrouter/free       # free model router (random selection from free pool)
+    harness: openrouter_api
+    provider: openrouter
+    model: openrouter/free
     cost: 0
-    plan_expires: null           # free tier, no expiry
-    max_tokens: 1024             # bounded output for background tasks
-    timeout: 30                  # 30s timeout — these are quick jobs
+    plan_expires: null
+    max_tokens: 1024
+    timeout: 30

@@ -23,25 +23,35 @@ providers:
 
   opencode_go:
     enabled: false
-    kind: opencode_go
-    base_url: "https://opencode.ai/zen/go/v1"
+    kind: model_gateway
+    description: "Model gateway. Not limited to OpenCode CLI — standard API endpoints."
     auth_env: OPENCODE_GO_API_KEY
+    endpoints:
+      openai: "https://opencode.ai/zen/go/v1/chat/completions"    # GLM, Kimi, DeepSeek, MiMo, Qwen
+      anthropic: "https://opencode.ai/zen/go/v1/messages"          # MiniMax M2.5, M2.7 only
+      models: "https://opencode.ai/zen/go/v1/models"               # dynamic model list
+    pricing:
+      subscription: "$5 first month, $10/month"
+      limits: "$12/5h, $30/week, $60/month (dollar-based, varies by model)"
     notes:
-      - "OpenCode Go is in beta; limits may change."
-      - "Usage limits: $12 / 5h window, $30 / week, $60 / month."
-      - "Cheap/high-volume models (deepseek_v4_flash, qwen) for routine work."
-      - "Premium models (glm_5_1, kimi_k2_6) only on escalation."
+      - "Claude CLI path only works with MiniMax models (Anthropic-compatible endpoint)."
+      - "Other models need OpenCode CLI or direct API (OpenAI-compatible)."
+      - "Zero data retention. Models hosted US/EU/Singapore."
     models:
-      deepseek_v4_flash: { id: "opencode-go/deepseek-v4-flash", role: cheap_fast }
-      qwen_3_5_plus:     { id: "opencode-go/qwen3.5-plus",      role: cheap_fast }
-      qwen_3_6_plus:     { id: "opencode-go/qwen3.6-plus",      role: cheap_summary }
-      minimax_m2_5:      { id: "opencode-go/minimax-m2.5",      role: routine_coder }
-      minimax_m2_7:      { id: "opencode-go/minimax-m2.7",      role: routine_coder }
-      kimi_k2_5:         { id: "opencode-go/kimi-k2.5",         role: strong_reasoning }
-      kimi_k2_6:         { id: "opencode-go/kimi-k2.6",         role: strong_reasoning }
-      deepseek_v4_pro:   { id: "opencode-go/deepseek-v4-pro",   role: strong_reasoning }
-      glm_5:             { id: "opencode-go/glm-5",             role: strong_reasoning }
-      glm_5_1:           { id: "opencode-go/glm-5.1",           role: premium_reasoning }
+      deepseek_v4_flash: { id: "deepseek-v4-flash", protocol: openai,    role: cheap_fast }
+      qwen_3_5_plus:     { id: "qwen3.5-plus",     protocol: openai,    role: cheap_fast }
+      qwen_3_6_plus:     { id: "qwen3.6-plus",     protocol: openai,    role: cheap_summary }
+      minimax_m2_5:      { id: "minimax-m2.5",     protocol: anthropic, role: routine_coder }
+      minimax_m2_7:      { id: "minimax-m2.7",     protocol: anthropic, role: routine_coder }
+      kimi_k2_5:         { id: "kimi-k2.5",        protocol: openai,    role: strong_reasoning }
+      kimi_k2_6:         { id: "kimi-k2.6",        protocol: openai,    role: strong_reasoning }
+      deepseek_v4_pro:   { id: "deepseek-v4-pro",   protocol: openai,    role: strong_reasoning }
+      glm_5:             { id: "glm-5",            protocol: openai,    role: strong_reasoning }
+      glm_5_1:           { id: "glm-5.1",          protocol: openai,    role: premium_reasoning }
+      mimo_v2_pro:       { id: "mimo-v2-pro",      protocol: openai,    role: routine_coder }
+      mimo_v2_omni:      { id: "mimo-v2-omni",     protocol: openai,    role: routine_coder }
+      mimo_v2_5_pro:     { id: "mimo-v2.5-pro",    protocol: openai,    role: strong_reasoning }
+      mimo_v2_5:         { id: "mimo-v2.5",        protocol: openai,    role: routine_coder }
 
   gemini:
     enabled: false
@@ -99,7 +109,8 @@ lanes:
     current_provider: zai
     current_model: glm_5_1
     future_provider: opencode_go
-    future_model: minimax_m2_7
+    future_model: minimax_m2_7              # Anthropic-compatible → Claude CLI path
+    future_runner: opencode_go_claude     # full toolchain via Claude CLI
     max_diff_lines: 500
     max_files: 12
     allow_architecture_changes: false
@@ -159,13 +170,46 @@ runner_templates:
     notes:
       - "Uses ANTHROPIC_AUTH_TOKEN (not API_KEY) for ZAI proxy auth"
       - "claude -p gives full tool access with --dangerously-skip-permissions"
+  # PATH 1: OpenCode CLI (all models — universal)
   opencode_go:
-    command: "opencode run --model {model_id} --prompt-file {task_file}"
+    command: "opencode run --model opencode-go/{model_id} --prompt-file {task_file}"
     cwd: "{worktree_path}"
     auth_env: OPENCODE_GO_API_KEY
     readiness:
       - "command -v opencode"
-      - "opencode auth list"
+    protocols: [openai, anthropic]
+    notes:
+      - "Universal path — works with all models."
+      - "Requires OpenCode CLI installed."
+
+  # PATH 2: Claude CLI (MiniMax models only — Anthropic-compatible endpoint)
+  opencode_go_claude:
+    command: "claude -p --dangerously-skip-permissions --model {model_id} \"$(cat {task_file})\""
+    cwd: "{worktree_path}"
+    auth_env: OPENCODE_GO_API_KEY
+    env:
+      ANTHROPIC_BASE_URL: "https://opencode.ai/zen/go/v1/messages"
+      ANTHROPIC_API_KEY: "{auth_value}"
+    readiness:
+      - "command -v claude"
+      - "secrets get OPENCODE_GO_API_KEY >/dev/null 2>&1"
+    protocols: [anthropic]
+    notes:
+      - "Same pattern as ZAI runner — Claude CLI with custom base URL."
+      - "Full native toolchain (bash, read, edit, glob, grep, git)."
+      - "Only works with MiniMax M2.5 and M2.7 (Anthropic-compatible endpoint)."
+
+  # PATH 3: Direct API (all models — OpenAI-compatible)
+  opencode_go_api:
+    command: "python3 -c \"from core.dispatch.direct_api import call; call('https://opencode.ai/zen/go/v1', '{model_id}', '{task_file}')\""
+    cwd: "{worktree_path}"
+    auth_env: OPENCODE_GO_API_KEY
+    readiness:
+      - "secrets get OPENCODE_GO_API_KEY >/dev/null 2>&1"
+    protocols: [openai]
+    notes:
+      - "Lightweight Python helper. No shell access for the model."
+      - "Good for summaries, extraction, classification."
   gemini:
     command: "gemini -p @{task_file} --output-format json --approval-mode yolo"
     cwd: "{worktree_path}"

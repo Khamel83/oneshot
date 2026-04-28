@@ -27,3 +27,11 @@ providers:
   claw_code:
     env: ZAI_API_KEY  # ZAI first (free); falls back to OPENROUTER_API_KEY then OPENAI_API_KEY
     description: Claw Code Agent — routes GLM models to ZAI, others to OpenRouter
+
+  opencode_go:
+    env: OPENCODE_GO_API_KEY
+    base_url: https://opencode.ai/zen/go/v1
+    base_url_openai: https://opencode.ai/zen/go/v1/chat/completions
+    base_url_anthropic: https://opencode.ai/zen/go/v1/messages   # MiniMax models only
+    models_endpoint: https://opencode.ai/zen/go/v1/models
+    description: "Model gateway (GLM, Kimi, DeepSeek, MiMo, MiniMax, Qwen) — $5/$10mo sub. OpenAI-compatible for most models, Anthropic-compatible for MiniMax only. Not limited to OpenCode CLI."

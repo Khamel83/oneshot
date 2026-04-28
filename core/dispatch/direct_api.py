@@ -1,0 +1,73 @@
+"""Lightweight helper for direct OpenAI-compatible API calls.
+
+Used by the opencode_go_api runner template for summaries, extraction,
+and classification tasks where the model doesn't need shell access.
+
+Usage:
+    python3 -c "from core.dispatch.direct_api import call; call(base_url, model, task_file)"
+"""
+
+import json
+import os
+import subprocess
+import sys
+import urllib.request
+import urllib.error
+
+
+def _get_api_key() -> str:
+    key = os.environ.get("OPENCODE_GO_API_KEY", "")
+    if not key:
+        try:
+            key = subprocess.check_output(
+                ["secrets", "get", "OPENCODE_GO_API_KEY"], stderr=subprocess.DEVNULL
+            ).decode().strip()
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            pass
+    if not key:
+        print("ERROR: OPENCODE_GO_API_KEY not set and secrets CLI unavailable", file=sys.stderr)
+        sys.exit(1)
+    return key
+
+
+def call(base_url: str, model: str, task_file: str) -> str:
+    api_key = _get_api_key()
+
+    with open(task_file) as f:
+        prompt = f.read().strip()
+
+    url = f"{base_url.rstrip('/')}/chat/completions"
+    payload = json.dumps({
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 4096,
+    }).encode()
+
+    req = urllib.request.Request(url, data=payload, method="POST")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Authorization", f"Bearer {api_key}")
+
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode() if e.fp else ""
+        print(f"ERROR: API returned {e.code}: {body}", file=sys.stderr)
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f"ERROR: Connection failed: {e.reason}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        return data["choices"][0]["message"]["content"]
+    except (KeyError, IndexError):
+        print(f"ERROR: Unexpected response format: {json.dumps(data)[:500]}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+        print(f"Usage: {sys.argv[0]} <base_url> <model> <task_file>", file=sys.stderr)
+        sys.exit(1)
+    result = call(sys.argv[1], sys.argv[2], sys.argv[3])
+    print(result)
