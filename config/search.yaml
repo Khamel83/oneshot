@@ -1,6 +1,7 @@
 search:
   default_backend: argus
   base_url: http://100.112.130.100:8270
+  api_key_env: ARGUS_API_KEY
   modes:
     discovery:
       providers: [searxng, brave, exa]

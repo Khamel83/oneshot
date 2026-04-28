@@ -116,7 +116,7 @@ or --code      # force Qwen3-Coder (free on OpenRouter)
 | `/restore` | Resume from handoff |
 | `/research` | Background research via Argus |
 | `/freesearch` | Zero-token search via Argus cheap mode |
-| `/doc` | Cache external docs locally |
+| `/doc` | Build docs and research packs through Argus |
 | `/vision` | Analyze images or websites |
 | `/secrets` | SOPS/Age secrets management |
 

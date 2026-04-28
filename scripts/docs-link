@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # Configuration
-CACHE_BASE="${DOCS_CACHE:-$HOME/github/docs-cache/docs/cache}"
+CACHE_BASE="${DOCS_CACHE:-$HOME/.local/share/argus/argus/docs/cache}"
 CACHE_INDEX="$CACHE_BASE/.index.md"
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
 EXTERNAL_DIR="$PROJECT_ROOT/docs/external"
@@ -27,7 +27,7 @@ log_error() { echo -e "${RED}[docs-link]${NC} $1" >&2; }
 ensure_cache() {
     if [[ ! -d "$CACHE_BASE" ]]; then
         log_error "Cache not found at $CACHE_BASE"
-        log_info "Set DOCS_CACHE env var or ensure ~/github/docs-cache exists"
+        log_info "Set DOCS_CACHE env var or mirror Argus corpus locally first"
         exit 1
     fi
 }

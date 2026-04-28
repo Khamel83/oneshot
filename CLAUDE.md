@@ -54,7 +54,7 @@ When you ask Claude to change `core/task_schema.py` keywords, `config/lanes.yaml
 | **networth** | Tennis ladder platform | Vercel + Supabase | Production |
 | **ralex** | Multi-model chat: Claude + 10 OpenRouter models | local | Active |
 | **kid-friendly-ai** | Kids voice assistant (ElevenLabs) | buddy.khamel.com | Production |
-| **docs-cache** | Local cached docs for offline/fast Claude access | `~/github/docs-cache` | Active |
+| **Argus corpus** | Canonical docs and research corpus for `/doc`, search, and MCP workflows | homelab appdata + optional local mirror | Running |
 | **archon** | RAG knowledge base + MCP server | local | MVP |
 | **atlas-voice** | Writing-style model from Atlas corpus | local | Active |
 | **oos** | Dev workflow context optimizer | local | Active |

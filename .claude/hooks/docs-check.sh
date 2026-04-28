@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-CACHE_BASE="${DOCS_CACHE:-$HOME/github/docs-cache/docs/cache}"
+CACHE_BASE="${DOCS_CACHE:-$HOME/.local/share/argus/argus/docs/cache}"
 CACHE_INDEX="$CACHE_BASE/.index.md"
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
 EXTERNAL_DIR="$PROJECT_ROOT/docs/external"

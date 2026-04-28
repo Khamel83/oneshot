@@ -1,42 +1,51 @@
 ---
-description: Cache external documentation locally
+description: Build or refresh documentation and research packs through Argus
 agent: build
 ---
 
-# /doc — Cache Documentation
+# /doc — Build Documentation Corpus
 
-Fetches external documentation and saves it locally for offline access.
+Uses Argus on homelab to collect official docs, related research, and site summaries into the Argus-managed corpus.
 
 ## Usage
 
-- `/doc <name> <url>` — Cache a document
-- `/doc --list` — Show cached documents
+- `/doc <topic> <url>` — Build a docs + research pack
+- `/doc site <url>` — Capture the important parts of a site with references
+- `/doc recover <url>` — Recover a dead article
+- `/doc --list` — Show where Argus stores imported docs locally if mirrored on this machine
 
 ## Steps
 
-### Caching a Document
+### Build a Docs + Research Pack
 
-1. `$1` = name, `$2` = URL. If not provided, ask the user.
+1. `$1` = topic, `$2` = official docs URL. If not provided, ask the user.
+2. Use Argus, not ad hoc scraping:
+   - `python -c "from core.search import argus_client; import json; print(json.dumps(argus_client.build_research_pack('<topic>', official_url='<url>'), indent=2))"`
+3. Tell the user:
+   - Argus stores the canonical corpus on homelab under `/mnt/main-drive/appdata/argus`
+   - imported legacy docs-cache content lives under `/mnt/main-drive/appdata/argus/docs`
+4. If the user wants a local project copy, mirror only the generated report or selected extracted docs into the project after the Argus run completes.
 
-2. Fetch the URL content using `webfetch` tool or:
+### Capture a Site Summary
+
+1. `$2` = URL
+2. Run:
    ```bash
-   curl -sL "$URL" | head -5000
+   python -c "from core.search import argus_client; import json; print(json.dumps(argus_client.capture_site('<url>'), indent=2))"
    ```
+3. Report the `run_id`, `status_url`, and the eventual `report_path` once available.
 
-3. Create directory and save:
+### Recover a Dead Article
+
+1. `$2` = dead URL
+2. Run:
    ```bash
-   mkdir -p docs/external/{name}
+   python -c "from core.search import argus_client; import json; print(json.dumps(argus_client.recover_article('<url>'), indent=2))"
    ```
+3. Poll workflow status if the user wants the recovered report immediately.
 
-4. Write fetched content to `docs/external/{name}/README.md`
+### Listing Docs
 
-5. Update index (`docs/external/.index.md` if it exists)
-
-6. Confirm: "Cached `{name}` to `docs/external/{name}/README.md`"
-
-### Listing Cached Docs
-
-```bash
-ls docs/external/ 2>/dev/null
-cat docs/external/.index.md 2>/dev/null
-```
+Use:
+- `python -c "from core.search import argus_client; import json; print(json.dumps({'base_url': argus_client.get_base_url(), 'api_key': bool(argus_client.get_api_key())}, indent=2))"`
+- `echo ${DOCS_CACHE:-$HOME/.local/share/argus/argus/docs/cache}`

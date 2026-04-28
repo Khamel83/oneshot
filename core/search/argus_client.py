@@ -1,6 +1,8 @@
 """Argus search client - thin HTTP wrapper around Argus broker API."""
 
 import json
+import os
+import subprocess
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -42,6 +44,61 @@ def get_base_url() -> str:
     return config.get("search", {}).get("base_url", DEFAULT_BASE_URL)
 
 
+def _load_api_key_from_vault() -> Optional[str]:
+    try:
+        result = subprocess.run(
+            ["secrets", "get", "ARGUS_API_KEY", "argus"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return None
+
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip() or None
+
+
+def get_api_key() -> Optional[str]:
+    """Resolve the Argus caller API key from config, env, or vault."""
+    config = _get_config().get("search", {})
+    env_name = config.get("api_key_env", "ARGUS_API_KEY")
+    env_value = os.environ.get(env_name, "").strip()
+    if env_value:
+        return env_value
+
+    config_value = str(config.get("api_key", "")).strip()
+    if config_value:
+        return config_value
+
+    return _load_api_key_from_vault()
+
+
+def _build_headers(*, include_json: bool = False) -> dict[str, str]:
+    headers: dict[str, str] = {}
+    if include_json:
+        headers["Content-Type"] = "application/json"
+
+    api_key = get_api_key()
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    return headers
+
+
+def _request_json(url: str, *, payload: Optional[dict] = None, timeout: int = 30) -> dict:
+    data = json.dumps(payload).encode() if payload is not None else None
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers=_build_headers(include_json=payload is not None),
+        method="POST" if payload is not None else "GET",
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read())
+
+
 def search(query: str, mode: str = "discovery", base_url: Optional[str] = None,
            max_results: Optional[int] = None) -> dict:
     """Search via Argus broker. Returns normalized results.
@@ -57,23 +114,52 @@ def search(query: str, mode: str = "discovery", base_url: Optional[str] = None,
     if max_results:
         payload["max_results"] = max_results
 
-    data = json.dumps(payload).encode()
-    req = urllib.request.Request(
-        f"{base}/api/search",
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read())
+    return _request_json(f"{base}/api/search", payload=payload)
 
 
 def health(base_url: Optional[str] = None) -> dict:
     """Check Argus provider health status."""
     base = base_url or get_base_url()
-    req = urllib.request.Request(f"{base}/api/health")
-    with urllib.request.urlopen(req, timeout=5) as resp:
-        return json.loads(resp.read())
+    return _request_json(f"{base}/api/health", timeout=5)
+
+
+def recover_article(url: str, title: Optional[str] = None, domain: Optional[str] = None,
+                    base_url: Optional[str] = None) -> dict:
+    base = base_url or get_base_url()
+    payload = {"url": url}
+    if title:
+        payload["title"] = title
+    if domain:
+        payload["domain"] = domain
+    return _request_json(f"{base}/api/workflows/recover-article", payload=payload)
+
+
+def capture_site(url: str, soft_page_limit: int = 75, hard_page_limit: int = 200,
+                 base_url: Optional[str] = None) -> dict:
+    base = base_url or get_base_url()
+    payload = {
+        "url": url,
+        "soft_page_limit": soft_page_limit,
+        "hard_page_limit": hard_page_limit,
+    }
+    return _request_json(f"{base}/api/workflows/capture-site", payload=payload)
+
+
+def build_research_pack(topic: str, official_url: Optional[str] = None,
+                        max_research_pages: int = 40, base_url: Optional[str] = None) -> dict:
+    base = base_url or get_base_url()
+    payload = {
+        "topic": topic,
+        "max_research_pages": max_research_pages,
+    }
+    if official_url:
+        payload["official_url"] = official_url
+    return _request_json(f"{base}/api/workflows/build-research-pack", payload=payload)
+
+
+def workflow_status(run_id: str, base_url: Optional[str] = None) -> dict:
+    base = base_url or get_base_url()
+    return _request_json(f"{base}/api/workflows/{run_id}")
 
 
 def is_available(base_url: Optional[str] = None) -> bool:
