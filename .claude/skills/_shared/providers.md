@@ -13,7 +13,7 @@ command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
 [ -d ~/github/claw-code-agent/src ] && echo "claw_code: yes" || echo "claw_code: no"
 [ -n "$ZAI_API_KEY" ] && echo "zai: yes" || echo "zai: no"
 [ -n "$OPENROUTER_API_KEY" ] && echo "openrouter: yes" || echo "openrouter: no"
-python -c "from core.search.argus_client import is_available; print('argus:', is_available())" 2>/dev/null || echo "argus: no"
+curl -s --connect-timeout 3 http://100.112.130.100:8270/api/health >/dev/null 2>&1 && echo "argus: yes" || echo "argus: no"
 ```
 
 **Fallback chain for cheap lane**: codex → gemini_cli → claw_code

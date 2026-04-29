@@ -21,7 +21,7 @@ Claude does NOT do web research inline. Build the query, dispatch, integrate res
 1. Ask 1-2 clarifying questions (goal, depth)
 2. **Check Argus availability**:
    ```bash
-   python -c "from core.search.argus_client import is_available; print(is_available())" 2>/dev/null
+   curl -s --connect-timeout 3 http://100.112.130.100:8270/api/health >/dev/null 2>&1 && echo "argus: yes" || echo "argus: no"
    ```
 3. **Dispatch research to worker** (MANDATORY):
    - If Argus available, dispatch via the research lane:
