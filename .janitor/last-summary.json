@@ -1,29 +1,32 @@
 {
   "decisions": [
     {
-      "what": "Add fallback handling for inline dispatch",
-      "why": "Identified missing fallback in dispatch logic via grep searches"
+      "what": "Create systemd user service and timer for oneshot-janitor",
+      "why": "To schedule periodic execution of janitor-cron.sh"
     },
     {
-      "what": "Create bug report for inline-fallback issue",
-      "why": "Found bug referenced in MEMORY.md and created conduct-inline-fallback-bug.md"
+      "what": "Run curl and python router.resolve to verify Argus endpoints and router resolution",
+      "why": "To ensure integration components are reachable and correctly resolved before proceeding"
     },
     {
-      "what": "Commit and push changes to repository",
-      "why": "To persist fixes and updates made to dispatch, providers, and SKILL files"
-    }
-  ],
-  "blockers": [
+      "what": "Execute ci.sh with --quick flag",
+      "why": "To perform a quick CI validation of changes"
+    },
     {
-      "what": "Unresolved TODO/FIXME items remain",
-      "reason": "Grepping revealed pending TODO/FIXME entries in .claude/skills/c that have not been addressed"
+      "what": "Clean up verify test data using python scripts and remove git directory",
+      "why": "To reset environment after verification"
+    },
+    {
+      "what": "Edit janitor-cron.sh after reviewing its content",
+      "why": "To adjust script based on new requirements"
     }
   ],
+  "blockers": [],
   "discoveries": [
-    "fallback and inline keywords found across documentation and skill files",
-    "silent fallback pattern detected via grep",
-    "config miss and dispatch fail references indicate missing config handling",
-    "bug report created for inline-fallback issue",
-    "multiple files edited: dispatch.md, providers.md, SKILL.md"
+    "SKILL.md was read multiple times indicating repeated reference to conduct skill documentation",
+    "janitor-cron.sh was created, made executable, and edited, showing active development of cleanup automation",
+    "systemd user service and timer files were created, indicating intention to run janitor as a scheduled service",
+    "git diff revealed changes and untracked files, highlighting pending modifications and new files",
+    "opencode.json was read and recreated, showing dynamic generation of configuration"
   ]
 }

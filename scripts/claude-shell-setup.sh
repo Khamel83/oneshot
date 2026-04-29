@@ -9,7 +9,9 @@
 # COMMANDS AFTER INSTALL:
 #   cc  - Claude Code via Anthropic Pro (assumes you're logged in)
 #   zai - Claude Code via z.ai GLM API
-#   oc  - OpenCode wrapper using OPENROUTER key from the vault when available
+#   mm25 - Claude Code via OpenCode Go (MiniMax M2.5, Anthropic-compatible)
+#   mm27 - Claude Code via OpenCode Go (MiniMax M2.7, Anthropic-compatible)
+#   oc  - OpenCode via ChatGPT Plus (reads ~/.codex/auth.json, defaults to gpt-5.4)
 #
 # UPDATING GLM VERSION:
 #   When z.ai releases a new model (e.g., glm-4.8), just update GLM_MODEL
@@ -86,8 +88,8 @@ if [[ "$1" == "--install" ]]; then
 export ZAI_API_KEY="__ZAI_API_KEY__"
 export GLM_MODEL="__GLM_MODEL__"
 
-unalias cc zai oc 2>/dev/null || true
-unset -f cc zai oc 2>/dev/null || true
+unalias cc zai mm25 mm27 oc 2>/dev/null || true
+unset -f cc zai mm25 mm27 oc 2>/dev/null || true
 
 # cc - Claude Code via Anthropic Pro (bypassPermissions via settings.json)
 cc() {
@@ -109,19 +111,60 @@ zai() {
         claude "$@"
 }
 
-# oc - OpenCode wrapper with vault-backed OpenRouter auth when available
+# mm25 - Claude Code via OpenCode Go (MiniMax M2.5, Anthropic-compatible)
+mm25() {
+    if ! command -v claude >/dev/null 2>&1; then
+        echo "mm25: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
+        return 127
+    fi
+    local ocg_key
+    if command -v secrets >/dev/null 2>&1; then
+        ocg_key="$(secrets get OPENCODE_GO_API_KEY 2>/dev/null || true)"
+    fi
+    [[ -z "$ocg_key" ]] && { echo "mm25: OPENCODE_GO_API_KEY not in vault (secrets set opencode_go OPENCODE_GO_API_KEY=<key>)" >&2; return 1; }
+
+    echo "mm25: opencode.ai/zen/go → minimax-m2.5" >&2
+    ANTHROPIC_BASE_URL="https://opencode.ai/zen/go" \
+    ANTHROPIC_AUTH_TOKEN="$ocg_key" \
+    ANTHROPIC_MODEL="minimax-m2.5" \
+        claude --dangerously-skip-permissions "$@"
+}
+
+# mm27 - Claude Code via OpenCode Go (MiniMax M2.7, Anthropic-compatible)
+mm27() {
+    if ! command -v claude >/dev/null 2>&1; then
+        echo "mm27: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
+        return 127
+    fi
+    local ocg_key
+    if command -v secrets >/dev/null 2>&1; then
+        ocg_key="$(secrets get OPENCODE_GO_API_KEY 2>/dev/null || true)"
+    fi
+    [[ -z "$ocg_key" ]] && { echo "mm27: OPENCODE_GO_API_KEY not in vault (secrets set opencode_go OPENCODE_GO_API_KEY=<key>)" >&2; return 1; }
+
+    echo "mm27: opencode.ai/zen/go → minimax-m2.7" >&2
+    ANTHROPIC_BASE_URL="https://opencode.ai/zen/go" \
+    ANTHROPIC_AUTH_TOKEN="$ocg_key" \
+    ANTHROPIC_MODEL="minimax-m2.7" \
+        claude --dangerously-skip-permissions "$@"
+}
+
+# oc - OpenCode via ChatGPT Plus (reads ~/.codex/auth.json, defaults to gpt-5.4)
 oc() {
     if ! command -v opencode >/dev/null 2>&1; then
         echo "oc: 'opencode' CLI not found" >&2
         return 127
     fi
 
-    unset OPENAI_API_KEY OPENAI_BASE_URL ANTHROPIC_BASE_URL
-    if command -v secrets >/dev/null 2>&1; then
-        export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null || true)"
+    # Read the OAuth-derived key from codex auth.json (ChatGPT Plus subscription)
+    local codex_auth="$HOME/.codex/auth.json"
+    if [[ -f "$codex_auth" ]] && command -v jq >/dev/null 2>&1; then
+        export OPENAI_API_KEY="$(jq -r '.OPENAI_API_KEY // empty' "$codex_auth" 2>/dev/null)"
     fi
+    [[ -z "$OPENAI_API_KEY" ]] && { echo "oc: no OPENAI_API_KEY in ~/.codex/auth.json — run 'codex login --device-auth' first" >&2; return 1; }
 
-    opencode "$@"
+    unset OPENAI_BASE_URL ANTHROPIC_BASE_URL
+    opencode --model openai/gpt-5.4 "$@"
 }
 
 # saveplan - open $EDITOR on /tmp/claude-plan.md to paste a plan
@@ -221,9 +264,11 @@ BASH_HOOK
 	fi
 
 	echo "✓ Installed to $SHELLRC"
-	echo "✓ cc  = Claude Code (Anthropic Pro, YOLO mode)"
-	echo "✓ zai = Claude Code (z.ai $GLM_MODEL, YOLO mode)"
-	echo "✓ oc  = OpenCode wrapper (vault-backed OpenRouter auth)"
+		echo "✓ cc   = Claude Code (Anthropic Pro)"
+		echo "✓ zai  = Claude Code (z.ai $GLM_MODEL)"
+		echo "✓ mm25 = Claude Code (OpenCode Go → MiniMax M2.5, YOLO mode)"
+		echo "✓ mm27 = Claude Code (OpenCode Go → MiniMax M2.7, YOLO mode)"
+		echo "✓ oc   = OpenCode (ChatGPT Plus → gpt-5.4)"
 	echo "✓ Heartbeat: Daily health checks on project enter"
 	echo ""
 	if [[ "$SHELL_TYPE" == "zsh" ]]; then
@@ -239,8 +284,8 @@ if [[ "$ZAI_API_KEY" == "YOUR_ZAI_API_KEY_HERE" ]]; then
 	echo "WARNING: ZAI_API_KEY not set. Edit the script or set ZAI_API_KEY env var." >&2
 fi
 
-unalias cc zai oc 2>/dev/null || true
-unset -f cc zai oc 2>/dev/null || true
+unalias cc zai mm25 mm27 oc 2>/dev/null || true
+unset -f cc zai mm25 mm27 oc 2>/dev/null || true
 
 # cc - Claude Code via Anthropic Pro (bypassPermissions via settings.json)
 cc() {
@@ -265,19 +310,59 @@ zai() {
 		claude "$@"
 }
 
-# oc - OpenCode wrapper with vault-backed OpenRouter auth when available
+# mm25 - Claude Code via OpenCode Go (MiniMax M2.5, Anthropic-compatible)
+mm25() {
+	if ! command -v claude >/dev/null 2>&1; then
+		echo "mm25: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
+		return 127
+	fi
+	local ocg_key
+	if command -v secrets >/dev/null 2>&1; then
+		ocg_key="$(secrets get OPENCODE_GO_API_KEY 2>/dev/null || true)"
+	fi
+	[[ -z "$ocg_key" ]] && { echo "mm25: OPENCODE_GO_API_KEY not in vault" >&2; return 1; }
+
+	echo "mm25: opencode.ai/zen/go → minimax-m2.5" >&2
+	ANTHROPIC_BASE_URL="https://opencode.ai/zen/go" \
+		ANTHROPIC_AUTH_TOKEN="$ocg_key" \
+		ANTHROPIC_MODEL="minimax-m2.5" \
+		claude --dangerously-skip-permissions "$@"
+}
+
+# mm27 - Claude Code via OpenCode Go (MiniMax M2.7, Anthropic-compatible)
+mm27() {
+	if ! command -v claude >/dev/null 2>&1; then
+		echo "mm27: 'claude' CLI not found (npm install -g @anthropic-ai/claude-code)" >&2
+		return 127
+	fi
+	local ocg_key
+	if command -v secrets >/dev/null 2>&1; then
+		ocg_key="$(secrets get OPENCODE_GO_API_KEY 2>/dev/null || true)"
+	fi
+	[[ -z "$ocg_key" ]] && { echo "mm27: OPENCODE_GO_API_KEY not in vault" >&2; return 1; }
+
+	echo "mm27: opencode.ai/zen/go → minimax-m2.7" >&2
+	ANTHROPIC_BASE_URL="https://opencode.ai/zen/go" \
+		ANTHROPIC_AUTH_TOKEN="$ocg_key" \
+		ANTHROPIC_MODEL="minimax-m2.7" \
+		claude --dangerously-skip-permissions "$@"
+}
+
+# oc - OpenCode via ChatGPT Plus (reads ~/.codex/auth.json, defaults to gpt-5.4)
 oc() {
 	if ! command -v opencode >/dev/null 2>&1; then
 		echo "oc: 'opencode' CLI not found" >&2
 		return 127
 	fi
 
-	unset OPENAI_API_KEY OPENAI_BASE_URL ANTHROPIC_BASE_URL
-	if command -v secrets >/dev/null 2>&1; then
-		export OPENROUTER_API_KEY="$(secrets get OPENROUTER_API_KEY 2>/dev/null || true)"
+	local codex_auth="$HOME/.codex/auth.json"
+	if [[ -f "$codex_auth" ]] && command -v jq >/dev/null 2>&1; then
+		export OPENAI_API_KEY="$(jq -r '.OPENAI_API_KEY // empty' "$codex_auth" 2>/dev/null)"
 	fi
+	[[ -z "$OPENAI_API_KEY" ]] && { echo "oc: no OPENAI_API_KEY in ~/.codex/auth.json — run 'codex login --device-auth' first" >&2; return 1; }
 
-	opencode "$@"
+	unset OPENAI_BASE_URL ANTHROPIC_BASE_URL
+	opencode --model openai/gpt-5.4 "$@"
 }
 
 # saveplan - open $EDITOR on /tmp/claude-plan.md to paste a plan
