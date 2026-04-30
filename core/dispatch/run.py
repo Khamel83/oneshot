@@ -293,7 +293,7 @@ def run_manus_task(prompt: str, output_file: str, model: str = "manus-1.6-lite")
             "POST",
             "/v2/task.create",
             {
-                "agent_id": model,
+                "agent_profile": model,
                 "message": {
                     "content": [
                         {"type": "text", "text": prompt}
