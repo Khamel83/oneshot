@@ -247,6 +247,45 @@ def _manus_request(
     return json.loads(raw) if raw else {}
 
 
+def _extract_waiting_event(msgs_payload: dict) -> tuple[str, str]:
+    """Extract event_id and event_type from a waiting status message."""
+    for msg in msgs_payload.get("messages", []):
+        if msg.get("type") == "status_update":
+            detail = msg.get("status_update", {})
+            if detail.get("agent_status") == "waiting":
+                sd = detail.get("status_detail", {})
+                return sd.get("waiting_for_event_id", ""), sd.get("waiting_for_event_type", "")
+    return "", ""
+
+
+# Events we auto-confirm and their input payloads
+_AUTO_CONFIRM_ACTIONS = {
+    "terminalExecute": {"accept": True, "always_allow": True},
+    "deployAction": {"accept": True, "global_allow": True},
+    "webdevRunAction": {"accept": True, "mode": "speed"},
+    "needConnectMyBrowser": {"action": "skip"},
+    "videoGenerate": {"choice": "standard"},
+    "apiHighCreditNotice": {"action": "accept"},
+    "mapreduceAction": {"accept": True},
+}
+
+
+def _manus_auto_confirm(task_id: str, event_id: str, event_type: str) -> bool:
+    """Auto-confirm a waiting action. Returns True if confirmed, False if skipped."""
+    input_data = _AUTO_CONFIRM_ACTIONS.get(event_type)
+    if not input_data:
+        return False
+    try:
+        _manus_request("POST", "/v2/task.confirmAction", {
+            "task_id": task_id,
+            "event_id": event_id,
+            "input": input_data,
+        })
+        return True
+    except Exception:
+        return False
+
+
 def run_manus_task(prompt: str, output_file: str, model: str = "manus-1.6-lite") -> tuple[int, str]:
     """Create and poll a Manus v2 task until completion; write raw response to output_file."""
     try:
@@ -296,13 +335,20 @@ def run_manus_task(prompt: str, output_file: str, model: str = "manus-1.6-lite")
                 }, indent=2))
                 return 1, f"manus task {task_id} status={status}"
             if status == "waiting":
+                # Extract waiting event from messages
+                event_id, event_type = _extract_waiting_event(msgs_payload)
+                if event_id and event_type:
+                    confirmed = _manus_auto_confirm(task_id, event_id, event_type)
+                    if confirmed:
+                        continue  # keep polling after confirm
+                # Can't auto-confirm (messageAskUser or no event found)
                 Path(output_file).write_text(json.dumps({
                     "task_id": task_id,
                     "detail": detail_payload,
                     "messages": msgs_payload,
                     "status": status,
                 }, indent=2))
-                return 1, f"manus task {task_id} waiting for input/confirmation"
+                return 1, f"manus task {task_id} waiting for {event_type or 'unknown'} (cannot auto-confirm)"
 
         Path(output_file).write_text(json.dumps({
             "task_id": task_id,
