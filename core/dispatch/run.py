@@ -30,7 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 CREDIT_LOG = Path.home() / ".claude" / "dispatch-credits.jsonl"
 
 
-def append_credit_log(result: dict, model: str = ""):
+def append_credit_log(result: dict):
     """Append a credit usage line to ~/.claude/dispatch-credits.jsonl."""
     credits = 0
     usage = result.get("usage")
@@ -40,7 +40,7 @@ def append_credit_log(result: dict, model: str = ""):
         "ts": result.get("completed", datetime.now(timezone.utc).isoformat()),
         "project": os.path.basename(os.getcwd()),
         "worker": result.get("worker", "unknown"),
-        "model": model,
+        "model": result.get("model", ""),
         "credits": credits,
         "task_id": result.get("task_id", ""),
         "status": result.get("status", "unknown"),
@@ -247,7 +247,7 @@ def _manus_request(
     return json.loads(raw) if raw else {}
 
 
-def run_manus_task(prompt: str, output_file: str, model: str = "manus-1.6") -> tuple[int, str]:
+def run_manus_task(prompt: str, output_file: str, model: str = "manus-1.6-lite") -> tuple[int, str]:
     """Create and poll a Manus v2 task until completion; write raw response to output_file."""
     try:
         created = _manus_request(
@@ -610,6 +610,7 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
     task_id = task["id"]
     output_file = os.path.join(output_dir, f"dispatch-{task_id}.json")
     started = datetime.now(timezone.utc)
+    model = task.get("model", "")
 
     # Build command
     if worker == "codex":
@@ -631,7 +632,7 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
     # Execute
     try:
         if worker == "manus":
-            model = task.get("model", "manus-1.6")
+            model = task.get("model") or "manus-1.6-lite"
             exit_code, stderr = run_manus_task(prompt, output_file, model=model)
         else:
             proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300,
@@ -665,6 +666,7 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
     return {
         "task_id": task_id,
         "worker": worker,
+        "model": model or "",
         "status": status,
         "exit_code": exit_code,
         "stderr": stderr,
@@ -748,7 +750,7 @@ def dispatch_parallel(tasks: list[dict], max_parallel: int = 3,
                     lane=lane or _resolution.get("lane", ""),
                     resolution=_resolution
                 )
-                append_credit_log(result, model=task.get("model", ""))
+                append_credit_log(result)
             except Exception as e:
                 results.append({
                     "task_id": task["id"],

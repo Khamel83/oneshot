@@ -86,7 +86,7 @@ workers:
     role: worker
     harness: direct_api
     provider: manus
-    model: manus-1.6
+    model: manus-1.6-lite
     api_base_url: https://api.manus.ai
     auth_env: MANUS_API_KEY
     notes:
