@@ -21,6 +21,7 @@ import subprocess
 import sys
 import time
 import urllib.request
+import urllib.parse
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
@@ -204,10 +205,16 @@ def _manus_headers() -> dict[str, str]:
     return {"Content-Type": "application/json", "x-manus-api-key": key}
 
 
-def _manus_request(method: str, path: str, payload: dict | None = None) -> dict:
-    url = f"{MANUS_BASE_URL}{path}"
-    body = json.dumps(payload or {}).encode("utf-8")
-    req = urllib.request.Request(url, data=body, method=method)
+def _manus_request(
+    method: str,
+    path: str,
+    payload: dict | None = None,
+    query: dict | None = None
+) -> dict:
+    query_str = f"?{urllib.parse.urlencode(query)}" if query else ""
+    url = f"{MANUS_BASE_URL}{path}{query_str}"
+    body = None if method.upper() == "GET" else json.dumps(payload or {}).encode("utf-8")
+    req = urllib.request.Request(url, data=body, method=method.upper())
     for k, v in _manus_headers().items():
         req.add_header(k, v)
     with urllib.request.urlopen(req, timeout=60) as resp:
@@ -216,32 +223,68 @@ def _manus_request(method: str, path: str, payload: dict | None = None) -> dict:
 
 
 def run_manus_task(prompt: str, output_file: str, model: str = "manus-1.6") -> tuple[int, str]:
-    """Create and poll a Manus task until completion; write raw response to output_file."""
+    """Create and poll a Manus v2 task until completion; write raw response to output_file."""
     try:
-        created = _manus_request("POST", "/v2/tasks", {"agentId": model, "input": prompt})
-        task_id = created.get("data", {}).get("id") or created.get("id")
+        created = _manus_request(
+            "POST",
+            "/v2/task.create",
+            {
+                "agent_id": model,
+                "message": {
+                    "content": [
+                        {"type": "text", "text": prompt}
+                    ]
+                },
+            },
+        )
+        task_id = created.get("task_id") or created.get("task", {}).get("id")
         if not task_id:
             Path(output_file).write_text(json.dumps(created, indent=2))
             return 1, "manus task create returned no id"
 
-        last = created
+        last_detail = {}
+        last_messages = {}
         for _ in range(120):
             time.sleep(5)
-            status_payload = _manus_request("GET", f"/v2/tasks/{task_id}", {})
-            last = status_payload
-            status = (
-                status_payload.get("data", {}).get("status")
-                or status_payload.get("status")
-                or ""
-            ).lower()
-            if status in {"completed", "succeeded", "done"}:
-                Path(output_file).write_text(json.dumps(status_payload, indent=2))
+            detail_payload = _manus_request("GET", "/v2/task.detail", query={"task_id": task_id})
+            msgs_payload = _manus_request(
+                "GET", "/v2/task.listMessages",
+                query={"task_id": task_id, "order": "desc", "limit": 20}
+            )
+            last_detail = detail_payload
+            last_messages = msgs_payload
+            status = (detail_payload.get("task", {}).get("status") or "").lower()
+            if status == "stopped":
+                Path(output_file).write_text(json.dumps({
+                    "task_id": task_id,
+                    "detail": detail_payload,
+                    "messages": msgs_payload,
+                    "status": status,
+                }, indent=2))
                 return 0, ""
-            if status in {"failed", "cancelled", "canceled", "error"}:
-                Path(output_file).write_text(json.dumps(status_payload, indent=2))
+            if status == "error":
+                Path(output_file).write_text(json.dumps({
+                    "task_id": task_id,
+                    "detail": detail_payload,
+                    "messages": msgs_payload,
+                    "status": status,
+                }, indent=2))
                 return 1, f"manus task {task_id} status={status}"
+            if status == "waiting":
+                Path(output_file).write_text(json.dumps({
+                    "task_id": task_id,
+                    "detail": detail_payload,
+                    "messages": msgs_payload,
+                    "status": status,
+                }, indent=2))
+                return 1, f"manus task {task_id} waiting for input/confirmation"
 
-        Path(output_file).write_text(json.dumps(last, indent=2))
+        Path(output_file).write_text(json.dumps({
+            "task_id": task_id,
+            "detail": last_detail,
+            "messages": last_messages,
+            "status": (last_detail.get("task", {}).get("status") or "unknown"),
+        }, indent=2))
         return 1, "manus task polling timeout"
     except Exception as e:
         Path(output_file).write_text(json.dumps({"error": str(e)}, indent=2))
@@ -408,19 +451,25 @@ def parse_manus_output(output_file: str) -> dict:
         return result
     try:
         data = json.loads(Path(output_file).read_text() or "{}")
-        data_block = data.get("data", data)
-        text = (
-            data_block.get("output")
-            or data_block.get("result")
-            or data_block.get("message")
-            or json.dumps(data_block)
-        )
-        result["messages"].append(str(text))
-        usage = data_block.get("usage") or data.get("usage")
+        detail = data.get("detail", {})
+        messages_payload = data.get("messages", {})
+        messages = messages_payload.get("messages", [])
+        assistant_texts = []
+        for ev in messages:
+            if ev.get("type") == "assistant_message":
+                content = ev.get("assistant_message", {}).get("content")
+                if isinstance(content, str):
+                    assistant_texts.append(content)
+        if assistant_texts:
+            result["messages"].append("\n\n".join(assistant_texts))
+        else:
+            result["messages"].append(json.dumps(messages_payload or detail or data))
+
+        usage = detail.get("task", {}).get("credit_usage")
         if usage:
-            result["usage"] = usage
-        status = (data_block.get("status") or data.get("status") or "").lower()
-        if status in {"failed", "cancelled", "canceled", "error"}:
+            result["usage"] = {"credit_usage": usage}
+        status = (data.get("status") or detail.get("task", {}).get("status") or "").lower()
+        if status in {"error", "waiting"}:
             result["errors"].append(f"manus status={status}")
     except Exception as e:
         result["errors"].append(str(e))
