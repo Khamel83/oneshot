@@ -27,6 +27,31 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+CREDIT_LOG = Path.home() / ".claude" / "dispatch-credits.jsonl"
+
+
+def append_credit_log(result: dict, model: str = ""):
+    """Append a credit usage line to ~/.claude/dispatch-credits.jsonl."""
+    credits = 0
+    usage = result.get("usage")
+    if isinstance(usage, dict):
+        credits = usage.get("credit_usage", 0) or 0
+    entry = {
+        "ts": result.get("completed", datetime.now(timezone.utc).isoformat()),
+        "project": os.path.basename(os.getcwd()),
+        "worker": result.get("worker", "unknown"),
+        "model": model,
+        "credits": credits,
+        "task_id": result.get("task_id", ""),
+        "status": result.get("status", "unknown"),
+        "duration": result.get("duration", 0),
+    }
+    try:
+        CREDIT_LOG.parent.mkdir(parents=True, exist_ok=True)
+        with open(CREDIT_LOG, "a") as f:
+            f.write(json.dumps(entry) + "\n")
+    except OSError:
+        pass
 CONFIG_PATH = REPO_ROOT / "config" / "lanes.yaml"
 CLAW_INSTALL_PATH = Path.home() / "github" / "claw-code-agent"
 
@@ -723,6 +748,7 @@ def dispatch_parallel(tasks: list[dict], max_parallel: int = 3,
                     lane=lane or _resolution.get("lane", ""),
                     resolution=_resolution
                 )
+                append_credit_log(result, model=task.get("model", ""))
             except Exception as e:
                 results.append({
                     "task_id": task["id"],
