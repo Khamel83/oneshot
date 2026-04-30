@@ -84,12 +84,12 @@ python3 -m core.router.resolve --class implement_small --category coding
 | Task Class | Lane | Category | Workers |
 |---|---|---|---|
 | `plan` | premium | general | claude_code |
-| `implement_small` | cheap | coding | codex, gemini_cli, glm_claude |
+| `implement_small` | cheap | coding | codex, manus, gemini_cli, glm_claude |
 | `implement_medium` | balanced | coding | codex, gemini_cli |
-| `test_write` | cheap | coding | codex, gemini_cli, glm_claude |
+| `test_write` | cheap | coding | codex, manus, gemini_cli, glm_claude |
 | `review_diff` | premium | review | claude_code, codex |
-| `doc_draft` | cheap | writing | gemini_cli, codex, glm_claude |
-| `research` | research | research | gemini_cli, codex |
+| `doc_draft` | cheap | writing | manus, gemini_cli, codex, glm_claude |
+| `research` | research | research | manus, gemini_cli, codex |
 | `janitor_*` | janitor | general | free (openrouter/free) |
 
 Full config: `config/lanes.yaml`, `config/workers.yaml`
@@ -101,6 +101,7 @@ Full config: `config/lanes.yaml`, `config/workers.yaml`
 | Worker | Backend | Cost |
 |---|---|---|
 | `glm_claude` | ZAI / GLM-5-turbo | Free (until plan expiry) |
+| `manus` | Manus API v2 | Credits-based (event/daily/monthly/add-on/free order) |
 | `codex` | ChatGPT Plus | $20/mo subscription |
 | `gemini_cli` | Google API | Free (sign-in) |
 | `free` | openrouter/free | $0 always — janitor lane only |

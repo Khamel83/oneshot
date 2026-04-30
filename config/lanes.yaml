@@ -35,31 +35,31 @@ lanes:
     # codex: ChatGPT Plus $20/mo
     # glm_claude: ZAI GLM-5-turbo, claude CLI harness, free until 2026-05-02
     # claw_code: available but manual opt-in only (not in pool)
-    worker_pool: [gemini_cli, codex, glm_claude]
+    worker_pool: [codex, manus, gemini_cli, glm_claude]
     strategy: first_available
     fallback_lane: balanced
     max_parallel: 3
     category_preference:
-      coding: [codex, gemini_cli, glm_claude]
-      research: [gemini_cli, codex, glm_claude]
-      writing: [gemini_cli, codex, glm_claude]
-      review: [codex, glm_claude, gemini_cli]
-      general: [gemini_cli, codex, glm_claude]
+      coding: [codex, manus, gemini_cli, glm_claude]
+      research: [manus, gemini_cli, codex, glm_claude]
+      writing: [manus, gemini_cli, codex, glm_claude]
+      review: [codex, manus, glm_claude, gemini_cli]
+      general: [manus, gemini_cli, codex, glm_claude]
 
   research:
     planner: claude_code
     review_with: claude_code
-    worker_pool: [gemini_cli, codex]
+    worker_pool: [manus, gemini_cli, codex]
     search_backend: argus
     strategy: first_available
     fallback_lane: balanced
     max_parallel: 3
     category_preference:
-      coding: [codex, gemini_cli]
-      research: [gemini_cli, codex]
-      writing: [gemini_cli, codex]
-      review: [codex, gemini_cli]
-      general: [gemini_cli, codex]
+      coding: [codex, manus, gemini_cli]
+      research: [manus, gemini_cli, codex]
+      writing: [manus, gemini_cli, codex]
+      review: [codex, manus, gemini_cli]
+      general: [manus, gemini_cli, codex]
 
   janitor:
     planner: claude_code

@@ -121,6 +121,36 @@ models:
     context_window: 1m
     latency_tier: medium
 
+  manus:manus-1.6-max:
+    lane: research
+    strengths: [research, agentic, long_horizon]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 200k
+    latency_tier: medium
+
+  manus:manus-1.6:
+    lane: cheap
+    strengths: [coding, reasoning, agentic]
+    max_task_size: large
+    can_plan: false
+    can_review: true
+    tool_calling: true
+    context_window: 200k
+    latency_tier: medium
+
+  manus:manus-1.6-lite:
+    lane: cheap
+    strengths: [throughput, low_latency]
+    max_task_size: medium
+    can_plan: false
+    can_review: false
+    tool_calling: true
+    context_window: 128k
+    latency_tier: fast
+
   claude:sonnet:
     lane: premium
     strengths: [planning, orchestration, repo_synthesis]

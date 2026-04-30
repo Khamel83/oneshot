@@ -20,6 +20,8 @@ import shlex
 import subprocess
 import sys
 import time
+import urllib.request
+import urllib.parse
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
@@ -69,6 +71,7 @@ ZAI_MODELS = {"glm-5.1", "glm-5", "glm-5-turbo", "glm-4.7", "glm-4.6", "glm-4.5"
 ZAI_BASE_URL = "https://api.z.ai/api/coding/paas/v4"          # OpenAI-compatible (claw-code-agent)
 ZAI_ANTHROPIC_URL = "https://api.z.ai/api/anthropic"           # Anthropic-compatible (claude CLI)
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+MANUS_BASE_URL = "https://api.manus.ai"
 
 
 def claw_code_command(prompt: str, output_file: str, model: str = "") -> list[str]:
@@ -180,7 +183,112 @@ def worker_available(worker: str) -> bool:
         if not _zai_plan_active():
             return False
         return True
+    elif worker == "manus":
+        has_key = bool(
+            os.environ.get("MANUS_API_KEY")
+            or subprocess.run(
+                ["bash", "-c", "secrets get MANUS_API_KEY 2>/dev/null"],
+                capture_output=True
+            ).stdout.strip()
+        )
+        return has_key
     return True
+
+
+def _manus_headers() -> dict[str, str]:
+    key = os.environ.get("MANUS_API_KEY", "")
+    if not key:
+        key = subprocess.run(
+            ["bash", "-c", "secrets get MANUS_API_KEY 2>/dev/null"],
+            capture_output=True, text=True
+        ).stdout.strip()
+    return {"Content-Type": "application/json", "x-manus-api-key": key}
+
+
+def _manus_request(
+    method: str,
+    path: str,
+    payload: dict | None = None,
+    query: dict | None = None
+) -> dict:
+    query_str = f"?{urllib.parse.urlencode(query)}" if query else ""
+    url = f"{MANUS_BASE_URL}{path}{query_str}"
+    body = None if method.upper() == "GET" else json.dumps(payload or {}).encode("utf-8")
+    req = urllib.request.Request(url, data=body, method=method.upper())
+    for k, v in _manus_headers().items():
+        req.add_header(k, v)
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        raw = resp.read().decode("utf-8")
+    return json.loads(raw) if raw else {}
+
+
+def run_manus_task(prompt: str, output_file: str, model: str = "manus-1.6") -> tuple[int, str]:
+    """Create and poll a Manus v2 task until completion; write raw response to output_file."""
+    try:
+        created = _manus_request(
+            "POST",
+            "/v2/task.create",
+            {
+                "agent_id": model,
+                "message": {
+                    "content": [
+                        {"type": "text", "text": prompt}
+                    ]
+                },
+            },
+        )
+        task_id = created.get("task_id") or created.get("task", {}).get("id")
+        if not task_id:
+            Path(output_file).write_text(json.dumps(created, indent=2))
+            return 1, "manus task create returned no id"
+
+        last_detail = {}
+        last_messages = {}
+        for _ in range(120):
+            time.sleep(5)
+            detail_payload = _manus_request("GET", "/v2/task.detail", query={"task_id": task_id})
+            msgs_payload = _manus_request(
+                "GET", "/v2/task.listMessages",
+                query={"task_id": task_id, "order": "desc", "limit": 20}
+            )
+            last_detail = detail_payload
+            last_messages = msgs_payload
+            status = (detail_payload.get("task", {}).get("status") or "").lower()
+            if status == "stopped":
+                Path(output_file).write_text(json.dumps({
+                    "task_id": task_id,
+                    "detail": detail_payload,
+                    "messages": msgs_payload,
+                    "status": status,
+                }, indent=2))
+                return 0, ""
+            if status == "error":
+                Path(output_file).write_text(json.dumps({
+                    "task_id": task_id,
+                    "detail": detail_payload,
+                    "messages": msgs_payload,
+                    "status": status,
+                }, indent=2))
+                return 1, f"manus task {task_id} status={status}"
+            if status == "waiting":
+                Path(output_file).write_text(json.dumps({
+                    "task_id": task_id,
+                    "detail": detail_payload,
+                    "messages": msgs_payload,
+                    "status": status,
+                }, indent=2))
+                return 1, f"manus task {task_id} waiting for input/confirmation"
+
+        Path(output_file).write_text(json.dumps({
+            "task_id": task_id,
+            "detail": last_detail,
+            "messages": last_messages,
+            "status": (last_detail.get("task", {}).get("status") or "unknown"),
+        }, indent=2))
+        return 1, "manus task polling timeout"
+    except Exception as e:
+        Path(output_file).write_text(json.dumps({"error": str(e)}, indent=2))
+        return 1, str(e)
 
 
 def _zai_plan_active() -> bool:
@@ -336,6 +444,38 @@ def parse_claw_code_output(output_file: str) -> dict:
     return result
 
 
+def parse_manus_output(output_file: str) -> dict:
+    result = {"worker": "manus", "messages": [], "errors": [], "usage": None}
+    if not os.path.exists(output_file):
+        result["errors"].append("No output file")
+        return result
+    try:
+        data = json.loads(Path(output_file).read_text() or "{}")
+        detail = data.get("detail", {})
+        messages_payload = data.get("messages", {})
+        messages = messages_payload.get("messages", [])
+        assistant_texts = []
+        for ev in messages:
+            if ev.get("type") == "assistant_message":
+                content = ev.get("assistant_message", {}).get("content")
+                if isinstance(content, str):
+                    assistant_texts.append(content)
+        if assistant_texts:
+            result["messages"].append("\n\n".join(assistant_texts))
+        else:
+            result["messages"].append(json.dumps(messages_payload or detail or data))
+
+        usage = detail.get("task", {}).get("credit_usage")
+        if usage:
+            result["usage"] = {"credit_usage": usage}
+        status = (data.get("status") or detail.get("task", {}).get("status") or "").lower()
+        if status in {"error", "waiting"}:
+            result["errors"].append(f"manus status={status}")
+    except Exception as e:
+        result["errors"].append(str(e))
+    return result
+
+
 def get_config_sha() -> str:
     """Get the git SHA of config files for trace provenance."""
     try:
@@ -457,16 +597,22 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
     elif worker == "glm_claude":
         model = task.get("model", "glm-5-turbo")
         cmd = glm_claude_command(prompt, output_file, model=model)
+    elif worker == "manus":
+        cmd = None
     else:
         return {"task_id": task_id, "worker": worker, "status": "failed",
                 "error": f"Unknown worker: {worker}"}
 
     # Execute
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300,
-                             env=clean_env())
-        exit_code = proc.returncode
-        stderr = proc.stderr.strip() if proc.stderr else ""
+        if worker == "manus":
+            model = task.get("model", "manus-1.6")
+            exit_code, stderr = run_manus_task(prompt, output_file, model=model)
+        else:
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300,
+                                 env=clean_env())
+            exit_code = proc.returncode
+            stderr = proc.stderr.strip() if proc.stderr else ""
     except subprocess.TimeoutExpired:
         exit_code = -1
         stderr = "Timeout (300s)"
@@ -482,6 +628,8 @@ def dispatch_single(task: dict, output_dir: str) -> dict:
         parsed = parse_codex_output(output_file)
     elif worker in ("claw_code", "glm_claude"):
         parsed = parse_claw_code_output(output_file)
+    elif worker == "manus":
+        parsed = parse_manus_output(output_file)
     else:
         parsed = parse_gemini_output(output_file)
 
