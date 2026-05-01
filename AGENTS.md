@@ -106,15 +106,17 @@ curl -s -X POST http://100.112.130.100:8270/api/search \
 
 # From Python (oneshot project)
 from core.search.argus_client import search
-results = search("query", mode="precision")
+results = search("query", mode="grounding")
 ```
 
 | Mode | Providers | Use for |
 |---|---|---|
 | `discovery` | SearXNG, Brave, Exa | Broad exploration |
-| `precision` | Serper, Tavily | Targeted, high-relevance |
-| `cheap` | SearXNG only | Quick lookups |
+| `grounding` | Serper, Tavily | Targeted, high-relevance |
+| `recovery` | SearXNG, DuckDuckGo, Yahoo | Fallback/recovery lookups |
 | `research` | All providers | Deep, comprehensive |
+
+Legacy aliases in `core.search.argus_client`: `cheap` → `discovery` with SearXNG only, `precision` → `grounding` with Serper/Tavily.
 
 **In Claude Code**: just ask — Claude calls `mcp__argus__search_web` automatically. Use `/research` for background deep search, `/freesearch` for zero-token quick lookups.
 

@@ -16,12 +16,13 @@ Argus provides multi-provider search with automatic fallback, ranking (RRF), and
 3. **Include source URLs.** Any claims backed by search results must include source URLs in `result.md`.
 4. **Mode selection.**
    - `discovery` — broad exploration, multiple sources (SearXNG, Brave, Exa)
-   - `precision` — targeted queries, high relevance (Serper, Tavily)
-   - `cheap` — quick lookups, cost-sensitive (SearXNG only)
+   - `grounding` — targeted queries, high relevance (Serper, Tavily)
+   - `recovery` — fallback/recovery lookups (SearXNG, DuckDuckGo, Yahoo)
    - `research` — deep multi-source (all providers)
+   - Legacy client aliases: `cheap` -> `discovery` with SearXNG only; `precision` -> `grounding`.
 5. **No API keys in prompts.** Workers should not receive raw API keys. Auth is handled by the runner template (env var injection).
 6. **Fallback.** If Argus is unreachable, the runner can use direct provider APIs as a fallback. Log the fallback in `search_log[]`.
-7. **Cost awareness.** `precision` and `research` modes cost money. Default to `discovery` or `cheap` for routine tasks.
+7. **Cost awareness.** `grounding` and `research` modes can cost money. Default to `discovery` or the `cheap` alias for routine tasks.
 
 ## Configuration
 

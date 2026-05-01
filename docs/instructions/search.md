@@ -16,11 +16,14 @@ provider selection, fallback, ranking (RRF), and budget enforcement.
 | Mode | Providers | Use Case |
 |------|-----------|----------|
 | discovery | searxng, brave, exa | Broad exploration, multiple sources |
-| precision | serper, tavily | Targeted queries, high relevance |
-| cheap | searxng only | Quick lookups, cost-sensitive |
+| grounding | serper, tavily | Targeted queries, high relevance |
+| recovery | searxng, duckduckgo, yahoo | Fallback/recovery lookups |
 | research | searxng, brave, exa, tavily | Deep research, comprehensive |
 
 Config: `config/search.yaml`
+
+Legacy aliases in `core.search.argus_client`: `cheap` maps to `discovery`
+with SearXNG only; `precision` maps to `grounding` with Serper/Tavily.
 
 ### How to Use Argus
 
@@ -32,7 +35,8 @@ MCP tool is available in every Claude Code session on every machine. No special 
 Claude will call `mcp__argus__search_web` automatically. This costs zero Claude tokens
 for the search itself.
 
-**`/freesearch [topic]`** — explicit zero-token search via Argus cheap mode (SearXNG).
+**`/freesearch [topic]`** — explicit zero-token search via the legacy `cheap`
+alias, sent to Argus as `discovery` with SearXNG.
 Use when you want to be explicit or are in a non-Claude session.
 
 **`/research [topic]`** — deep multi-source research spawned as a background agent.
@@ -75,7 +79,7 @@ Fallback to Gemini CLI only if homelab Argus is unreachable.
 
 Zero-token web search:
 1. Check docs cache first (`~/github/docs-cache/docs/cache/.index.md`)
-2. Query Argus in `cheap` mode (SearXNG only)
+2. Query Argus through the `cheap` alias (SearXNG only)
 3. Return results directly
 
 ## Doc Caching

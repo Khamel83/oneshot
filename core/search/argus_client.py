@@ -10,6 +10,12 @@ from typing import Optional
 
 DEFAULT_BASE_URL = "http://localhost:8005"
 
+MODE_ALIASES = {
+    # Legacy oneshot mode names kept for existing commands/docs.
+    "cheap": ("discovery", ["searxng"]),
+    "precision": ("grounding", ["serper", "tavily"]),
+}
+
 # Config file paths to search (first found wins)
 _CONFIG_PATHS = [
     Path(__file__).resolve().parent.parent.parent / "config" / "search.yaml",
@@ -99,20 +105,33 @@ def _request_json(url: str, *, payload: Optional[dict] = None, timeout: int = 30
         return json.loads(resp.read())
 
 
+def _resolve_mode(mode: str, providers: Optional[list[str]] = None) -> tuple[str, Optional[list[str]]]:
+    if mode in MODE_ALIASES:
+        resolved_mode, alias_providers = MODE_ALIASES[mode]
+        return resolved_mode, providers or alias_providers
+    return mode, providers
+
+
 def search(query: str, mode: str = "discovery", base_url: Optional[str] = None,
-           max_results: Optional[int] = None) -> dict:
+           max_results: Optional[int] = None, providers: Optional[list[str]] = None) -> dict:
     """Search via Argus broker. Returns normalized results.
 
     Args:
         query: Search query string.
-        mode: Search mode (discovery, precision, cheap, research).
+        mode: Search mode (discovery, grounding, recovery, research).
+              Legacy aliases: cheap -> discovery/searxng,
+              precision -> grounding/serper+tavily.
         base_url: Argus server URL. Defaults to localhost:8005.
         max_results: Override max results from config.
+        providers: Override provider routing order.
     """
     base = base_url or get_base_url()
-    payload = {"query": query, "mode": mode}
+    resolved_mode, resolved_providers = _resolve_mode(mode, providers)
+    payload = {"query": query, "mode": resolved_mode}
     if max_results:
         payload["max_results"] = max_results
+    if resolved_providers:
+        payload["providers"] = resolved_providers
 
     return _request_json(f"{base}/api/search", payload=payload)
 

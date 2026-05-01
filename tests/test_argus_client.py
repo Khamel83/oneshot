@@ -40,6 +40,47 @@ class TestArgusClient:
         assert request.get_header("Authorization") == "Bearer secret-token"
         assert request.full_url == "http://argus.test/api/search"
 
+    def test_search_maps_legacy_cheap_mode(self):
+        response = MagicMock()
+        response.read.return_value = json.dumps({"results": []}).encode()
+        response.__enter__.return_value = response
+
+        with (
+            patch.object(argus_client, "get_base_url", return_value="http://argus.test"),
+            patch.object(argus_client, "get_api_key", return_value="secret-token"),
+            patch("urllib.request.urlopen", return_value=response) as mock_urlopen,
+        ):
+            argus_client.search("example", mode="cheap", max_results=1)
+
+        request = mock_urlopen.call_args.args[0]
+        payload = json.loads(request.data.decode())
+        assert payload == {
+            "query": "example",
+            "mode": "discovery",
+            "max_results": 1,
+            "providers": ["searxng"],
+        }
+
+    def test_search_maps_legacy_precision_mode(self):
+        response = MagicMock()
+        response.read.return_value = json.dumps({"results": []}).encode()
+        response.__enter__.return_value = response
+
+        with (
+            patch.object(argus_client, "get_base_url", return_value="http://argus.test"),
+            patch.object(argus_client, "get_api_key", return_value="secret-token"),
+            patch("urllib.request.urlopen", return_value=response) as mock_urlopen,
+        ):
+            argus_client.search("example", mode="precision")
+
+        request = mock_urlopen.call_args.args[0]
+        payload = json.loads(request.data.decode())
+        assert payload == {
+            "query": "example",
+            "mode": "grounding",
+            "providers": ["serper", "tavily"],
+        }
+
     def test_build_research_pack_hits_workflow_endpoint(self):
         response = MagicMock()
         response.read.return_value = json.dumps({"run_id": "wf-1"}).encode()
