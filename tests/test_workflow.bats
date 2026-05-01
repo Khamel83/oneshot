@@ -368,10 +368,10 @@ assert 'requires_approval' in r['risk']
     [[ ! "$pool" == *"claw_code"* ]]
 }
 
-@test "workers.yaml has glm worker with plan_expires" {
+@test "workers.yaml has glm_claude worker with plan_expires" {
     [ -f "$ORIGINAL_DIR/config/workers.yaml" ] || skip "workers.yaml not found"
 
-    grep -A 5 "^  glm:" "$ORIGINAL_DIR/config/workers.yaml" | grep -q "plan_expires"
+    grep -A 7 "^  glm_claude:" "$ORIGINAL_DIR/config/workers.yaml" | grep -q "plan_expires"
 }
 
 @test "models.yaml has post_expiry_default_model for claw_code" {

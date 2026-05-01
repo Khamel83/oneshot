@@ -49,11 +49,11 @@ def run_config_check() -> dict:
             errors.append(f"LANE_ASSIGNMENTS[{tc}] references unknown lane '{lane}'")
 
     # 3. Every worker in lane worker_pools is a known dispatch worker
-    # Known dispatch workers: codex, gemini_cli, glm_claude, claw_code, claude_code
-    # workers.yaml defines machine-level workers (local, oci, macmini, homelab, claw, glm),
+    # Known dispatch workers: codex, gemini_cli, glm_claude, claw_code, claude_code, manus
+    # workers.yaml defines machine-level workers (local, oci, macmini, homelab, claw, glm_claude, manus),
     # which are different from dispatch worker names.
     known_dispatch_workers = {
-        "claude_code", "codex", "gemini_cli", "glm_claude", "claw_code",
+        "claude_code", "codex", "gemini_cli", "glm_claude", "claw_code", "manus",
         "free",  # openrouter/free via openrouter_api harness (janitor lane)
     }
     for lane_name, lane_cfg in lanes.items():
@@ -76,10 +76,10 @@ def run_config_check() -> dict:
         if lane and lane not in lanes:
             errors.append(f"model '{model_id}' has unknown lane '{lane}'")
 
-    # 6. workers.yaml glm entry has plan_expires
-    glm = workers.get("glm", {})
-    if "plan_expires" not in glm:
-        warnings.append("workers.yaml glm entry missing plan_expires")
+    # 6. workers.yaml glm_claude entry has plan_expires
+    glm_claude = workers.get("glm_claude", {})
+    if "plan_expires" not in glm_claude:
+        warnings.append("workers.yaml glm_claude entry missing plan_expires")
 
     # 7. Every lane has a review_with field
     for lane_name, lane_cfg in lanes.items():

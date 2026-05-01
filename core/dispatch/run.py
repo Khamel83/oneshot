@@ -365,12 +365,12 @@ def run_manus_task(prompt: str, output_file: str, model: str = "manus-1.6-lite")
 def _zai_plan_active() -> bool:
     """Check if the ZAI GLM Coding Plan is still active.
 
-    Reads plan_expires from config/workers.yaml (glm worker entry).
+    Reads plan_expires from config/workers.yaml (glm_claude worker entry).
     Returns True if the plan has not expired or if the field is missing.
     """
     try:
         workers_config = load_yaml(str(REPO_ROOT / "config" / "workers.yaml"))
-        plan_expires = workers_config.get("workers", {}).get("glm", {}).get("plan_expires")
+        plan_expires = workers_config.get("workers", {}).get("glm_claude", {}).get("plan_expires")
         if not plan_expires:
             return True  # no expiry configured, assume active
         from datetime import date

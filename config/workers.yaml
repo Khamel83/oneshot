@@ -31,7 +31,7 @@ workers:
     provider: zai
     install_path: ~/github/claw-code-agent
 
-  glm:
+  glm_claude:
     host: localhost
     transport: local
     role: worker

@@ -138,7 +138,7 @@ jobs:
 
           r = resolve('research', category='research')
           assert r['lane'] == 'research'
-          assert r['workers'][0] == 'gemini_cli'
+          assert r['workers'][0] == 'manus', f'Expected manus first, got {r[\"workers\"]}'
 
           r = resolve('plan')
           assert r['lane'] == 'premium'
@@ -184,7 +184,9 @@ jobs:
           python-version: '3.12'
 
       - name: Run pytest
-        run: python3 -m pytest tests/test_task_schema.py tests/test_lane_policy.py -v
+        run: |
+          python3 -m pip install pytest pyyaml
+          python3 -m pytest tests/test_task_schema.py tests/test_lane_policy.py -v
 
   lint-basic:
     name: Basic Checks
@@ -261,9 +263,9 @@ jobs:
           fi
           echo "claw_code correctly excluded from cheap lane"
 
-          # workers.yaml glm should have plan_expires
-          if ! grep -A 5 "^  glm:" config/workers.yaml | grep -q "plan_expires"; then
-            echo "ERROR: glm worker missing plan_expires"
+          # workers.yaml glm_claude should have plan_expires
+          if ! grep -A 7 "^  glm_claude:" config/workers.yaml | grep -q "plan_expires"; then
+            echo "ERROR: glm_claude worker missing plan_expires"
             exit 1
           fi
           echo "ZAI expiry config present"

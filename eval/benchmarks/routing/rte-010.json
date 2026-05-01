@@ -1,1 +1,1 @@
-{"id": "rte-010", "category": "routing", "input": {"task_class": "search_sweep", "category": "research"}, "expected": {"lane": "research", "workers_first": "gemini_cli", "review_with": "claude_code"}}
+{"id": "rte-010", "category": "routing", "input": {"task_class": "search_sweep", "category": "research"}, "expected": {"lane": "research", "workers_first": "manus", "review_with": "claude_code"}}
