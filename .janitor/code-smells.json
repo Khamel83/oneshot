@@ -5,12 +5,16 @@
       "lines": 1834
     },
     {
+      "path": "core/dispatch/run.py",
+      "lines": 910
+    },
+    {
       "path": "oneshot_cli/doctor_cmd.py",
       "lines": 791
     },
     {
-      "path": "core/dispatch/run.py",
-      "lines": 675
+      "path": "oneshot_cli/memory.py",
+      "lines": 604
     },
     {
       "path": "tests/test_doctor.py",
@@ -26,6 +30,11 @@
       "path": "oneshot_cli/doctor_cmd.py",
       "function": "autofix",
       "lines": 271
+    },
+    {
+      "path": "oneshot_cli/memory.py",
+      "function": "_gitignore_template",
+      "lines": 260
     },
     {
       "path": "core/janitor/jobs.py",
@@ -53,6 +62,16 @@
       "lines": 166
     },
     {
+      "path": "oneshot_cli/memory_cmd.py",
+      "function": "scaffold_cmd",
+      "lines": 138
+    },
+    {
+      "path": "oneshot_cli/memory.py",
+      "function": "index_repo_memory",
+      "lines": 132
+    },
+    {
       "path": "core/janitor/jobs.py",
       "function": "generate_pending_tasks",
       "lines": 126
@@ -68,6 +87,6 @@
       "lines": 102
     }
   ],
-  "oversized_file_count": 5,
-  "oversized_function_count": 9
+  "oversized_file_count": 6,
+  "oversized_function_count": 12
 }

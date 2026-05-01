@@ -1,0 +1,69 @@
+{
+  "task_id": "ASTFEHSrQ2ibPwTfBrAoQS",
+  "detail": {
+    "ok": true,
+    "request_id": "1d6fd6b32708a5cdc7f03d91f331dda7",
+    "task": {
+      "agent_profile": "manus-1.6-lite",
+      "created_at": "1777585430",
+      "created_by_api_key": {
+        "id": "TRML7NYNXUxnnypfXMRFWY",
+        "name": "oneshot"
+      },
+      "credit_usage": 4,
+      "id": "ASTFEHSrQ2ibPwTfBrAoQS",
+      "share_visibility": "private",
+      "status": "stopped",
+      "task_type": "standard",
+      "task_url": "https://manus.im/app/ASTFEHSrQ2ibPwTfBrAoQS",
+      "title": "Agent Profile Fix Verified",
+      "updated_at": "1777585432"
+    }
+  },
+  "messages": {
+    "has_more": false,
+    "messages": [
+      {
+        "id": "gPqDh8keqQmj3E4RRssx0v",
+        "status_update": {
+          "agent_status": "stopped",
+          "brief": "Manus finished working",
+          "description": "Manus has completed the current task and is ready for new requests or revisions."
+        },
+        "timestamp": "1777585432035",
+        "type": "status_update"
+      },
+      {
+        "assistant_message": {
+          "content": "agent_profile fix verified"
+        },
+        "id": "v6nLiILULhL87yk5fOj3KP",
+        "timestamp": "1777585431766",
+        "type": "assistant_message"
+      },
+      {
+        "id": "8Ya5ZBUIwKEoRvEX8CMpZE-1",
+        "status_update": {
+          "agent_status": "running",
+          "brief": "Manus is running",
+          "description": "Manus is working on your request"
+        },
+        "timestamp": "1777585430553",
+        "type": "status_update"
+      },
+      {
+        "id": "cNabnJi9OB4csW5qRg5fSq",
+        "timestamp": "1777585430172",
+        "type": "user_message",
+        "user_message": {
+          "content": "Say only: agent_profile fix verified",
+          "message_type": "text"
+        }
+      }
+    ],
+    "ok": true,
+    "request_id": "ad43d489c4dc0530aa30139ad119ff35",
+    "task_id": "ASTFEHSrQ2ibPwTfBrAoQS"
+  },
+  "status": "stopped"
+}

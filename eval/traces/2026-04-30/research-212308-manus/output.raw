@@ -1,0 +1,69 @@
+{
+  "task_id": "4YTAoD7HCPMN4YLz8CKf4a",
+  "detail": {
+    "ok": true,
+    "request_id": "a23e16dbb0cc8db84c392901aeb75f4f",
+    "task": {
+      "agent_profile": "manus-1.6",
+      "created_at": "1777584189",
+      "created_by_api_key": {
+        "id": "TRML7NYNXUxnnypfXMRFWY",
+        "name": "oneshot"
+      },
+      "credit_usage": 5,
+      "id": "4YTAoD7HCPMN4YLz8CKf4a",
+      "share_visibility": "private",
+      "status": "stopped",
+      "task_type": "standard",
+      "task_url": "https://manus.im/app/4YTAoD7HCPMN4YLz8CKf4a",
+      "title": "Credit Tracking Test OK",
+      "updated_at": "1777584192"
+    }
+  },
+  "messages": {
+    "has_more": false,
+    "messages": [
+      {
+        "id": "1lkph3UtRD9dTALyON4wY4",
+        "status_update": {
+          "agent_status": "stopped",
+          "brief": "Manus finished working",
+          "description": "Manus has completed the current task and is ready for new requests or revisions."
+        },
+        "timestamp": "1777584192221",
+        "type": "status_update"
+      },
+      {
+        "assistant_message": {
+          "content": "credit tracking test ok"
+        },
+        "id": "6c9cvZQq23g492dYs1yLf8",
+        "timestamp": "1777584191944",
+        "type": "assistant_message"
+      },
+      {
+        "id": "HkyRuHP0H8VwyASJSuKcT8-1",
+        "status_update": {
+          "agent_status": "running",
+          "brief": "Manus is running",
+          "description": "Manus is working on your request"
+        },
+        "timestamp": "1777584190032",
+        "type": "status_update"
+      },
+      {
+        "id": "S5DoC8djqdwUUfmF1DuPyl",
+        "timestamp": "1777584189393",
+        "type": "user_message",
+        "user_message": {
+          "content": "Say only: credit tracking test ok",
+          "message_type": "text"
+        }
+      }
+    ],
+    "ok": true,
+    "request_id": "e8c1459ab71acdcee49c5e036f455317",
+    "task_id": "4YTAoD7HCPMN4YLz8CKf4a"
+  },
+  "status": "stopped"
+}

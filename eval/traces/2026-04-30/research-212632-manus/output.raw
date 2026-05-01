@@ -1,0 +1,69 @@
+{
+  "task_id": "HLnYzwcuPdeLcmCdCERYSg",
+  "detail": {
+    "ok": true,
+    "request_id": "2a8144cfe4e376ab02000ab793e6f445",
+    "task": {
+      "agent_profile": "manus-1.6",
+      "created_at": "1777584393",
+      "created_by_api_key": {
+        "id": "TRML7NYNXUxnnypfXMRFWY",
+        "name": "oneshot"
+      },
+      "credit_usage": 5,
+      "id": "HLnYzwcuPdeLcmCdCERYSg",
+      "share_visibility": "private",
+      "status": "stopped",
+      "task_type": "standard",
+      "task_url": "https://manus.im/app/HLnYzwcuPdeLcmCdCERYSg",
+      "title": "Lite Verified",
+      "updated_at": "1777584395"
+    }
+  },
+  "messages": {
+    "has_more": false,
+    "messages": [
+      {
+        "id": "4bPpnJvqCLQ0lw8A47RDv6",
+        "status_update": {
+          "agent_status": "stopped",
+          "brief": "Manus finished working",
+          "description": "Manus has completed the current task and is ready for new requests or revisions."
+        },
+        "timestamp": "1777584396028",
+        "type": "status_update"
+      },
+      {
+        "assistant_message": {
+          "content": "lite verified"
+        },
+        "id": "rfOJ1L37k0Rsi8Deyqtvsf",
+        "timestamp": "1777584395819",
+        "type": "assistant_message"
+      },
+      {
+        "id": "e7uYAlQhjMQxQQZVqkPoF3-1",
+        "status_update": {
+          "agent_status": "running",
+          "brief": "Manus is running",
+          "description": "Manus is working on your request"
+        },
+        "timestamp": "1777584393867",
+        "type": "status_update"
+      },
+      {
+        "id": "eGK2mxxI0WZVIZO9d4ZljQ",
+        "timestamp": "1777584393537",
+        "type": "user_message",
+        "user_message": {
+          "content": "Say only: lite verified",
+          "message_type": "text"
+        }
+      }
+    ],
+    "ok": true,
+    "request_id": "7acc68a634e0d71ef3a7de5d21ace53e",
+    "task_id": "HLnYzwcuPdeLcmCdCERYSg"
+  },
+  "status": "stopped"
+}

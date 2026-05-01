@@ -3,23 +3,23 @@
 
 ## Tasks
 
-1. **[high]** Add tests for core/dispatch/direct_api.py
+1. **[high]** Add tests for core/dispatch/run.py
 
-2. **[high]** Add tests for oneshot_cli/__main__.py
+2. **[medium]** Refactor autofix in oneshot_cli/doctor_cmd.py (271 lines)
 
-3. **[high]** Add tests for scripts/validate-oneshot-config.py
+3. **[medium]** Refactor _gitignore_template in oneshot_cli/memory.py (260 lines)
 
-4. **[medium]** Refactor autofix in oneshot_cli/doctor_cmd.py (271 lines)
+4. **[medium]** Refactor generate_onboarding in core/janitor/jobs.py (242 lines)
 
-5. **[medium]** Refactor generate_onboarding in core/janitor/jobs.py (242 lines)
+5. **[medium]** Refactor run_session_start in core/janitor/jobs.py (202 lines)
 
-6. **[medium]** Refactor run_session_start in core/janitor/jobs.py (202 lines)
+6. **[medium]** Split core/janitor/jobs.py (1834 lines) into smaller modules
 
-7. **[medium]** Split core/janitor/jobs.py (1834 lines) into smaller modules
+7. **[medium]** Split core/dispatch/run.py (910 lines) into smaller modules
 
-8. **[low]** Add a second contributor to .claude/skills/conduct/SKILL.md (sole author: Test User, 11 edits)
+8. **[low]** Add a second contributor to .claude/skills/_shared/providers.md (sole author: Test User, 12 edits)
 
-9. **[low]** Add a second contributor to .claude/skills/_shared/providers.md (sole author: Test User, 10 edits)
+9. **[low]** Add a second contributor to .claude/skills/conduct/SKILL.md (sole author: Test User, 11 edits)
 
 10. **[low]** Add a second contributor to .claude/skills/full/SKILL.md (sole author: Test User, 10 edits)
 
@@ -29,46 +29,32 @@
 
 13. **[low]** Add frontmatter to 6 research docs: docs/research/2026-03-27_multi-tenant_platforms_research.md, docs/research/background-intelligence/research.md, docs/research/claude-code-non-anthropic-models/research.md (+3 more)
 
-14. **[low]** Update docs/public-access.md — 102 days stale
+14. **[low]** Update docs/public-access.md — 105 days stale
 
-15. **[low]** Update docs/sessions/README.md — 79 days stale
+15. **[low]** Update docs/sessions/README.md — 82 days stale
 
-16. **[low]** Update .sops.yaml — 75 days stale
+16. **[low]** Update .sops.yaml — 77 days stale
 # Project Status  
-Oneshot is a mature Python package with extensive code but limited test coverage; several very large source files and stale documentation indicate technical‑debt hotspots.
+Oneshoot is a medium‑size Python package with heavy churn on core dispatch logic; several files exceed 800 lines and documentation is noticeably stale.
 
 # Recent Activity  
-- `.oneshot/config/models.yaml` was opened 5 times by “Test User”.  
-- `CLAUDE.md` edited 4 times by Khamel83.  
-- `.claude/skills/_shared/providers.md` edited 3 times by “Test User”.  
-- `docs/ZAI_TO_OPENCODE_GO_MIGRATION.md` edited 3 times by “Test User”.  
-- `README.md` edited 3 times by Khamel83.  
-- The most recent focus files were `.claude/skills/conduct/SKILL.md` (twice) and two memory notes in `/home/ubuntu/.claude/projects/.../memory/`.
+- `core/dispatch/run.py` was edited in the last 2 sessions (36 total sessions).  
+- `.oneshot/config/models.yaml` saw 36 sessions of access.  
+- `oneshot_cli/tasks.py` recorded 17 sessions.  
+- Memory notes (`/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/manus-credits.md`) were revisited twice.
 
 # Attention Items  
-1. **Test Gaps (high urgency)** – No tests for:  
-   - `core/dispatch/direct_api.py`  
-   - `oneshot_cli/__main__.py`  
-   - `scripts/validate-oneshot-config.py`  
-2. **Knowledge Risk (high urgency)** – Sole‑author files with limited review:  
-   - `.claude/skills/conduct/SKILL.md` (11 edits, Test User)  
-   - `.claude/skills/_shared/providers.md` (10 edits, Test User)  
-   - `.claude/skills/full/SKILL.md` (10 edits, Test User)  
-3. **Oversized Files (medium urgency)** – Files >600 lines that are hard to maintain:  
-   - `core/janitor/jobs.py` (1,834 lines)  
-   - `oneshot_cli/doctor_cmd.py` (791 lines)  
-   - `core/dispatch/run.py` (675 lines)  
-4. **Config Drift (medium urgency)** – Frequently edited YAML configs suggest drift:  
-   - `.oneshot/config/models.yaml` (36 sessions)  
-   - `oneshot_cli/tasks.py` (17 sessions)  
-   - `.opencode/opencode.json` (15 sessions)  
+1. **Test Gap** – No tests cover `core/dispatch/run.py` (910 LOC).  
+2. **Knowledge Risk** – Solo‑author files: `.claude/skills/_shared/providers.md` (12 edits by Test User), `.claude/skills/conduct/SKILL.md` (11 edits), `.claude/skills/full/SKILL.md` (10 edits).  
+3. **Oversized Files** – `core/janitor/jobs.py` (1 834 LOC), `core/dispatch/run.py` (910 LOC), `oneshot_cli/doctor_cmd.py` (791 LOC).  
+4. **Config Drift** – Multiple config files (`models.yaml`, `workers.yaml`, `lanes.yaml`, `providers.yaml`) are accessed frequently but have no version‑control diff summary; potential drift.
 
 # Recommended Next Steps  
-1. Add unit tests for `core/dispatch/direct_api.py`, `oneshot_cli/__main__.py`, and `scripts/validate-oneshot-config.py`.  
-2. Conduct a peer review of the three sole‑author skill files (`.claude/skills/conduct/SKILL.md`, `.claude/skills/_shared/providers.md`, `.claude/skills/full/SKILL.md`) and document any missing edge cases.  
-3. Refactor `core/janitor/jobs.py` into smaller modules (e.g., split `generate_onboarding` and `run_session_start` into separate files).  
-4. Split `oneshot_cli/doctor_cmd.py` and `core/dispatch/run.py` into logical sub‑components to bring each below 400 lines.  
-5. Freeze the current state of `models.yaml`, `tasks.py`, and `opencode.json`, then create a linting/validation script to detect unintended changes in future commits.
+1. Add unit tests for `core/dispatch/run.py` focusing on its main entry points (e.g., `run_dispatch`, `handle_task`).  
+2. Refactor `core/janitor/jobs.py` to extract logical modules (< 500 LOC each) and introduce tests for each new module.  
+3. Pair‑program on one of the solo‑author skill docs (e.g., `.claude/skills/_shared/providers.md`) to broaden ownership and add inline documentation.  
+4. Audit the four config files for consistency: run a diff against the latest committed versions, update any out‑of‑sync keys, and commit the reconciled versions.  
+5. Schedule a documentation sprint to update stale docs (`docs/public-access.md`, `archive/v7-high-token/README.md`, `archive/SKILL_LOG.md`).  
 
 ## Project Intelligence Sources
 

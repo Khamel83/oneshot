@@ -1,18 +1,18 @@
 {
   "at_risk": [
     {
+      "file": ".claude/skills/_shared/providers.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 12
+    },
+    {
       "file": ".claude/skills/conduct/SKILL.md",
       "contributors": [
         "Test User"
       ],
       "edit_count": 11
-    },
-    {
-      "file": ".claude/skills/_shared/providers.md",
-      "contributors": [
-        "Test User"
-      ],
-      "edit_count": 10
     },
     {
       "file": ".claude/skills/full/SKILL.md",

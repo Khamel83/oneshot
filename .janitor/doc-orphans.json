@@ -1,5 +1,5 @@
 {
-  "orphan_count": 89,
+  "orphan_count": 104,
   "orphan_files": [
     ".claude/agents/TEMPLATE.md",
     ".claude/commands/dispatch.md",
@@ -12,6 +12,7 @@
     ".claude/skills/_shared/dispatch.md",
     ".claude/skills/conduct/templates/ROADMAP.md",
     ".claude/skills/conduct/templates/STATE.md",
+    ".janitor/digest.md",
     ".janitor/onboarding.md",
     ".janitor/pending-tasks-prev.md",
     ".janitor/pending-tasks.md",
@@ -19,8 +20,7 @@
     ".opencode/agents/cheap-worker.md",
     ".opencode/agents/reviewer.md",
     ".opencode/commands/conduct.md",
-    ".opencode/commands/debug.md",
-    ".opencode/commands/doc.md"
+    ".opencode/commands/debug.md"
   ],
-  "total_documents": 177
+  "total_documents": 192
 }

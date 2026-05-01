@@ -232,5 +232,91 @@
       ],
       "category": "chore"
     }
+  },
+  "1029ae36c59857cfdfcd64ebd34690e0da0ce678": {
+    "hash": "1029ae36c598",
+    "message": "fix: replace broken argus_client import with HTTP health check",
+    "enriched": {
+      "summary": "Replace broken argus_client import with an HTTP health check in provider documentation.",
+      "tags": [
+        "bugfix",
+        "refactor",
+        "http",
+        "documentation"
+      ],
+      "category": "fix"
+    }
+  },
+  "2e6ebb7cb280cce1f54681601b8ccf512f1a75ce": {
+    "hash": "2e6ebb7cb280",
+    "message": "feat: add mm25/mm27 OpenCode Go aliases, switch oc to ChatGPT Plus auth",
+    "enriched": {
+      "summary": "Adds OpenCode Go aliases for mm25/mm27 and configures oc to use ChatGPT Plus authentication.",
+      "tags": [
+        "feat",
+        "alias",
+        "auth",
+        "go",
+        "openapi"
+      ],
+      "category": "feature"
+    }
+  },
+  "427f7fc31214f53c7721e3c360dee7c9f189e7d4": {
+    "hash": "427f7fc31214",
+    "message": "fix: resolve OpenCode adapter drift \u2014 7 recommendations with tests",
+    "enriched": {
+      "summary": "Fixes OpenCode adapter drift by applying 7 recommendations, adds comprehensive tests and documentation updates across core, scripts, and migration guides.",
+      "tags": [
+        "drift-fix",
+        "adapter",
+        "tests",
+        "documentation",
+        "migration"
+      ],
+      "category": "bugfix"
+    }
+  },
+  "a30c5793903dd48c9fb6f16e337d954bc1ff3f8a": {
+    "hash": "a30c5793903d",
+    "message": "feat: add MANUS_SESSION_ID to oneshot vault for daily credit refresh",
+    "enriched": {
+      "summary": "feat: add MANUS_SESSION_ID to oneshot vault for daily credit refresh",
+      "tags": [
+        "feat",
+        "security",
+        "vault",
+        "daily-refresh"
+      ],
+      "category": "feature"
+    }
+  },
+  "57c9f50446d60439ac80594d3007259cc00e8173": {
+    "hash": "57c9f50446d6",
+    "message": "fix: use agent_profile (not agent_id) for manus v2 API",
+    "enriched": {
+      "summary": "Replace agent_id with agent_profile in manus v2 API call",
+      "tags": [
+        "fix",
+        "api",
+        "manus",
+        "agent_profile"
+      ],
+      "category": "bugfix"
+    }
+  },
+  "d9f109752fa9ed4975a6cb826f09b39569fa3c79": {
+    "hash": "d9f109752fa9",
+    "message": "feat: add manus daily credit refresh cron",
+    "enriched": {
+      "summary": "Added a daily credit refresh cron script for manus.",
+      "tags": [
+        "feat",
+        "cron",
+        "script",
+        "manus"
+      ],
+      "category": "Feature"
+    }
   }
 }

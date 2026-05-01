@@ -1,5 +1,5 @@
 {
-  "files_with_imports": 23,
+  "files_with_imports": 25,
   "impact_ranking": [
     {
       "file": "core/task_schema.py",
@@ -26,11 +26,15 @@
       "downstream_count": 2
     },
     {
+      "file": "oneshot_cli/__main__.py",
+      "downstream_count": 2
+    },
+    {
       "file": "core/janitor/jobs.py",
       "downstream_count": 1
     },
     {
-      "file": "oneshot_cli/__main__.py",
+      "file": "core/dispatch/direct_api.py",
       "downstream_count": 1
     },
     {

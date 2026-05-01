@@ -1,0 +1,53 @@
+{
+  "trace_id": "research-2026-04-30-211423-manus",
+  "schema_version": "1",
+  "timestamp": "2026-04-30T21:14:23.344380+00:00",
+  "harness_version": "14.2",
+  "classification": {
+    "description": "Return exactly three bullets: 1) readiness check 2) one risk 3) done.",
+    "task_class": "research",
+    "category": "research",
+    "inferred_by": "dispatch runner"
+  },
+  "routing": {
+    "lane": "research",
+    "workers": [
+      "manus",
+      "gemini_cli",
+      "codex"
+    ],
+    "selected_worker": "manus",
+    "selection_reason": "first_available",
+    "review_with": "claude_code",
+    "fallback_lane": "balanced"
+  },
+  "prompt": {
+    "template": "dispatch_v1",
+    "word_count": 12,
+    "file_path": "prompt.md"
+  },
+  "execution": {
+    "worker": "manus",
+    "exit_code": 0,
+    "started": "2026-04-30T21:14:23.344380+00:00",
+    "completed": "2026-04-30T21:14:30.342809+00:00",
+    "duration_seconds": 7.0
+  },
+  "output": {
+    "errors": [],
+    "message_preview": "- **Readiness check:** Sandbox is active, all tools are available, and the environment is fully operational.\n- **One risk:** No specific task was provided, so there is nothing to execute or deliver be"
+  },
+  "retry": {
+    "attempt": 1,
+    "previous_traces": [],
+    "escalated": false
+  },
+  "cost": {
+    "estimated_cost_usd": 0,
+    "worker_cost_basis": "subscription"
+  },
+  "config_snapshot": {
+    "lanes_sha": "db748c1"
+  },
+  "status": "succeeded"
+}

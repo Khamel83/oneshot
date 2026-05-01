@@ -1,12 +1,77 @@
 {
-  "changes_count": 71,
+  "changes_count": 112,
   "time_window_days": 7,
   "recent_changes": [
+    {
+      "file": "README.md",
+      "change_count": 5,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/commit-enrichments.json",
+      "change_count": 5,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/last-summary.json",
+      "change_count": 5,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/pending-tasks.md",
+      "change_count": 5,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
     {
       "file": ".oneshot/config/models.yaml",
       "change_count": 5,
       "authors": [
         "Test User",
+        "unknown"
+      ]
+    },
+    {
+      "file": "config/workers.yaml",
+      "change_count": 4,
+      "authors": [
+        "Test User",
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".claude/skills/_shared/providers.md",
+      "change_count": 4,
+      "authors": [
+        "Test User",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/pending-tasks-prev.md",
+      "change_count": 4,
+      "authors": [
+        "Khamel83",
+        "unknown"
+      ]
+    },
+    {
+      "file": ".janitor/redo-queue.json",
+      "change_count": 4,
+      "authors": [
+        "Khamel83",
         "unknown"
       ]
     },
@@ -20,39 +85,24 @@
       ]
     },
     {
-      "file": ".claude/skills/_shared/providers.md",
-      "change_count": 3,
-      "authors": [
-        "Test User"
-      ]
-    },
-    {
-      "file": "docs/ZAI_TO_OPENCODE_GO_MIGRATION.md",
+      "file": "AGENTS.md",
       "change_count": 3,
       "authors": [
         "Test User",
-        "unknown"
-      ]
-    },
-    {
-      "file": "README.md",
-      "change_count": 3,
-      "authors": [
-        "Khamel83",
-        "unknown"
+        "Khamel83"
       ]
     },
     {
       "file": "config/search.yaml",
       "change_count": 3,
       "authors": [
-        "Khamel83",
         "Test User",
+        "Khamel83",
         "unknown"
       ]
     },
     {
-      "file": ".janitor/commit-enrichments.json",
+      "file": ".janitor/doc-clusters.json",
       "change_count": 3,
       "authors": [
         "Khamel83",
@@ -60,7 +110,7 @@
       ]
     },
     {
-      "file": ".janitor/last-summary.json",
+      "file": ".janitor/doc-crossrefs.json",
       "change_count": 3,
       "authors": [
         "Khamel83",
@@ -68,7 +118,7 @@
       ]
     },
     {
-      "file": ".janitor/pending-tasks.md",
+      "file": ".janitor/doc-orphans.json",
       "change_count": 3,
       "authors": [
         "Khamel83",
@@ -76,7 +126,7 @@
       ]
     },
     {
-      "file": ".janitor/redo-queue.json",
+      "file": ".janitor/doc-recent-activity.json",
       "change_count": 3,
       "authors": [
         "Khamel83",
@@ -84,75 +134,30 @@
       ]
     },
     {
-      "file": "docs/instructions/search.md",
+      "file": ".janitor/doc-staleness.json",
       "change_count": 3,
       "authors": [
         "Khamel83",
-        "Test User"
+        "unknown"
       ]
     },
     {
-      "file": ".claude/skills/update/SKILL.md",
+      "file": ".janitor/test-gaps.json",
       "change_count": 3,
       "authors": [
-        "Test User"
-      ]
-    },
-    {
-      "file": ".claude/skills/conduct/SKILL.md",
-      "change_count": 2,
-      "authors": [
-        "Test User"
-      ]
-    },
-    {
-      "file": ".claude/rules/delegation-enforcement.md",
-      "change_count": 2,
-      "authors": [
-        "Test User"
-      ]
-    },
-    {
-      "file": ".claude/skills/research/SKILL.md",
-      "change_count": 2,
-      "authors": [
-        "Test User"
-      ]
-    },
-    {
-      "file": "config/workers.yaml",
-      "change_count": 2,
-      "authors": [
-        "Test User",
         "unknown"
       ]
     },
     {
       "file": "CLAUDE.local.md",
-      "change_count": 2,
+      "change_count": 3,
       "authors": [
-        "unknown"
-      ]
-    },
-    {
-      "file": "docs/DELEGATION_MODEL.md",
-      "change_count": 2,
-      "authors": [
-        "Test User",
-        "unknown"
-      ]
-    },
-    {
-      "file": "docs/WORKTREE_FLOW.md",
-      "change_count": 2,
-      "authors": [
-        "Test User",
         "unknown"
       ]
     },
     {
       "file": "docs/sessions/index.md",
-      "change_count": 2,
+      "change_count": 3,
       "authors": [
         "unknown"
       ]

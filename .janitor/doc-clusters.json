@@ -1,6 +1,6 @@
 {
   "cluster_count": 13,
-  "total_documents": 270,
+  "total_documents": 287,
   "clusters": [
     {
       "directory": "docs",
@@ -15,7 +15,7 @@
     },
     {
       "directory": "eval",
-      "file_count": 50,
+      "file_count": 53,
       "files": [
         "eval/benchmarks/classification/holdout/cls-h01.json",
         "eval/benchmarks/classification/holdout/cls-h02.json",
@@ -37,13 +37,24 @@
     },
     {
       "directory": ".janitor",
-      "file_count": 25,
+      "file_count": 27,
       "files": [
         ".janitor/blockers.json",
         ".janitor/code-smells.json",
         ".janitor/commit-enrichments.json",
         ".janitor/config-drift.json",
         ".janitor/critical-files.json"
+      ]
+    },
+    {
+      "directory": "1shot",
+      "file_count": 18,
+      "files": [
+        "1shot/2026-04-27-plan-l-hardening-PROJECT.md",
+        "1shot/2026-04-27-plan-l-hardening-ROADMAP.md",
+        "1shot/2026-04-27-plan-l-hardening-STATE.md",
+        "1shot/2026-04-28-drift-fix-PROJECT.md",
+        "1shot/2026-04-28-memory-architecture-PROJECT.md"
       ]
     },
     {
@@ -99,17 +110,6 @@
         "templates/community-starter/.github/workflows/scheduled-jobs.yml",
         "templates/community-starter/.github/workflows/tests.yml",
         "templates/community-starter/ARCHITECTURE.md"
-      ]
-    },
-    {
-      "directory": ".oneshot",
-      "file_count": 8,
-      "files": [
-        ".oneshot/code-smells.json",
-        ".oneshot/commit-enrichments.json",
-        ".oneshot/config-drift.json",
-        ".oneshot/config/models.yaml",
-        ".oneshot/dep-graph.json"
       ]
     }
   ]

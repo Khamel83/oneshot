@@ -1,14 +1,8 @@
 {
-  "gap_count": 3,
+  "gap_count": 1,
   "gaps": [
     {
-      "source_file": "core/dispatch/direct_api.py"
-    },
-    {
-      "source_file": "oneshot_cli/__main__.py"
-    },
-    {
-      "source_file": "scripts/validate-oneshot-config.py"
+      "source_file": "core/dispatch/run.py"
     }
   ]
 }

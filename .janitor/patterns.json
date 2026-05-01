@@ -1,41 +1,35 @@
 {
   "patterns": [
     {
-      "type": "Configuration file hotspot",
-      "description": "Multiple config YAML files (models.yaml, workers.yaml, providers.yaml) are edited frequently, with models.yaml alone appearing in 36 sessions.",
-      "frequency": "36 sessions (models.yaml)",
-      "recommendation": "Centralize configuration into a single validated schema and add automated linting to reduce manual edits."
+      "type": "configuration_management",
+      "description": "Multiple configuration files (models.yaml, workers.yaml, lanes.yaml, providers.yaml) accessed frequently with high session counts, indicating complex configuration management needs",
+      "frequency": "36, 11, 6, 5, 4, 3 sessions across 6 config files",
+      "recommendation": "Implement configuration schema validation, create a unified config loader with caching, and establish configuration versioning to reduce access overhead"
     },
     {
-      "type": "Dispatch logic usage",
-      "description": "Files related to dispatch (dispatch.md, run.py, dispatch_cmd.py) are accessed in 3\u20115 sessions each, indicating heavy reliance on routing logic.",
-      "frequency": "3\u20115 sessions",
-      "recommendation": "Extract dispatch components into reusable modules and add comprehensive unit tests to improve maintainability."
+      "type": "dispatch_system",
+      "description": "Core dispatch functionality (tasks.py, dispatch_cmd.py, dispatch/run.py, __main__.py) shows high engagement with 17, 5, 3, 4 sessions respectively",
+      "frequency": "30 total sessions across 4 dispatch-related files",
+      "recommendation": "Refactor dispatch logic into modular components with clear separation of concerns, implement dispatch pipeline visualization, and add comprehensive logging for debugging"
     },
     {
-      "type": "Skill definition edits",
-      "description": "Skill files under .claude/skills are edited repeatedly (SKILL.md, update/SKILL.md, _shared/dispatch.md) across 3\u20117 sessions.",
-      "frequency": "3\u20117 sessions",
-      "recommendation": "Version\u2011control skill definitions separately and generate documentation to track changes and dependencies."
+      "type": "skill_routing_architecture",
+      "description": "Skill documentation and routing files (SKILL.md files, delegation-enforcement.md, routing.md, lane_policy.py, resolve.py) show systematic development across multiple skills",
+      "frequency": "40+ sessions across 10+ routing/skill files",
+      "recommendation": "Create a skill registry pattern with automated documentation generation, implement routing rule validation, and establish skill composition patterns"
     },
     {
-      "type": "Onboarding and routing documentation",
-      "description": "README.md and core router files (lane_policy.py, resolve.py, model_registry.py) see multiple accesses, reflecting active onboarding and routing work.",
-      "frequency": "3 sessions",
-      "recommendation": "Enhance onboarding guides with diagrams and automate router policy validation to reduce manual adjustments."
+      "type": "testing_diagnostics",
+      "description": "Doctor command and test files (doctor_cmd.py, test_doctor.py) indicate focus on system health monitoring and validation",
+      "frequency": "10 sessions across 2 diagnostic/testing files",
+      "recommendation": "Expand diagnostic coverage to other components, implement automated health checks, and create a self-healing mechanism for common issues"
     },
     {
-      "type": "Debugging and testing activity",
-      "description": "Doctor command files (doctor_cmd.py) and its tests (test_doctor.py) are edited frequently, showing ongoing debugging efforts.",
-      "frequency": "7 sessions (doctor_cmd.py)",
-      "recommendation": "Integrate doctor functionality into CI pipeline and expand test coverage to catch issues earlier."
-    },
-    {
-      "type": "Hidden plan reference",
-      "description": "The plan file you-re-not-dealing-with-hidden-russell.md is opened 4 times, suggesting it contains critical guidance that is being consulted often.",
-      "frequency": "4 sessions",
-      "recommendation": "Make the plan explicit in project documentation and link it to relevant tasks to ensure consistency."
+      "type": "migration_planning",
+      "description": "Migration documentation (ZAI_TO_OPENCODE_GO_MIGRATION.md) and planning documents show ongoing architectural evolution",
+      "frequency": "6-10 sessions across 3 planning documents",
+      "recommendation": "Create a migration checklist with rollback procedures, establish feature flags for gradual migration, and document migration progress with clear milestones"
     }
   ],
-  "events_analyzed": 521
+  "events_analyzed": 583
 }

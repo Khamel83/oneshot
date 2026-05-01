@@ -1,0 +1,69 @@
+{
+  "task_id": "NdyCeY5h7ontmPAy8fo8qn",
+  "detail": {
+    "ok": true,
+    "request_id": "e921723a6e1eebcb5dd02d6ebf0f03bf",
+    "task": {
+      "agent_profile": "manus-1.6",
+      "created_at": "1777583664",
+      "created_by_api_key": {
+        "id": "TRML7NYNXUxnnypfXMRFWY",
+        "name": "oneshot"
+      },
+      "credit_usage": 5,
+      "id": "NdyCeY5h7ontmPAy8fo8qn",
+      "share_visibility": "private",
+      "status": "stopped",
+      "task_type": "standard",
+      "task_url": "https://manus.im/app/NdyCeY5h7ontmPAy8fo8qn",
+      "title": "Readiness Check Risk and Completion Summary",
+      "updated_at": "1777583669"
+    }
+  },
+  "messages": {
+    "has_more": false,
+    "messages": [
+      {
+        "id": "HpsofwA5eAm4unK6vbLEEz",
+        "status_update": {
+          "agent_status": "stopped",
+          "brief": "Manus finished working",
+          "description": "Manus has completed the current task and is ready for new requests or revisions."
+        },
+        "timestamp": "1777583669641",
+        "type": "status_update"
+      },
+      {
+        "assistant_message": {
+          "content": "- **Readiness check:** Sandbox is active, all tools are available, and the environment is fully operational.\n- **One risk:** No specific task was provided, so there is nothing to execute or deliver beyond this response.\n- **Done.**"
+        },
+        "id": "XwZ6EiOPylYIMzuxsbfm4c",
+        "timestamp": "1777583669143",
+        "type": "assistant_message"
+      },
+      {
+        "id": "XayTwNrmRbahZrf9Le7OKn-1",
+        "status_update": {
+          "agent_status": "running",
+          "brief": "Manus is running",
+          "description": "Manus is working on your request"
+        },
+        "timestamp": "1777583665537",
+        "type": "status_update"
+      },
+      {
+        "id": "XXGPC2PwcLqc589Wucwelu",
+        "timestamp": "1777583664437",
+        "type": "user_message",
+        "user_message": {
+          "content": "Return exactly three bullets: 1) readiness check 2) one risk 3) done.",
+          "message_type": "text"
+        }
+      }
+    ],
+    "ok": true,
+    "request_id": "def338bf39db445d85f9f71453c322f8",
+    "task_id": "NdyCeY5h7ontmPAy8fo8qn"
+  },
+  "status": "stopped"
+}

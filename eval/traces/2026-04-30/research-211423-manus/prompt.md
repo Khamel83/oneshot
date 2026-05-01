@@ -1,0 +1,1 @@
+Return exactly three bullets: 1) readiness check 2) one risk 3) done.

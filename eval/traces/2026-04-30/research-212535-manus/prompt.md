@@ -1,0 +1,1 @@
+Say only: lite test ok

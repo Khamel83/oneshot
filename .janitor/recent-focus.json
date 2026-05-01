@@ -1,27 +1,27 @@
 {
   "files": [
-    ".claude/skills/_shared/providers.md",
-    ".claude/skills/_shared/dispatch.md",
-    ".claude/skills/_shared/dispatch.md",
-    ".claude/skills/_shared/dispatch.md",
-    ".claude/skills/_shared/providers.md",
-    ".claude/skills/conduct/SKILL.md",
-    ".claude/skills/conduct/SKILL.md",
-    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/conduct-inline-fallback-bug.md",
-    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/MEMORY.md",
-    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/MEMORY.md"
+    "core/dispatch/run.py",
+    "core/dispatch/run.py",
+    "scripts/manus-daily-refresh.sh",
+    "scripts/manus-daily-refresh.sh",
+    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/manus-credits.md",
+    "core/dispatch/run.py",
+    "core/dispatch/run.py",
+    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/manus-credits.md",
+    "/home/ubuntu/.claude/projects/-home-ubuntu-github-oneshot/memory/manus-credits.md",
+    "/home/ubuntu/.claude/lessons/manus-api-field-names.md"
   ],
   "commands": [
-    "Ran: python3 -m core.dispatch.run \\\n  --class implement_small \\\n  --category coding \\\n  --prompt \"",
-    "Ran: python3 -m core.dispatch.run \\\n  --class implement_small \\\n  --category coding \\\n  --prompt \"",
-    "Ran: find docs/instructions/ .claude/skills/_shared/ -type f -name \"*.md\" | head -20",
-    "Ran: grep -r -i \"degradation\\|fallback\\|inline\" docs/instructions/ .claude/skills/_shared/ --include=",
-    "Ran: find ~/.claude/projects/-home-ubuntu-github-oneshot/memory/ -name \"*.md\" -o -name \"*.txt\" | head",
-    "Ran: find .janitor -name \"*.jsonl\" -o -name \"*.json\" 2>/dev/null | head -10",
-    "Ran: grep -r \"TODO\\|FIXME\" --include=\"*.md\" --include=\"*.py\" --include=\"*.yaml\" .claude/skills/c",
-    "Ran: grep -r \"fallback\\|inline\\|config.*miss\\|dispatch.*fail\" --include=\"*.md\" --include=\"*.py\" ",
-    "Ran: grep -r \"silent.*fallback\\|silently.*fallback\" --include=\"*.md\" --include=\"*.py\" . | head -5",
-    "Ran: grep -A10 -B5 \"skip silently\" .claude/skills/_shared/providers.md"
+    "Ran: grep -rl \"manus\" docs/ .claude/ --include=\"*.md\" --include=\"*.yaml\" 2>/dev/null | grep -v node",
+    "Ran: grep -rl \"manus\" /home/ubuntu/github/oneshot/docs/ /home/ubuntu/github/oneshot/.claude/ --include=",
+    "Ran: grep -rl -i \"manus\" /home/ubuntu/github/oneshot/docs/ /home/ubuntu/github/oneshot/.claude/ 2>/dev/",
+    "Ran: grep -ri \"manus\" /home/ubuntu/github/oneshot/docs/ /home/ubuntu/github/oneshot/.claude/ 2>/dev/nul",
+    "Ran: grep -A 12 \"^  manus:\" config/workers.yaml",
+    "Ran: grep -B2 -A5 \"manus\" config/lanes.yaml",
+    "Ran: grep -B1 -A4 \"manus\" config/models.yaml",
+    "Ran: ls ~/.claude/lessons/ 2>/dev/null | head -10",
+    "Ran: crontab -l 2>/dev/null | grep manus",
+    "Ran: cat ~/.claude/dispatch-credits.jsonl 2>/dev/null | tail -3"
   ],
-  "session_count": 739
+  "session_count": 889
 }
