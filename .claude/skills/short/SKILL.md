@@ -34,7 +34,7 @@ When invoked:
 
 3. **Verify Workers Are Available**
    ```bash
-   python3 -m core.router.resolve --class implement_small --category coding
+   cd ~/github/oneshot && python3 -m core.router.resolve --class implement_small --category coding
    ```
    If the router fails or returns no workers, stop and tell the user.
 
@@ -57,9 +57,9 @@ When invoked:
    - **Planning/review tasks**: Claude handles inline
    - **Implementation tasks** (code changes, test writing, refactoring):
      ```bash
-     python3 -m core.router.resolve --class <task_class> --category <category>
+     cd ~/github/oneshot && python3 -m core.router.resolve --class <task_class> --category <category>
      # Build self-contained prompt from dispatch.md template
-     python3 -m core.dispatch.run \
+     ~/github/oneshot/bin/dispatch \
        --class <task_class> \
        --category <category> \
        --prompt "..." \

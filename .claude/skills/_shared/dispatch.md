@@ -26,7 +26,7 @@ For each task to dispatch:
    doc/write/summarize→writing, review/audit→review, default→general)
 3. Resolve lane, worker pool (reordered by category preference), and routing:
    ```bash
-   python3 -m core.router.resolve --class <task_class> --category <category>
+   cd ~/github/oneshot && python3 -m core.router.resolve --class <task_class> --category <category>
    ```
    Returns: `{task_class, category, lane, workers[], review_with, search_backend, fallback_lane}`
    Workers are already ordered by category preference — first available wins.
@@ -310,7 +310,7 @@ workers already sorted by category preference. Just pick the first available.
 | review | codex → glm_claude → gemini_cli | codex → gemini_cli | claude_code → codex | codex → gemini_cli |
 | general | gemini_cli → codex → glm_claude | codex → gemini_cli | claude_code → codex | gemini_cli → codex |
 
-No manual selection needed — `python3 -m core.router.resolve --class <class> --category <cat>`
+No manual selection needed — `cd ~/github/oneshot && python3 -m core.router.resolve --class <class> --category <cat>`
 returns the correct order. See `~/.claude/skills/_shared/providers.md` for full provider details.
 
 ## Terminal Entry Points

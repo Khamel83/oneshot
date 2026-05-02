@@ -40,7 +40,7 @@ Claude's role: planning, review, integration. That's it. Workers do the coding.
    ```bash
    command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
    command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
-   python3 -m core.router.resolve --class implement_medium --category coding
+   cd ~/github/oneshot && python3 -m core.router.resolve --class implement_medium --category coding
    ```
    If NO workers available: stop and tell the user. Do not proceed without workers.
 6. **Codex Plan Review** — dispatch plan for adversarial review BEFORE coding:
@@ -64,10 +64,10 @@ Claude's role: planning, review, integration. That's it. Workers do the coding.
    For each milestone task:
    ```bash
    # Classify and resolve
-   python3 -m core.router.resolve --class <task_class> --category <category>
+   cd ~/github/oneshot && python3 -m core.router.resolve --class <task_class> --category <category>
 
    # Dispatch to worker
-   python3 -m core.dispatch.run \
+   ~/github/oneshot/bin/dispatch \
      --class <task_class> \
      --category <category> \
      --prompt "Self-contained prompt: task, acceptance criteria, files to read, patterns, constraints, output format" \
