@@ -22,7 +22,7 @@ providers:
       glm_5_turbo:   { id: "glm-5-turbo",   role: strong_reasoning }
 
   opencode_go:
-    enabled: false
+    enabled: true
     kind: model_gateway
     description: "Model gateway. Not limited to OpenCode CLI — standard API endpoints."
     auth_env: OPENCODE_GO_API_KEY
@@ -86,8 +86,8 @@ providers:
 lanes:
   cheap_fast:
     description: "Tiny fixes, lint, formatting, simple tests, trivial docs."
-    current_provider: zai
-    current_model: glm_4_5_air
+    current_provider: opencode_go
+    current_model: deepseek_v4_flash
     future_provider: opencode_go
     future_model: deepseek_v4_flash
     max_diff_lines: 150
@@ -96,8 +96,8 @@ lanes:
 
   cheap_summary:
     description: "Summaries, notes, extraction, low-risk transforms."
-    current_provider: zai
-    current_model: glm_4_5_air
+    current_provider: opencode_go
+    current_model: qwen_3_5_plus
     future_provider: opencode_go
     future_model: qwen_3_5_plus
     max_diff_lines: 100
@@ -106,8 +106,9 @@ lanes:
 
   routine_coder:
     description: "Normal bounded implementation and tests. Default lane."
-    current_provider: zai
-    current_model: glm_5_1
+    current_provider: opencode_go
+    current_model: minimax_m2_7
+    current_runner: opencode_go_claude
     future_provider: opencode_go
     future_model: minimax_m2_7              # Anthropic-compatible → Claude CLI path
     future_runner: opencode_go_claude     # full toolchain via Claude CLI
@@ -117,8 +118,8 @@ lanes:
 
   strong_reasoning:
     description: "Harder refactors, ambiguous failures, cross-file reasoning."
-    current_provider: zai
-    current_model: glm_5_turbo
+    current_provider: opencode_go
+    current_model: kimi_k2_6
     future_provider: opencode_go
     future_model: kimi_k2_6
     max_diff_lines: 800
@@ -127,8 +128,8 @@ lanes:
 
   premium_reasoning:
     description: "Escalation only. Failed worker recovery or design-sensitive changes."
-    current_provider: zai
-    current_model: glm_5_turbo
+    current_provider: opencode_go
+    current_model: deepseek_v4_pro
     future_provider: opencode_go
     future_model: deepseek_v4_pro
     max_diff_lines: 1000
@@ -247,7 +248,7 @@ runner_templates:
 search:
   preferred: argus
   argus:
-    enabled: false
+    enabled: true
     mcp_server_name: argus
     cli_command: "argus search"
   fallback_web_search:
