@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Cross-project morning briefing.
 
 Aggregates every ~/github/*/.janitor/digest.md into one ~/INBOX.md, sorted

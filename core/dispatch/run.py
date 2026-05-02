@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Parallel dispatch runner for Codex and Gemini.
 
 Usage:
