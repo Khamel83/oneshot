@@ -75,10 +75,10 @@ Inspect the task description. Apply the right protocol:
 For worker dispatch:
 ```bash
 # Classify the task
-python3 -m core.router.resolve --class <task_class>
+cd ~/github/oneshot && python3 -m core.router.resolve --class <task_class>
 
 # Dispatch to workers
-python3 -m core.dispatch.run --class <task_class> --prompt "task description"
+~/github/oneshot/bin/dispatch --class <task_class> --prompt "task description"
 ```
 
 ### 8. Session Summary

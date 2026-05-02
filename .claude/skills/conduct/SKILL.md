@@ -28,7 +28,7 @@ Implementation tasks MUST go to codex/gemini/glm via `core.dispatch.run` or subp
    ```bash
    command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
    command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
-   python3 -m core.router.resolve --class implement_small --category coding
+   cd ~/github/oneshot && python3 -m core.router.resolve --class implement_small --category coding
    ```
    The router MUST return a valid lane with workers. If it fails, stop and tell the user.
    `config/lanes.yaml` and `config/workers.yaml` MUST exist. If they don't, stop and tell the user.
@@ -87,7 +87,7 @@ Repeat until no unblocked tasks remain:
    - Resolve lane: `python -m core.router.resolve --class <class> --category <category>`
    - **If lane is NOT premium**: Build self-contained prompt → dispatch to worker:
      ```bash
-     python3 -m core.dispatch.run \
+     ~/github/oneshot/bin/dispatch \
        --class <task_class> \
        --category <category> \
        --prompt "Your self-contained prompt here..." \
@@ -98,7 +98,7 @@ Repeat until no unblocked tasks remain:
    - **For parallel tasks**:
      ```bash
      echo '[{"id":"1","prompt":"task 1"},{"id":"2","prompt":"task 2"}]' > /tmp/batch.json
-     python3 -m core.dispatch.run --class <task_class> --prompts-file /tmp/batch.json --parallel 3
+     ~/github/oneshot/bin/dispatch --class <task_class> --prompts-file /tmp/batch.json --parallel 3
      ```
    - **CRITICAL: Use subprocess dispatch, NOT Agent tool subagents.**
      `core.dispatch.run` spawns lightweight CLI processes.

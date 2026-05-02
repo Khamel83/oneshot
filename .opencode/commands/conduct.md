@@ -42,7 +42,7 @@ Classifies tasks by type, routes to lanes, dispatches to workers, reviews. Loops
    - One item per deliverable with clear acceptance criteria
 4. **Classify each task**:
    ```bash
-   python3 -m core.router.resolve --class <task_class>
+   cd ~/github/oneshot && python3 -m core.router.resolve --class <task_class>
    ```
 5. **Update STATE.md**: phase = "plan → build"
 
@@ -60,8 +60,8 @@ Repeat until no unblocked tasks remain:
      No production code without a failing test shown first.
 3. **Classify and dispatch**:
    ```bash
-   python3 -m core.router.resolve --class <task_class>
-   python3 -m core.dispatch.run --class <task_class> --prompt "task description"
+   cd ~/github/oneshot && python3 -m core.router.resolve --class <task_class>
+   ~/github/oneshot/bin/dispatch --class <task_class> --prompt "task description"
    ```
    - For premium lane tasks → execute inline
    - For worker tasks → dispatch via `core.dispatch.run`

@@ -26,7 +26,7 @@ Claude does NOT do web research inline. Build the query, dispatch, integrate res
 3. **Dispatch research to worker** (MANDATORY):
    - If Argus available, dispatch via the research lane:
      ```bash
-     python3 -m core.dispatch.run \
+     ~/github/oneshot/bin/dispatch \
        --class doc_draft \
        --category research \
        --prompt "Research: [topic]. Query Argus in research mode via HTTP API, extract key results, write findings to docs/research/[slug]/research.md. Structure: Executive Summary → Findings → Sources." \
@@ -35,7 +35,7 @@ Claude does NOT do web research inline. Build the query, dispatch, integrate res
      ```
    - If Argus unavailable, dispatch to Gemini CLI:
      ```bash
-     python3 -m core.dispatch.run \
+     ~/github/oneshot/bin/dispatch \
        --class doc_draft \
        --category research \
        --prompt "Research: [topic]. Write findings to docs/research/[slug]/research.md." \

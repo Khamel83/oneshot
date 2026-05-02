@@ -10,12 +10,12 @@ Claude plans, reviews, and integrates. Workers execute.
 
 ```bash
 # 1. Resolve lane and workers
-python3 -m core.router.resolve --class <task_class> --category <category>
+cd ~/github/oneshot && python3 -m core.router.resolve --class <task_class> --category <category>
 
 # 2. Build self-contained prompt (see _shared/dispatch.md template)
 
 # 3. Dispatch
-python3 -m core.dispatch.run \
+~/github/oneshot/bin/dispatch \
   --class <task_class> \
   --category <category> \
   --prompt "Self-contained prompt..." \
@@ -48,7 +48,7 @@ If the router returns `premium` lane, Claude handles the task inline.
 
 ## What "No Workers Available" Means
 
-If `python3 -m core.router.resolve` fails, or returns an empty worker pool:
+If `cd ~/github/oneshot && python3 -m core.router.resolve` fails, or returns an empty worker pool:
 1. Stop. Tell the user workers are unavailable.
 2. Do NOT silently fall back to doing the work yourself.
 
