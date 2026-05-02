@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Ensure user-local bins are on PATH (cron/launchd start with minimal PATH).
 # Without this, `secrets` is not found and the LLM enrichment is silently skipped.
-export PATH="${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
 
 ONESHOT_DIR="${HOME}/github/oneshot"
 REPO_BASE="${HOME}/github"
@@ -44,21 +44,6 @@ for project_dir in "${PROJECTS[@]}"; do
   }
 
   log "--- Janitor cron start ---"
-
-  # Pure-compute jobs + write results (no LLM needed)
-  python3 -c "
-import sys, os
-sys.path.insert(0, '$ONESHOT_DIR')
-try:
-    from core.janitor.jobs import run_session_start
-    result = run_session_start(project_dir='$project_dir')
-    print('Pure-compute jobs completed' + (f': {result[:100]}' if result else ' (nothing to report)'))
-except Exception as e:
-    print(f'ERROR: {e}')
-    sys.exit(1)
-" 2>&1 | while read line; do
-    log "  $line"
-  done
 
   # Onboarding generation (needs LLM via openrouter/free)
   if [ -f "${JANITOR_DIR}/events.jsonl" ]; then

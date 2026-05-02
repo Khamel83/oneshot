@@ -1559,6 +1559,26 @@ def review_pending_tasks(project_dir: Optional[str] = None, min_score: int = 3) 
     }
 
 
+def _rotate_events_jsonl(project_dir: Optional[str] = None, max_lines: int = 2000) -> None:
+    """Keep events.jsonl bounded. Trims to last max_lines, archives the rest."""
+    try:
+        events_path = _janitor_dir(project_dir or os.getcwd()) / "events.jsonl"
+        if not events_path.exists():
+            return
+        lines = events_path.read_text().splitlines(keepends=True)
+        if len(lines) <= max_lines:
+            return
+        keep = lines[-max_lines:]
+        overflow = lines[:-max_lines]
+        archive_name = f"events-archive-{datetime.now().strftime('%Y%m%d')}.jsonl"
+        archive_path = events_path.parent / archive_name
+        with open(archive_path, "a") as f:
+            f.writelines(overflow)
+        events_path.write_text("".join(keep))
+    except Exception:
+        pass
+
+
 # --- SessionStart: run pure-compute + inject results ---
 
 def run_session_start(project_dir: Optional[str] = None) -> str:
@@ -1773,6 +1793,8 @@ def run_session_end(project_dir: Optional[str] = None) -> None:
     project_dir = project_dir or os.getcwd()
     if not (Path(project_dir) / ".git").exists():
         return
+
+    _rotate_events_jsonl(project_dir)
 
     janitor_dir = _janitor_dir(project_dir)
     events_path = janitor_dir / "events.jsonl"
