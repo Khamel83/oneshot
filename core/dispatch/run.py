@@ -96,7 +96,6 @@ def gemini_command(prompt: str, output_file: str) -> list[str]:
 
 ZAI_MODELS = {"glm-5.1", "glm-5", "glm-5-turbo", "glm-4.7", "glm-4.6", "glm-4.5", "glm-4.5-air"}
 ZAI_BASE_URL = "https://api.z.ai/api/coding/paas/v4"          # OpenAI-compatible (claw-code-agent)
-ZAI_ANTHROPIC_URL = "https://api.z.ai/api/anthropic"           # Anthropic-compatible (claude CLI)
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 MANUS_BASE_URL = "https://api.manus.ai"
 
@@ -130,31 +129,31 @@ def claw_code_command(prompt: str, output_file: str, model: str = "") -> list[st
     ]
 
 
-def glm_claude_command(prompt: str, output_file: str, model: str = "glm-5-turbo") -> list[str]:
-    """Run claude CLI with ZAI as the Anthropic-compatible backend.
+OPENCODE_GO_URL = "https://opencode.ai/zen/go"
 
-    This gives a full Claude Code session (all native tools: bash, read, edit, glob, grep)
-    running on GLM-5-turbo via ZAI — free on the GLM Coding Plan (expires 2026-05-02).
-    Equivalent to how codex/gemini are used but with the full claude toolchain.
+
+def glm_claude_command(prompt: str, output_file: str, model: str = "glm-5-turbo") -> list[str]:
+    """Run claude CLI with OpenCode Go as the Anthropic-compatible backend.
+
+    Full Claude Code toolchain (bash, read, edit, glob, grep) via OpenCode Go.
+    Uses OPENCODE_GO_API_KEY from vault.
     """
-    zai_key = os.environ.get("ZAI_API_KEY", "")
-    if not zai_key:
-        # Fall back to vault
+    ocg_key = os.environ.get("OPENCODE_GO_API_KEY", "")
+    if not ocg_key:
         try:
-            zai_key = subprocess.run(
-                ["bash", "-c", "secrets get ZAI_API_KEY 2>/dev/null"],
+            ocg_key = subprocess.run(
+                ["bash", "-c", "secrets get OPENCODE_GO_API_KEY 2>/dev/null"],
                 capture_output=True, text=True
             ).stdout.strip()
         except Exception:
             pass
     return [
         "bash", "-c",
-        f"ANTHROPIC_AUTH_TOKEN={shlex.quote(zai_key)} "
-        f"ANTHROPIC_BASE_URL={shlex.quote(ZAI_ANTHROPIC_URL)} "
-        f"ANTHROPIC_DEFAULT_SONNET_MODEL={shlex.quote(model)} "
-        f"ANTHROPIC_DEFAULT_OPUS_MODEL={shlex.quote(model)} "
-        f"ANTHROPIC_DEFAULT_HAIKU_MODEL=glm-4.5-air "
-        f"claude --print --dangerously-skip-permissions "
+        f"unset ANTHROPIC_AUTH_TOKEN ANTHROPIC_API_KEY ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL ANTHROPIC_DEFAULT_HAIKU_MODEL; "
+        f"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 "
+        f"ANTHROPIC_BASE_URL={shlex.quote(OPENCODE_GO_URL)} "
+        f"ANTHROPIC_API_KEY={shlex.quote(ocg_key)} "
+        f"claude --print --dangerously-skip-permissions --model {shlex.quote(model)} "
         f"{json.dumps(prompt)} "
         f"> {output_file} 2>/dev/null"
     ]
@@ -196,20 +195,14 @@ def worker_available(worker: str) -> bool:
         has_claude = subprocess.run(
             ["bash", "-c", "command -v claude"], capture_output=True
         ).returncode == 0
-        # Check env first, then fall back to vault (secrets CLI)
         has_key = bool(
-            os.environ.get("ZAI_API_KEY")
+            os.environ.get("OPENCODE_GO_API_KEY")
             or subprocess.run(
-                ["bash", "-c", "secrets get ZAI_API_KEY 2>/dev/null"],
+                ["bash", "-c", "secrets get OPENCODE_GO_API_KEY 2>/dev/null"],
                 capture_output=True
             ).stdout.strip()
         )
-        if not has_claude or not has_key:
-            return False
-        # Check ZAI plan expiry from workers.yaml
-        if not _zai_plan_active():
-            return False
-        return True
+        return has_claude and has_key
     elif worker == "manus":
         has_key = bool(
             os.environ.get("MANUS_API_KEY")
@@ -385,7 +378,12 @@ def _zai_plan_active() -> bool:
 def clean_env() -> dict[str, str]:
     """Return a clean environment for worker subprocesses."""
     env = os.environ.copy()
-    for key in ["OPENAI_API_KEY", "OPENAI_BASE_URL"]:
+    for key in [
+        "OPENAI_API_KEY", "OPENAI_BASE_URL",
+        "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL", "ANTHROPIC_DEFAULT_SONNET_MODEL",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+    ]:
         env.pop(key, None)
     return env
 
