@@ -479,5 +479,22 @@
       ],
       "category": "chore"
     }
+  },
+  "c126bf62c2d15a463af3fc90e5ce99833ef9a9cc": {
+    "hash": "c126bf62c2d1",
+    "message": "chore: add janitor signals, eval traces, remove stale opencode_go vault file",
+    "enriched": {
+      "summary": "Adds janitor signals and evaluation traces, updates numerous documentation and configuration files, and removes an obsolete opencode_go encrypted vault file.",
+      "tags": [
+        "janitor",
+        "signals",
+        "eval",
+        "trace",
+        "vault",
+        "cleanup",
+        "documentation"
+      ],
+      "category": "chore"
+    }
   }
 }
