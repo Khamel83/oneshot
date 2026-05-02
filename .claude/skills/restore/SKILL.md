@@ -9,8 +9,10 @@ Restore context from a handoff document and continue work.
 
 ## Usage
 
-`/restore` — finds most recent handoff
-`/restore @thoughts/shared/handoffs/YYYY-MM-DD-file.md` — specific handoff
+`/restore` — finds most recent handoff in `~/github/oneshot/1shot/handoffs/`
+`/restore @~/github/oneshot/1shot/handoffs/YYYY-MM-DD-file.md` — specific handoff
+
+Works in any harness: Claude Code, opencode, mm25, gemini.
 
 ## Process
 
@@ -72,7 +74,7 @@ Start with first item in "Next Steps" from handoff.
 ## Finding Handoffs
 
 ```bash
-ls -t thoughts/shared/handoffs/ | head -5  # Recent handoffs
+ls -t ~/github/oneshot/1shot/handoffs/ | head -5  # Recent handoffs
 ```
 
 If multiple exist, list them and ask which to resume (or use most recent).

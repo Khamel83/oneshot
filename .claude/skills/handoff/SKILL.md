@@ -16,7 +16,9 @@ Create a structured handoff document to preserve context for seamless resumption
 
 ## Handoff Document
 
-Write to: `thoughts/shared/handoffs/YYYY-MM-DD-{slug}-handoff.md`
+Write to: `~/github/oneshot/1shot/handoffs/YYYY-MM-DD-HHMM-{project}-handoff.md`
+
+This location is git-synced to all machines automatically. Always use this path regardless of which project you're working in or which machine you're on.
 
 ```markdown
 # Handoff: [Task Name]
@@ -84,7 +86,7 @@ Analyze the session for patterns that should be captured for future sessions:
 2. **Then**: [Second priority]
 
 ## Resume
-/restore @thoughts/shared/handoffs/YYYY-MM-DD-{slug}-handoff.md
+/restore @~/github/oneshot/1shot/handoffs/YYYY-MM-DD-HHMM-{project}-handoff.md
 ```
 
 ## Process
@@ -95,9 +97,8 @@ Analyze the session for patterns that should be captured for future sessions:
 4. Note blockers
 5. Write prioritized next steps
 6. Analyze session for learnings (see "Learnings & Suggested Updates" section)
-7. If beads: `bd sync`
-8. Commit handoff: `docs: create handoff for [feature]`
-9. Review learnings and propose lesson saves (see Feedback Loop below)
+7. Commit and push: `git -C ~/github/oneshot add 1shot/handoffs/ && git -C ~/github/oneshot commit -m "handoff: $(date +%Y-%m-%d) [project] [summary]" && git -C ~/github/oneshot push`
+8. Review learnings and propose lesson saves (see Feedback Loop below)
 
 ## Feedback Loop: Propose Lesson Saves
 
