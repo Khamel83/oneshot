@@ -1,0 +1,26 @@
+{
+  "orphan_count": 114,
+  "orphan_files": [
+    ".claude/agents/TEMPLATE.md",
+    ".claude/commands/dispatch.md",
+    ".claude/commands/escalate-worker.md",
+    ".claude/commands/review-worker.md",
+    ".claude/commands/status.md",
+    ".claude/memory/memory.md",
+    ".claude/rules/delegation-enforcement.md",
+    ".claude/skills/SKILLS_REFERENCE.md",
+    ".claude/skills/_shared/dispatch.md",
+    ".claude/skills/conduct/templates/ROADMAP.md",
+    ".claude/skills/conduct/templates/STATE.md",
+    ".oneshot/onboarding-summary.md",
+    ".opencode/agents/cheap-worker.md",
+    ".opencode/agents/reviewer.md",
+    ".opencode/commands/conduct.md",
+    ".opencode/commands/debug.md",
+    ".opencode/commands/doc.md",
+    ".opencode/commands/freesearch.md",
+    ".opencode/commands/handoff.md",
+    ".opencode/commands/research.md"
+  ],
+  "total_documents": 202
+}

@@ -1,0 +1,16 @@
+{
+  "outlier_count": 2,
+  "threshold_kb": 100,
+  "outliers": [
+    {
+      "file": "docs/LLM-OVERVIEW.md",
+      "size_kb": 1204.7,
+      "type": "text"
+    },
+    {
+      "file": "archive/v9-skills.tar.gz",
+      "size_kb": 147.1,
+      "type": "binary"
+    }
+  ]
+}

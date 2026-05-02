@@ -1,0 +1,25 @@
+{
+  "at_risk": [
+    {
+      "file": ".claude/skills/_shared/providers.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 12
+    },
+    {
+      "file": "1shot/2026-04-27-plan-l-hardening-PROJECT.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 5
+    },
+    {
+      "file": "1shot/2026-04-27-plan-l-hardening-STATE.md",
+      "contributors": [
+        "Test User"
+      ],
+      "edit_count": 5
+    }
+  ]
+}

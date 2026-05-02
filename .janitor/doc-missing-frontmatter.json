@@ -1,0 +1,12 @@
+{
+  "missing_count": 6,
+  "checked_count": 6,
+  "missing_files": [
+    "docs/research/2026-03-27_multi-tenant_platforms_research.md",
+    "docs/research/background-intelligence/research.md",
+    "docs/research/claude-code-non-anthropic-models/research.md",
+    "docs/research/document-intelligence/research.md",
+    "docs/research/intelligence-tiers-architecture.md",
+    "docs/research/oneshot-v2-redesign.md"
+  ]
+}

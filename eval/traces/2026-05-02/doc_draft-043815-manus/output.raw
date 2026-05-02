@@ -1,0 +1,77 @@
+{
+  "task_id": "4qR7iHKpgCA9nh7hAyYMbr",
+  "detail": {
+    "ok": true,
+    "request_id": "b680fed3750f573eb5a68897f5ac5333",
+    "task": {
+      "agent_profile": "manus-1.6-lite",
+      "created_at": "1777696696",
+      "created_by_api_key": {
+        "id": "TRML7NYNXUxnnypfXMRFWY",
+        "name": "oneshot"
+      },
+      "credit_usage": 6,
+      "id": "4qR7iHKpgCA9nh7hAyYMbr",
+      "share_visibility": "private",
+      "status": "stopped",
+      "task_type": "standard",
+      "task_url": "https://manus.im/app/4qR7iHKpgCA9nh7hAyYMbr",
+      "title": "Say READY",
+      "updated_at": "1777696705"
+    }
+  },
+  "messages": {
+    "has_more": false,
+    "messages": [
+      {
+        "id": "yij4Tl1Ho5DEOvAeHBSeFz",
+        "status_update": {
+          "agent_status": "stopped",
+          "brief": "Manus finished working",
+          "description": "Manus has completed the current task and is ready for new requests or revisions."
+        },
+        "timestamp": "1777696705505",
+        "type": "status_update"
+      },
+      {
+        "assistant_message": {
+          "content": "I am ready to assist you. Please provide your task, and I will execute it immediately."
+        },
+        "id": "sVpajRt37MGX3P6ls3HT69",
+        "timestamp": "1777696705292",
+        "type": "assistant_message"
+      },
+      {
+        "assistant_message": {
+          "content": "READY"
+        },
+        "id": "jJ2sD3XrCJh4hnxJeWwWiW",
+        "timestamp": "1777696701136",
+        "type": "assistant_message"
+      },
+      {
+        "id": "ifh0bq9LaC727T4yiFBMmE-1",
+        "status_update": {
+          "agent_status": "running",
+          "brief": "Manus is running",
+          "description": "Manus is working on your request"
+        },
+        "timestamp": "1777696697456",
+        "type": "status_update"
+      },
+      {
+        "id": "IjjlRS7togO4QwP8uYMXox",
+        "timestamp": "1777696696884",
+        "type": "user_message",
+        "user_message": {
+          "content": "say READY",
+          "message_type": "text"
+        }
+      }
+    ],
+    "ok": true,
+    "request_id": "fd7f989274b67099c4cf6d17d244f612",
+    "task_id": "4qR7iHKpgCA9nh7hAyYMbr"
+  },
+  "status": "stopped"
+}

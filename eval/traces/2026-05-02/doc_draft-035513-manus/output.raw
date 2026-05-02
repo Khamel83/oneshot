@@ -1,0 +1,77 @@
+{
+  "task_id": "GLYMyLSfC6JfAc22WpcdD6",
+  "detail": {
+    "ok": true,
+    "request_id": "d87d90c8516ee19e1f954e866527dda0",
+    "task": {
+      "agent_profile": "manus-1.6-lite",
+      "created_at": "1777694114",
+      "created_by_api_key": {
+        "id": "TRML7NYNXUxnnypfXMRFWY",
+        "name": "oneshot"
+      },
+      "credit_usage": 6,
+      "id": "GLYMyLSfC6JfAc22WpcdD6",
+      "share_visibility": "private",
+      "status": "stopped",
+      "task_type": "standard",
+      "task_url": "https://manus.im/app/GLYMyLSfC6JfAc22WpcdD6",
+      "title": "Ready",
+      "updated_at": "1777694123"
+    }
+  },
+  "messages": {
+    "has_more": false,
+    "messages": [
+      {
+        "id": "bNPICVcUq6vrHc6TiJJSvb",
+        "status_update": {
+          "agent_status": "stopped",
+          "brief": "Manus finished working",
+          "description": "Manus has completed the current task and is ready for new requests or revisions."
+        },
+        "timestamp": "1777694123248",
+        "type": "status_update"
+      },
+      {
+        "assistant_message": {
+          "content": "READY. I am standing by for your instructions."
+        },
+        "id": "0UuWrI8KheEz9X23tKLIQd",
+        "timestamp": "1777694123015",
+        "type": "assistant_message"
+      },
+      {
+        "assistant_message": {
+          "content": "READY"
+        },
+        "id": "jadbaRxWhbGA3vjXIE04PD",
+        "timestamp": "1777694116857",
+        "type": "assistant_message"
+      },
+      {
+        "id": "fizcShYqDu5LWRmPlKXCw0-1",
+        "status_update": {
+          "agent_status": "running",
+          "brief": "Manus is running",
+          "description": "Manus is working on your request"
+        },
+        "timestamp": "1777694115379",
+        "type": "status_update"
+      },
+      {
+        "id": "KFNVWj4TShvT2mwYbEcJPa",
+        "timestamp": "1777694114818",
+        "type": "user_message",
+        "user_message": {
+          "content": "say READY",
+          "message_type": "text"
+        }
+      }
+    ],
+    "ok": true,
+    "request_id": "ee5a00051787302e15056e986f4193c7",
+    "task_id": "GLYMyLSfC6JfAc22WpcdD6"
+  },
+  "status": "stopped"
+}

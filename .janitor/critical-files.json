@@ -1,0 +1,29 @@
+{
+  "critical_files": [
+    {
+      "file": "/home/ubuntu/github/oneshot/core/dispatch/run.py",
+      "sessions": 36,
+      "downstream_deps": 0
+    },
+    {
+      "file": "/home/ubuntu/github/oneshot/.oneshot/config/models.yaml",
+      "sessions": 36,
+      "downstream_deps": 0
+    },
+    {
+      "file": "/home/ubuntu/github/oneshot/oneshot_cli/tasks.py",
+      "sessions": 17,
+      "downstream_deps": 0
+    },
+    {
+      "file": "/home/ubuntu/github/oneshot/.claude/skills/_shared/providers.md",
+      "sessions": 15,
+      "downstream_deps": 0
+    },
+    {
+      "file": "/home/ubuntu/github/oneshot/config/workers.yaml",
+      "sessions": 15,
+      "downstream_deps": 0
+    }
+  ]
+}

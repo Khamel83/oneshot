@@ -1,0 +1,32 @@
+{
+  "decisions": [
+    {
+      "what": "Added cron entry for Manus daily credit refresh",
+      "why": "To ensure credits are regenerated automatically at 00:01 UT each day"
+    },
+    {
+      "what": "Edited core/dispatch/run.py and compiled it",
+      "why": "To integrate manus functionality and verify syntax correctness"
+    },
+    {
+      "what": "Pushed changes to remote master branch",
+      "why": "To persist modifications and keep repository up\u2011to\u2011date"
+    },
+    {
+      "what": "Created docs/manus-api-field-names.md",
+      "why": "To document the API field names for future reference"
+    },
+    {
+      "what": "Searched configuration files for 'manus' references",
+      "why": "To locate where manus is defined and understand its integration points"
+    }
+  ],
+  "blockers": [],
+  "discoveries": [
+    "Manus daily credit refresh is scheduled via cron at 00:01 UT",
+    "Manus appears in config/workers.yaml, config/lanes.yaml, and config/models.yaml",
+    "Manus API field names have been recorded in ~/.claude/lessons/manus-api-field-names.md",
+    "Recent dispatch credit entries are stored in ~/.claude/dispatch-credits.jsonl",
+    "The modified run.py script compiles without errors"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "task_id": "XiaxbXKBLVcSn2d2zo8Jmx",
+  "detail": {
+    "ok": true,
+    "request_id": "7c3581ba362924fc33e74de00fe3921e",
+    "task": {
+      "agent_profile": "manus-1.6-lite",
+      "created_at": "1777691023",
+      "created_by_api_key": {
+        "id": "TRML7NYNXUxnnypfXMRFWY",
+        "name": "oneshot"
+      },
+      "credit_usage": 6,
+      "id": "XiaxbXKBLVcSn2d2zo8Jmx",
+      "share_visibility": "private",
+      "status": "stopped",
+      "task_type": "standard",
+      "task_url": "https://manus.im/app/XiaxbXKBLVcSn2d2zo8Jmx",
+      "title": "Test",
+      "updated_at": "1777691029"
+    }
+  },
+  "messages": {
+    "has_more": false,
+    "messages": [
+      {
+        "id": "ibkTHPzZGph6B7q2VsMQUP",
+        "status_update": {
+          "agent_status": "stopped",
+          "brief": "Manus finished working",
+          "description": "Manus has completed the current task and is ready for new requests or revisions."
+        },
+        "timestamp": "1777691029825",
+        "type": "status_update"
+      },
+      {
+        "assistant_message": {
+          "content": "I have noted your instruction, Omar. I will execute your tasks directly without any questions or clarifications. I am ready for your next command."
+        },
+        "id": "UDryVZPxnZ0WO0RWnqFcoN",
+        "timestamp": "1777691029609",
+        "type": "assistant_message"
+      },
+      {
+        "assistant_message": {
+          "content": "Hello Omar! I understand your request. I will proceed with your task directly without any questions or clarifications. Please let me know what you would like me to do."
+        },
+        "id": "w8VRllAMl0XGZrCJb3ls1G",
+        "timestamp": "1777691025576",
+        "type": "assistant_message"
+      },
+      {
+        "id": "so9W3kN3TjJ3FxA7sZZF5J-1",
+        "status_update": {
+          "agent_status": "running",
+          "brief": "Manus is running",
+          "description": "Manus is working on your request"
+        },
+        "timestamp": "1777691024234",
+        "type": "status_update"
+      },
+      {
+        "id": "Sl1v2C9qOowaZkamzf5NGT",
+        "timestamp": "1777691023638",
+        "type": "user_message",
+        "user_message": {
+          "content": "test",
+          "message_type": "text"
+        }
+      }
+    ],
+    "ok": true,
+    "request_id": "b86050a3249b14d9ac4e483c3830c542",
+    "task_id": "XiaxbXKBLVcSn2d2zo8Jmx"
+  },
+  "status": "stopped"
+}

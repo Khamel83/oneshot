@@ -1,0 +1,92 @@
+{
+  "oversized_files": [
+    {
+      "path": "core/janitor/jobs.py",
+      "lines": 1834
+    },
+    {
+      "path": "core/dispatch/run.py",
+      "lines": 910
+    },
+    {
+      "path": "oneshot_cli/doctor_cmd.py",
+      "lines": 791
+    },
+    {
+      "path": "oneshot_cli/memory.py",
+      "lines": 604
+    },
+    {
+      "path": "tests/test_doctor.py",
+      "lines": 525
+    },
+    {
+      "path": "oneshot_cli/tasks.py",
+      "lines": 522
+    }
+  ],
+  "oversized_functions": [
+    {
+      "path": "oneshot_cli/doctor_cmd.py",
+      "function": "autofix",
+      "lines": 271
+    },
+    {
+      "path": "oneshot_cli/memory.py",
+      "function": "_gitignore_template",
+      "lines": 260
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "generate_onboarding",
+      "lines": 242
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "run_session_start",
+      "lines": 202
+    },
+    {
+      "path": "oneshot_cli/tasks.py",
+      "function": "_is_tree_dirty",
+      "lines": 199
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "evaluate_task_sufficiency",
+      "lines": 166
+    },
+    {
+      "path": "core/janitor/worker.py",
+      "function": "get_usage_stats",
+      "lines": 166
+    },
+    {
+      "path": "oneshot_cli/memory_cmd.py",
+      "function": "scaffold_cmd",
+      "lines": 138
+    },
+    {
+      "path": "oneshot_cli/memory.py",
+      "function": "index_repo_memory",
+      "lines": 132
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "generate_pending_tasks",
+      "lines": 126
+    },
+    {
+      "path": "core/janitor/jobs.py",
+      "function": "review_pending_tasks",
+      "lines": 118
+    },
+    {
+      "path": "core/dispatch/run.py",
+      "function": "get_config_sha",
+      "lines": 102
+    }
+  ],
+  "oversized_file_count": 6,
+  "oversized_function_count": 12
+}
