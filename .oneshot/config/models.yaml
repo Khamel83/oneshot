@@ -107,11 +107,9 @@ lanes:
   routine_coder:
     description: "Normal bounded implementation and tests. Default lane."
     current_provider: opencode_go
-    current_model: minimax_m2_7
-    current_runner: opencode_go_claude
+    current_model: deepseek_v4_flash
     future_provider: opencode_go
-    future_model: minimax_m2_7              # Anthropic-compatible → Claude CLI path
-    future_runner: opencode_go_claude     # full toolchain via Claude CLI
+    future_model: deepseek_v4_flash
     max_diff_lines: 500
     max_files: 12
     allow_architecture_changes: false
