@@ -11,12 +11,12 @@ pool, and review path.
 | `plan` | premium | general | claude_code |
 | `research` | research | research | gemini_cli, codex |
 | `search_sweep` | research | research | gemini_cli, codex |
-| `implement_small` | cheap | coding | codex, gemini_cli, glm_claude |
+| `implement_small` | cheap | coding | codex, gemini_cli |
 | `implement_medium` | balanced | coding | codex, gemini_cli |
-| `test_write` | cheap | coding | codex, gemini_cli, glm_claude |
+| `test_write` | cheap | coding | codex, gemini_cli |
 | `review_diff` | premium | review | codex, claude_code |
-| `doc_draft` | cheap | writing | gemini_cli, codex, glm_claude |
-| `summarize_findings` | cheap | writing | gemini_cli, codex, glm_claude |
+| `doc_draft` | cheap | writing | gemini_cli, codex |
+| `summarize_findings` | cheap | writing | gemini_cli, codex |
 
 ### `plan` — Planning & Decomposition
 - **Lane**: premium | **Category**: general
@@ -109,7 +109,7 @@ Three consecutive failures → circuit breaker → log blocker → skip.
 |--------|---------|---------|-------|
 | `codex` | cheap, balanced | ChatGPT Plus OAuth | Requires `unset OPENAI_API_KEY` |
 | `gemini_cli` | cheap, research, balanced | Google API | Direct CLI |
-| `glm_claude` | cheap | ZAI/GLM-5-turbo | Full claude CLI, free until 2026-05-02 |
+| `glm_claude` | cheap | ZAI/GLM-5-turbo | ⚠️ Plan expired 2026-05-02 — worker self-disables |
 | `claw_code` | opt-in | OpenRouter | Manual opt-in via `--worker claw_code` |
 | `claude_code` | premium, planner | Anthropic API | Main orchestrator, never dispatched externally |
 
