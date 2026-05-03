@@ -63,7 +63,9 @@ providers:
       - "Auth: ~/.codex/auth.json — copy from MBA to servers or use codex login --device-auth"
       - "OPENAI_API_KEY must be unset or it hits paid API instead of Plus subscription"
     models:
-      chatgpt_plus: { id: "chatgpt-plus", role: routine_coder }
+      gpt_5_5:      { id: "gpt-5.5",      role: strong_reasoning }
+      gpt_5_4:      { id: "gpt-5.4",      role: routine_coder }
+      gpt_5_4_mini: { id: "gpt-5.4-mini", role: cheap_fast }
 
   claude_review:
     enabled: true
@@ -87,7 +89,7 @@ lanes:
   cheap_fast:
     description: "Tiny fixes, lint, formatting, simple tests, trivial docs."
     current_provider: codex
-    current_model: chatgpt_plus
+    current_model: gpt_5_4_mini
     fallback_provider: opencode_go
     fallback_model: deepseek_v4_flash
     max_diff_lines: 150
@@ -107,7 +109,7 @@ lanes:
   routine_coder:
     description: "Normal bounded implementation and tests. Default lane."
     current_provider: codex
-    current_model: chatgpt_plus
+    current_model: gpt_5_4
     fallback_provider: opencode_go
     fallback_model: deepseek_v4_flash
     max_diff_lines: 500
@@ -212,7 +214,7 @@ runner_templates:
       - "gemini --version"
       - "gemini -p 'Say READY and nothing else.'"
   codex:
-    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access \"$(cat {task_file})\""
+    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec -m {model_id} --sandbox danger-full-access \"$(cat {task_file})\""
     cwd: "{worktree_path}"
     auth_env: null
     readiness:
@@ -222,7 +224,7 @@ runner_templates:
       - "OPENAI_API_KEY must be unset — otherwise hits paid API instead of ChatGPT Plus subscription"
       - "Prompt passed as positional arg, not --prompt-file (flag does not exist)"
   codex_cli_direct:
-    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access \"$(cat {task_file})\""
+    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec -m {model_id} --sandbox danger-full-access \"$(cat {task_file})\""
     cwd: "{worktree_path}"
     auth_env: null
     yolo: true
