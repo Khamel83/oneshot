@@ -173,7 +173,7 @@ runner_templates:
       - "claude -p gives full tool access with --dangerously-skip-permissions"
   # PATH 1: OpenCode CLI (all models — universal)
   opencode_go:
-    command: "opencode run --model opencode-go/{model_id} --prompt-file {task_file}"
+    command: "opencode run --model opencode-go/{model_id} --dangerously-skip-permissions \"$(cat {task_file})\""
     cwd: "{worktree_path}"
     auth_env: OPENCODE_GO_API_KEY
     readiness:
@@ -182,6 +182,7 @@ runner_templates:
     notes:
       - "Universal path — works with all models."
       - "Requires OpenCode CLI installed."
+      - "opencode run takes message as positional arg, not --prompt-file"
 
   # PATH 2: Claude CLI (MiniMax models only — Anthropic-compatible endpoint)
   opencode_go_claude:
