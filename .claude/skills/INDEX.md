@@ -41,8 +41,9 @@ Full operator for complex tasks:
 | `/restore` | Resume from handoff |
 | `/research` | Background research mode |
 | `/doc` | Cache external documentation |
-| `/freesearch` | Zero-token web search (Exa) |
+| `/freesearch` | Zero-token web search via Argus |
 | `/vision` | Image/website visual analysis |
+| `/adversarial-review` | Adversarial second-opinion review via Gemini — challenges design decisions |
 | `/secrets` | SOPS/Age secrets management |
 | `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
 | `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
