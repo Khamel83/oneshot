@@ -18,7 +18,7 @@ OneShot provides three operators for different work styles:
 - Verify and completion summary
 
 ### `/conduct` — Multi-Model Orchestration
-- Detect available providers (read `config/workers.yaml`)
+- Detect available providers (read `.oneshot/config/models.yaml`)
 - Ask 5 intake questions (BLOCKING until answered)
 - Classify tasks by task class → lane → worker
 - Route work across planner, workers, and reviewers
@@ -37,7 +37,7 @@ task → task_class → lane → worker_pool + reviewer
 
 Use the CLI resolver to check routing:
 ```bash
-python -m core.router.resolve --class implement_medium
+./bin/oneshot lanes
 ```
 
 ## Subagent Roles

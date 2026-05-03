@@ -10,7 +10,7 @@ Classifies tasks by type, routes to lanes, dispatches to workers, reviews with C
 ## CRITICAL: Dispatch Is Mandatory
 
 This operator REQUIRES external worker dispatch. Claude is the planner and reviewer ONLY.
-Implementation tasks MUST go to codex/gemini/glm via `core.dispatch.run` or subprocess.
+Implementation tasks MUST go to opencode_go workers via `./bin/oneshot dispatch` or `./bin/oneshot dispatch-many`.
 **There is no "do it inline" fallback. If dispatch fails, log a blocker and escalate.**
 
 ## Usage
@@ -26,12 +26,10 @@ Implementation tasks MUST go to codex/gemini/glm via `core.dispatch.run` or subp
 
 1. **Detect providers and verify routing works**
    ```bash
-   command -v codex >/dev/null 2>&1 && echo "codex: yes" || echo "codex: no"
-   command -v gemini >/dev/null 2>&1 && echo "gemini: yes" || echo "gemini: no"
-   cd ~/github/oneshot && python3 -m core.router.resolve --class implement_small --category coding
+   ./bin/oneshot lanes
    ```
    The router MUST return a valid lane with workers. If it fails, stop and tell the user.
-   `config/lanes.yaml` and `config/workers.yaml` MUST exist. If they don't, stop and tell the user.
+   `.oneshot/config/models.yaml` MUST exist. If it doesn't, stop and tell the user.
 
 2. **Ask 5 required questions** using AskUserQuestion — do NOT proceed until answered:
    1. What is the goal / deliverable?
@@ -86,24 +84,24 @@ Repeat until no unblocked tasks remain:
    - Determine task class (see task-classes.md)
    - Resolve lane: `python -m core.router.resolve --class <class> --category <category>`
    - **If lane is NOT premium**: Build self-contained prompt → dispatch to worker:
-     ```bash
-     ~/github/oneshot/bin/dispatch \
-       --class <task_class> \
-       --category <category> \
-       --prompt "Your self-contained prompt here..." \
-       --output 1shot/dispatch \
-       --manifest 1shot/dispatch
-     ```
+      ```bash
+      ./bin/oneshot dispatch \
+        --lane <lane> \
+        --task-file /tmp/task-spec.md \
+        --allow-dirty
+      ```
    - **If lane IS premium**: Claude handles inline (planning, review, integration only)
    - **For parallel tasks**:
-     ```bash
-     echo '[{"id":"1","prompt":"task 1"},{"id":"2","prompt":"task 2"}]' > /tmp/batch.json
-     ~/github/oneshot/bin/dispatch --class <task_class> --prompts-file /tmp/batch.json --parallel 3
-     ```
+      ```bash
+      ./bin/oneshot dispatch-many --lane <lane> \
+        --task-file /tmp/task-a.md \
+        --task-file /tmp/task-b.md \
+        --task-file /tmp/task-c.md
+      ```
    - **CRITICAL: Use subprocess dispatch, NOT Agent tool subagents.**
      `core.dispatch.run` spawns lightweight CLI processes.
      Agent tool spawns full Claude Code sessions — never use Agent for dispatch.
-   - If NO workers are available (codex, gemini, glm all fail): **log blocker, stop, tell user**
+   - If NO workers are available: **log blocker, stop, tell user**
 5. **Review**: If task requires review, dispatch review to reviewer
 6. **Scope check** — `git diff --name-only` against TASK_SPEC "Files Involved"
 7. **Verify**: Run Phase 3 verification checklist
@@ -136,12 +134,14 @@ Re-read `1shot/PROJECT.md`. For each acceptance criterion: cite evidence. Check 
 
 #### Stage B: Code Quality
 ```bash
-unset OPENAI_API_KEY && codex exec --json --sandbox danger-full-access \
-  -o /tmp/conduct-challenge.json \
-  "Review this diff for code quality: (1) what could break in production, (2) what edge cases are unhandled, (3) are there any security concerns, (4) does it follow the repo's existing patterns. Diff: [content]"
+# Dispatch a single task
+./bin/oneshot dispatch --lane routine_coder --task-file /tmp/task.md
+
+# Dispatch multiple tasks in parallel
+./bin/oneshot dispatch-many --lane routine_coder \
+  --task-file /tmp/task-a.md \
+  --task-file /tmp/task-b.md
 ```
-Parse: `jq 'select(.type=="item.completed") | .item.text' /tmp/conduct-challenge.json`
-If Codex unavailable: log blocker, surface to user. Do NOT review inline.
 
 ### Phase 5: Session-End Learning
 
@@ -165,8 +165,7 @@ Conduct Complete
 ## Routing Reference
 
 See `docs/instructions/task-classes.md` for full classification guide.
-See `~/.claude/skills/_shared/dispatch.md` for the dispatch protocol.
+See `.claude/commands/dispatch.md` for the /dispatch skill and `./bin/oneshot --help` for CLI reference.
 See `~/.claude/skills/_shared/providers.md` for provider detection and commands.
 
 **Key rule**: Route by task class, not provider name. Use lane policy from config.
-Claude thinks. Codex and Gemini execute. This is non-negotiable.

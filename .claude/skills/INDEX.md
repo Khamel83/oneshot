@@ -1,6 +1,6 @@
-# ONE_SHOT v13 — Operator Framework
+# ONE_SHOT v14 — Operator Framework
 
-**15 skills.** Three operators. Twelve utilities.
+**16 skills.** Three operators. Thirteen utilities.
 
 ---
 
@@ -100,7 +100,7 @@ description: What it does and WHEN to use it. Include trigger keywords.
 
 ### Why Commands Didn't Work
 
-Claude Code v2.1+ uses the **skills** system, not `~/.claude/commands/`.
+Claude Code uses the **skills** system. The `.claude/commands/` directory holds legacy commands (dispatch, status, escalate-worker, review-worker) that are still active.
 
 - Skills are **model-invoked** — Claude decides when to use them based on description
 - Commands were **user-invoked** — required explicit `/command` typing
