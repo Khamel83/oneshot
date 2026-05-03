@@ -5,6 +5,7 @@ import click
 from oneshot_cli import (
     lanes_cmd,
     dispatch_cmd,
+    dispatch_many_cmd,
     status_cmd,
     collect_cmd,
     review_cmd,
@@ -22,6 +23,7 @@ def cli():
 
 cli.add_command(lanes_cmd.cli, name="lanes")
 cli.add_command(dispatch_cmd.cli, name="dispatch")
+cli.add_command(dispatch_many_cmd.cli, name="dispatch-many")
 cli.add_command(status_cmd.cli, name="status")
 cli.add_command(collect_cmd.cli, name="collect")
 cli.add_command(review_cmd.cli, name="review")
