@@ -6,6 +6,8 @@ pool, and review path.
 
 ## Task Classes
 
+> **Note**: The lane names below (`cheap`, `balanced`, `premium`, `research`) describe the legacy `/conduct` routing system (`config/lanes.yaml`). The active dispatch harness uses different lane names (`cheap_fast`, `cheap_summary`, `routine_coder`, `strong_reasoning`, `premium_reasoning`) — see `.oneshot/config/models.yaml`.
+
 | Class | Lane | Category | Preferred Workers |
 |-------|------|----------|-------------------|
 | `plan` | premium | general | claude_code |
@@ -107,10 +109,13 @@ Three consecutive failures → circuit breaker → log blocker → skip.
 
 | Worker | Lane(s) | Backend | Notes |
 |--------|---------|---------|-------|
-| `codex` | cheap, balanced | ChatGPT Plus OAuth | Requires `unset OPENAI_API_KEY` |
-| `gemini_cli` | cheap, research, balanced | Google API | Direct CLI |
-| `glm_claude` | cheap | ZAI/GLM-5-turbo | ⚠️ Plan expired 2026-05-02 — worker self-disables |
-| `claw_code` | opt-in | OpenRouter | Manual opt-in via `--worker claw_code` |
+| `opencode_go/deepseek-v4-flash` | cheap_fast, routine_coder | OpenCode Go API | Fast, default for routine tasks |
+| `opencode_go/kimi-k2.6` | strong_reasoning | OpenCode Go API | Strong reasoning, cross-file changes |
+| `opencode_go/deepseek-v4-pro` | premium_reasoning | OpenCode Go API | Escalation only |
+| `opencode_go/minimax-m2.7` | routine_coder (legacy) | OpenCode Go / Claude CLI path | Anthropic-compatible endpoint |
+| `codex` | (legacy) | ChatGPT Plus OAuth | Requires `unset OPENAI_API_KEY` |
+| `gemini_cli` | (legacy) | Google API | Direct CLI |
+| `glm_claude` | (retired) | ZAI/GLM | ⚠️ Plan expired 2026-05-02 — unavailable |
 | `claude_code` | premium, planner | Anthropic API | Main orchestrator, never dispatched externally |
 
 ## Risk Classification
@@ -154,11 +159,11 @@ both "refactor" and "auth", it's classified as high risk.
 ## CLI Reference
 
 ```bash
-# Resolve routing for a task class
-python -m core.router.resolve --class implement_small
+# List active dispatch lanes
+./bin/oneshot lanes
 
-# Check available models for a lane
-python -c "from core.router.model_registry import models_for_lane; print(models_for_lane('cheap'))"
+# Check dispatched task status
+./bin/oneshot status
 
 # Check if Argus is available
 python -c "from core.search.argus_client import is_available; print(is_available())"
