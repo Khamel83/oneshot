@@ -1,12 +1,12 @@
 ## Blockers (need your input)
 
-1. **[high]** Redo: redo unknown work (scored 0.4)
+1. **[high]** Redo: redo unknown work (scored 0.6)
 
-2. **[high]** Redo: redo unknown work (scored 0.6)
+2. **[high]** Redo: redo unknown work (scored 0.2)
 
-3. **[high]** Redo: redo unknown work (scored 0.6)
+3. **[high]** Redo: redo unknown work (scored 0.4)
 
-4. **[high]** Redo: redo unknown work (scored 0.4)
+4. **[high]** Redo: redo unknown work (scored 0.6)
 
 5. **[high]** Redo: redo unknown work (scored 0.6)
 
@@ -30,6 +30,6 @@
 
 14. **[low]** Add a second contributor to 1shot/2026-04-27-plan-l-hardening-STATE.md (sole author: Test User, 5 edits)
 
-15. **[low]** Add frontmatter to 6 research docs: docs/research/2026-03-27_multi-tenant_platforms_research.md, docs/research/background-intelligence/research.md, docs/research/claude-code-non-anthropic-models/research.md (+3 more)
+15. **[low]** Add frontmatter to 7 research docs: docs/research/2026-03-27_multi-tenant_platforms_research.md, docs/research/background-intelligence/research.md, docs/research/claude-code-non-anthropic-models/research.md (+4 more)
 
-16. **[low]** Update docs/public-access.md — 91 days stale
+16. **[low]** Update docs/public-access.md — 92 days stale

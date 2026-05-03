@@ -784,5 +784,34 @@
       ],
       "category": "handoff"
     }
+  },
+  "cdeeae0e9a53963d68a21d99415ce689bbe14e29": {
+    "hash": "cdeeae0e9a53",
+    "message": "fix(commands): add slash commands as harness-level .md files",
+    "enriched": {
+      "summary": "Adds comprehensive markdown documentation for slash commands at the harness level and updates numerous supporting JSON metadata files to reflect new command structures and status changes.",
+      "tags": [
+        "documentation",
+        "commands",
+        "markdown",
+        "metadata",
+        "refactor"
+      ],
+      "category": "documentation"
+    }
+  },
+  "63653ebe13f4c7c3a1506e72a5e2cc6c942b736a": {
+    "hash": "63653ebe13f4",
+    "message": "fix(update): sync .claude/commands/ to projects on update",
+    "enriched": {
+      "summary": "Synchronize .claude/commands/ to projects during update using oneshot-update.sh",
+      "tags": [
+        "fix",
+        "update",
+        "sync",
+        "script"
+      ],
+      "category": "script"
+    }
   }
 }

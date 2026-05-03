@@ -1,33 +1,32 @@
 {
   "decisions": [
     {
-      "what": "Set up cron job for daily credit refresh at 00:01 UTC",
-      "why": "To automatically trigger 300 daily credits for manus"
+      "what": "Added cron entry for daily credit refresh",
+      "why": "Automate daily credit refresh at 00:01 UT"
     },
     {
-      "what": "Modified core/dispatch/run.py to handle agent_id and agent_profile fields",
-      "why": "To support manus API integration"
+      "what": "Created/edited manus-credits.md with API field names",
+      "why": "Document discovered Manus API fields"
     },
     {
-      "what": "Created documentation files for manus credits and API field names",
-      "why": "To track and document the manus integration work"
-    }
-  ],
-  "blockers": [
+      "what": "Modified and compiled core/dispatch/run.py",
+      "why": "Integrate manus functionality and verify syntax"
+    },
     {
-      "what": "Cron entry for manus-daily-refresh may not have been created successfully",
-      "reason": "Initial grep check showed 'No' indicating the entry didn't exist"
+      "what": "Pushed changes to master branch",
+      "why": "Persist modifications"
+    },
+    {
+      "what": "Searched config files for 'manus' references",
+      "why": "Locate configuration definitions"
     }
   ],
+  "blockers": [],
   "discoveries": [
-    {
-      "what": "Found manus configuration in workers.yaml, lanes.yaml, and models.yaml files"
-    },
-    {
-      "what": "Created lesson file documenting manus API field names"
-    },
-    {
-      "what": "Dispatch system is being used to manage credit tracking with JSON output"
-    }
+    "Daily credit refresh scheduled via cron at 00:01 UT",
+    "Manus API field names documented in manus-api-field-names.md",
+    "Latest dispatch-credits.jsonl entries show credit activity",
+    "'manus' found in workers.yaml, lanes.yaml, models.yaml configurations",
+    "run.py compiled successfully after modifications"
   ]
 }
