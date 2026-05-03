@@ -51,8 +51,12 @@ providers:
     notes:
       - "Mac: OAuth in ~/.gemini/oauth_creds.json (browser login)"
       - "Linux servers: GEMINI_API_KEY in ~/.gemini/.env"
+      - "Model aliases auto-upgrade as Gemini releases new versions"
     models:
-      gemini_flash: { id: "gemini-2.5-flash", role: cheap_summary }
+      gemini_auto:       { id: "auto",                    role: strong_reasoning }  # best available, routes complex→pro, simple→flash
+      gemini_pro:        { id: "pro",                     role: routine_coder }     # gemini-2.5-pro or 3-pro-preview if available
+      gemini_flash:      { id: "flash",                   role: cheap_summary }     # gemini-2.5-flash — fast, balanced
+      gemini_flash_lite: { id: "flash-lite",              role: cheap_fast }        # gemini-2.5-flash-lite — fastest
 
   codex:
     enabled: true
@@ -60,12 +64,13 @@ providers:
     description: "OpenAI Codex CLI. Free via ChatGPT Plus subscription. Strong coder."
     auth_env: null    # ChatGPT Plus OAuth in ~/.codex/auth.json; OPENAI_API_KEY must be unset.
     notes:
-      - "Auth: ~/.codex/auth.json — copy from MBA to servers or use codex login --device-auth"
+      - "Auth: ~/.codex/auth.json — each machine needs independent auth (codex login --device-auth)"
       - "OPENAI_API_KEY must be unset or it hits paid API instead of Plus subscription"
+      - "gpt-5.5 is newest/strongest, only available with ChatGPT Plus (not API key)"
     models:
-      gpt_5_5:      { id: "gpt-5.5",      role: strong_reasoning }
-      gpt_5_4:      { id: "gpt-5.4",      role: routine_coder }
-      gpt_5_4_mini: { id: "gpt-5.4-mini", role: cheap_fast }
+      gpt_5_5:      { id: "gpt-5.5",      role: strong_reasoning }  # newest, ChatGPT Plus only
+      gpt_5_4:      { id: "gpt-5.4",      role: routine_coder }     # flagship, Plus + API
+      gpt_5_4_mini: { id: "gpt-5.4-mini", role: cheap_fast }        # fast, lower cost
 
   claude_review:
     enabled: true
@@ -118,20 +123,20 @@ lanes:
 
   strong_reasoning:
     description: "Harder refactors, ambiguous failures, cross-file reasoning."
-    current_provider: opencode_go
-    current_model: kimi_k2_6
-    future_provider: opencode_go
-    future_model: kimi_k2_6
+    current_provider: codex
+    current_model: gpt_5_5
+    fallback_provider: opencode_go
+    fallback_model: kimi_k2_6
     max_diff_lines: 800
     max_files: 20
     allow_architecture_changes: true
 
   premium_reasoning:
     description: "Escalation only. Failed worker recovery or design-sensitive changes."
-    current_provider: opencode_go
-    current_model: deepseek_v4_pro
-    future_provider: opencode_go
-    future_model: deepseek_v4_pro
+    current_provider: codex
+    current_model: gpt_5_5
+    fallback_provider: opencode_go
+    fallback_model: deepseek_v4_pro
     max_diff_lines: 1000
     max_files: 25
     allow_architecture_changes: true
