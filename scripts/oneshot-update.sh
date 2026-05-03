@@ -164,6 +164,16 @@ sync_to_project() {
         fi
     fi
 
+    # Sync commands if target project has a .claude/commands/ dir
+    # Use merge (no --delete) to preserve project-specific commands (eagle.md, marcus.md, etc.)
+    if [ -d "$target_dir/.claude/commands" ]; then
+        if rsync -av "$ONESHOT_DIR/.claude/commands/" "$target_dir/.claude/commands/" 2>>"$LOG_FILE"; then
+            log "Commands synced successfully"
+        else
+            log "Commands sync failed (non-fatal)"
+        fi
+    fi
+
     echo "SYNCED:$target_dir"
     return 0
 }
