@@ -7,9 +7,9 @@ For general coding/workflow rules, see the other instruction files.
 
 OneShot is a **control plane for Claude-first orchestration**:
 - Claude Code is the primary planner and reviewer (thinker)
-- Codex and Gemini execute tasks via parallel dispatch (doers)
-- Lane-based routing policy (config/lanes.yaml) drives task dispatch
-- Dispatch protocol (`_shared/dispatch.md`) handles prompt construction, parallel execution, output capture
+- OpenCode Go workers (deepseek-v4-flash, minimax-m2.7, kimi-k2.6) execute tasks via parallel dispatch (doers)
+- Lane-based routing policy (`.oneshot/config/models.yaml`) drives task dispatch
+- `./bin/oneshot dispatch` and `./bin/oneshot dispatch-many` handle execution, worktree management, and output capture
 - Argus is the default search plane
 - Instructions are the single source of truth (docs/instructions/)
 
@@ -17,12 +17,13 @@ OneShot is a **control plane for Claude-first orchestration**:
 
 ```
 oneshot/
-  config/           # YAML routing policy (lanes, models, workers, search, providers)
+  config/ + .oneshot/config/  # YAML routing (legacy lanes, active models/providers)
   core/             # Python schemas, router, and dispatch runner
   docs/instructions/ # Neutral instruction source (this directory)
   .claude/rules/    # Thin imports to docs/instructions/
   .claude/skills/   # Operator and utility skill prompts
-  .opencode/        # OpenCode adapter (installed, pending interactive auth)
+  .opencode/        # OpenCode adapter (installed, fully set up)
+  oneshot_cli/      # CLI tool for dispatch and worktree management
   templates/        # Project templates (AGENTS.md.j2, CLAUDE.md.j2)
   secrets/          # SOPS/Age encrypted vault
   scripts/          # Build, deployment, and maintenance scripts
@@ -48,13 +49,19 @@ Instructions load based on project type:
 |-------|---------|
 | `/handoff` | Save context before `/clear` |
 | `/restore` | Resume from handoff |
+| `/dispatch` | Dispatch a single task to a worker |
+| `/status` | Check status of dispatched tasks |
+| `/escalate` | Escalate a failed task to a stronger lane |
 | `/research` | Background research via Argus |
 | `/freesearch` | Zero-token web search via Argus |
 | `/doc` | Cache external documentation |
 | `/vision` | Image/website visual analysis |
+| `/adversarial-review` | Adversarial second-opinion review |
 | `/secrets` | SOPS/Age secrets management |
-| `/debug` | Systematic debugging (4-phase: investigate → analyze → hypothesize → fix) |
-| `/tdd` | Test-driven development (RED-GREEN-REFACTOR cycle) |
+| `/debug` | Systematic debugging (4-phase) |
+| `/tdd` | Test-driven development (RED-GREEN-REFACTOR) |
+| `/janitor` | Background intelligence debrief |
+| `/update` | Sync oneshot skills to current project |
 
 ## v2 Capabilities
 
@@ -83,12 +90,12 @@ Background intelligence layer (`core/janitor/`) that runs automatically via Clau
 
 Storage: `.janitor/` per project (events.jsonl, signal JSON files, onboarding-state.json).
 
-The janitor lane (`janitor` task classes) routes exclusively to the `free` worker.
+The janitor lane routes to the `free` worker (OpenRouter free tier).
 No review needed — these are housekeeping tasks.
 
 ## Shared Memory
 
-Cross-agent knowledge surface at `.claude/memory/`. All agents (Claude, Codex, Gemini, OpenCode) read and write to the same files, so learnings from one agent benefit all others.
+Cross-agent knowledge surface at `.claude/memory/`. All agents (Claude, OpenCode, other workers) read and write to the same files, so learnings from one agent benefit all others.
 
 **Structure:**
 ```
@@ -102,7 +109,7 @@ Cross-agent knowledge surface at `.claude/memory/`. All agents (Claude, Codex, G
 
 **How it works:**
 1. Claude reads `.claude/memory/memory.md` at session start (via `.claude/rules/core.md`)
-2. Dispatch prompts tell Codex/Gemini to read it before starting tasks (via `_shared/dispatch.md`)
+2. Dispatch prompts tell workers (opencode, minimax, kimi) to read it before starting tasks
 3. Any agent that discovers something useful appends a dated entry: `YYYY-MM-DD — [agent] — finding`
 4. AGENTS.md references it as the shared memory location
 
@@ -131,6 +138,7 @@ Never echo secrets in output. Never commit plaintext secrets.
 
 | Machine | IP | Role |
 |---------|------|------|
-| oci-dev | 100.126.13.70 | Primary dev, services, Claude Code |
+| MBA (primary dev) | 100.64.121.72 | MacBook Air, primary dev, Claude Code |
+| oci-dev | 100.126.13.70 | Cloud VM, services |
 | homelab | 100.112.130.100 | Docker services, 26TB storage |
 | macmini | 100.113.216.27 | Apple Silicon GPU, transcription |
