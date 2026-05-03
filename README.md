@@ -124,7 +124,7 @@ Use `/secrets` skill from Claude Code. Never commit plaintext.
 
 ## Janitor
 
-Runs automatically via hooks + 15-min cron. Cost: $0 (openrouter/free).
+Runs automatically via hooks + daily cron (3am UTC on homelab). Cost: $0 (openrouter/free).
 
 **Signals** in `.janitor/`:
 
@@ -136,7 +136,7 @@ Runs automatically via hooks + 15-min cron. Cost: $0 (openrouter/free).
 | Dependency map | `dep-graph.json` |
 | Doc staleness | `doc-staleness.json` |
 | Knowledge risk | `knowledge-risk.json` |
-| Onboarding | `onboarding-summary.md` |
+| Onboarding | `onboarding.md` |
 | Patterns | `patterns.json` |
 
 Hooks write to `events.jsonl`; cron runs summarizer + hygiene. Files: `core/janitor/worker.py`, `recorder.py`, `jobs.py`
