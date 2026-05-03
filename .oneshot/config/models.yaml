@@ -1,26 +1,16 @@
 # Delegation Harness — provider, lane, and runner configuration.
 #
-# This is a separate routing layer from config/lanes.yaml (which powers the
-# /short, /full, /conduct skills). Don't merge them yet.
+# Worker priority (cost-first):
+#   1. codex   — ChatGPT Plus OAuth, $0 marginal cost, strong coder
+#   2. gemini  — Google AI Pro / API key, $0 marginal cost, strong at writing/docs
+#   3. opencode_go — metered ($10/mo cap), fallback or heavy reasoning
 #
 # Lifecycle:
-#   - "current_*" fields point to the active provider/model used today.
-#   - "future_*"  fields point to where a lane will move once OpenCode Go is enabled.
+#   - "current_*" fields point to the active provider/model.
+#   - "fallback_*" fields are the metered fallback if primary is unavailable.
 #   - To migrate a lane, change current_provider/current_model — runner_templates stay put.
 
 providers:
-  zai:
-    enabled: true
-    kind: cli_or_proxy
-    description: "Active GLM coding plan provider. Routed via OpenCode by default; claude-CLI fallback available."
-    auth_env: ZAI_API_KEY     # name only, never rendered into worker.log
-    notes:
-      - "Plan expires 2026-05-02. Migrate lanes to opencode_go before then."
-    models:
-      glm_4_5_air:   { id: "glm-4.5-air",   role: cheap_fast }
-      glm_5_1:       { id: "glm-5.1",       role: routine_coder }
-      glm_5_turbo:   { id: "glm-5-turbo",   role: strong_reasoning }
-
   opencode_go:
     enabled: true
     kind: model_gateway
@@ -54,16 +44,26 @@ providers:
       mimo_v2_5:         { id: "mimo-v2.5",        protocol: openai,    role: routine_coder }
 
   gemini:
-    enabled: false
+    enabled: true
     kind: cli
-    description: "Optional. Documentation, tests, summaries."
+    description: "Google Gemini CLI. Free via Google AI Pro subscription. Best for summaries, docs, writing."
     auth_env: GEMINI_API_KEY
+    notes:
+      - "Mac: OAuth in ~/.gemini/oauth_creds.json (browser login)"
+      - "Linux servers: GEMINI_API_KEY in ~/.gemini/.env"
+    models:
+      gemini_flash: { id: "gemini-2.5-flash", role: cheap_summary }
 
   codex:
-    enabled: false
+    enabled: true
     kind: cli
-    description: "Optional. Alternate worker or reviewer."
+    description: "OpenAI Codex CLI. Free via ChatGPT Plus subscription. Strong coder."
     auth_env: null    # ChatGPT Plus OAuth in ~/.codex/auth.json; OPENAI_API_KEY must be unset.
+    notes:
+      - "Auth: ~/.codex/auth.json — copy from MBA to servers or use codex login --device-auth"
+      - "OPENAI_API_KEY must be unset or it hits paid API instead of Plus subscription"
+    models:
+      chatgpt_plus: { id: "chatgpt-plus", role: routine_coder }
 
   claude_review:
     enabled: true
@@ -86,30 +86,30 @@ providers:
 lanes:
   cheap_fast:
     description: "Tiny fixes, lint, formatting, simple tests, trivial docs."
-    current_provider: opencode_go
-    current_model: deepseek_v4_flash
-    future_provider: opencode_go
-    future_model: deepseek_v4_flash
+    current_provider: codex
+    current_model: chatgpt_plus
+    fallback_provider: opencode_go
+    fallback_model: deepseek_v4_flash
     max_diff_lines: 150
     max_files: 5
     allow_architecture_changes: false
 
   cheap_summary:
     description: "Summaries, notes, extraction, low-risk transforms."
-    current_provider: opencode_go
-    current_model: qwen_3_5_plus
-    future_provider: opencode_go
-    future_model: qwen_3_5_plus
+    current_provider: gemini
+    current_model: gemini_flash
+    fallback_provider: opencode_go
+    fallback_model: qwen_3_5_plus
     max_diff_lines: 100
     max_files: 5
     allow_architecture_changes: false
 
   routine_coder:
     description: "Normal bounded implementation and tests. Default lane."
-    current_provider: opencode_go
-    current_model: deepseek_v4_flash
-    future_provider: opencode_go
-    future_model: deepseek_v4_flash
+    current_provider: codex
+    current_model: chatgpt_plus
+    fallback_provider: opencode_go
+    fallback_model: deepseek_v4_flash
     max_diff_lines: 500
     max_files: 12
     allow_architecture_changes: false
@@ -155,20 +155,6 @@ lanes:
 #
 # ---------------------------------------------------------------------------
 runner_templates:
-  zai:
-    command: "claude -p --dangerously-skip-permissions --model {model_id} \"$(cat {task_file})\""
-    cwd: "{worktree_path}"
-    auth_env: ZAI_API_KEY
-    env:
-      ANTHROPIC_BASE_URL: "https://api.z.ai/api/anthropic"
-      ANTHROPIC_AUTH_TOKEN: "{auth_value}"
-      ANTHROPIC_API_KEY: ""
-    readiness:
-      - "command -v claude"
-      - "secrets get ZAI_API_KEY >/dev/null 2>&1"
-    notes:
-      - "Uses ANTHROPIC_AUTH_TOKEN (not API_KEY) for ZAI proxy auth"
-      - "claude -p gives full tool access with --dangerously-skip-permissions"
   # PATH 1: OpenCode CLI (all models — universal)
   opencode_go:
     command: "opencode run --model opencode-go/{model_id} --dangerously-skip-permissions \"$(cat {task_file})\""
@@ -226,14 +212,17 @@ runner_templates:
       - "gemini --version"
       - "gemini -p 'Say READY and nothing else.'"
   codex:
-    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access --prompt-file {task_file}"
+    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access \"$(cat {task_file})\""
     cwd: "{worktree_path}"
     auth_env: null
     readiness:
       - "command -v codex"
       - "test -s ~/.codex/auth.json"
+    notes:
+      - "OPENAI_API_KEY must be unset — otherwise hits paid API instead of ChatGPT Plus subscription"
+      - "Prompt passed as positional arg, not --prompt-file (flag does not exist)"
   codex_cli_direct:
-    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access --prompt-file {task_file}"
+    command: "unset OPENAI_API_KEY OPENAI_BASE_URL && codex exec --sandbox danger-full-access \"$(cat {task_file})\""
     cwd: "{worktree_path}"
     auth_env: null
     yolo: true
