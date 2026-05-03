@@ -496,5 +496,293 @@
       ],
       "category": "chore"
     }
+  },
+  "2a3666949663840541a7ae01342d9a76238a4610": {
+    "hash": "2a3666949663",
+    "message": "chore: update janitor signals",
+    "enriched": {
+      "summary": "Update janitor signals and related configuration files",
+      "tags": [
+        "chore",
+        "janitor",
+        "signals",
+        "configuration"
+      ],
+      "category": "chore"
+    }
+  },
+  "58c39e4b770facc1f07d0cf9ea18b0097757fdec": {
+    "hash": "58c39e4b770f",
+    "message": "feat: switch default opencode model to deepseek-v4-flash via opencode-go",
+    "enriched": {
+      "summary": "Switched the default opencode model to deepseek-v4-flash using opencode-go, updating .opencode/opencode.json.",
+      "tags": [
+        "opencode",
+        "deepseek-v4-flash",
+        "model-switch",
+        "go"
+      ],
+      "category": "feat"
+    }
+  },
+  "3b625b19869924effe1102409acabd44bff7e483": {
+    "hash": "3b625b198699",
+    "message": "refactor: condense system prompt \u2014 move reference docs out of auto-load",
+    "enriched": {
+      "summary": "Refactored system prompt by removing reference docs from auto-load and consolidating them into dedicated documentation files.",
+      "tags": [
+        "refactor",
+        "documentation",
+        "prompt",
+        "cleanup"
+      ],
+      "category": "refactor"
+    }
+  },
+  "7a68f0fcffdcc33bc0b0f654b96b73d1700cbf93": {
+    "hash": "7a68f0fcffdc",
+    "message": "feat: universal handoff location for cross-machine/cross-harness resumption",
+    "enriched": {
+      "summary": "Add a universal handoff location to support cross-machine and cross-harness resumption.",
+      "tags": [
+        "feat",
+        "handoff",
+        "cross-machine",
+        "cross-harness",
+        "resumption"
+      ],
+      "category": "feature"
+    }
+  },
+  "278027b3d36e3390092ac6a51998d5814bf60ca2": {
+    "hash": "278027b3d36e",
+    "message": "fix(dispatch): correct opencode_go runner command \u2014 use positional arg, not --prompt-file",
+    "enriched": {
+      "summary": "Fix dispatch runner command to use positional argument instead of --prompt-file",
+      "tags": [
+        "fix",
+        "dispatch",
+        "opencode_go",
+        "runner",
+        "prompt-file"
+      ],
+      "category": "bugfix"
+    }
+  },
+  "fa156456b5143e95497427608986c9f7a87cfe09": {
+    "hash": "fa156456b514",
+    "message": "fix(janitor): remove redundant cron signal refresh, add events rotation, fix repomix PATH",
+    "enriched": {
+      "summary": "Removed unnecessary cron signal refresh, added event rotation logic, and fixed repomix PATH handling in janitor jobs.",
+      "tags": [
+        "bugfix",
+        "janitor",
+        "cron",
+        "repomix",
+        "maintenance"
+      ],
+      "category": "maintenance"
+    }
+  },
+  "224e7835630c08ecc09c24ed946fa7a9367d164f": {
+    "hash": "224e7835630c",
+    "message": "docs(pass-a): fix cron frequency (daily not 15-min) and onboarding filename post-merge",
+    "enriched": {
+      "summary": "Fix cronfrequency to daily and correct onboarding filename after merge in documentation",
+      "tags": [
+        "docs",
+        "cron",
+        "filename",
+        "merge"
+      ],
+      "category": "documentation"
+    }
+  },
+  "a78337e1ee9c421670480240e8fc635aa60a4fb0": {
+    "hash": "a78337e1ee9c",
+    "message": "docs(pass-a): update README to reflect current codebase",
+    "enriched": {
+      "summary": "Updated documentation to align README with current codebase, adding 135 lines to DOC_AUDIT.md and modifying 243 lines in README.md while removing 145 lines.",
+      "tags": [
+        "docs",
+        "readme",
+        "pass-a"
+      ],
+      "category": "documentation"
+    }
+  },
+  "559ad8b66ded990923c672f3da124b7fc70f1a2e": {
+    "hash": "559ad8b66ded",
+    "message": "docs: mark glm_claude as expired in task-classes.md",
+    "enriched": {
+      "summary": "Mark glm_claude as expired in task-classes.md",
+      "tags": [
+        "documentation",
+        "maintenance",
+        "expired",
+        "glm_claude"
+      ],
+      "category": "documentation"
+    }
+  },
+  "7f24506e77e1b51751a14755187065840e3e6bdc": {
+    "hash": "7f24506e77e1",
+    "message": "docs: add missing adversarial-review to INDEX.md, fix freesearch description",
+    "enriched": {
+      "summary": "Add missing adversarial-review entry to INDEX.md and correct freesearch description.",
+      "tags": [
+        "docs",
+        "index",
+        "adversarial-review",
+        "freesearch",
+        "documentation"
+      ],
+      "category": "documentation"
+    }
+  },
+  "be94b4a5a171af3ffc85598ee56f6e299e73f502": {
+    "hash": "be94b4a5a171",
+    "message": "feat(dispatch): add dispatch-many for native parallel fan-out",
+    "enriched": {
+      "summary": "Add dispatch-many command to enable native parallel fan-out execution",
+      "tags": [
+        "feature",
+        "dispatch",
+        "parallel",
+        "fan-out",
+        "cli"
+      ],
+      "category": "feat"
+    }
+  },
+  "a9da2e30be7ad95edaff4172d3488ef195846053": {
+    "hash": "a9da2e30be7a",
+    "message": "config(lanes): switch routine_coder to deepseek-v4-flash",
+    "enriched": {
+      "summary": "Switch routine_coder model to deepseek-v4-flash in the configuration",
+      "tags": [
+        "config",
+        "model",
+        "deepseek",
+        "lanes"
+      ],
+      "category": "configuration"
+    }
+  },
+  "c46352b732984f6829d5faba8fa2f4b0ca3b929f": {
+    "hash": "c46352b73298",
+    "message": "docs: update oneshot.md \u2014 current workers, correct config paths, full skill catalog",
+    "enriched": {
+      "summary": "Updated the oneshot documentation to reflect current worker names, corrected configuration paths, and added a comprehensive skill catalog.",
+      "tags": [
+        "docs",
+        "oneshot",
+        "skill-catalog",
+        "config"
+      ],
+      "category": "documentation"
+    }
+  },
+  "7405e4306ee035d0afa32189038068c7406c0f94": {
+    "hash": "7405e4306ee0",
+    "message": "docs(skills): update conduct skill to use ./bin/oneshot dispatch",
+    "enriched": {
+      "summary": "Update conduct skill documentation to use ./bin/oneshot dispatch",
+      "tags": [
+        "docs",
+        "skills",
+        "conduct",
+        "dispatch"
+      ],
+      "category": "documentation"
+    }
+  },
+  "3a31a1a42d8b434d85d40906b8105b72dd71830d": {
+    "hash": "3a31a1a42d8b",
+    "message": "docs: update INDEX.md to v14, add adversarial-review skill to repo",
+    "enriched": {
+      "summary": "Updated documentation index to version 14 and added a new adversarial-review skill entry.",
+      "tags": [
+        "docs",
+        "skill",
+        "adversarial-review",
+        "documentation"
+      ],
+      "category": "documentation"
+    }
+  },
+  "3817414693867587d50bcbb62e22d864a1904d93": {
+    "hash": "381741469386",
+    "message": "config(dispatch): wire Codex + Gemini as primary workers, remove ZAI",
+    "enriched": {
+      "summary": "Updated dispatch configuration to use Codex and Gemini as primary workers, removed ZAI, and adjusted model settings.",
+      "tags": [
+        "config",
+        "dispatch",
+        "codex",
+        "gemini",
+        "zai",
+        "worker"
+      ],
+      "category": "refactor"
+    }
+  },
+  "05218ee15d77dfbe6aca345d17d02a0d94058ba7": {
+    "hash": "05218ee15d77",
+    "message": "research: Codex + Gemini CLI auth setup for multi-machine dispatch",
+    "enriched": {
+      "summary": "Implemented research documentation on setting up Codex and Gemini CLI authentication for multi-machine dispatch, adding 210 lines of explanatory content.",
+      "tags": [
+        "codex",
+        "gemini",
+        "cli",
+        "auth",
+        "multi-machine",
+        "dispatch"
+      ],
+      "category": "research"
+    }
+  },
+  "df3d9d1635c71d9d8cd86a354c515fbb82b4365e": {
+    "hash": "df3d9d1635c7",
+    "message": "secrets: add ARGUS_REMOTE_URL to argus vault",
+    "enriched": {
+      "summary": "Add ARGUS_REMOTE_URL to argus vault",
+      "tags": [
+        "secrets",
+        "vault",
+        "ARGUS_REMOTE_URL",
+        "encryption"
+      ],
+      "category": "security"
+    }
+  },
+  "d8cfe9ce2e9f93faaa1588df396f1f31310118eb": {
+    "hash": "d8cfe9ce2e9f",
+    "message": "config(dispatch): Codex + Gemini are free workers, OpenCode Go is fallback",
+    "enriched": {
+      "summary": "MarkCodex and Gemini as free workers; OpenCode Go used as fallback in dispatch configuration.",
+      "tags": [
+        "config",
+        "dispatch",
+        "workers",
+        "fallback"
+      ],
+      "category": "configuration"
+    }
+  },
+  "d6bb5a935607f1eab79058387395885f3965146a": {
+    "hash": "d6bb5a935607",
+    "message": "handoff: 2026-05-02 oneshot slash command investigation",
+    "enriched": {
+      "summary": "Created handoff document for a oneshot slash command investigation dated 2026-05-02.",
+      "tags": [
+        "2026-05-02",
+        "oneshot",
+        "slash command",
+        "investigation"
+      ],
+      "category": "handoff"
+    }
   }
 }

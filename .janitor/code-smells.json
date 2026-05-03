@@ -2,7 +2,7 @@
   "oversized_files": [
     {
       "path": "core/janitor/jobs.py",
-      "lines": 1834
+      "lines": 1856
     },
     {
       "path": "core/dispatch/run.py",
@@ -79,7 +79,7 @@
     {
       "path": "core/janitor/jobs.py",
       "function": "review_pending_tasks",
-      "lines": 118
+      "lines": 116
     },
     {
       "path": "core/dispatch/run.py",

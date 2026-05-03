@@ -1,34 +1,33 @@
 {
   "decisions": [
     {
-      "what": "Added crontab entry for Manus daily credit refresh",
-      "why": "To automate scheduling of 300 daily credits at 00:01 UT"
+      "what": "Set up cron job for daily credit refresh at 00:01 UTC",
+      "why": "To automatically trigger 300 daily credits for manus"
     },
     {
-      "what": "Pushed changes to master after modifying run.py and config files",
-      "why": "To persist modifications and trigger CI"
+      "what": "Modified core/dispatch/run.py to handle agent_id and agent_profile fields",
+      "why": "To support manus API integration"
     },
     {
-      "what": "Searched configuration files for 'manus' references",
-      "why": "To locate relevant config definitions for further work"
-    },
-    {
-      "what": "Created lessons/manus-api-field-names.md",
-      "why": "To document discovered Manus API field names for future reference"
+      "what": "Created documentation files for manus credits and API field names",
+      "why": "To track and document the manus integration work"
     }
   ],
   "blockers": [
     {
-      "what": "Unable to locate a defined 'manus' worker in configuration files",
-      "reason": "grep searches in workers.yaml, lanes.yaml, models.yaml returned no matches, indicating possible missing definition"
+      "what": "Cron entry for manus-daily-refresh may not have been created successfully",
+      "reason": "Initial grep check showed 'No' indicating the entry didn't exist"
     }
   ],
   "discoveries": [
-    "Cron entry for Manus daily credit refresh was missing and was added",
-    "Manus daily credit refresh is scheduled at 00:01 UT to trigger 300 credits",
-    "File manus-credits.md was created to store credit information",
-    "Configuration files were inspected for 'manus' references",
-    "dispatch-credits.jsonl was examined to view recent credit records",
-    "Lessons directory was accessed and a new markdown file was created for API field names"
+    {
+      "what": "Found manus configuration in workers.yaml, lanes.yaml, and models.yaml files"
+    },
+    {
+      "what": "Created lesson file documenting manus API field names"
+    },
+    {
+      "what": "Dispatch system is being used to manage credit tracking with JSON output"
+    }
   ]
 }

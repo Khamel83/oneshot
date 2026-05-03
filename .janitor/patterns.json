@@ -1,35 +1,35 @@
 {
   "patterns": [
     {
-      "type": "configuration_management",
-      "description": "Multiple configuration files (models.yaml, workers.yaml, lanes.yaml, providers.yaml) accessed frequently with high session counts, indicating complex configuration management needs",
-      "frequency": "36, 11, 6, 5, 4, 3 sessions across 6 config files",
-      "recommendation": "Implement configuration schema validation, create a unified config loader with caching, and establish configuration versioning to reduce access overhead"
+      "type": "Core Router Overuse",
+      "description": "Core router modules (run.py, lane_policy.py, resolve.py, model_registry.py) are accessed in many sessions, indicating they are a central bottleneck.",
+      "frequency": "High",
+      "recommendation": "Extract shared dispatch logic into reusable utilities, add caching, and enforce strict interface versioning to reduce direct coupling."
     },
     {
-      "type": "dispatch_system",
-      "description": "Core dispatch functionality (tasks.py, dispatch_cmd.py, dispatch/run.py, __main__.py) shows high engagement with 17, 5, 3, 4 sessions respectively",
-      "frequency": "30 total sessions across 4 dispatch-related files",
-      "recommendation": "Refactor dispatch logic into modular components with clear separation of concerns, implement dispatch pipeline visualization, and add comprehensive logging for debugging"
+      "type": "Configuration File Overuse",
+      "description": "Configuration files, especially .oneshot/config/models.yaml, are edited in a large number of sessions, risking configuration drift and inconsistencies.",
+      "frequency": "Very High",
+      "recommendation": "Externalize configuration to a version\u2011controlled schema, add automated validation, and centralize access via a config service."
     },
     {
-      "type": "skill_routing_architecture",
-      "description": "Skill documentation and routing files (SKILL.md files, delegation-enforcement.md, routing.md, lane_policy.py, resolve.py) show systematic development across multiple skills",
-      "frequency": "40+ sessions across 10+ routing/skill files",
-      "recommendation": "Create a skill registry pattern with automated documentation generation, implement routing rule validation, and establish skill composition patterns"
+      "type": "Delegation & Routing Documentation",
+      "description": "Delegation\u2011enforcement.md, DELEGATION_MODEL.md, WORKER_LANES.md, and routing.md are repeatedly consulted, suggesting unclear or fragmented policies.",
+      "frequency": "High",
+      "recommendation": "Consolidate all delegation and routing policies into a single authoritative document, add examples, and enforce via code reviews and linters."
     },
     {
-      "type": "testing_diagnostics",
-      "description": "Doctor command and test files (doctor_cmd.py, test_doctor.py) indicate focus on system health monitoring and validation",
-      "frequency": "10 sessions across 2 diagnostic/testing files",
-      "recommendation": "Expand diagnostic coverage to other components, implement automated health checks, and create a self-healing mechanism for common issues"
+      "type": "CLI Task Entry Point Hotspot",
+      "description": "oneshot_cli/tasks.py is accessed in 17 sessions, indicating it may be a focal point for command execution.",
+      "frequency": "High",
+      "recommendation": "Refactor tasks.py into modular command modules with lazy loading, and add unit tests for each command path."
     },
     {
-      "type": "migration_planning",
-      "description": "Migration documentation (ZAI_TO_OPENCODE_GO_MIGRATION.md) and planning documents show ongoing architectural evolution",
-      "frequency": "6-10 sessions across 3 planning documents",
-      "recommendation": "Create a migration checklist with rollback procedures, establish feature flags for gradual migration, and document migration progress with clear milestones"
+      "type": "Skill Documentation Access",
+      "description": "Various SKILL.md files (conduct, research, shared) are accessed moderately (3\u20118 sessions), indicating potential gaps in onboarding or knowledge sharing.",
+      "frequency": "Medium",
+      "recommendation": "Standardize skill documentation templates, add a onboarding checklist, and integrate documentation checks into CI."
     }
   ],
-  "events_analyzed": 583
+  "events_analyzed": 710
 }

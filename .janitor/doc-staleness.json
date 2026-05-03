@@ -1,16 +1,16 @@
 {
   "stale_count": 2,
-  "fresh_count": 279,
+  "fresh_count": 320,
   "stale_threshold_days": 30,
   "stale_files": [
     {
       "file": "archive/v7-high-token/README.md",
-      "days_since_edit": 90,
+      "days_since_edit": 92,
       "last_modified": "2026-01-31"
     },
     {
       "file": "docs/public-access.md",
-      "days_since_edit": 90,
+      "days_since_edit": 92,
       "last_modified": "2026-01-31"
     }
   ]

@@ -1,10 +1,10 @@
 {
-  "cluster_count": 12,
-  "total_documents": 281,
+  "cluster_count": 13,
+  "total_documents": 322,
   "clusters": [
     {
       "directory": "eval",
-      "file_count": 74,
+      "file_count": 83,
       "files": [
         "eval/benchmarks/classification/holdout/cls-h01.json",
         "eval/benchmarks/classification/holdout/cls-h02.json",
@@ -15,7 +15,7 @@
     },
     {
       "directory": "docs",
-      "file_count": 64,
+      "file_count": 66,
       "files": [
         "docs/DELEGATION_MODEL.md",
         "docs/LLM-OVERVIEW.md",
@@ -26,7 +26,7 @@
     },
     {
       "directory": ".claude",
-      "file_count": 42,
+      "file_count": 43,
       "files": [
         ".claude/agents/INDEX.md",
         ".claude/agents/TEMPLATE.md",
@@ -36,8 +36,19 @@
       ]
     },
     {
+      "directory": ".janitor",
+      "file_count": 27,
+      "files": [
+        ".janitor/blockers.json",
+        ".janitor/code-smells.json",
+        ".janitor/commit-enrichments.json",
+        ".janitor/config-drift.json",
+        ".janitor/critical-files.json"
+      ]
+    },
+    {
       "directory": "1shot",
-      "file_count": 18,
+      "file_count": 19,
       "files": [
         "1shot/2026-04-27-plan-l-hardening-PROJECT.md",
         "1shot/2026-04-27-plan-l-hardening-ROADMAP.md",
@@ -70,7 +81,7 @@
     },
     {
       "directory": "(root)",
-      "file_count": 13,
+      "file_count": 14,
       "files": [
         ".sops.yaml",
         "AGENTS.md",
@@ -99,17 +110,6 @@
         "templates/community-starter/.github/workflows/scheduled-jobs.yml",
         "templates/community-starter/.github/workflows/tests.yml",
         "templates/community-starter/ARCHITECTURE.md"
-      ]
-    },
-    {
-      "directory": ".oneshot",
-      "file_count": 8,
-      "files": [
-        ".oneshot/code-smells.json",
-        ".oneshot/commit-enrichments.json",
-        ".oneshot/config-drift.json",
-        ".oneshot/config/models.yaml",
-        ".oneshot/dep-graph.json"
       ]
     }
   ]

@@ -1,5 +1,5 @@
 {
-  "files_with_imports": 25,
+  "files_with_imports": 26,
   "impact_ranking": [
     {
       "file": "core/task_schema.py",
@@ -7,7 +7,7 @@
     },
     {
       "file": "oneshot_cli/tasks.py",
-      "downstream_count": 5
+      "downstream_count": 6
     },
     {
       "file": "core/router/lane_policy.py",
