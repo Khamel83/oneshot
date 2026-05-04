@@ -90,6 +90,11 @@ if [[ "$1" == "--install" ]]; then
 # Portable setup: github.com/Khamel83/oneshot/scripts/claude-shell-setup.sh
 # To reinstall: bash claude-shell-setup.sh --install
 
+# Ensure ~/.local/bin and npm-global are in PATH (secrets CLI, claude, etc.)
+[[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
+[[ ":$PATH:" != *":$HOME/.npm-global/bin:"* ]] && export PATH="$HOME/.npm-global/bin:$PATH"
+[[ ":$PATH:" != *":$HOME/.opencode/bin:"* ]] && export PATH="$HOME/.opencode/bin:$PATH"
+
 export ZAI_API_KEY="__ZAI_API_KEY__"
 export GLM_MODEL="__GLM_MODEL__"
 
