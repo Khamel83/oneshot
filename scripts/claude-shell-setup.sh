@@ -39,17 +39,18 @@ fi
 
 # Handle --install flag
 if [[ "$1" == "--install" ]]; then
-	# Try vault first, fall back to hardcoded value, error if still placeholder
+	# Try vault first, fall back to env var, warn if not found (don't block install)
 	if [[ "$ZAI_API_KEY" == "YOUR_ZAI_API_KEY_HERE" ]]; then
-		_vault_key=$(secrets get ZAI_API_KEY 2>/dev/null)
+		_vault_key=$(~/.local/bin/secrets get ZAI_API_KEY 2>/dev/null || secrets get ZAI_API_KEY 2>/dev/null || true)
 		if [[ -n "$_vault_key" ]]; then
 			ZAI_API_KEY="$_vault_key"
 			echo "✓ ZAI_API_KEY loaded from vault"
+		elif [[ -n "${ZAI_API_KEY_OVERRIDE:-}" ]]; then
+			ZAI_API_KEY="$ZAI_API_KEY_OVERRIDE"
+			echo "✓ ZAI_API_KEY from environment"
 		else
-			echo "ERROR: ZAI_API_KEY not found in vault and not set in script." >&2
-			echo "  Run: secrets set research_keys ZAI_API_KEY=<your-key>" >&2
-			echo "  Or get your key at: https://z.ai/devpack" >&2
-			exit 1
+			ZAI_API_KEY="NOT_SET"
+			echo "⚠ ZAI_API_KEY not found — 'zai' command will not work (run: secrets set research_keys ZAI_API_KEY=<key>)" >&2
 		fi
 	fi
 
