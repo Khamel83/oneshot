@@ -1,4 +1,10 @@
 workers:
+  # Remote machine metadata is compatibility-only during the OneShot Lite
+  # migration. Homelab owns fleet inventory and CLI readiness checks:
+  #   make -C ~/github/homelab doctor-dev-tools
+  #
+  # Keep worker/provider routing here only when it is specific to OneShot's
+  # coding adapters. Do not grow this into another machine manager.
   local:
     host: localhost
     transport: local

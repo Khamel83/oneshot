@@ -730,6 +730,27 @@ def detect_local_machine(machines: dict) -> str | None:
 @click.option("--fix", is_flag=True, help="Auto-fix issues where possible.")
 def cli(all_machines: bool, fix: bool):
     """Check machine readiness for oneshot delegation harness."""
+    if all_machines:
+        homelab_dir = Path.home() / "github" / "homelab"
+        homelab_doctor = homelab_dir / "scripts" / "doctor-dev-tools.sh"
+        if homelab_doctor.exists():
+            if fix:
+                click.echo(
+                    "oneshot doctor --all-machines delegates to homelab; --fix is ignored.",
+                    err=True,
+                )
+            result = subprocess.run(
+                ["make", "-C", str(homelab_dir), "doctor-dev-tools"],
+                text=True,
+            )
+            raise SystemExit(result.returncode)
+
+        click.echo(
+            "Fleet readiness has moved to homelab, but ~/github/homelab was not found; "
+            "falling back to legacy OneShot checks.",
+            err=True,
+        )
+
     machines_data = load_machines()
     machines = machines_data.get("machines", {})
     all_hosts = [cfg["host"] for cfg in machines.values() if cfg.get("enabled", True)]

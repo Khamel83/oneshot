@@ -1,10 +1,15 @@
-# ONE_SHOT v14 — Orchestration Operating Contract
+# ONE_SHOT v14.5 Lite — Private Adapter Contract
 
-> Works in any project on any machine. Claude plans, workers execute, Argus searches, Janitor runs in the background.
+> OneShot Lite owns private repo/context glue. Homelab owns the machine fleet.
 
 ---
 
 ## OPERATORS
+
+`/short`, `/full`, and `/conduct` are legacy workflow wrappers during the Lite
+migration. Generic coding process should move to better-maintained external
+workflow systems. Keep OneShot-specific value in Argus, secrets, handoff,
+restore, repo source-of-truth maps, and private adapters.
 
 ### `/short` — Quick Iteration
 1. Load context: `git log -5`, TaskList, DECISIONS.md, BLOCKERS.md
@@ -20,7 +25,7 @@
 5. Context checkpoints (50% → suggest handoff, 70% → auto-handoff)
 6. Verify and show completion summary
 
-### `/conduct` — Multi-Model Orchestration
+### `/conduct` — Multi-Model Orchestration (legacy)
 1. Check available workers (see INTELLIGENCE TIERS below)
 2. Ask clarifying questions — BLOCKING, nothing runs until answered
 3. Classify each task by task class + category
@@ -73,6 +78,17 @@ classify task → pick worker from routing table → build self-contained prompt
 
 ## INTELLIGENCE TIERS & WORKER COMMANDS
 
+Fleet installation, SSH/Tailscale reachability, cron, repo sync, shell setup,
+and CLI/auth readiness are owned by `~/github/homelab`.
+
+```bash
+make -C ~/github/homelab doctor-dev-tools
+make -C ~/github/homelab doctor-dev-tools-local
+```
+
+Use OneShot worker routing only for coding-session adapter decisions, not as a
+second machine inventory.
+
 | Worker | Cost | How to invoke |
 |---|---|---|
 | `glm_claude` | Free (ZAI plan, check expiry) | `zai` — full Claude Code session via GLM-5-turbo |
@@ -83,7 +99,7 @@ classify task → pick worker from routing table → build self-contained prompt
 
 **glm_claude expiry:** Check `config/workers.yaml → plan_expires` in the oneshot project. After expiry, `zai` falls back to OpenRouter via the `shot` command.
 
-**SSH dispatch** (run worker on a specific machine):
+**SSH dispatch** (legacy examples only; fleet truth lives in homelab):
 ```bash
 ssh oci-ts "cd ~/github/PROJECT && unset OPENAI_API_KEY && codex exec --sandbox danger-full-access 'prompt'"
 ssh macmini-ts "cd ~/github/PROJECT && gemini 'prompt'"

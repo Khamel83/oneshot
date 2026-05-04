@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Systematic debugging with 4 mandatory phases. Use when fixing bugs, investigating errors, or troubleshooting unexpected behavior. DO NOT skip to the fix — investigate first. Trigger keywords: bug, error, broken, not working, crash, failing, debug, investigate, troubleshoot, wrong output, unexpected behavior, regression.
+description: "Systematic debugging with 4 mandatory phases. Use when fixing bugs, investigating errors, or troubleshooting unexpected behavior. DO NOT skip to the fix — investigate first. Trigger keywords: bug, error, broken, not working, crash, failing, debug, investigate, troubleshoot, wrong output, unexpected behavior, regression."
 ---
 
 # /debug — Systematic Debugging Protocol

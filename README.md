@@ -1,19 +1,30 @@
-# ONE_SHOT — Orchestration Control Plane for Claude Code and OpenCode
+# ONE_SHOT — Private Adapter Kit For Coding Agents
 
-**v14.3** | Claude plans. Workers execute. Argus searches. Janitor runs in the background.
+**v14.5 Lite transition** | Private context. Argus searches. Handoffs persist.
 
 ---
 
 ## What It Is
 
-ONE_SHOT is an operator framework centered on Claude Code, with OpenCode-backed delegation support in the harness layer. It combines skills, routing policies, and background intelligence into a multi-model orchestration system.
+ONE_SHOT is being reduced from a broad orchestration framework into OneShot
+Lite: a small private adapter kit for Khamel's repos.
 
-- **Claude Code** is the planner and reviewer (never the doer for bounded tasks)
-- **Codex, Gemini CLI, GLM** are the workers (parallel execution, structured output)
-- **OpenCode-backed runners** are supported through `.oneshot/config/models.yaml` and `oneshot_cli/`
-- **Lane-based routing** (`config/lanes.yaml`) drives task dispatch by class and category
-- **Argus** is the search plane (SearXNG + Brave + Exa, running on homelab)
-- **Janitor** is background intelligence ($0, always on, runs via `openrouter/free`)
+It should answer:
+
+1. What is the source of truth for this repo?
+2. Which external workflow should own this task?
+3. What private context/tooling must be injected?
+4. How do we preserve continuity across sessions?
+
+It should not own the physical developer fleet. `homelab` owns machine
+inventory, SSH/Tailscale, cron, repo sync, shell/bootstrap, and CLI/auth
+readiness for Claude Code, Codex, Gemini, and OpenCode.
+
+- **Argus** remains the private search and docs plane.
+- **Secrets** remain wrapped through SOPS/Age helpers.
+- **Handoff/restore** remains a OneShot continuity layer.
+- **Generic coding process** should move to external workflow systems such as
+  Superpowers or Matt skills.
 
 ---
 
@@ -38,22 +49,25 @@ oneshot-update force  # force now
 
 **Readiness:**
 ```bash
-./bin/oneshot doctor          # check this machine
-./bin/oneshot doctor --all-machines
+./bin/oneshot doctor          # check this local OneShot install
+make -C ~/github/homelab doctor-dev-tools  # check fleet CLI readiness
 ```
 
 ---
 
 ## Operators
 
-### `/short` — Quick Iteration
-Fast operator for existing projects. Loads context (git log, tasks, decisions), asks what you're working on, executes in burn-down mode.
+### `/short` — Deprecated Workflow Wrapper
+Legacy quick-iteration operator. During the Lite migration, generic coding
+process should be delegated to an external workflow system.
 
-### `/full` — Structured Work
-Full operator for new projects and complex refactors. Structured intake → phase-based planning → parallel dispatch → verification.
+### `/full` — Deprecated Workflow Wrapper
+Legacy structured-work operator. Keep only as a compatibility wrapper or remove
+after external workflow adapters are installed.
 
-### `/conduct` — Multi-Model Orchestration
-PMO-style orchestrator. Asks clarifying questions first (blocking). Classifies tasks by class + category → routes to lane → dispatches workers in parallel → loops until goal is fully met.
+### `/conduct` — Deprecated Workflow Wrapper
+Legacy multi-model orchestration operator. OneShot Lite should not maintain its
+own generic task graph unless a private tool requires it.
 
 ### `oneshot memory` — Repo-First Memory Primitives
 Customer-repo-facing memory commands for scaffolding and maintaining durable repo memory.
@@ -92,7 +106,8 @@ python3 -m core.router.resolve --class implement_small --category coding
 | `research` | research | research | manus, gemini_cli, codex |
 | `janitor_*` | janitor | general | free (openrouter/free) |
 
-Full config: `config/lanes.yaml`, `config/workers.yaml`
+Full config: `config/lanes.yaml`, `config/workers.yaml`. These are legacy
+routing surfaces during the Lite migration, not the target identity.
 
 ---
 
@@ -118,7 +133,13 @@ or             # force OpenRouter model
 or --code      # force Qwen3-Coder (free on OpenRouter)
 ```
 
-`oneshot doctor` checks whether the local `oc` launcher exists, but `install.sh` does not create that wrapper for you.
+`oneshot doctor` checks local OneShot/tool readiness. Fleet readiness belongs to
+`homelab`:
+
+```bash
+make -C ~/github/homelab doctor-dev-tools
+make -C ~/github/homelab doctor-dev-tools-local
+```
 
 ---
 
@@ -126,9 +147,9 @@ or --code      # force Qwen3-Coder (free on OpenRouter)
 
 | Skill | Purpose |
 |---|---|
-| `/short` | Quick iteration on existing work |
-| `/full` | New project or major refactor |
-| `/conduct` | Multi-model orchestration until done |
+| `/short` | Deprecated wrapper; delegate generic coding process upstream |
+| `/full` | Deprecated wrapper; delegate generic planning/execution upstream |
+| `/conduct` | Deprecated wrapper; avoid custom orchestration unless private glue requires it |
 | `/handoff` | Save context before `/clear` |
 | `/restore` | Resume from handoff |
 | `/research` | Background research via Argus |

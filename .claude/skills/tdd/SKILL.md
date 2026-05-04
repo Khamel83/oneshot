@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Test-driven development with mandatory RED-GREEN-REFACTOR cycle. Enforces writing failing tests before production code. Use when implementing new features, fixing bugs with test coverage, or when the user wants TDD discipline. Trigger keywords: tdd, test first, test driven, red green refactor, add tests, coverage, write a test, failing test.
+description: "Test-driven development with mandatory RED-GREEN-REFACTOR cycle. Enforces writing failing tests before production code. Use when implementing new features, fixing bugs with test coverage, or when the user wants TDD discipline. Trigger keywords: tdd, test first, test driven, red green refactor, add tests, coverage, write a test, failing test."
 ---
 
 # /tdd — Test-Driven Development
