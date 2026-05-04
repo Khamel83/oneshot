@@ -28,11 +28,13 @@ GLM_MODEL="glm-5-turbo"          # Update when z.ai releases new version
 SHELL_TYPE="${SHELL_TYPE:-bash}" # bash or zsh - auto-detected by --install
 # ══════════════════════════════════════════════════════════════════
 
-# Auto-detect shell type
-if [[ -n "${ZSH_VERSION:-}" ]]; then
-	SHELL_TYPE="zsh"
-elif [[ -n "${BASH_VERSION:-}" ]]; then
-	SHELL_TYPE="bash"
+# Auto-detect shell type only if not explicitly set via env
+if [[ "${SHELL_TYPE:-}" != "zsh" && "${SHELL_TYPE:-}" != "bash" ]]; then
+	if [[ -n "${ZSH_VERSION:-}" ]]; then
+		SHELL_TYPE="zsh"
+	elif [[ -n "${BASH_VERSION:-}" ]]; then
+		SHELL_TYPE="bash"
+	fi
 fi
 
 # Handle --install flag
@@ -51,11 +53,13 @@ if [[ "$1" == "--install" ]]; then
 		fi
 	fi
 
-	# Auto-detect shell if not set
-	if [[ -n "${ZSH_VERSION:-}" ]]; then
-		SHELL_TYPE="zsh"
-	elif [[ -n "${BASH_VERSION:-}" ]]; then
-		SHELL_TYPE="bash"
+	# Auto-detect shell only if SHELL_TYPE not explicitly passed via env
+	if [[ "${SHELL_TYPE:-}" != "zsh" && "${SHELL_TYPE:-}" != "bash" ]]; then
+		if [[ -n "${ZSH_VERSION:-}" ]]; then
+			SHELL_TYPE="zsh"
+		elif [[ -n "${BASH_VERSION:-}" ]]; then
+			SHELL_TYPE="bash"
+		fi
 	fi
 
 	if [[ "$SHELL_TYPE" == "zsh" ]]; then
@@ -88,12 +92,12 @@ if [[ "$1" == "--install" ]]; then
 export ZAI_API_KEY="__ZAI_API_KEY__"
 export GLM_MODEL="__GLM_MODEL__"
 
-unalias cc zai mm25 mm27 oc 2>/dev/null || true
-unset -f cc zai mm25 mm27 oc 2>/dev/null || true
+unalias cc zai mm25 mm27 oc cx gem 2>/dev/null || true
+unset -f cc zai mm25 mm27 oc cx gem 2>/dev/null || true
 
-# cc - Claude Code via Anthropic Pro (bypassPermissions via settings.json)
+# cc - Claude Code via Anthropic Pro (--dangerously-skip-permissions)
 cc() {
-    claude "$@"
+    claude --dangerously-skip-permissions "$@"
 }
 
 # zai - Claude Code via z.ai GLM API (bypassPermissions via settings.json)
@@ -121,7 +125,7 @@ mm25() {
     if command -v secrets >/dev/null 2>&1; then
         ocg_key="$(secrets get OPENCODE_GO_API_KEY 2>/dev/null || true)"
     fi
-    [[ -z "$ocg_key" ]] && { echo "mm25: OPENCODE_GO_API_KEY not in vault (secrets set opencode_go OPENCODE_GO_API_KEY=<key>)" >&2; return 1; }
+    [[ -z "$ocg_key" ]] && { echo "mm25: OPENCODE_GO_API_KEY not in vault" >&2; return 1; }
 
     echo "mm25: opencode.ai/zen/go → minimax-m2.5" >&2
     ANTHROPIC_BASE_URL="https://opencode.ai/zen/go" \
@@ -140,7 +144,7 @@ mm27() {
     if command -v secrets >/dev/null 2>&1; then
         ocg_key="$(secrets get OPENCODE_GO_API_KEY 2>/dev/null || true)"
     fi
-    [[ -z "$ocg_key" ]] && { echo "mm27: OPENCODE_GO_API_KEY not in vault (secrets set opencode_go OPENCODE_GO_API_KEY=<key>)" >&2; return 1; }
+    [[ -z "$ocg_key" ]] && { echo "mm27: OPENCODE_GO_API_KEY not in vault" >&2; return 1; }
 
     echo "mm27: opencode.ai/zen/go → minimax-m2.7" >&2
     ANTHROPIC_BASE_URL="https://opencode.ai/zen/go" \
@@ -149,22 +153,36 @@ mm27() {
         claude --dangerously-skip-permissions "$@"
 }
 
-# oc - OpenCode via ChatGPT Plus (reads ~/.codex/auth.json, defaults to gpt-5.4)
+# oc - OpenCode (opencode-go/deepseek-v4-flash, OPENCODE_GO_API_KEY from vault)
 oc() {
     if ! command -v opencode >/dev/null 2>&1; then
-        echo "oc: 'opencode' CLI not found" >&2
+        echo "oc: 'opencode' not found — install: curl -fsSL https://opencode.ai/install | bash" >&2
         return 127
     fi
+    local ocg_key
+    command -v secrets >/dev/null 2>&1 && ocg_key="$(secrets get OPENCODE_GO_API_KEY 2>/dev/null || true)"
+    [[ -z "$ocg_key" ]] && ocg_key="${OPENCODE_GO_API_KEY:-}"
+    [[ -z "$ocg_key" ]] && { echo "oc: OPENCODE_GO_API_KEY not in vault" >&2; return 1; }
+    OPENCODE_GO_API_KEY="$ocg_key" opencode --model opencode-go/deepseek-v4-flash "$@"
+}
 
-    # Read the OAuth-derived key from codex auth.json (ChatGPT Plus subscription)
-    local codex_auth="$HOME/.codex/auth.json"
-    if [[ -f "$codex_auth" ]] && command -v jq >/dev/null 2>&1; then
-        export OPENAI_API_KEY="$(jq -r '.OPENAI_API_KEY // empty' "$codex_auth" 2>/dev/null)"
+# cx - Codex (yolo mode via --sandbox danger-full-access, OAuth auth — NOT API key)
+cx() {
+    if ! command -v codex >/dev/null 2>&1; then
+        echo "cx: 'codex' not found — install: npm install -g @openai/codex" >&2
+        return 127
     fi
-    [[ -z "$OPENAI_API_KEY" ]] && { echo "oc: no OPENAI_API_KEY in ~/.codex/auth.json — run 'codex login --device-auth' first" >&2; return 1; }
+    unset OPENAI_API_KEY
+    codex --sandbox danger-full-access "$@"
+}
 
-    unset OPENAI_BASE_URL ANTHROPIC_BASE_URL
-    opencode --model openai/gpt-5.4 "$@"
+# gem - Gemini CLI (yolo mode via --yolo flag, Google OAuth auth)
+gem() {
+    if ! command -v gemini >/dev/null 2>&1; then
+        echo "gem: 'gemini' not found — install: npm install -g @google/gemini-cli" >&2
+        return 127
+    fi
+    gemini --yolo "$@"
 }
 
 # saveplan - open $EDITOR on /tmp/claude-plan.md to paste a plan
@@ -264,11 +282,13 @@ BASH_HOOK
 	fi
 
 	echo "✓ Installed to $SHELLRC"
-		echo "✓ cc   = Claude Code (Anthropic Pro)"
+		echo "✓ cc   = Claude Code (Anthropic, --dangerously-skip-permissions)"
+		echo "✓ oc   = OpenCode (opencode-go/deepseek-v4-flash, OPENCODE_GO_API_KEY)"
+		echo "✓ cx   = Codex (--sandbox danger-full-access, OAuth)"
+		echo "✓ gem  = Gemini CLI (--yolo, Google OAuth)"
 		echo "✓ zai  = Claude Code (z.ai $GLM_MODEL)"
-		echo "✓ mm25 = Claude Code (OpenCode Go → MiniMax M2.5, YOLO mode)"
-		echo "✓ mm27 = Claude Code (OpenCode Go → MiniMax M2.7, YOLO mode)"
-		echo "✓ oc   = OpenCode (ChatGPT Plus → gpt-5.4)"
+		echo "✓ mm25 = Claude Code (OpenCode Go → MiniMax M2.5)"
+		echo "✓ mm27 = Claude Code (OpenCode Go → MiniMax M2.7)"
 	echo "✓ Heartbeat: Daily health checks on project enter"
 	echo ""
 	if [[ "$SHELL_TYPE" == "zsh" ]]; then
@@ -284,12 +304,12 @@ if [[ "$ZAI_API_KEY" == "YOUR_ZAI_API_KEY_HERE" ]]; then
 	echo "WARNING: ZAI_API_KEY not set. Edit the script or set ZAI_API_KEY env var." >&2
 fi
 
-unalias cc zai mm25 mm27 oc 2>/dev/null || true
-unset -f cc zai mm25 mm27 oc 2>/dev/null || true
+unalias cc zai mm25 mm27 oc cx gem 2>/dev/null || true
+unset -f cc zai mm25 mm27 oc cx gem 2>/dev/null || true
 
-# cc - Claude Code via Anthropic Pro (bypassPermissions via settings.json)
+# cc - Claude Code via Anthropic Pro (--dangerously-skip-permissions)
 cc() {
-	claude "$@"
+	claude --dangerously-skip-permissions "$@"
 }
 
 # zai - Claude Code via z.ai GLM API (bypassPermissions via settings.json)
@@ -348,21 +368,36 @@ mm27() {
 		claude --dangerously-skip-permissions "$@"
 }
 
-# oc - OpenCode via ChatGPT Plus (reads ~/.codex/auth.json, defaults to gpt-5.4)
+# oc - OpenCode (opencode-go/deepseek-v4-flash, OPENCODE_GO_API_KEY from vault)
 oc() {
 	if ! command -v opencode >/dev/null 2>&1; then
-		echo "oc: 'opencode' CLI not found" >&2
+		echo "oc: 'opencode' not found — install: curl -fsSL https://opencode.ai/install | bash" >&2
 		return 127
 	fi
+	local ocg_key
+	command -v secrets >/dev/null 2>&1 && ocg_key="$(secrets get OPENCODE_GO_API_KEY 2>/dev/null || true)"
+	[[ -z "$ocg_key" ]] && ocg_key="${OPENCODE_GO_API_KEY:-}"
+	[[ -z "$ocg_key" ]] && { echo "oc: OPENCODE_GO_API_KEY not in vault" >&2; return 1; }
+	OPENCODE_GO_API_KEY="$ocg_key" opencode --model opencode-go/deepseek-v4-flash "$@"
+}
 
-	local codex_auth="$HOME/.codex/auth.json"
-	if [[ -f "$codex_auth" ]] && command -v jq >/dev/null 2>&1; then
-		export OPENAI_API_KEY="$(jq -r '.OPENAI_API_KEY // empty' "$codex_auth" 2>/dev/null)"
+# cx - Codex (yolo mode via --sandbox danger-full-access, OAuth auth — NOT API key)
+cx() {
+	if ! command -v codex >/dev/null 2>&1; then
+		echo "cx: 'codex' not found — install: npm install -g @openai/codex" >&2
+		return 127
 	fi
-	[[ -z "$OPENAI_API_KEY" ]] && { echo "oc: no OPENAI_API_KEY in ~/.codex/auth.json — run 'codex login --device-auth' first" >&2; return 1; }
+	unset OPENAI_API_KEY
+	codex --sandbox danger-full-access "$@"
+}
 
-	unset OPENAI_BASE_URL ANTHROPIC_BASE_URL
-	opencode --model openai/gpt-5.4 "$@"
+# gem - Gemini CLI (yolo mode via --yolo flag, Google OAuth auth)
+gem() {
+	if ! command -v gemini >/dev/null 2>&1; then
+		echo "gem: 'gemini' not found — install: npm install -g @google/gemini-cli" >&2
+		return 127
+	fi
+	gemini --yolo "$@"
 }
 
 # saveplan - open $EDITOR on /tmp/claude-plan.md to paste a plan
