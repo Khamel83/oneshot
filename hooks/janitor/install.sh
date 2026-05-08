@@ -1,23 +1,51 @@
 #!/bin/bash
-# Install janitor hooks — symlinks from this repo to ~/.claude/hooks/
-# Run once per machine: ./hooks/janitor/install.sh
+# Janitor is disabled by default.
+# This script is intentionally an uninstaller so machine updates do not
+# re-enable the global Claude hooks that generate large CLAUDE.local.md files.
+
+set -euo pipefail
 
 HOOK_DIR="$HOME/.claude/hooks"
-REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)/janitor"
-
-mkdir -p "$HOOK_DIR"
+SETTINGS_FILE="$HOME/.claude/settings.json"
 
 for hook in context session-end record pre-compact; do
-    src="$REPO_DIR/${hook}.sh"
-    dst="$HOOK_DIR/janitor-${hook}.sh"
-    if [ -L "$dst" ]; then
-        rm "$dst"
-    elif [ -f "$dst" ]; then
-        mv "$dst" "${dst}.bak"
-        echo "Backed up existing ${dst}.bak"
-    fi
-    ln -s "$src" "$dst"
-    echo "Linked: $dst -> $src"
+	dst="$HOOK_DIR/janitor-${hook}.sh"
+	if [ -e "$dst" ] || [ -L "$dst" ]; then
+		rm -f "$dst"
+		echo "Removed: $dst"
+	fi
 done
 
-echo "Done. 4 janitor hooks installed."
+if [ -f "$SETTINGS_FILE" ]; then
+	python3 - "$SETTINGS_FILE" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+data = json.loads(path.read_text())
+changed = False
+
+for event, entries in list(data.get("hooks", {}).items()):
+    for entry in entries:
+        hooks = entry.get("hooks", [])
+        kept = [
+            hook for hook in hooks
+            if "janitor-" not in hook.get("command", "")
+            and "/janitor" not in hook.get("command", "")
+        ]
+        if len(kept) != len(hooks):
+            changed = True
+        entry["hooks"] = kept
+    data["hooks"][event] = [entry for entry in entries if entry.get("hooks")]
+
+if "hooks" in data:
+    data["hooks"] = {event: entries for event, entries in data["hooks"].items() if entries}
+
+if changed:
+    path.write_text(json.dumps(data, indent=2) + "\n")
+    print(f"Removed janitor hook entries from {path}")
+PY
+fi
+
+echo "Janitor hooks are disabled."
