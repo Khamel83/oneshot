@@ -112,14 +112,6 @@ def check_opencode() -> tuple[str, str]:
     return OK, ver.split("\n")[0]
 
 
-def check_oc_launcher() -> tuple[str, str]:
-    if not _has_binary("oc"):
-        return MISSING, ""
-    r = _run("command -v oc")
-    launcher = r.stdout.strip() or "oc"
-    return OK, launcher
-
-
 def check_opencode_auth() -> tuple[str, str]:
     if not _has_binary("opencode"):
         return MISSING, ""
@@ -254,7 +246,6 @@ LOCAL_CHECKS = [
     ("git", check_git),
     ("claude", check_claude),
     ("opencode", check_opencode),
-    ("oc launcher", check_oc_launcher),
     ("opencode auth", check_opencode_auth),
     ("gemini", check_gemini),
     ("gemini auth", check_gemini_auth),
@@ -374,16 +365,6 @@ def autofix(results: list[dict]) -> list[str]:
             )
             _run("npm install -g @google/gemini-cli@latest", timeout=120)
 
-        elif name == "oc launcher" and status == MISSING:
-            local_bin = Path.home() / ".local" / "bin"
-            local_bin.mkdir(parents=True, exist_ok=True)
-            src = Path.home() / "github" / "oneshot" / "scripts" / "oc"
-            if src.exists():
-                fixes.append(f"  Symlinking oc launcher: {src} -> {local_bin / 'oc'}")
-                _run(f"ln -sf {src} {local_bin / 'oc'}")
-            else:
-                fixes.append(f"  Cannot find {src}")
-
         elif name == "codex" and status == MISSING:
             fixes.append("  Installing codex: npm install -g @openai/codex@latest")
             _run("npm install -g @openai/codex@latest", timeout=120)
@@ -473,13 +454,6 @@ if command -v opencode >/dev/null 2>&1; then
   emit opencode "OK ${VER}"
 else
   emit opencode MISSING
-fi
-
-# oc launcher
-if command -v oc >/dev/null 2>&1; then
-  emit oc_launcher "OK $(command -v oc)"
-else
-  emit oc_launcher MISSING
 fi
 
 # opencode auth
